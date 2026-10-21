@@ -315,7 +315,7 @@ class ChannelBody(BaseModel):
     drive_done_folder_id:  str  = ""
     upload_time:           str  = "09:00"
     uploads_per_day:       int  = 1
-    privacy_status:        str  = "public"
+    privacy_status:        str  = "private"
     gemini_extra_prompt:   str  = ""
     enabled:               bool = True
 
