@@ -1,6 +1,8 @@
 name: YouTube Drive Uploader
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       dry_run:
@@ -85,7 +87,7 @@ jobs:
 Çalıştırma: ${RUN_URL}"
 
       - name: Validate configuration (manual dry run)
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
         run: |
           python - <<'PY'
           from uploader import get_google_clients, load_config
