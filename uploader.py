@@ -73,7 +73,7 @@ log = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 DEFAULT_CONFIG = {
     "upload_time":          "09:00",   # HH:MM local time
-    "privacy_status":       "public",  # public | unlisted | private
+    "privacy_status":       "private",  # private by default; change explicitly when ready
     "default_category":     "22",      # fallback YouTube category ID
     "gemini_api_key":       "",        # aistudio.google.com/app/apikey
     "gemini_extra_prompt":  "",        # extra instructions for Gemini
