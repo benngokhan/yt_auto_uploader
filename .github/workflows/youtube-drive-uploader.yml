@@ -1,0 +1,97 @@
+name: YouTube Drive Uploader
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Validate configuration only; do not upload"
+        required: true
+        type: boolean
+        default: true
+  schedule:
+    - cron: "17 6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: yt-drive-uploader
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure Google credentials
+        env:
+          GOOGLE_CLIENT_SECRETS_JSON: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          DRIVE_QUEUE_FOLDER_ID: ${{ secrets.DRIVE_QUEUE_FOLDER_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          required = ["GOOGLE_CLIENT_SECRETS_JSON", "GOOGLE_TOKEN_JSON", "DRIVE_QUEUE_FOLDER_ID"]
+          missing = [k for k in required if not os.getenv(k, "").strip()]
+          if missing:
+              raise SystemExit("Missing GitHub Actions secrets: " + ", ".join(missing))
+          Path("client_secrets.json").write_text(os.environ["GOOGLE_CLIENT_SECRETS_JSON"], encoding="utf-8")
+          Path("token.json").write_text(os.environ["GOOGLE_TOKEN_JSON"], encoding="utf-8")
+          cfg = json.loads(Path("config.json").read_text(encoding="utf-8")) if Path("config.json").exists() else {}
+          cfg["drive_queue_folder_id"] = os.environ["DRIVE_QUEUE_FOLDER_ID"].strip()
+          cfg["privacy_status"] = "private"
+          if os.getenv("GEMINI_API_KEY"): cfg["gemini_api_key"] = os.environ["GEMINI_API_KEY"]
+          if os.getenv("GROQ_API_KEY"): cfg["groq_api_key"] = os.environ["GROQ_API_KEY"]
+          Path("config.json").write_text(json.dumps(cfg, indent=2), encoding="utf-8")
+          PY
+
+      - name: Validate configuration (manual dry run)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from uploader import get_google_clients, load_config
+          cfg = load_config()
+          yt, drive = get_google_clients()
+          yt.channels().list(part="id,snippet", mine=True, maxResults=1).execute()
+          drive.files().list(q=f"'{cfg['drive_queue_folder_id']}' in parents and trashed=false", pageSize=1, fields="files(id,name)").execute()
+          print("VALIDATION OK: OAuth, YouTube and Drive access succeeded. No video uploaded.")
+          PY
+
+      - name: Upload one queued video
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
+        run: python uploader.py --now
+
+      - name: Persist duplicate-prevention log
+        if: ${{ success() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)) }}
+        run: |
+          if [ -f uploaded.txt ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add uploaded.txt
+            git diff --cached --quiet || git commit -m "chore: record uploaded Drive video"
+            git push
+          fi
