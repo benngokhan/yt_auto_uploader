@@ -67,12 +67,27 @@ jobs:
           Path("config.json").write_text(json.dumps(cfg, indent=2), encoding="utf-8")
           PY
 
+      - name: Telegram start notification
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "Telegram secrets not configured; start notification skipped."
+            exit 0
+          fi
+          curl --fail --silent --show-error --max-time 15 \
+            --get "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+            --data-urlencode "text=▶️ YouTube otomasyonu başladı.
+Çalıştırma: ${RUN_URL}"
+
       - name: Validate configuration (manual dry run)
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
         run: |
           python - <<'PY'
-          import json
-          from pathlib import Path
           from uploader import get_google_clients, load_config
           cfg = load_config()
           yt, drive = get_google_clients()
@@ -95,3 +110,31 @@ jobs:
             git diff --cached --quiet || git commit -m "chore: record uploaded Drive video"
             git push
           fi
+
+      - name: Telegram result notification
+        if: ${{ always() }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          JOB_STATUS: ${{ job.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EVENT_NAME: ${{ github.event_name }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "Telegram secrets not configured; result notification skipped."
+            exit 0
+          fi
+          if [ "$JOB_STATUS" = "success" ]; then
+            STATUS_TEXT="✅ GitHub otomasyon adımları başarılı."
+          else
+            STATUS_TEXT="❌ GitHub otomasyonunda hata oluştu. Ayrıntı için çalıştırma kayıtlarını aç."
+          fi
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]; then
+            STATUS_TEXT="🧪 Bağlantı testi sonucu: $JOB_STATUS"
+          fi
+          curl --fail --silent --show-error --max-time 15 \
+            --get "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+            --data-urlencode "text=${STATUS_TEXT}
+Çalıştırma: ${RUN_URL}"
