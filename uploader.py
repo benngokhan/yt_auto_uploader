@@ -1,6 +1,6 @@
 """
 YouTube Auto Uploader — Google Drive Edition
-Flow: Drive folder → download temp → Gemini watches it → metadata → YouTube upload → move to done/ in Drive
+Flow: Drive folder + baslik.xlsx / DRIVE → match prepared metadata → YouTube upload
 """
 
 import io
@@ -455,7 +455,7 @@ def main() -> None:
     log.info(f"  Drive queue folder : {config.get('drive_queue_folder_id') or 'NOT SET'}")
     log.info(f"  Upload time        : {upload_time} (local)")
     log.info(f"  Privacy            : {config['privacy_status']}")
-    log.info(f"  AI metadata        : {'enabled' if config.get('gemini_api_key') else 'DISABLED — set gemini_api_key'}")
+    log.info("  Metadata source    : baslik.xlsx / DRIVE")
     log.info("=" * 60)
 
     log.info("Verifying Google credentials (YouTube + Drive)…")
