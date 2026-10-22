@@ -71,7 +71,7 @@ log = logging.getLogger(__name__)
 DEFAULT_CONFIG = {
     "upload_time":          "09:00",   # HH:MM local time
     "privacy_status":       "public",   # prepared metadata defaults to public unless DRIVE row overrides it
-    "default_category":     "22",      # fallback YouTube category ID
+    "default_category":     "27",      # Education category for Bilgi Dozu
     "gemini_api_key":       "",        # aistudio.google.com/app/apikey
     "gemini_extra_prompt":  "",        # extra instructions for Gemini
     "drive_queue_folder_id": "",       # Drive folder ID where your videos live
