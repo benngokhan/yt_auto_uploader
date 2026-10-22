@@ -1,10 +1,9 @@
 {
-  "upload_time": "09:00",
-  "privacy_status": "private",
-  "default_category": "22",
+  "upload_time": "19:30",
+  "privacy_status": "public",
+  "default_category": "28",
+  "drive_queue_folder_id": "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br",
+  "sheets_id": "1DTXIt8wY9fDHRYRT_Kz5GVVcGe00hDaK",
   "gemini_api_key": "",
-  "gemini_extra_prompt": "",
-  "drive_queue_folder_id": "",
-  "drive_done_folder_id": "",
   "groq_api_key": ""
 }
