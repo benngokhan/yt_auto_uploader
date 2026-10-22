@@ -91,12 +91,16 @@ jobs:
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
         run: |
           python - <<'PY'
+          from google.oauth2.credentials import Credentials
           from uploader import get_google_clients, load_config
           cfg = load_config()
-          yt, drive = get_google_clients()
-          yt.channels().list(part="id,snippet", mine=True, maxResults=1).execute()
+          creds = Credentials.from_authorized_user_file("token.json")
+          granted_scopes = set(creds.scopes or [])
+          if "https://www.googleapis.com/auth/youtube.upload" not in granted_scopes:
+              raise SystemExit("OAuth token is missing the youtube.upload scope; re-authorize with uploader.py's configured scopes.")
+          _, drive = get_google_clients()
           drive.files().list(q=f"'{cfg['drive_queue_folder_id']}' in parents and trashed=false", pageSize=1, fields="files(id,name)").execute()
-          print("VALIDATION OK: OAuth, YouTube and Drive access succeeded. No video uploaded.")
+          print("VALIDATION OK: YouTube upload scope is present and Drive access succeeded. No video uploaded.")
           PY
 
       - name: Upload one queued video
