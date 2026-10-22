@@ -68,7 +68,7 @@ jobs:
           Path("token.json").write_text(os.environ["GOOGLE_TOKEN_JSON"], encoding="utf-8")
           cfg = json.loads(Path("config.json").read_text(encoding="utf-8")) if Path("config.json").exists() else {}
           cfg["drive_queue_folder_id"] = os.environ["DRIVE_QUEUE_FOLDER_ID"].strip()
-          cfg["privacy_status"] = "private"
+          cfg["privacy_status"] = "public"
           if os.getenv("GEMINI_API_KEY"): cfg["gemini_api_key"] = os.environ["GEMINI_API_KEY"]
           if os.getenv("GROQ_API_KEY"): cfg["groq_api_key"] = os.environ["GROQ_API_KEY"]
           Path("config.json").write_text(json.dumps(cfg, indent=2), encoding="utf-8")
@@ -96,7 +96,7 @@ jobs:
         run: |
           python - <<'PY'
           from google.oauth2.credentials import Credentials
-          from uploader import get_google_clients, load_config
+          from uploader import get_google_clients, load_config, validate_metadata_workbook
           cfg = load_config()
           creds = Credentials.from_authorized_user_file("token.json")
           granted_scopes = set(creds.scopes or [])
@@ -104,7 +104,8 @@ jobs:
               raise SystemExit("OAuth token is missing the youtube.upload scope; re-authorize with uploader.py's configured scopes.")
           _, drive = get_google_clients()
           drive.files().list(q=f"'{cfg['drive_queue_folder_id']}' in parents and trashed=false", pageSize=1, fields="files(id,name)").execute()
-          print("VALIDATION OK: YouTube upload scope is present and Drive access succeeded. No video uploaded.")
+          print(validate_metadata_workbook(drive, cfg["drive_queue_folder_id"]))
+          print("VALIDATION OK: YouTube scope, Drive access, and Excel metadata workbook passed. No video uploaded.")
           PY
 
       - name: Upload one queued video
