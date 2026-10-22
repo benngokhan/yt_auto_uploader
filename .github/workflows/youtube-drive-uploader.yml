@@ -85,7 +85,7 @@ jobs:
             --get "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
             --data-urlencode "text=▶️ YouTube otomasyonu başladı.
-Çalıştırma: ${RUN_URL}"
+            Çalıştırma: ${RUN_URL}"
 
       - name: Validate configuration (manual dry run)
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
@@ -140,4 +140,4 @@ jobs:
             --get "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
             --data-urlencode "text=${STATUS_TEXT}
-Çalıştırma: ${RUN_URL}"
+            Çalıştırma: ${RUN_URL}"
