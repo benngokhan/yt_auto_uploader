@@ -7,7 +7,6 @@ import io
 import json
 import logging
 import os
-import random
 import socket
 import sys
 import tempfile
@@ -22,7 +21,6 @@ load_dotenv()
 # Give Google API calls 60 s to connect — default Windows timeout is too short for Indian ISPs
 socket.setdefaulttimeout(60)
 
-from google import genai
 from apscheduler.schedulers.blocking import BlockingScheduler
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -46,7 +44,6 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive.readonly",
 ]
 
-GEMINI_MODEL     = "gemini-2.0-flash-lite"
 DRIVE_VIDEO_MIME = "video/"  # matches all video/* MIME types
 
 # ---------------------------------------------------------------------------
@@ -73,7 +70,7 @@ log = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 DEFAULT_CONFIG = {
     "upload_time":          "09:00",   # HH:MM local time
-    "privacy_status":       "private",  # private by default; change explicitly when ready
+    "privacy_status":       "public",   # prepared metadata defaults to public unless DRIVE row overrides it
     "default_category":     "22",      # fallback YouTube category ID
     "gemini_api_key":       "",        # aistudio.google.com/app/apikey
     "gemini_extra_prompt":  "",        # extra instructions for Gemini
@@ -216,277 +213,118 @@ def download_drive_file(drive, file_id: str, dest_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Gemini — AI metadata generation
+# Excel metadata — read prepared metadata from baslik.xlsx / DRIVE
 # ---------------------------------------------------------------------------
-METADATA_PROMPT = """You are a YouTube Shorts SEO expert. Watch this short vertical video reel and generate metadata optimised for YouTube Shorts discovery.
-
-Return ONLY a valid JSON object — no markdown, no explanation, just raw JSON:
-{{
-  "title": "Compelling title ending with #Shorts — 75 characters max total",
-  "description": "2-3 punchy lines. Relevant hashtags at end: #Shorts #shortsvideo #reels",
-  "tags": ["Shorts", "shortsvideo", "reels", "tag1", "tag2"],
-  "categoryId": "24"
-}}
-
-Rules:
-- Title MUST end with #Shorts (e.g. "She Waited Her Whole Life For This #Shorts")
-- tags: always include "Shorts", "shortsvideo", "reels" plus 8-10 relevant topical tags
-- Description: 2-3 lines only — Shorts viewers scroll fast, keep it punchy, no paragraphs
-- categoryId must be exactly one of: 1, 2, 10, 15, 17, 19, 20, 22, 23, 24, 25, 26, 27, 28
-- Prefer categoryId 24 (Entertainment) or 22 (People & Blogs) for story reels
-- Title must trigger curiosity or strong emotion — make people stop mid-scroll instantly
-{extra}"""
+def _normalise_header(value) -> str:
+    import re
+    import unicodedata
+    text = unicodedata.normalize("NFKD", str(value or "")).encode("ascii", "ignore").decode("ascii").lower()
+    return re.sub(r"[^a-z0-9]+", " ", text).strip()
 
 
-def _find_ff(name: str) -> str:
-    """Find ffmpeg or ffprobe — checks PATH, then WinGet install folder."""
-    import shutil, glob as _glob
-    found = shutil.which(name)
-    if found:
-        return found
-    local = os.environ.get("LOCALAPPDATA", "")
-    pattern = os.path.join(local, "Microsoft", "WinGet", "Packages",
-                           "Gyan.FFmpeg*", "**", f"{name}.exe")
-    matches = _glob.glob(pattern, recursive=True)
-    if matches:
-        log.info(f"Found {name} at: {matches[0]}")
-        return matches[0]
-    return name  # will fail with FileNotFoundError — caught below
+def _find_column(headers: dict, aliases: list[str]):
+    for alias in aliases:
+        key = _normalise_header(alias)
+        if key in headers:
+            return headers[key]
+    return None
 
 
-def _extract_video_frames(video_path: Path, n: int = 3) -> list[Path]:
-    """Extract n evenly-spaced frames from the video using ffmpeg."""
-    import subprocess, tempfile
-    ffmpeg  = _find_ff("ffmpeg")
-    ffprobe = _find_ff("ffprobe")
-    frames  = []
-    try:
-        r = subprocess.run(
-            [ffprobe, "-v", "error", "-show_entries", "format=duration",
-             "-of", "default=noprint_wrappers=1:nokey=1", str(video_path)],
-            capture_output=True, text=True, timeout=15,
-        )
-        duration = float(r.stdout.strip())
-        for i in range(n):
-            t = duration * (i + 1) / (n + 1)
-            with tempfile.NamedTemporaryFile(suffix=f"_f{i}.jpg", delete=False) as _tf:
-                frame_path = Path(_tf.name)
-            subprocess.run(
-                [ffmpeg, "-ss", f"{t:.2f}", "-i", str(video_path),
-                 "-vframes", "1", "-vf", "scale=720:-1", "-q:v", "3",
-                 "-y", str(frame_path)],
-                capture_output=True, timeout=20,
-            )
-            if frame_path.exists() and frame_path.stat().st_size > 1000:
-                frames.append(frame_path)
-    except FileNotFoundError:
-        log.warning("ffmpeg/ffprobe not found — install ffmpeg and add to PATH.")
-    except Exception as e:
-        log.warning(f"Frame extraction failed: {e}")
-        for f in frames:
-            try: f.unlink()
-            except Exception: pass
-        return []
-    return frames
-
-
-_VISION_PROMPT = """You are a viral YouTube Shorts expert. You are looking at {n} screenshots taken from a short text-message story reel.
-
-CRITICAL — what is on screen:
-- FOREGROUND: An iPhone text message conversation (the actual content)
-- BACKGROUND: Minecraft parkour gameplay or similar gaming footage (completely ignore this)
-
-YOUR JOB:
-1. Read EVERY text message bubble you can see across all screenshots in order
-2. Understand the full story arc: who is texting whom, what drama/situation is unfolding, what is the twist or reveal
-3. Write metadata that makes someone STOP SCROLLING instantly
-
-Return ONLY a valid JSON object — no markdown, no explanation:
-{{
-  "title": "Suspenseful title based on the ACTUAL story in the texts — end with #Shorts — max 80 chars",
-  "description": "Most shocking moment from the story — make it feel like a punch.\\nYou won't believe what happens next… watch till the end.\\n👍 Like & Subscribe for daily text story reels!\\n\\n#Shorts #shortsvideo #reels #textstory #textmessage #storytime #drama #viral #fyp #foryoupage #trending #relationship #exposed",
-  "tags": ["Shorts","shortsvideo","reels","textstory","textmessage","storytime","drama","viral","fyp","foryoupage","trending","relationship","exposed","shocking","mustwatch","satisfying","cheating","betrayal","revenge","heartbreak","twist","unbelievable","realstory","textprank","iphone"],
-  "categoryId": "24"
-}}
-
-TITLE RULES (critical):
-- Base it on what ACTUALLY happens in the texts — specific, not generic
-- Use power phrases: "He Finally Admitted", "She Found The Texts", "The Truth Came Out", "Nobody Expected This", "He Didn't Know She Saw Everything"
-- Create unbearable curiosity — viewer must feel they NEED to see what happens
-- Vary the style: sometimes start with "She", "He", "They", "The", "I"
-- NEVER use generic titles like "This Story Will Shock You"
-
-DESCRIPTION RULES:
-- First line = the most jaw-dropping moment written as a statement (NO labels like "Line 1:")
-- Second line = tease the twist without revealing it (e.g. "You won't believe what he said next…")
-- Third line = "👍 Like & Subscribe for daily text story reels!" (exactly like this)
-- Then a blank line, then all hashtags
-- Do NOT write "Line 1" or "Line 2" or any labels — just write the actual text
-{extra}"""
-
-_TEXT_ONLY_PROMPT = """You are a viral YouTube Shorts expert. Generate metadata for a short vertical text-message story reel (iPhone chat bubbles over a gaming background).
-
-Return ONLY a valid JSON object:
-{{
-  "title": "Suspenseful dramatic title ending with #Shorts — max 80 chars",
-  "description": "Most shocking moment from the story — make it feel like a punch.\\nYou won't believe what happens next… watch till the end.\\n👍 Like & Subscribe for daily text story reels!\\n\\n#Shorts #shortsvideo #reels #textstory #textmessage #storytime #drama #viral #fyp #foryoupage #trending #relationship #exposed",
-  "tags": ["Shorts","shortsvideo","reels","textstory","textmessage","storytime","drama","viral","fyp","foryoupage","trending","relationship","exposed","shocking","mustwatch","satisfying","cheating","betrayal","revenge","heartbreak","twist","unbelievable","realstory","textprank","iphone"],
-  "categoryId": "24"
-}}
-
-Rules:
-- Title MUST end with #Shorts and create unbearable curiosity
-- Use power phrases like "She Found Out", "He Admitted Everything", "The Twist Nobody Saw Coming"
-- Every title must be UNIQUE — vary the angle each time
-- Make the description hook feel like a punch to the gut
-{extra}"""
-
-
-def generate_metadata_with_groq(config: dict, video_path: Path = None) -> dict | None:
-    """Generate metadata using Groq vision (reads actual iPhone chat frames) or text fallback."""
-    import base64
-    api_key = config.get("groq_api_key", "").strip()
-    if not api_key:
-        return None
-    try:
-        from groq import Groq
-    except ImportError:
-        log.error("groq not installed — run: pip install groq")
-        return None
-
-    client = Groq(api_key=api_key)
-    extra  = config.get("gemini_extra_prompt", "").strip()
-    extra_line = f"\nExtra instructions: {extra}" if extra else ""
-
-    # ── Vision mode: extract frames and let Groq read the actual texts ──
-    if video_path and video_path.exists():
-        frames = _extract_video_frames(video_path)
-        if frames:
-            log.info(f"Sending {len(frames)} video frames to Groq Vision…")
-            image_parts = []
-            for fp in frames:
-                try:
-                    b64 = base64.b64encode(fp.read_bytes()).decode()
-                    image_parts.append({
-                        "type":      "image_url",
-                        "image_url": {"url": f"data:image/jpeg;base64,{b64}"},
-                    })
-                finally:
-                    try: fp.unlink()
-                    except Exception: pass
-
-            prompt = _VISION_PROMPT.format(n=len(image_parts), extra=extra_line)
-            messages = [{"role": "user", "content": image_parts + [{"type": "text", "text": prompt}]}]
-            model    = "meta-llama/llama-4-scout-17b-16e-instruct"
-
-            try:
-                response = client.chat.completions.create(
-                    model=model, messages=messages, temperature=0.9, max_tokens=1024,
-                )
-                return _parse_groq_response(response.choices[0].message.content)
-            except Exception as e:
-                log.warning(f"Groq Vision failed ({e}) — falling back to text mode…")
-
-    # ── Text-only fallback ──
-    log.info("Generating metadata with Groq AI (text mode)…")
-    prompt = _TEXT_ONLY_PROMPT.format(extra=extra_line)
-    try:
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"},
-            temperature=0.95,
-        )
-        return _parse_groq_response(response.choices[0].message.content)
-    except Exception as e:
-        log.error(f"Groq error: {e}")
-        return None
-
-
-def _parse_groq_response(raw: str) -> dict | None:
-    raw = raw.strip()
-    if raw.startswith("```"):
-        parts = raw.split("```")
-        raw   = parts[1][4:].strip() if parts[1].startswith("json") else parts[1].strip()
-    try:
-        metadata = json.loads(raw)
-        log.info(f"  Title    : {metadata.get('title', '???')}")
-        log.info(f"  Category : {metadata.get('categoryId', '???')}")
-        log.info(f"  Tags ({len(metadata.get('tags', []))}): {metadata.get('tags', [])}")
-        return metadata
-    except json.JSONDecodeError as e:
-        log.error(f"Groq returned invalid JSON: {e}\n{raw[:300]}")
-        return None
-
-
-def generate_metadata_with_gemini(video_path: Path, config: dict) -> dict | None:
-    api_key = config.get("gemini_api_key") or os.getenv("GEMINI_API_KEY", "")
-    if not api_key:
-        log.warning("No Gemini API key — skipping AI metadata.")
-        return None
-
-    client = genai.Client(api_key=api_key)
-    extra  = config.get("gemini_extra_prompt", "").strip()
-
-    # ── Text-only generation (no video upload — works on all free tier regions) ──
-    text_prompt = (
-        "You are a YouTube Shorts SEO expert. Generate viral metadata for a short vertical "
-        "text-message story reel video.\n\n"
-        "Return ONLY a valid JSON object — no markdown, no explanation:\n"
-        "{{\n"
-        '  "title": "Compelling dramatic title ending with #Shorts — 75 chars max",\n'
-        '  "description": "2-3 punchy lines. End with: #Shorts #shortsvideo #reels #textstory",\n'
-        '  "tags": ["Shorts","shortsvideo","reels","textstory","storytime","textmessage","viralshorts","drama"],\n'
-        '  "categoryId": "24"\n'
-        "}}\n\n"
-        "Rules:\n"
-        "- Title MUST end with #Shorts\n"
-        "- Make it dramatic, emotional, curiosity-driven — stop-the-scroll energy\n"
-        "- Category 24 (Entertainment) for story reels\n"
-        f"{('- Additional: ' + extra) if extra else ''}"
-    )
-
-    log.info("Generating metadata with Gemini (text mode)…")
-    raw = None
-    for attempt in range(3):
-        try:
-            response = client.models.generate_content(
-                model=GEMINI_MODEL,
-                contents=text_prompt,
-            )
-            raw = response.text.strip()
+def _find_metadata_workbook(drive, queue_folder: str) -> dict:
+    files, page_token = [], None
+    while True:
+        kwargs = {"q": "name = 'baslik.xlsx' and trashed = false", "pageSize": 100,
+                  "fields": "nextPageToken,files(id,name,parents,modifiedTime,mimeType)"}
+        if page_token:
+            kwargs["pageToken"] = page_token
+        result = drive.files().list(**kwargs).execute()
+        files.extend(result.get("files", []))
+        page_token = result.get("nextPageToken")
+        if not page_token:
             break
-        except Exception as gen_err:
-            err_str = str(gen_err)
-            if "RESOURCE_EXHAUSTED" in err_str or "429" in err_str or "quota" in err_str.lower():
-                wait = 90 * (attempt + 1)
-                log.warning(f"Gemini quota hit — waiting {wait}s before retry ({attempt + 1}/3)…")
-                time.sleep(wait)
-            else:
-                log.error(f"Gemini error: {gen_err}")
-                return None
-    if raw is None:
-        log.error("Gemini failed after 3 retries.")
-        return None
+    in_queue = [f for f in files if queue_folder in f.get("parents", [])]
+    if len(in_queue) == 1:
+        return in_queue[0]
+    if len(in_queue) > 1:
+        raise RuntimeError("Video klasöründe birden fazla baslik.xlsx bulundu; yükleme durduruldu.")
+    if len(files) == 1:
+        return files[0]
+    if not files:
+        raise RuntimeError("Google Drive'da baslik.xlsx bulunamadı; yükleme durduruldu.")
+    raise RuntimeError("Birden fazla baslik.xlsx bulundu; doğru tabloyu seçmek için dosyayı video klasörüne koy.")
 
-    # Strip markdown code fences if Gemini wrapped the JSON
-    if raw.startswith("```"):
-        parts = raw.split("```")
-        raw   = parts[1] if len(parts) > 1 else parts[0]
-        if raw.startswith("json"):
-            raw = raw[4:]
-        raw = raw.strip()
 
+def _load_metadata_rows(drive, queue_folder: str):
+    from openpyxl import load_workbook
+    workbook_file = _find_metadata_workbook(drive, queue_folder)
+    with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as temp:
+        workbook_path = Path(temp.name)
     try:
-        metadata = json.loads(raw)
-    except json.JSONDecodeError as e:
-        log.error(f"Gemini returned invalid JSON: {e}\nOutput: {raw[:500]}")
-        return None
+        download_drive_file(drive, workbook_file["id"], workbook_path)
+        workbook = load_workbook(workbook_path, read_only=True, data_only=True)
+        try:
+            sheet = next((ws for ws in workbook.worksheets if ws.title.strip().casefold() == "drive"), None)
+            if sheet is None:
+                raise RuntimeError("baslik.xlsx içinde 'DRIVE' sekmesi bulunamadı.")
+            rows = list(sheet.iter_rows(values_only=True))
+            for header_index, row in enumerate(rows[:10]):
+                headers = {_normalise_header(v): i for i, v in enumerate(row) if v is not None and str(v).strip()}
+                title_col = _find_column(headers, ["Başlık", "Baslik", "Title", "YouTube Title", "Video Başlığı"])
+                file_col = _find_column(headers, ["Dosya Adı", "Dosya Adi", "Filename", "File Name", "Video Filename", "Video File Name", "Video Adı", "Video Adi", "Drive File Name"])
+                id_col = _find_column(headers, ["Drive File ID", "Drive ID", "File ID", "Dosya ID", "Dosya Kimliği"])
+                if title_col is not None and (file_col is not None or id_col is not None):
+                    return headers, rows[header_index + 1:], workbook_file.get("name", "baslik.xlsx")
+            raise RuntimeError("DRIVE sekmesinde başlık ve dosya adı/Drive ID sütunları bulunamadı; yükleme durduruldu.")
+        finally:
+            workbook.close()
+    finally:
+        try:
+            workbook_path.unlink()
+        except OSError:
+            pass
 
-    log.info(f"  Title    : {metadata.get('title', '???')}")
-    log.info(f"  Category : {metadata.get('categoryId', '???')}")
-    log.info(f"  Tags ({len(metadata.get('tags', []))}): {metadata.get('tags', [])}")
-    return metadata
+
+def validate_metadata_workbook(drive, queue_folder: str) -> str:
+    _, rows, workbook_name = _load_metadata_rows(drive, queue_folder)
+    count = sum(1 for row in rows if any(v is not None and str(v).strip() for v in row))
+    return f"{workbook_name}: DRIVE sekmesi ve eşleştirme sütunları doğrulandı; {count} veri satırı."
+
+
+def load_excel_metadata(drive, queue_folder: str, file_id: str, file_name: str, config: dict) -> dict:
+    headers, rows, _ = _load_metadata_rows(drive, queue_folder)
+    title_col = _find_column(headers, ["Başlık", "Baslik", "Title", "YouTube Title", "Video Başlığı"])
+    file_col = _find_column(headers, ["Dosya Adı", "Dosya Adi", "Filename", "File Name", "Video Filename", "Video File Name", "Video Adı", "Video Adi", "Drive File Name"])
+    id_col = _find_column(headers, ["Drive File ID", "Drive ID", "File ID", "Dosya ID", "Dosya Kimliği"])
+    desc_col = _find_column(headers, ["Açıklama", "Aciklama", "Description", "YouTube Description"])
+    tags_col = _find_column(headers, ["Etiketler", "Etiket", "Tags", "Hashtags"])
+    category_col = _find_column(headers, ["Kategori ID", "Category ID", "Category", "Kategori"])
+    privacy_col = _find_column(headers, ["Gizlilik", "Privacy", "Privacy Status", "Visibility", "Görünürlük"])
+    selected = None
+    for row in rows:
+        row_file = str(row[file_col]).strip() if file_col is not None and file_col < len(row) and row[file_col] is not None else ""
+        row_id = str(row[id_col]).strip() if id_col is not None and id_col < len(row) and row[id_col] is not None else ""
+        if (row_id == file_id and row_id) or (row_file.casefold() == file_name.casefold() and row_file):
+            selected = row
+            break
+    if selected is None:
+        raise RuntimeError(f"baslik.xlsx / DRIVE sekmesinde '{file_name}' eşleşmesi yok; video yüklenmedi.")
+    def cell(column, default=""):
+        return selected[column] if column is not None and column < len(selected) and selected[column] is not None else default
+    title = str(cell(title_col)).strip()
+    if not title:
+        raise RuntimeError(f"baslik.xlsx içinde '{file_name}' başlığı boş; video yüklenmedi.")
+    raw_tags = str(cell(tags_col)).strip()
+    tags = [t.strip().lstrip("#") for t in raw_tags.replace(";", ",").replace("\n", ",").split(",") if t.strip()]
+    privacy_raw = str(cell(privacy_col, config.get("privacy_status", "public"))).strip().lower()
+    privacy_map = {"public":"public", "herkese açık":"public", "herkese acik":"public", "acik":"public",
+                   "unlisted":"unlisted", "liste dışı":"unlisted", "liste disi":"unlisted",
+                   "private":"private", "gizli":"private"}
+    privacy = privacy_map.get(privacy_raw, config.get("privacy_status", "public"))
+    if privacy not in {"public", "unlisted", "private"}:
+        privacy = "public"
+    category = str(cell(category_col, config.get("default_category", "27"))).strip() or str(config.get("default_category", "27"))
+    return {"title":title, "description":str(cell(desc_col)).strip(), "tags":tags,
+            "categoryId":category, "privacyStatus":privacy}
 
 
 # ---------------------------------------------------------------------------
@@ -522,31 +360,6 @@ def upload_to_youtube(youtube, video_path: Path, meta: dict) -> dict:
         if status:
             log.info(f"  YouTube upload: {int(status.progress() * 100)}%")
     return response
-
-
-# ---------------------------------------------------------------------------
-# Fallback title when Gemini is unavailable
-# ---------------------------------------------------------------------------
-_FALLBACK_TITLES = [
-    "This Story Will Break Your Heart #Shorts",
-    "You Won't Believe How This Ended #Shorts",
-    "The Truth Finally Came Out #Shorts",
-    "She Had No Idea What Was Coming #Shorts",
-    "Nobody Saw This Coming #Shorts",
-    "The Most Unexpected Ending #Shorts",
-    "He Thought He Could Hide It #Shorts",
-    "This Changed Everything #Shorts",
-    "Wait For The Twist #Shorts",
-    "The Message That Said It All #Shorts",
-    "She Finally Found Out The Truth #Shorts",
-    "This Is Why You Should Always Check #Shorts",
-    "The Text That Ruined Everything #Shorts",
-    "I Can't Believe This Happened #Shorts",
-    "The Secret Was Out #Shorts",
-]
-
-def _fallback_title(file_name: str) -> str:
-    return random.choice(_FALLBACK_TITLES)
 
 
 # ---------------------------------------------------------------------------
@@ -595,31 +408,8 @@ def upload_job(channel_config: dict = None, publish_at=None) -> "dict | None":
         download_drive_file(drive, file_id, tmp_path)
         log.info("Download complete.")
 
-        # Try Groq first (reads actual video frames), fall back to Gemini text-only
-        ai_meta = generate_metadata_with_groq(config, video_path=tmp_path) or generate_metadata_with_gemini(tmp_path, config)
-
-        if ai_meta:
-            title = ai_meta.get("title", Path(file_name).stem)
-            # Safety net: always include #Shorts for YouTube Shorts detection
-            if "#shorts" not in title.lower() and len(title) + 8 <= 100:
-                title += " #Shorts"
-            meta = {
-                "title":         title,
-                "description":   ai_meta.get("description", ""),
-                "tags":          ai_meta.get("tags", []),
-                "categoryId":    ai_meta.get("categoryId", config["default_category"]),
-                "privacyStatus": config["privacy_status"],
-            }
-        else:
-            log.warning("No AI metadata — using smart fallback title.")
-            meta = {
-                "title":         _fallback_title(file_name),
-                "description":   "Follow for more text story reels every day! #Shorts #shortsvideo #reels #textstory",
-                "tags":          ["Shorts", "shortsvideo", "reels", "textstory", "storytime", "textmessage", "viralshorts"],
-                "categoryId":    "24",
-                "privacyStatus": config["privacy_status"],
-            }
-
+        # Use the prepared Excel row; never invent fallback metadata.
+        meta = load_excel_metadata(drive, queue_folder, file_id, file_name, config)
         log.info(f"  Title   : {meta['title']}")
         log.info(f"  Privacy : {meta['privacyStatus']}")
 
