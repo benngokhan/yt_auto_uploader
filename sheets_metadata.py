@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Bilgi Dozu (@bilgidozuofficial) — Google Drive & Excel (DRIVE Sekmesi) Metadata Eşleştirici
-- Shorts kuyruğu kesin olarak video_20.mp4'ten başlar (video_1..video_19 korumalıdır).
+- Shorts kuyruğu kesin olarak video_31.mp4'ten başlar (video_1..video_30 korumalıdır).
 - 'short' (video_XX.mp4) ve 'long' (uzun_video_XX.mp4) ayrımını destekler.
 """
 
@@ -25,7 +25,7 @@ log = logging.getLogger(__name__)
 
 DEFAULT_DRIVE_FOLDER_ID = "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br"
 DEFAULT_SHEETS_ID = "1DTXIt8wY9fDHRYRT_Kz5GVVcGe00hDaK"
-MIN_SHORTS_NUMBER = 20  # 1..19 tamamlandı, 20'den başlar
+MIN_SHORTS_NUMBER = 31  # 1..30 kilitli/atlandı, Shorts video_31.mp4'ten başlar
 
 CATEGORY_MAP = {
     "uzay ve astronomi": "28",

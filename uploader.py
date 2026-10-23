@@ -2,7 +2,7 @@
 """
 Bilgi Dozu (@bilgidozuofficial) — YouTube Otomatik Video & Shorts Yükleyici
 Prime Time Takvimi (Türkiye Saati UTC+3):
-  - 14:00 TR -> 1. Shorts (video_20.mp4 ve sonrası)
+  - 14:00 TR -> 1. Shorts (video_31.mp4 ve sonrası)
   - 18:00 TR -> 2. Shorts
   - 21:00 TR -> Normal gün 3. Shorts | 1 gün arayla (çift günler) 1 Uzun Video (uzun_video_3.mp4 ve sonrası)
 Özellikler:
@@ -135,7 +135,7 @@ def validate_metadata_workbook(drive, queue_folder: str) -> str:
     ready_shorts = sum(1 for r in records.values() if r.get("is_ready") and not r.get("is_long"))
     ready_longs = sum(1 for r in records.values() if r.get("is_ready") and r.get("is_long"))
     return (
-        f"bilgidozu_yukleme_tablosu.xlsx: DRIVE sekmesi doğrulandı (video_20+ başlangıç kilidi aktif); "
+        f"bilgidozu_yukleme_tablosu.xlsx: DRIVE sekmesi doğrulandı (video_31+ başlangıç kilidi aktif); "
         f"{ready_shorts} hazır Shorts, {ready_longs} hazır Uzun Video."
     )
 
@@ -360,7 +360,7 @@ def upload_job(
 
     youtube, drive = get_google_clients(token_file=token_file)
     skip_ids = load_uploaded_ids(list_path)
-    log.info(f"Atlanan/Tamamlanan kayıt sayısı: {len(skip_ids)} (+ video_1..19 kilidi)")
+    log.info(f"Atlanan/Tamamlanan kayıt sayısı: {len(skip_ids)} (+ video_1..30 kilidi)")
 
     # Otomatik cron (schedule) çalışmasında son 90 dk içinde zaten yükleme yapıldıysa üst üste 2. videoyu atma:
     if not dry_run and os.getenv("GITHUB_EVENT_NAME") == "schedule" and list_path.exists():
