@@ -274,18 +274,6 @@ def build_telegram_report(
     studio_comments_url = f"https://studio.youtube.com/video/{vid_id}/comments"
     community_url = "https://www.youtube.com/@bilgidozuofficial/community"
 
-    if comment_ok:
-        comment_header = "✅ <b>Sabit Yorum Otomatik Yazıldı!</b> <i>(Alttaki butondan tek tıkla sabitle)</i>"
-    else:
-        comment_header = "📌 <b>SABİT YORUM</b> <i>(Metne 1 kez dokun kopyalanır):</i>"
-
-    community_post = (
-        f"🔥 {clean_title}\n\n"
-        f"💬 {pinned}\n\n"
-        f"👇 Hemen izle ve fikrini yaz:\n{yt_url}"
-    )
-
-    # Calculate remaining ready stock from table
     try:
         all_recs = load_table_from_drive_or_local(None, DEFAULT_DRIVE_FOLDER_ID)
         done_ids = load_uploaded_ids(BASE_DIR / "uploaded.txt")
@@ -302,11 +290,17 @@ def build_telegram_report(
     except Exception:
         stock_line = ""
 
-    reels_tiktok_caption = (
-        f"{clean_title}\n\n"
-        f"💬 {pinned}\n\n"
-        f"Daha fazlası için @bilgidozuofficial takip et! 🔔\n"
-        f"#bilgidozu #bilim #ilginçbilgiler #keşfet #reels #shorts"
+    if comment_ok:
+        comment_header = "✅ <b>SABİT YORUM (Otomatik Atıldı · Sabitle):</b>"
+    else:
+        comment_header = "📌 <b>SABİT YORUM (1 Kez Dokun Kopyala):</b>"
+
+    # Single-block community post without double-newline split so 1 tap copies the entire text + link together!
+    community_post = (
+        f"🔥 {clean_title}\n"
+        f"💬 {pinned}\n"
+        f"👇 Hemen izle ve fikrini yaz:\n"
+        f"{yt_url}"
     )
 
     msg_html = (
@@ -316,11 +310,9 @@ def build_telegram_report(
         f"📂 <code>{_html.escape(file_name)}</code> · <b>{vtype_label}</b>\n"
         f"{stock_line}"
         f"{comment_header}\n"
-        f"<code>{_html.escape(pinned)}</code>\n\n"
-        f"📢 <b>YOUTUBE GÖNDERİLER METNİ</b> <i>(Dokun Kopyala):</i>\n"
-        f"<code>{_html.escape(community_post)}</code>\n\n"
-        f"📲 <b>REELS & TIKTOK AÇIKLAMASI</b> <i>(Dokun Kopyala):</i>\n"
-        f"<code>{_html.escape(reels_tiktok_caption)}</code>"
+        f"<pre>{_html.escape(pinned)}</pre>\n\n"
+        f"📢 <b>YOUTUBE GÖNDERİLER METNİ (1 Kez Dokun Tamamı Kopyalanır):</b>\n"
+        f"<pre>{_html.escape(community_post)}</pre>"
     )
 
     payload = {
@@ -329,6 +321,10 @@ def build_telegram_report(
         "disable_web_page_preview": True,
         "reply_markup": {
             "inline_keyboard": [
+                [
+                    {"text": "📋 Sabit Yorumu Kopyala", "copy_text": {"text": pinned}},
+                    {"text": "📋 Gönderi Metnini Kopyala", "copy_text": {"text": community_post}},
+                ],
                 [
                     {"text": "▶️ Videoyu İzle", "url": yt_url},
                     {"text": "📌 Yorumu Sabitle", "url": studio_comments_url},
