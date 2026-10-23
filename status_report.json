@@ -1,17 +1,17 @@
 {
-  "updated_at": "2026-10-23 21:20",
+  "updated_at": "2026-10-23 21:24",
   "updated_at_iso": "2026-10-23T21:20:42.539764+03:00",
   "overall_status": "ok",
   "overall_label": "Her şey çalışıyor",
   "summary": {
     "total_views": 33457,
     "subscribers": 43,
-    "total_videos_published": 54,
-    "weekly_uploaded": 25,
+    "total_videos_published": 55,
+    "weekly_uploaded": 26,
     "total_comments": 32,
     "total_likes": 491,
     "failed_jobs": 0,
-    "stock_shorts": 58,
+    "stock_shorts": 57,
     "stock_long": 10
   },
   "workers": [
@@ -20,9 +20,9 @@
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-23 18:29",
-      "jobs_done": 58,
-      "last_action": "video_32.mp4 yayınlandı (https://youtu.be/mANNR6Tf21o)",
+      "updated_at": "2026-10-23 21:24",
+      "jobs_done": 55,
+      "last_action": "video_33.mp4 yayınlandı (https://youtu.be/sh9zYFybcHY) · Telegram son bildirim: 21:24",
       "error_message": ""
     },
     {
@@ -50,9 +50,9 @@
       "name": "Telegram bildirim işçisi",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-23 18:29",
-      "jobs_done": 22,
-      "last_action": "video_32.mp4 yayın kartı ve sabit yorum metni gönderildi",
+      "updated_at": "2026-10-23 21:24",
+      "jobs_done": 23,
+      "last_action": "video_33.mp4 yayın kartı gönderildi · Telegram son bildirim: 21:24",
       "error_message": ""
     }
   ],
@@ -83,6 +83,16 @@
     }
   ],
   "videos": [
+    {
+      "id": "sh9zYFybcHY",
+      "url": "https://youtu.be/sh9zYFybcHY",
+      "title": "Kendini Neden Gıdıklayamazsın? Beynin Hamleni Önceden Biliyor! 🧠🤭 #bilgidozu #shorts",
+      "publishedAt": "2026-10-23T18:24:45Z",
+      "views": 12,
+      "likes": 2,
+      "comments": 1,
+      "privacy": "public"
+    },
     {
       "id": "mANNR6Tf21o",
       "url": "https://youtu.be/mANNR6Tf21o",
