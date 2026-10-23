@@ -285,15 +285,42 @@ def build_telegram_report(
         f"👇 Hemen izle ve fikrini yaz:\n{yt_url}"
     )
 
+    # Calculate remaining ready stock from table
+    try:
+        all_recs = load_table_from_drive_or_local(None, DEFAULT_DRIVE_FOLDER_ID)
+        done_ids = load_uploaded_ids(BASE_DIR / "uploaded.txt")
+        rem_shorts = sum(
+            1 for k, r in all_recs.items()
+            if r.get("is_ready") and not r.get("is_long") and k not in done_ids and k != file_name
+        )
+        rem_longs = sum(
+            1 for k, r in all_recs.items()
+            if r.get("is_ready") and r.get("is_long") and k not in done_ids and k != file_name
+        )
+        days_left = round((rem_shorts + rem_longs) / 3, 1)
+        stock_line = f"📦 <b>Kalan Stok:</b> <code>{rem_shorts} Shorts · {rem_longs} Uzun (~{days_left} Gün)</code>\n\n"
+    except Exception:
+        stock_line = ""
+
+    reels_tiktok_caption = (
+        f"{clean_title}\n\n"
+        f"💬 {pinned}\n\n"
+        f"Daha fazlası için @bilgidozuofficial takip et! 🔔\n"
+        f"#bilgidozu #bilim #ilginçbilgiler #keşfet #reels #shorts"
+    )
+
     msg_html = (
         f"🟢 <b>BİLGİ DOZU · YENİ VİDEO YAYINDA!</b>\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
         f"🎬 <b>{_html.escape(clean_title)}</b>\n"
-        f"📂 <code>{_html.escape(file_name)}</code> · <b>{vtype_label}</b>\n\n"
+        f"📂 <code>{_html.escape(file_name)}</code> · <b>{vtype_label}</b>\n"
+        f"{stock_line}"
         f"{comment_header}\n"
         f"<code>{_html.escape(pinned)}</code>\n\n"
         f"📢 <b>YOUTUBE GÖNDERİLER METNİ</b> <i>(Dokun Kopyala):</i>\n"
-        f"<code>{_html.escape(community_post)}</code>"
+        f"<code>{_html.escape(community_post)}</code>\n\n"
+        f"📲 <b>REELS & TIKTOK AÇIKLAMASI</b> <i>(Dokun Kopyala):</i>\n"
+        f"<code>{_html.escape(reels_tiktok_caption)}</code>"
     )
 
     payload = {
