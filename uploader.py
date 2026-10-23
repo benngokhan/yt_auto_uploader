@@ -335,10 +335,11 @@ def build_telegram_report(
             ]
         },
     }
-    (BASE_DIR / "last_upload_payload.json").write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    if "Önizleme" not in str(file_name) and os.getenv("GITHUB_EVENT_NAME") != "push":
+        (BASE_DIR / "last_upload_payload.json").write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
     return msg_html
 
 
