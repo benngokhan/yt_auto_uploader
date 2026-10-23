@@ -266,22 +266,18 @@ def build_telegram_report(
     meta: dict,
     comment_ok: bool,
 ) -> str:
-    clean_title = meta["title"].replace("#bilgidozu", "").replace("#shorts", "").strip()
+    import html as _html
+    raw_title = meta.get("title", "")
+    clean_title = raw_title.replace("#bilgidozu", "").replace("#shorts", "").strip()
     pinned = (meta.get("pinned_comment") or "").strip()
+    vtype_label = "Uzun Video 🎬" if file_name.lower().startswith("uzun_") else "Shorts 📱"
     studio_comments_url = f"https://studio.youtube.com/video/{vid_id}/comments"
+    community_url = "https://www.youtube.com/@bilgidozuofficial/community"
 
     if comment_ok:
-        comment_status = (
-            f"✅ YORUM OTOMATİK ATILDI!\n"
-            f"📌 Hemen Sabitlemek İçin Tıkla: {studio_comments_url}\n"
-            f"💬 Atılan Yorum: {pinned}"
-        )
+        comment_header = "✅ <b>Sabit Yorum Otomatik Yazıldı!</b> <i>(Alttaki butondan tek tıkla sabitle)</i>"
     else:
-        comment_status = (
-            f"⚠️ Yorumu Sabitlemek İçin Kopyala (Token'da force-ssl izni kapalı):\n"
-            f"💬 {pinned}\n"
-            f"📌 Yorumlar Ekranı: {studio_comments_url}"
-        )
+        comment_header = "📌 <b>SABİT YORUM</b> <i>(Metne 1 kez dokun kopyalanır):</i>"
 
     community_post = (
         f"🔥 {clean_title}\n\n"
@@ -289,16 +285,38 @@ def build_telegram_report(
         f"👇 Hemen izle ve fikrini yaz:\n{yt_url}"
     )
 
-    return (
-        f"🎬 YENİ VİDEO YAYINDA! ({file_name})\n"
-        f"🏷 Başlık: {meta['title']}\n"
-        f"🔗 Link: {yt_url}\n\n"
-        f"{comment_status}\n\n"
-        f"📢 YOUTUBE GÖNDERİLER (TOPLULUK) PAYLAŞIM METNİ:\n"
-        f"----------------------------------------\n"
-        f"{community_post}\n"
-        f"----------------------------------------"
+    msg_html = (
+        f"🟢 <b>BİLGİ DOZU · YENİ VİDEO YAYINDA!</b>\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"🎬 <b>{_html.escape(clean_title)}</b>\n"
+        f"📂 <code>{_html.escape(file_name)}</code> · <b>{vtype_label}</b>\n\n"
+        f"{comment_header}\n"
+        f"<code>{_html.escape(pinned)}</code>\n\n"
+        f"📢 <b>YOUTUBE GÖNDERİLER METNİ</b> <i>(Dokun Kopyala):</i>\n"
+        f"<code>{_html.escape(community_post)}</code>"
     )
+
+    payload = {
+        "text": msg_html,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": True,
+        "reply_markup": {
+            "inline_keyboard": [
+                [
+                    {"text": "▶️ Videoyu İzle", "url": yt_url},
+                    {"text": "📌 Yorumu Sabitle", "url": studio_comments_url},
+                ],
+                [
+                    {"text": "📢 Gönderiler (Topluluk) Sekmesini Aç", "url": community_url},
+                ],
+            ]
+        },
+    }
+    (BASE_DIR / "last_upload_payload.json").write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    return msg_html
 
 
 def upload_job(

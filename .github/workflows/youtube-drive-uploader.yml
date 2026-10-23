@@ -78,29 +78,12 @@ jobs:
           Path("config.json").write_text(json.dumps(cfg, indent=2, ensure_ascii=False), encoding="utf-8")
           PY
 
-      - name: Telegram start notification
-        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || vars.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || vars.TELEGRAM_CHAT_ID }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
-            echo "Telegram secrets not configured; start notification skipped."
-            exit 0
-          fi
-          curl --fail --silent --show-error --max-time 15 \
-            --get "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
-            --data-urlencode "text=▶️ Bilgi Dozu Prime Time otomasyonu başladı.
-            Çalıştırma: ${RUN_URL}"
-
       - name: Validate configuration (manual dry run)
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
         run: |
           python - <<'PY'
           from google.oauth2.credentials import Credentials
-          from uploader import get_google_clients, load_config, validate_metadata_workbook
+          from uploader import get_google_clients, load_config, validate_metadata_workbook, build_telegram_report, load_excel_metadata
           cfg = load_config()
           creds = Credentials.from_authorized_user_file("token.json")
           granted_scopes = set(creds.scopes or [])
@@ -109,6 +92,9 @@ jobs:
           _, drive = get_google_clients()
           drive.files().list(q=f"'{cfg['drive_queue_folder_id']}' in parents and trashed=false", pageSize=5, fields="files(id,name)").execute()
           print(validate_metadata_workbook(drive, cfg["drive_queue_folder_id"]))
+          # Build preview payload for video_20.mp4 so manual dry-run / push shows the clean card
+          m20 = load_excel_metadata(drive, cfg["drive_queue_folder_id"], "preview", "video_20.mp4", cfg)
+          build_telegram_report("video_20.mp4 (Sıradaki Önizleme)", "nO9zzEKwYIQ", "https://www.youtube.com/@bilgidozuofficial", m20, comment_ok=False)
           print("VALIDATION OK: YouTube scope, Drive access, and Excel metadata workbook passed. No video uploaded.")
           PY
 
@@ -136,35 +122,48 @@ jobs:
             git push
           fi
 
-      - name: Telegram result notification
+      - name: Telegram VIP Bildirimi
         if: ${{ always() }}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || vars.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || vars.TELEGRAM_CHAT_ID }}
           JOB_STATUS: ${{ job.status }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          EVENT_NAME: ${{ github.event_name }}
-          DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
-            echo "Telegram secrets not configured; result notification skipped."
-            exit 0
-          fi
-          if [ "$JOB_STATUS" = "success" ] && [ -f last_upload_report.txt ]; then
-            STATUS_TEXT=$(cat last_upload_report.txt)
-          elif [ "$JOB_STATUS" = "success" ]; then
-            LAST_UPLOAD=""
-            if [ -f uploaded.txt ]; then LAST_UPLOAD=$(tail -n 1 uploaded.txt); fi
-            STATUS_TEXT="✅ Bilgi Dozu YouTube otomasyonu başarılı!
-            Son Kayıt: ${LAST_UPLOAD}"
-          else
-            STATUS_TEXT="❌ GitHub otomasyonunda hata oluştu. Ayrıntı için çalıştırma kayıtlarını aç."
-          fi
-          if [ "$EVENT_NAME" = "push" ] || ([ "$EVENT_NAME" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]); then
-            STATUS_TEXT="🧪 Bilgi Dozu Prime Time & Tablo Testi: $JOB_STATUS"
-          fi
-          curl --fail --silent --show-error --max-time 15 \
-            --get "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
-            --data-urlencode "text=${STATUS_TEXT}
-            Çalıştırma: ${RUN_URL}"
+          python - <<'PY'
+          import json, os, urllib.request
+          from pathlib import Path
+
+          token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+          chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+          if not token or not chat_id:
+              raise SystemExit(0)
+
+          status = os.getenv("JOB_STATUS", "")
+          run_url = os.getenv("RUN_URL", "")
+          payload_file = Path("last_upload_payload.json")
+
+          if status == "success" and payload_file.exists():
+              payload = json.loads(payload_file.read_text(encoding="utf-8"))
+              payload["chat_id"] = chat_id
+          elif status != "success":
+              payload = {
+                  "chat_id": chat_id,
+                  "text": f"❌ <b>Bilgi Dozu Otomasyon Уyarısı</b>\nDurum: <code>{status}</code>",
+                  "parse_mode": "HTML",
+                  "disable_web_page_preview": True,
+                  "reply_markup": {
+                      "inline_keyboard": [[{"text": "🔍 Hata Kaydını Gör", "url": run_url}]]
+                  },
+              }
+          else:
+              raise SystemExit(0)
+
+          req = urllib.request.Request(
+              f"https://api.telegram.org/bot{token}/sendMessage",
+              data=json.dumps(payload).encode("utf-8"),
+              headers={"Content-Type": "application/json; charset=utf-8"},
+              method="POST",
+          )
+          urllib.request.urlopen(req, timeout=15).read()
+          PY
