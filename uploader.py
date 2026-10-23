@@ -361,6 +361,21 @@ def upload_job(
     skip_ids = load_uploaded_ids(list_path)
     log.info(f"Atlanan/Tamamlanan kayıt sayısı: {len(skip_ids)} (+ video_1..19 kilidi)")
 
+    # Otomatik cron (schedule) çalışmasında son 90 dk içinde zaten yükleme yapıldıysa üst üste 2. videoyu atma:
+    if not dry_run and os.getenv("GITHUB_EVENT_NAME") == "schedule" and list_path.exists():
+        try:
+            lines = [ln.strip() for ln in list_path.read_text(encoding="utf-8").splitlines() if ln.strip() and not ln.strip().startswith("#")]
+            if lines:
+                last_parts = [p.strip() for p in lines[-1].split("|")]
+                if len(last_parts) >= 4:
+                    last_dt = datetime.strptime(last_parts[3], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+                    elapsed_min = (datetime.now(timezone.utc) - last_dt).total_seconds() / 60.0
+                    if 0 <= elapsed_min < 90:
+                        log.info(f"Son yükleme ({last_parts[1]}) {elapsed_min:.1f} dk önce yapıldı (<90 dk). Üst üste paylaşım olmaması için bu cron kuşağı atlanıyor.")
+                        return None
+        except Exception as e:
+            log.warning(f"Cooldown kontrolü atlandı: {e}")
+
     scheduled = get_next_scheduled_video(
         drive,
         queue_folder,
