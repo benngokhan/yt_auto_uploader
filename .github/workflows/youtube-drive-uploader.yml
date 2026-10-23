@@ -150,11 +150,11 @@ jobs:
             echo "Telegram secrets not configured; result notification skipped."
             exit 0
           fi
-          LAST_UPLOAD=""
-          if [ -f uploaded.txt ]; then
-            LAST_UPLOAD=$(tail -n 1 uploaded.txt)
-          fi
-          if [ "$JOB_STATUS" = "success" ]; then
+          if [ "$JOB_STATUS" = "success" ] && [ -f last_upload_report.txt ]; then
+            STATUS_TEXT=$(cat last_upload_report.txt)
+          elif [ "$JOB_STATUS" = "success" ]; then
+            LAST_UPLOAD=""
+            if [ -f uploaded.txt ]; then LAST_UPLOAD=$(tail -n 1 uploaded.txt); fi
             STATUS_TEXT="✅ Bilgi Dozu YouTube otomasyonu başarılı!
             Son Kayıt: ${LAST_UPLOAD}"
           else

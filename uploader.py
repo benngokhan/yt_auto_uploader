@@ -4,7 +4,10 @@ Bilgi Dozu (@bilgidozuofficial) — YouTube Otomatik Video & Shorts Yükleyici
 Prime Time Takvimi (Türkiye Saati UTC+3):
   - 14:00 TR -> 1. Shorts (video_20.mp4 ve sonrası)
   - 18:00 TR -> 2. Shorts
-  - 21:00 TR -> Normal gün 3. Shorts | 1 gün arayla (çift günler) 1 Uzun Video (uzun_video_X.mp4)
+  - 21:00 TR -> Normal gün 3. Shorts | 1 gün arayla (çift günler) 1 Uzun Video (uzun_video_3.mp4 ve sonrası)
+Özellikler:
+  - Otomatik Sabit Yorum (commentThreads.insert) + Sabitleme Bildirimi
+  - YouTube Gönderiler (Topluluk / Community Post) hazır paylaşım metni üretimi + Telegram bildirimi
 """
 
 import io
@@ -53,9 +56,11 @@ LOG_DIR = BASE_DIR / "logs"
 TOKEN_FILE = BASE_DIR / "token.json"
 SECRETS_FILE = BASE_DIR / "client_secrets.json"
 CONFIG_FILE = BASE_DIR / "config.json"
+REPORT_FILE = BASE_DIR / "last_upload_report.txt"
 
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
+    "https://www.googleapis.com/auth/youtube.force-ssl",
     "https://www.googleapis.com/auth/drive.readonly",
 ]
 
@@ -229,11 +234,11 @@ def upload_to_youtube(youtube, video_path: Path, meta: dict) -> dict:
     return response
 
 
-def post_pinned_comment(youtube, video_id: str, comment_text: str) -> bool:
+def post_pinned_comment(youtube, video_id: str, comment_text: str) -> tuple[bool, str]:
     if not comment_text or not comment_text.strip():
-        return False
+        return False, "Tabloda sabit yorum metni boş."
     try:
-        youtube.commentThreads().insert(
+        res = youtube.commentThreads().insert(
             part="snippet",
             body={
                 "snippet": {
@@ -246,11 +251,54 @@ def post_pinned_comment(youtube, video_id: str, comment_text: str) -> bool:
                 }
             },
         ).execute()
-        log.info(f"  İlk yorum başarıyla eklendi: {comment_text[:60]}...")
-        return True
+        cid = res.get("id", "")
+        log.info(f"  İlk yorum başarıyla eklendi (ID: {cid}): {comment_text[:60]}...")
+        return True, cid
     except Exception as e:
-        log.warning(f"  Yorum API uyarısı (Soru açıklamanın en üstüne de eklendi): {e}")
-        return False
+        log.warning(f"  Yorum API uyarısı: {e}")
+        return False, str(e)
+
+
+def build_telegram_report(
+    file_name: str,
+    vid_id: str,
+    yt_url: str,
+    meta: dict,
+    comment_ok: bool,
+) -> str:
+    clean_title = meta["title"].replace("#bilgidozu", "").replace("#shorts", "").strip()
+    pinned = (meta.get("pinned_comment") or "").strip()
+    studio_comments_url = f"https://studio.youtube.com/video/{vid_id}/comments"
+
+    if comment_ok:
+        comment_status = (
+            f"✅ YORUM OTOMATİK ATILDI!\n"
+            f"📌 Hemen Sabitlemek İçin Tıkla: {studio_comments_url}\n"
+            f"💬 Atılan Yorum: {pinned}"
+        )
+    else:
+        comment_status = (
+            f"⚠️ Yorumu Sabitlemek İçin Kopyala (Token'da force-ssl izni kapalı):\n"
+            f"💬 {pinned}\n"
+            f"📌 Yorumlar Ekranı: {studio_comments_url}"
+        )
+
+    community_post = (
+        f"🔥 {clean_title}\n\n"
+        f"💬 {pinned}\n\n"
+        f"👇 Hemen izle ve fikrini yaz:\n{yt_url}"
+    )
+
+    return (
+        f"🎬 YENİ VİDEO YAYINDA! ({file_name})\n"
+        f"🏷 Başlık: {meta['title']}\n"
+        f"🔗 Link: {yt_url}\n\n"
+        f"{comment_status}\n\n"
+        f"📢 YOUTUBE GÖNDERİLER (TOPLULUK) PAYLAŞIM METNİ:\n"
+        f"----------------------------------------\n"
+        f"{community_post}\n"
+        f"----------------------------------------"
+    )
 
 
 def upload_job(
@@ -320,9 +368,12 @@ def upload_job(
         yt_url = f"https://youtu.be/{vid_id}"
         log.info(f"YouTube yüklemesi tamamlandı: {yt_url}")
 
-        post_pinned_comment(youtube, vid_id, meta.get("pinned_comment", ""))
+        comment_ok, _ = post_pinned_comment(youtube, vid_id, meta.get("pinned_comment", ""))
         mark_as_uploaded(list_path, file_id, file_name, yt_url, title=meta["title"])
         update_excel_status_in_drive(drive, queue_folder, file_name, new_status="YÜKLENDİ", youtube_url=yt_url)
+
+        report_txt = build_telegram_report(file_name, vid_id, yt_url, meta, comment_ok)
+        REPORT_FILE.write_text(report_txt, encoding="utf-8")
 
         return {
             "video_id": vid_id,
@@ -330,6 +381,7 @@ def upload_job(
             "url": yt_url,
             "drive_file_id": file_id,
             "drive_file_name": file_name,
+            "comment_posted": comment_ok,
         }
     finally:
         if tmp_path.exists():
@@ -339,7 +391,6 @@ def upload_job(
 def main() -> None:
     get_google_clients()
     scheduler = BlockingScheduler()
-    # Türkiye Prime Time: 14:00 (Shorts), 18:00 (Shorts), 21:00 (Günde 3. Shorts / Gün Aşırı Uzun Video)
     scheduler.add_job(upload_job, "cron", hour=14, minute=0, kwargs={"video_type": "short"})
     scheduler.add_job(upload_job, "cron", hour=18, minute=0, kwargs={"video_type": "short"})
     scheduler.add_job(upload_job, "cron", hour=21, minute=0, kwargs={"video_type": "auto"})
