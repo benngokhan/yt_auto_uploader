@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """
 Bilgi Dozu (@bilgidozuofficial) — Google Drive & Excel (DRIVE Sekmesi) Metadata Eşleştirici
-Hem Drive içindeki bilgidozu_yukleme_tablosu.xlsx / baslik.xlsx / Google Sheets dosyasını,
-hem de repodaki yerel bilgidozu_yukleme_tablosu.xlsx yedek tablosunu destekler.
+- Shorts kuyruğu kesin olarak video_20.mp4'ten başlar (video_1..video_19 korumalıdır).
+- 'short' (video_XX.mp4) ve 'long' (uzun_video_XX.mp4) ayrımını destekler.
 """
 
 import io
 import logging
 import os
 import re
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -24,10 +25,7 @@ log = logging.getLogger(__name__)
 
 DEFAULT_DRIVE_FOLDER_ID = "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br"
 DEFAULT_SHEETS_ID = "1DTXIt8wY9fDHRYRT_Kz5GVVcGe00hDaK"
-XLSX_CANDIDATE_NAMES = (
-    "bilgidozu_yukleme_tablosu.xlsx",
-    "baslik.xlsx",
-)
+MIN_SHORTS_NUMBER = 20  # 1..19 tamamlandı, 20'den başlar
 
 CATEGORY_MAP = {
     "uzay ve astronomi": "28",
@@ -45,11 +43,44 @@ CATEGORY_MAP = {
 }
 
 
+def is_long_filename(filename: str) -> bool:
+    return os.path.basename(filename).lower().startswith("uzun_")
+
+
+def extract_video_number(filename: str) -> int:
+    nums = [int(n) for n in re.findall(r"\d+", os.path.basename(filename))]
+    return nums[0] if nums else 999999
+
+
 def natural_sort_key(filename: str) -> tuple:
     name = os.path.basename(filename).lower()
-    is_long = 1 if name.startswith("uzun_") else 0
-    nums = [int(n) for n in re.findall(r"\d+", name)]
-    return (is_long, nums[0] if nums else 999999, name)
+    is_long = 1 if is_long_filename(name) else 0
+    return (is_long, extract_video_number(name), name)
+
+
+def is_skipped_by_floor(filename: str) -> bool:
+    name = os.path.basename(filename).lower()
+    if name.startswith("video_") and extract_video_number(name) < MIN_SHORTS_NUMBER:
+        return True
+    if name in ("uzun_video_1.mp4", "uzun_video_2.mp4"):
+        return True
+    return False
+
+
+def decide_prime_time_video_type(now_tr: Optional[datetime] = None) -> str:
+    """
+    Türkiye YouTube Prime Time Takvimi (UTC+3):
+    - 14:00 TR (Öğle Kuşağı)   -> 'short' (1. Shorts)
+    - 18:00 TR (Akşamüstü)     -> 'short' (2. Shorts)
+    - 21:00 TR (Ana Prime Time)-> 1 gün arayla (çift günler) 'long' (Uzun Video), tek günler 'short' (3. Shorts)
+    """
+    tr_tz = timezone(timedelta(hours=3))
+    dt = now_tr.astimezone(tr_tz) if now_tr else datetime.now(tr_tz)
+    # 20:00 - 23:59 TR arası akşam ana Prime Time kuşağıdır
+    if dt.hour >= 20:
+        if dt.toordinal() % 2 == 0:
+            return "long"
+    return "short"
 
 
 def sanitize_title(raw_title: str, max_len: int = 100) -> str:
@@ -117,6 +148,8 @@ def parse_drive_sheet(xlsx_source) -> dict[str, dict]:
         source = str(ws.cell(r, 9).value or "").strip()
 
         full_desc = desc
+        if pinned and pinned not in full_desc:
+            full_desc = f"💬 {pinned}\n\n{full_desc}".strip()
         if source and "kaynak" not in full_desc.lower():
             full_desc = f"{full_desc}\n\n📚 Kaynak: {source}".strip()
         if hashtags and hashtags.split()[0].lower() not in full_desc.lower():
@@ -127,12 +160,15 @@ def parse_drive_sheet(xlsx_source) -> dict[str, dict]:
         cat_id = map_category_id(raw_cat)
 
         status_up = status.upper()
-        is_done = any(w in status_up for w in ("YÜKLENDİ", "YUKLENDI", "YAYINLANDI", "UPLOADED", "PUBLISHED", "TAMAM"))
+        is_done = (
+            any(w in status_up for w in ("YÜKLENDİ", "YUKLENDI", "YAYINLANDI", "UPLOADED", "PUBLISHED", "TAMAM"))
+            or is_skipped_by_floor(fname)
+        )
         has_title = bool(title)
 
         records[fname] = {
             "row": r,
-            "status": status or "BEKLEMEDE",
+            "status": "YÜKLENDİ" if is_skipped_by_floor(fname) else (status or "BEKLEMEDE"),
             "file_name": fname,
             "title": title,
             "description": full_desc,
@@ -142,6 +178,7 @@ def parse_drive_sheet(xlsx_source) -> dict[str, dict]:
             "category_name": raw_cat,
             "categoryId": cat_id,
             "source": source,
+            "is_long": is_long_filename(fname),
             "has_title": has_title,
             "is_ready": (not is_done) and has_title,
         }
@@ -153,7 +190,6 @@ def _download_workbook_bytes_from_drive(drive, folder_id: str, sheets_id: str = 
     if not drive or MediaIoBaseDownload is None:
         return None
 
-    # 1. Try finding .xlsx or Google Sheet inside the Drive folder or anywhere in Drive
     queries = []
     if folder_id:
         queries.append(
@@ -193,7 +229,6 @@ def _download_workbook_bytes_from_drive(drive, folder_id: str, sheets_id: str = 
         except Exception as e:
             log.warning(f"Drive tablo arama uyarısı ({q[:40]}...): {e}")
 
-    # 2. Try exporting DEFAULT_SHEETS_ID directly
     if sheets_id:
         for method in ("export", "get"):
             try:
@@ -223,7 +258,6 @@ def load_table_from_drive_or_local(
     sheets_id: str = DEFAULT_SHEETS_ID,
     local_fallback: Optional[Path] = None,
 ) -> dict[str, dict]:
-    # Always load bundled local table first as base, then overlay live Drive table if found!
     base_records = {}
     base_dir = Path(__file__).parent
     for candidate in [
@@ -294,34 +328,57 @@ def get_next_scheduled_video(
     skip_ids: set = None,
     sheets_id: str = DEFAULT_SHEETS_ID,
     local_xlsx: Optional[Path] = None,
+    video_type: str = "auto",
 ) -> Optional[dict]:
     skip_ids = skip_ids or set()
     table = load_table_from_drive_or_local(drive, folder_id, sheets_id=sheets_id, local_fallback=local_xlsx)
     videos = list_drive_videos(drive, folder_id) if drive else []
 
-    for v in videos:
-        vid = v["id"]
-        vname = v["name"]
-        if vid in skip_ids or vname in skip_ids:
-            continue
-        meta = table.get(vname)
-        if meta and not meta["is_ready"]:
-            continue
-        if meta:
-            return {
-                "id": vid,
-                "name": vname,
-                "size": int(v.get("size", 0)),
-                "video": v,
-                "metadata": meta,
-                "title": meta["title"],
-                "description": meta["description"],
-                "tags": meta["tags"],
-                "categoryId": meta["categoryId"],
-                "pinned_comment": meta["pinned_comment"],
-                "row": meta["row"],
-            }
-    return None
+    target_type = decide_prime_time_video_type() if video_type == "auto" else video_type
+
+    def find_candidate(want_long: Optional[bool]) -> Optional[dict]:
+        for v in videos:
+            vid = v["id"]
+            vname = v["name"]
+            if is_skipped_by_floor(vname):
+                continue
+            if vid in skip_ids or vname in skip_ids:
+                continue
+            if want_long is not None and is_long_filename(vname) != want_long:
+                continue
+            meta = table.get(vname)
+            if meta and not meta["is_ready"]:
+                continue
+            if meta:
+                return {
+                    "id": vid,
+                    "name": vname,
+                    "size": int(v.get("size", 0)),
+                    "video": v,
+                    "metadata": meta,
+                    "title": meta["title"],
+                    "description": meta["description"],
+                    "tags": meta["tags"],
+                    "categoryId": meta["categoryId"],
+                    "pinned_comment": meta["pinned_comment"],
+                    "row": meta["row"],
+                    "video_type": "long" if is_long_filename(vname) else "short",
+                }
+        return None
+
+    if target_type == "long":
+        cand = find_candidate(want_long=True)
+        if cand:
+            return cand
+        log.info("Sırada hazır uzun video bulunamadı, otomatik olarak sıradaki Shorts videosuna geçiliyor.")
+        return find_candidate(want_long=False)
+    elif target_type == "short":
+        cand = find_candidate(want_long=False)
+        if cand:
+            return cand
+        return find_candidate(want_long=True)
+    else:
+        return find_candidate(want_long=None)
 
 
 def update_excel_status_in_drive(

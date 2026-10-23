@@ -1,5 +1,7 @@
-# Bilgi Dozu — Yüklenen Videolar Kaydı
+# Bilgi Dozu — Yüklenen Videolar Kaydı (video_1..video_19 tamamlandı, Shorts video_20.mp4'ten başlar)
 # Format: drive_file_id | filename | youtube_url | uploaded_at | title
 
+LOCKED_01_16 | video_1.mp4 | https://www.youtube.com/@bilgidozuofficial | 2026-10-22 | Önceki Yüklemeler (1-16)
 1A0znEm7xmGvi2qEQKxHJ8yh0HJ-2Zrcr | video_17.mp4 | https://youtu.be/w7kJABjxyJ8 | 2026-10-22 23:52 | Everest'in 2.5 Katı Yüksekliğinde Bir Dağ Var — Ama Dünya'da Değil! 🌋🪐 #bilgidozu #shorts
 1RVrBNnteuOwbCgupFxtvL2BLeI3pmzS8 | video_18.mp4 | https://youtu.be/nO9zzEKwYIQ | 2026-10-22 23:55 | Bu Hayvanın BEYNİ YOK — Ama Görüyor, Hissediyor! ⭐🌊 #bilgidozu #shorts
+MANUAL_SKIP_19 | video_19.mp4 | https://www.youtube.com/@bilgidozuofficial | 2026-10-23 00:00 | Kullanıcı İsteğiyle 20'den Başlatma Kilidi

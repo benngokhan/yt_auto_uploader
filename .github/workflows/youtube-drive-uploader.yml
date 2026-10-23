@@ -10,8 +10,19 @@ on:
         required: true
         type: boolean
         default: false
+      video_type:
+        description: "Video türü: auto (Prime Time Takvimi) | short (Shorts) | long (Uzun Video)"
+        required: false
+        type: string
+        default: "auto"
   schedule:
-    - cron: "30 19 * * *"
+    # Türkiye Saati (UTC+3) Prime Time Kuşakları:
+    # 1) 14:00 TR (11:00 UTC) -> 1. Shorts
+    - cron: "0 11 * * *"
+    # 2) 18:00 TR (15:00 UTC) -> 2. Shorts
+    - cron: "0 15 * * *"
+    # 3) 21:00 TR (18:00 UTC) -> Normal gün 3. Shorts | 1 gün arayla (çift günler) 1 Uzun Video
+    - cron: "0 18 * * *"
 
 permissions:
   actions: read
@@ -81,7 +92,7 @@ jobs:
           curl --fail --silent --show-error --max-time 15 \
             --get "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
-            --data-urlencode "text=▶️ Bilgi Dozu YouTube otomasyonu başladı.
+            --data-urlencode "text=▶️ Bilgi Dozu Prime Time otomasyonu başladı.
             Çalıştırma: ${RUN_URL}"
 
       - name: Validate configuration (manual dry run)
@@ -101,9 +112,18 @@ jobs:
           print("VALIDATION OK: YouTube scope, Drive access, and Excel metadata workbook passed. No video uploaded.")
           PY
 
-      - name: Upload one queued video
+      - name: Upload one queued video (Prime Time Schedule)
         if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
-        run: python uploader.py --now
+        env:
+          INPUT_VIDEO_TYPE: ${{ inputs.video_type || 'auto' }}
+        run: |
+          if [ "$INPUT_VIDEO_TYPE" = "short" ]; then
+            python uploader.py --now --short
+          elif [ "$INPUT_VIDEO_TYPE" = "long" ]; then
+            python uploader.py --now --long
+          else
+            python uploader.py --now
+          fi
 
       - name: Persist duplicate-prevention log
         if: ${{ success() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)) }}
@@ -141,7 +161,7 @@ jobs:
             STATUS_TEXT="❌ GitHub otomasyonunda hata oluştu. Ayrıntı için çalıştırma kayıtlarını aç."
           fi
           if [ "$EVENT_NAME" = "push" ] || ([ "$EVENT_NAME" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]); then
-            STATUS_TEXT="🧪 Bilgi Dozu Tablo & Drive Bağlantı Testi: $JOB_STATUS"
+            STATUS_TEXT="🧪 Bilgi Dozu Prime Time & Tablo Testi: $JOB_STATUS"
           fi
           curl --fail --silent --show-error --max-time 15 \
             --get "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
