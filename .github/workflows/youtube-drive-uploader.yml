@@ -117,7 +117,7 @@ jobs:
           if [ -f uploaded.txt ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add uploaded.txt
+            git add uploaded.txt status_report.json bilgidozu_yukleme_tablosu.xlsx baslik.xlsx
             git diff --cached --quiet || git commit -m "chore: record uploaded Bilgi Dozu video"
             git push
           fi
