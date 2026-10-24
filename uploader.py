@@ -61,7 +61,8 @@ REPORT_FILE = BASE_DIR / "last_upload_report.txt"
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
     "https://www.googleapis.com/auth/youtube.force-ssl",
-    "https://www.googleapis.com/auth/drive.readonly",
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/spreadsheets",
 ]
 
 LOG_DIR.mkdir(exist_ok=True)
