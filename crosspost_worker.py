@@ -126,6 +126,12 @@ def post_instagram(video_path: Path, caption: str) -> str | None:
         log.info("Instagram kimliği yok (IG_SESSIONID / IG_USERNAME+IG_PASSWORD) -> atlanıyor.")
         return None
     try:
+        # ffmpeg zırhı: imageio-ffmpeg pip paketi binary getirir; instagrapi/moviepy onu bulsun
+        try:
+            import imageio_ffmpeg
+            os.environ.setdefault("IMAGEIO_FFMPEG_EXE", imageio_ffmpeg.get_ffmpeg_exe())
+        except Exception as ffe:
+            log.warning(f"imageio-ffmpeg bulunamadı: {ffe}")
         from instagrapi import Client
 
         cl = Client()
@@ -169,10 +175,15 @@ def post_tiktok(video_path: Path, caption: str) -> str | None:
         _ensure_playwright_browser()
         from tiktok_uploader.upload import upload_video
 
+        # tiktok-uploader 1.2.0 sessionid cookie'sini domain'siz ekleyip patlıyor;
+        # domain+path içeren cookies_list formatıyla bypass ediyoruz
+        cookies_list = [
+            {"name": "sessionid", "value": sid, "domain": ".tiktok.com", "path": "/"},
+        ]
         failed = upload_video(
             filename=str(video_path),
             description=_trim_caption(caption, TIKTOK_MAX_CAPTION),
-            sessionid=sid,
+            cookies_list=cookies_list,
             headless=True,
         )
         if failed:
