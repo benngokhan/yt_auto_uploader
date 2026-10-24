@@ -94,8 +94,8 @@ def load_config() -> dict:
             cfg.update(json.loads(CONFIG_FILE.read_text(encoding="utf-8")))
         except Exception as e:
             log.warning(f"config.json okuma uyarısı: {e}")
-    if os.getenv("DRIVE_QUEUE_FOLDER_ID"):
-        cfg["drive_queue_folder_id"] = os.environ["DRIVE_QUEUE_FOLDER_ID"].strip()
+    # Ana klasör her zaman 1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br olarak kilitlidir
+    cfg["drive_queue_folder_id"] = DEFAULT_DRIVE_FOLDER_ID
     if os.getenv("SHEETS_ID"):
         cfg["sheets_id"] = os.environ["SHEETS_ID"].strip()
     if os.getenv("YOUTUBE_PRIVACY_STATUS"):
@@ -130,33 +130,95 @@ def get_google_clients(token_file: Path = None, force_reauth: bool = False):
 
 
 def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
-    """Bulut teslimat paketlerindeki (.mp4 ve .png) dosyaları ve güncel tabloyu otomatik Drive'a aktarır."""
+    """Bulut teslimat paketlerindeki (.mp4) videoları doğrudan 1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br klasörüne,
+    kapakları (.png) KAPAKLAR alt klasörüne ve 3 sekmeli baslik.xlsx tablosunu ana klasöre aktarır."""
     import urllib.request
     import zipfile
 
-    main_folder = queue_folder or DEFAULT_DRIVE_FOLDER_ID
-    videolar_folder = "1N632sQ4eyeRpFrmcmECGSuVDM-Lx4nVe"
+    main_folder = DEFAULT_DRIVE_FOLDER_ID  # 1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br
     try:
-        # 1. Mevcut Videolar klasörü dosyalarını listele
-        existing = set()
+        # 1. Ana klasördeki mevcut dosyaları ve KAPAKLAR alt klasörünü bul/oluştur
+        existing_main = set()
+        kapaklar_folder_id = None
         page_token = None
         while True:
             res = drive.files().list(
-                q=f"'{videolar_folder}' in parents and trashed=false",
+                q=f"'{main_folder}' in parents and trashed=false",
                 pageSize=200,
-                fields="nextPageToken, files(id, name)",
+                fields="nextPageToken, files(id, name, mimeType)",
                 pageToken=page_token,
             ).execute()
             for f in res.get("files", []):
-                existing.add(f.get("name", ""))
+                fname = f.get("name", "")
+                existing_main.add(fname)
+                if f.get("mimeType") == "application/vnd.google-apps.folder" and fname.upper() == "KAPAKLAR":
+                    kapaklar_folder_id = f["id"]
             page_token = res.get("nextPageToken")
             if not page_token:
                 break
 
-        # 2. Güncel bilgidozu_yukleme_tablosu.xlsx dosyasını Drive ana klasörüne senkronize et
-        local_xlsx = BASE_DIR / "bilgidozu_yukleme_tablosu.xlsx"
+        if not kapaklar_folder_id:
+            folder_meta = {
+                "name": "KAPAKLAR",
+                "mimeType": "application/vnd.google-apps.folder",
+                "parents": [main_folder],
+            }
+            created_f = drive.files().create(body=folder_meta, fields="id").execute()
+            kapaklar_folder_id = created_f["id"]
+            log.info(f"Ana Drive klasöründe KAPAKLAR klasörü oluşturuldu (ID: {kapaklar_folder_id})")
+
+        # 1.b Eğer eski 1N632sQ4eyeRpFrmcmECGSuVDM-Lx4nVe klasöründe videolar/kapaklar varsa doğrudan ana klasöre (1MBjwKp...) ve KAPAKLAR'a taşı!
+        old_folder = "1N632sQ4eyeRpFrmcmECGSuVDM-Lx4nVe"
+        try:
+            res_old = drive.files().list(
+                q=f"'{old_folder}' in parents and trashed=false",
+                pageSize=200,
+                fields="files(id, name, mimeType)",
+            ).execute()
+            for of in res_old.get("files", []):
+                oname = of.get("name", "")
+                oid = of.get("id", "")
+                if oname.endswith(".mp4") and oname not in existing_main:
+                    drive.files().update(
+                        fileId=oid,
+                        addParents=main_folder,
+                        removeParents=old_folder,
+                        fields="id, parents",
+                    ).execute()
+                    existing_main.add(oname)
+                    log.info(f"Eski klasörden ana klasöre (1MBjwKp...) taşındı: {oname}")
+                elif oname.endswith(".png"):
+                    drive.files().update(
+                        fileId=oid,
+                        addParents=kapaklar_folder_id,
+                        removeParents=old_folder,
+                        fields="id, parents",
+                    ).execute()
+                    log.info(f"Eski klasörden KAPAKLAR klasörüne taşındı: {oname}")
+        except Exception as move_err:
+            log.warning(f"Eski klasör taşıma kontrolü: {move_err}")
+
+        existing_kapaklar = set()
+        page_token = None
+        while True:
+            res_k = drive.files().list(
+                q=f"'{kapaklar_folder_id}' in parents and trashed=false",
+                pageSize=200,
+                fields="nextPageToken, files(id, name)",
+                pageToken=page_token,
+            ).execute()
+            for f in res_k.get("files", []):
+                existing_kapaklar.add(f.get("name", ""))
+            page_token = res_k.get("nextPageToken")
+            if not page_token:
+                break
+
+        # 2. Güncel 3 sekmeli (DRIVE, ISCILER, UYARILAR) baslik.xlsx dosyasını ana klasöre senkronize et
+        local_xlsx = BASE_DIR / "baslik.xlsx"
+        if not local_xlsx.exists():
+            local_xlsx = BASE_DIR / "bilgidozu_yukleme_tablosu.xlsx"
         if local_xlsx.exists():
-            for target_name in ("bilgidozu_yukleme_tablosu.xlsx", "baslik.xlsx"):
+            for target_name in ("baslik.xlsx", "bilgidozu_yukleme_tablosu.xlsx"):
                 q_x = f"'{main_folder}' in parents and name='{target_name}' and trashed=false"
                 rx = drive.files().list(q=q_x, pageSize=5, fields="files(id,name)").execute().get("files", [])
                 media_x = MediaFileUpload(
@@ -168,8 +230,9 @@ def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
                     drive.files().update(fileId=rx[0]["id"], media_body=media_x).execute()
                 else:
                     drive.files().create(body={"name": target_name, "parents": [main_folder]}, media_body=media_x).execute()
+            log.info("3 sekmeli baslik.xlsx (DRIVE, ISCILER, UYARILAR) ana klasöre senkronize edildi.")
 
-        # 3. 5 Üretim Bandı ZIP paketlerini kontrol et ve eksik .mp4 / .png dosyalarını Videolar klasörüne yükle
+        # 3. 5 Üretim Bandı ZIP paketlerini kontrol et: .mp4 -> main_folder, .png -> KAPAKLAR
         packages = [
             ("bilgidozu_bant1_101_105.zip", ["video_101.mp4", "video_102.mp4", "video_103.mp4", "video_104.mp4", "video_105.mp4"]),
             ("bilgidozu_106_110.zip", ["video_106.mp4", "video_107.mp4", "video_108.mp4", "video_109.mp4", "video_110.mp4"]),
@@ -178,7 +241,7 @@ def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
             ("BANT5_UZUN_VIDEO_13.zip", ["uzun_video_13.mp4"]),
         ]
         for zip_name, check_vids in packages:
-            if all(v in existing for v in check_vids):
+            if all(v in existing_main for v in check_vids):
                 continue
             urls = [
                 f"https://github.com/benngokhan/yt_auto_uploader/releases/download/v2.0-bant-paketleri/{zip_name}",
@@ -203,21 +266,34 @@ def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
                 with zipfile.ZipFile(zip_path, "r") as zf:
                     for member in zf.namelist():
                         base = os.path.basename(member)
-                        if not base or base in existing:
+                        if not base:
                             continue
-                        if not (base.endswith(".mp4") or base.endswith(".png")):
+                        if base.endswith(".mp4"):
+                            if base in existing_main:
+                                continue
+                            target_parent = main_folder
+                            mime = "video/mp4"
+                        elif base.endswith(".png"):
+                            if base in existing_kapaklar:
+                                continue
+                            target_parent = kapaklar_folder_id
+                            mime = "image/png"
+                        else:
                             continue
                         tmp_item = Path(tempfile.gettempdir()) / base
                         tmp_item.write_bytes(zf.read(member))
-                        mime = "video/mp4" if base.endswith(".mp4") else "image/png"
                         media = MediaFileUpload(str(tmp_item), mimetype=mime, resumable=True)
                         drive.files().create(
-                            body={"name": base, "parents": [videolar_folder]},
+                            body={"name": base, "parents": [target_parent]},
                             media_body=media,
                             fields="id,name",
                         ).execute()
-                        existing.add(base)
-                        log.info(f"Buluttan Drive Videolar klasörüne eklendi: {base}")
+                        if base.endswith(".mp4"):
+                            existing_main.add(base)
+                            log.info(f"Ana Drive klasörüne (1MBjwKp...) video eklendi: {base}")
+                        else:
+                            existing_kapaklar.add(base)
+                            log.info(f"KAPAKLAR klasörüne kapak eklendi: {base}")
                         try:
                             tmp_item.unlink()
                         except Exception:
@@ -353,9 +429,22 @@ def upload_thumbnail_if_exists(youtube, drive, folder_id: str, video_file_name: 
     if not candidates:
         return False
     try:
-        q = f"'{folder_id}' in parents and trashed=false"
-        res = drive.files().list(q=q, pageSize=200, fields="files(id,name)").execute()
-        files = {f["name"].lower(): f["id"] for f in res.get("files", [])}
+        search_folders = [DEFAULT_DRIVE_FOLDER_ID]
+        if folder_id and folder_id not in search_folders:
+            search_folders.append(folder_id)
+        # Ana klasör içindeki KAPAKLAR alt klasörünü de ara
+        q_sub = f"'{DEFAULT_DRIVE_FOLDER_ID}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
+        sub_res = drive.files().list(q=q_sub, pageSize=50, fields="files(id,name)").execute()
+        for sf in sub_res.get("files", []):
+            if "kapak" in sf.get("name", "").lower():
+                search_folders.insert(0, sf["id"])
+
+        files = {}
+        for sf_id in search_folders:
+            q = f"'{sf_id}' in parents and trashed=false"
+            res = drive.files().list(q=q, pageSize=200, fields="files(id,name)").execute()
+            for f in res.get("files", []):
+                files.setdefault(f["name"].lower(), f["id"])
         target_id = None
         target_name = None
         for c in candidates:
