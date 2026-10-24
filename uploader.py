@@ -129,7 +129,110 @@ def get_google_clients(token_file: Path = None, force_reauth: bool = False):
     return youtube, drive
 
 
+def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
+    """Bulut teslimat paketlerindeki (.mp4 ve .png) dosyaları ve güncel tabloyu otomatik Drive'a aktarır."""
+    import urllib.request
+    import zipfile
+
+    main_folder = queue_folder or DEFAULT_DRIVE_FOLDER_ID
+    videolar_folder = "1N632sQ4eyeRpFrmcmECGSuVDM-Lx4nVe"
+    try:
+        # 1. Mevcut Videolar klasörü dosyalarını listele
+        existing = set()
+        page_token = None
+        while True:
+            res = drive.files().list(
+                q=f"'{videolar_folder}' in parents and trashed=false",
+                pageSize=200,
+                fields="nextPageToken, files(id, name)",
+                pageToken=page_token,
+            ).execute()
+            for f in res.get("files", []):
+                existing.add(f.get("name", ""))
+            page_token = res.get("nextPageToken")
+            if not page_token:
+                break
+
+        # 2. Güncel bilgidozu_yukleme_tablosu.xlsx dosyasını Drive ana klasörüne senkronize et
+        local_xlsx = BASE_DIR / "bilgidozu_yukleme_tablosu.xlsx"
+        if local_xlsx.exists():
+            for target_name in ("bilgidozu_yukleme_tablosu.xlsx", "baslik.xlsx"):
+                q_x = f"'{main_folder}' in parents and name='{target_name}' and trashed=false"
+                rx = drive.files().list(q=q_x, pageSize=5, fields="files(id,name)").execute().get("files", [])
+                media_x = MediaFileUpload(
+                    str(local_xlsx),
+                    mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    resumable=False,
+                )
+                if rx:
+                    drive.files().update(fileId=rx[0]["id"], media_body=media_x).execute()
+                else:
+                    drive.files().create(body={"name": target_name, "parents": [main_folder]}, media_body=media_x).execute()
+
+        # 3. 5 Üretim Bandı ZIP paketlerini kontrol et ve eksik .mp4 / .png dosyalarını Videolar klasörüne yükle
+        packages = [
+            ("bilgidozu_bant1_101_105.zip", ["video_101.mp4", "video_102.mp4", "video_103.mp4", "video_104.mp4", "video_105.mp4"]),
+            ("bilgidozu_106_110.zip", ["video_106.mp4", "video_107.mp4", "video_108.mp4", "video_109.mp4", "video_110.mp4"]),
+            ("bilgidozu_111_115.zip", ["video_111.mp4", "video_112.mp4", "video_113.mp4", "video_114.mp4", "video_115.mp4"]),
+            ("bilgidozu_116_120.zip", ["video_116.mp4", "video_117.mp4", "video_118.mp4", "video_119.mp4", "video_120.mp4"]),
+            ("BANT5_UZUN_VIDEO_13.zip", ["uzun_video_13.mp4"]),
+        ]
+        for zip_name, check_vids in packages:
+            if all(v in existing for v in check_vids):
+                continue
+            urls = [
+                f"https://github.com/benngokhan/yt_auto_uploader/releases/download/v2.0-bant-paketleri/{zip_name}",
+                f"https://filebin.net/bilgidozu_teslimat/{zip_name}",
+            ]
+            zip_path = Path(tempfile.gettempdir()) / zip_name
+            downloaded = False
+            for u in urls:
+                try:
+                    req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0", "Cookie": "verified=2024-05-24"})
+                    with urllib.request.urlopen(req, timeout=90) as resp:
+                        data = resp.read()
+                        if len(data) > 100_000:
+                            zip_path.write_bytes(data)
+                            downloaded = True
+                            break
+                except Exception:
+                    continue
+            if not downloaded or not zip_path.exists():
+                continue
+            try:
+                with zipfile.ZipFile(zip_path, "r") as zf:
+                    for member in zf.namelist():
+                        base = os.path.basename(member)
+                        if not base or base in existing:
+                            continue
+                        if not (base.endswith(".mp4") or base.endswith(".png")):
+                            continue
+                        tmp_item = Path(tempfile.gettempdir()) / base
+                        tmp_item.write_bytes(zf.read(member))
+                        mime = "video/mp4" if base.endswith(".mp4") else "image/png"
+                        media = MediaFileUpload(str(tmp_item), mimetype=mime, resumable=True)
+                        drive.files().create(
+                            body={"name": base, "parents": [videolar_folder]},
+                            media_body=media,
+                            fields="id,name",
+                        ).execute()
+                        existing.add(base)
+                        log.info(f"Buluttan Drive Videolar klasörüne eklendi: {base}")
+                        try:
+                            tmp_item.unlink()
+                        except Exception:
+                            pass
+            finally:
+                try:
+                    zip_path.unlink()
+                except Exception:
+                    pass
+    except Exception as exc:
+        log.warning(f"Bulut -> Drive senkronizasyon uyarısı: {exc}")
+
+
 def validate_metadata_workbook(drive, queue_folder: str) -> str:
+    sync_cloud_deliveries_to_drive(drive, queue_folder or DEFAULT_DRIVE_FOLDER_ID)
     records = load_table_from_drive_or_local(drive, queue_folder or DEFAULT_DRIVE_FOLDER_ID)
     if not records:
         raise RuntimeError("DRIVE sekmesi okunamadı veya hiç satır bulunamadı.")

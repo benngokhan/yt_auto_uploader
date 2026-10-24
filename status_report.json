@@ -1,18 +1,21 @@
 {
-  "updated_at": "2026-10-24 14:24",
-  "updated_at_iso": "2026-10-24T14:24:57.905715+03:00",
+  "updated_at": "24.10.2026 15:18",
+  "updated_at_iso": "2026-10-24T15:18:28.484897+03:00",
   "overall_status": "ok",
   "overall_label": "Her şey çalışıyor",
   "summary": {
-    "total_views": 34026,
+    "total_views": 33457,
     "subscribers": 43,
     "total_videos_published": 55,
-    "weekly_uploaded": 21,
-    "total_comments": 24,
-    "total_likes": 346,
+    "weekly_uploaded": 26,
+    "total_comments": 32,
+    "total_likes": 491,
     "failed_jobs": 0,
-    "stock_shorts": 56,
-    "stock_long": 10
+    "stock_shorts": 77,
+    "stock_long": 11,
+    "remaining_shorts": 77,
+    "remaining_longs": 11,
+    "total_ready": 88
   },
   "workers": [
     {
@@ -20,9 +23,9 @@
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-24 14:24",
+      "updated_at": "2026-10-23 21:24",
       "jobs_done": 55,
-      "last_action": "video_34.mp4 yayınlandı (https://youtu.be/tCuQNw_V74I)",
+      "last_action": "video_33.mp4 yayınlandı (https://youtu.be/sh9zYFybcHY) · Telegram son bildirim: 21:24",
       "error_message": ""
     },
     {
@@ -30,9 +33,9 @@
       "name": "Yorumcu ve kapak işçisi",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-24 14:24",
-      "jobs_done": 55,
-      "last_action": "OAuth (youtube.force-ssl) aktif · İlk yorum otomatik yazılır",
+      "updated_at": "2026-10-23 21:20",
+      "jobs_done": 58,
+      "last_action": "OAuth (youtube.force-ssl) aktif · Yeni videolara otomatik ilk yorum ve kapak yazar",
       "error_message": ""
     },
     {
@@ -40,9 +43,9 @@
       "name": "Analitik çekici (YouTube API)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-24 14:24",
-      "jobs_done": 30,
-      "last_action": "30 videonun gerçek görüntülenme ve yorum verisi güncellendi",
+      "updated_at": "2026-10-23 21:20",
+      "jobs_done": 58,
+      "last_action": "58 videonun gerçek görüntülenme ve yorum verisi çekildi",
       "error_message": ""
     },
     {
@@ -50,9 +53,9 @@
       "name": "Telegram bildirim işçisi",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-24 14:24",
-      "jobs_done": 55,
-      "last_action": "Yayın kartı ve sabit yorum metni gönderildi",
+      "updated_at": "2026-10-23 21:24",
+      "jobs_done": 23,
+      "last_action": "video_33.mp4 yayın kartı gönderildi · Telegram son bildirim: 21:24",
       "error_message": ""
     }
   ],
@@ -62,24 +65,24 @@
       "title": "YouTube API günlük kotası",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-24 14:24",
-      "detail": "Günlük 10.000 birim kotası aktif ve yeterli."
+      "updated_at": "2026-10-23 21:20",
+      "detail": "Günlük 10.000 birim kotanın ~3.400 birimi kullanıldı. Kalan kota bugünkü tüm yükleme ve analitik sorguları için yeterli."
     },
     {
       "id": "drive_sheets",
       "title": "Google Drive ve Sheets bağlantısı",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-24 14:24",
-      "detail": "Drive klasörü ve 3 sekmeli yükleme tablosu canlı bağlı (Stok: 56 Shorts, 10 Uzun)."
+      "updated_at": "2026-10-23 21:20",
+      "detail": "Drive video klasörü (video_81..85, video_91..95 ve uzun_video_12 dahil) ve 3 sekmeli DRIVE/ISCILER/UYARILAR tablosu senkronize."
     },
     {
       "id": "comment_worker",
       "title": "Yorum ve kapak işçisi yetkisi",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-24 14:24",
-      "detail": "youtube.force-ssl yetkisi aktif."
+      "updated_at": "2026-10-23 21:20",
+      "detail": "youtube.force-ssl, drive ve spreadsheets yetkileri onaylandı. Yüklenen her videoya otomatik ilk yorum yazılır."
     }
   ],
   "videos": [
@@ -87,109 +90,161 @@
       "id": "sh9zYFybcHY",
       "url": "https://youtu.be/sh9zYFybcHY",
       "title": "Kendini Neden Gıdıklayamazsın? Beynin Hamleni Önceden Biliyor! 🧠🤭 #bilgidozu #shorts",
-      "publishedAt": "2026-10-23T18:25:00Z",
-      "views": 4,
-      "likes": 0,
-      "comments": 1
+      "publishedAt": "2026-10-23T18:24:45Z",
+      "views": 12,
+      "likes": 2,
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "mANNR6Tf21o",
       "url": "https://youtu.be/mANNR6Tf21o",
       "title": "Burnun Nöbetleşe Çalışıyor: İki Delik Aynı Anda Eşit Nefes Almaz! 👃🔄 #bilgidozu #shorts",
       "publishedAt": "2026-10-23T15:29:55Z",
-      "views": 945,
-      "likes": 8,
-      "comments": 1
+      "views": 338,
+      "likes": 5,
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "c0lcGGWy-hw",
       "url": "https://youtu.be/c0lcGGWy-hw",
       "title": "Gözünde Bir Kör Nokta Var — Beynin Boşluğu Gizliyor! 👁️🧠 #bilgidozu #shorts",
       "publishedAt": "2026-10-23T11:44:52Z",
-      "views": 378,
+      "views": 208,
       "likes": 8,
-      "comments": 1
+      "comments": 1,
+      "privacy": "public"
+    },
+    {
+      "id": "AO661X-EeBw",
+      "url": "https://youtu.be/AO661X-EeBw",
+      "title": "Vücudundaki Bakteriler Hücrelerinden FAZLA! 🦠⚖️ #bilgidozu #shorts",
+      "publishedAt": "2026-10-23T11:31:23Z",
+      "views": 4,
+      "likes": 1,
+      "comments": 0,
+      "privacy": "private"
+    },
+    {
+      "id": "MzkXjFsAZ90",
+      "url": "https://youtu.be/MzkXjFsAZ90",
+      "title": "Satürn Suda Yüzebilecek Kadar Hafif! 🪐💧 #bilgidozu #shorts",
+      "publishedAt": "2026-10-23T10:27:58Z",
+      "views": 18,
+      "likes": 0,
+      "comments": 0,
+      "privacy": "private"
+    },
+    {
+      "id": "nO9zzEKwYIQ",
+      "url": "https://youtu.be/nO9zzEKwYIQ",
+      "title": "Bu Hayvanın BEYNİ YOK — Ama Görüyor, Hissediyor! ⭐🌊 #bilgidozu #shorts",
+      "publishedAt": "2026-10-22T23:56:18Z",
+      "views": 6,
+      "likes": 0,
+      "comments": 0,
+      "privacy": "private"
+    },
+    {
+      "id": "WTI6zqWvbYg",
+      "url": "https://youtu.be/WTI6zqWvbYg",
+      "title": "Wait For The Twist #Shorts",
+      "publishedAt": "2026-10-22T21:17:10Z",
+      "views": 0,
+      "likes": 0,
+      "comments": 0,
+      "privacy": "private"
     },
     {
       "id": "JO2Vxbd5gLM",
       "url": "https://youtu.be/JO2Vxbd5gLM",
       "title": "Gözlerinize İnanmayın: Yıldırımlar Aslında Aşağıdan Yukarıya Çakar! ⚡🌩️ #bilgidozu #shorts",
       "publishedAt": "2026-10-22T17:30:15Z",
-      "views": 1022,
+      "views": 1007,
       "likes": 13,
-      "comments": 1
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "CPITUvh_5rs",
       "url": "https://youtu.be/CPITUvh_5rs",
       "title": "Birinin Sizden Hoşlandığını Anlamanın En Kesin Yolu! 👁️✨ #bilgidozu #shorts",
       "publishedAt": "2026-10-22T15:30:03Z",
-      "views": 1047,
+      "views": 1014,
       "likes": 17,
-      "comments": 1
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "IrutrnRqyWM",
       "url": "https://youtu.be/IrutrnRqyWM",
       "title": "Bu Canlı Uzay Boşluğunda ve Radyasyonda Bile Ölmüyor! 🐻🔬 #bilgidozu #shorts",
       "publishedAt": "2026-10-22T09:30:13Z",
-      "views": 1299,
+      "views": 1288,
       "likes": 23,
-      "comments": 1
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "DEhC0RBlZvM",
       "url": "https://youtu.be/DEhC0RBlZvM",
       "title": "Jüpiter'de Dünya'dan Büyük Bir Fırtına 350 Yıldır DÖNÜYOR! 🌪️🪐 #bilgidozu #shorts",
       "publishedAt": "2026-10-21T08:47:47Z",
-      "views": 982,
-      "likes": 22,
-      "comments": 3
+      "views": 962,
+      "likes": 21,
+      "comments": 3,
+      "privacy": "public"
     },
     {
       "id": "qYzG9jVSLDw",
       "url": "https://youtu.be/qYzG9jVSLDw",
       "title": "Dünyanın En Yaşlı Canlısı Bir Hayvan Değil, 80.000 Yaşındaki Bu Orman! 🌲⚡ #bilgidozu #shorts",
       "publishedAt": "2026-10-21T08:47:12Z",
-      "views": 1137,
-      "likes": 18,
-      "comments": 1
+      "views": 1111,
+      "likes": 17,
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "OuOe6-JsAnI",
       "url": "https://youtu.be/OuOe6-JsAnI",
       "title": "Gökten Yağmur Değil Dev Elmaslar Yağan Gezegenler! 💎🪐 #bilgidozu #shorts",
       "publishedAt": "2026-10-20T19:04:22Z",
-      "views": 980,
+      "views": 975,
       "likes": 22,
-      "comments": 1
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "ah1-d0TQepk",
       "url": "https://youtu.be/ah1-d0TQepk",
       "title": "2000 Yıllık Roma Binaları Neden Yıkılmıyor? Beton Kendi Kendini Onarıyor! 🏛️⚡ #bilgidozu #shorts",
       "publishedAt": "2026-10-20T18:48:56Z",
-      "views": 513,
+      "views": 509,
       "likes": 23,
-      "comments": 1
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "5lREZUglUqU",
       "url": "https://youtu.be/5lREZUglUqU",
       "title": "Jüpiter'in Bu Uydusunda Dünya'dan 2 Kat Fazla Su Var! 🪐🌊 #bilgidozu #shorts",
       "publishedAt": "2026-10-20T15:51:20Z",
-      "views": 1037,
+      "views": 1023,
       "likes": 23,
-      "comments": 1
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "znBAuA2MY3Y",
       "url": "https://youtu.be/znBAuA2MY3Y",
       "title": "Dünyadaki Tüm Karıncalar İnsanlardan Daha Ağır Çekiyor! 🐜⚖️ #bilgidozu #shorts",
       "publishedAt": "2026-10-20T12:01:45Z",
-      "views": 1102,
+      "views": 1086,
       "likes": 18,
-      "comments": 1
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "kZ41nV2oLi0",
@@ -198,34 +253,38 @@
       "publishedAt": "2026-10-20T10:22:07Z",
       "views": 947,
       "likes": 4,
-      "comments": 1
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "MG5oXVSwuto",
       "url": "https://youtu.be/MG5oXVSwuto",
       "title": "Su Aslında Şeffaf Değil, Doğal Olarak Mavidir! 💧 #bilgidozu #shorts",
       "publishedAt": "2026-10-20T00:29:15Z",
-      "views": 966,
+      "views": 964,
       "likes": 17,
-      "comments": 1
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "W2v90CvX9_4",
       "url": "https://youtu.be/W2v90CvX9_4",
       "title": "Aynaya Baktığında Bir İnsan Değil, Bir Süpernova Görüyorsun! ✨ #bilgidozu #shorts",
       "publishedAt": "2026-10-19T22:37:54Z",
-      "views": 520,
+      "views": 519,
       "likes": 13,
-      "comments": 3
+      "comments": 3,
+      "privacy": "public"
     },
     {
       "id": "SBOuforDIV4",
       "url": "https://youtu.be/SBOuforDIV4",
       "title": "Ormanın Altındaki Gizli İnternet: Ağaçlar Birbiriyle Konuşuyor! 🌲🍄 #bilgidozu #shorts",
       "publishedAt": "2026-10-19T17:00:22Z",
-      "views": 163,
+      "views": 161,
       "likes": 1,
-      "comments": 1
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "OMDKbkGYfUM",
@@ -234,7 +293,8 @@
       "publishedAt": "2026-10-19T09:00:31Z",
       "views": 238,
       "likes": 0,
-      "comments": 0
+      "comments": 0,
+      "privacy": "public"
     },
     {
       "id": "gBe0fwts7lU",
@@ -243,7 +303,8 @@
       "publishedAt": "2026-10-18T17:00:02Z",
       "views": 1233,
       "likes": 11,
-      "comments": 0
+      "comments": 0,
+      "privacy": "public"
     },
     {
       "id": "eAnBBamiD1U",
@@ -252,16 +313,18 @@
       "publishedAt": "2026-10-18T12:00:31Z",
       "views": 7,
       "likes": 0,
-      "comments": 0
+      "comments": 0,
+      "privacy": "public"
     },
     {
       "id": "TTquqw3WSTg",
       "url": "https://youtu.be/TTquqw3WSTg",
       "title": "Uyurken Beynin İsmini Kontrol Ediyor! 👂",
       "publishedAt": "2026-10-18T09:30:18Z",
-      "views": 406,
+      "views": 405,
       "likes": 8,
-      "comments": 0
+      "comments": 0,
+      "privacy": "public"
     },
     {
       "id": "ML2-a_smuEY",
@@ -270,7 +333,8 @@
       "publishedAt": "2026-10-17T17:00:07Z",
       "views": 1140,
       "likes": 26,
-      "comments": 1
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "I9u1ueNOZi4",
@@ -279,7 +343,8 @@
       "publishedAt": "2026-10-17T09:00:09Z",
       "views": 1006,
       "likes": 14,
-      "comments": 2
+      "comments": 2,
+      "privacy": "public"
     },
     {
       "id": "vh_h0diuFG8",
@@ -288,7 +353,8 @@
       "publishedAt": "2026-10-16T15:10:14Z",
       "views": 126,
       "likes": 0,
-      "comments": 1
+      "comments": 1,
+      "privacy": "public"
     },
     {
       "id": "NGHtductf2Y",
@@ -297,7 +363,8 @@
       "publishedAt": "2026-10-16T10:30:34Z",
       "views": 1017,
       "likes": 10,
-      "comments": 0
+      "comments": 0,
+      "privacy": "public"
     },
     {
       "id": "OSkYdtOPHqU",
@@ -306,7 +373,8 @@
       "publishedAt": "2026-10-16T04:30:22Z",
       "views": 1032,
       "likes": 10,
-      "comments": 0
+      "comments": 0,
+      "privacy": "public"
     },
     {
       "id": "-99K-qaVFkk",
@@ -315,7 +383,8 @@
       "publishedAt": "2026-10-16T03:56:18Z",
       "views": 312,
       "likes": 4,
-      "comments": 0
+      "comments": 0,
+      "privacy": "public"
     },
     {
       "id": "Es86PRkY1hw",
@@ -324,34 +393,8 @@
       "publishedAt": "2026-10-15T16:30:25Z",
       "views": 1025,
       "likes": 5,
-      "comments": 0
-    },
-    {
-      "id": "lYtn7rjqKD8",
-      "url": "https://youtu.be/lYtn7rjqKD8",
-      "title": "Güneşe En Yakın Gezegende Donuyorsun! 🌡️",
-      "publishedAt": "2026-10-15T04:29:26Z",
-      "views": 1139,
-      "likes": 11,
-      "comments": 0
-    },
-    {
-      "id": "GMKWwDnabuQ",
-      "url": "https://youtu.be/GMKWwDnabuQ",
-      "title": "Elin Geri Çekilirken Beynin Yolda! 🔥",
-      "publishedAt": "2026-10-14T16:30:03Z",
-      "views": 958,
-      "likes": 8,
-      "comments": 0
-    },
-    {
-      "id": "_weo5Nxygkc",
-      "url": "https://youtu.be/_weo5Nxygkc",
-      "title": "Uykuya Dalarken Niçin Düşersin? 😴",
-      "publishedAt": "2026-10-13T10:00:19Z",
-      "views": 344,
-      "likes": 9,
-      "comments": 0
+      "comments": 0,
+      "privacy": "public"
     }
   ]
 }
