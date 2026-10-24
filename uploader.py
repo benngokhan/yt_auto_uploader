@@ -667,7 +667,7 @@ def upload_job(
             from crosspost_worker import run_crosspost
 
             xcap = build_crosspost_caption(meta)
-            crosspost_result = run_crosspost(tmp_path, file_name, xcap)
+            crosspost_result = run_crosspost(tmp_path, file_name, xcap, drive=drive, folder_id="1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_")
             log.info(f"Çapraz paylaşım sonucu: {crosspost_result}")
         except Exception as xe:
             log.warning(f"Çapraz paylaşım atlandı (YouTube akışı etkilenmedi): {xe}")

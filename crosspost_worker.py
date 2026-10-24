@@ -25,6 +25,49 @@ from pathlib import Path
 log = logging.getLogger("crosspost")
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(name)s | %(message)s")
 
+# KartaL Stok (Bot'un yayın çekim klasörü) — çapraz paylaşım anahtar dosyası burada durur
+STOCK_FOLDER_ID = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"
+KEYS_FILE_NAME = "crosspost_keys.json"
+
+
+def _load_drive_keys(drive=None, folder_id: str = "") -> dict:
+    """GitHub YAML'sine dokunmadan anahtar taşımak için Drive'daki crosspost_keys.json'u okur.
+    (Kullanıcı bu küçük dosyayı telefonundan KartaL Stok klasörüne atar; bot her turda oradan okur.)"""
+    if drive is None or not folder_id:
+        return {}
+    try:
+        import io
+        import json as _json
+
+        q = f"'{folder_id}' in parents and name='{KEYS_FILE_NAME}' and trashed=false"
+        res = drive.files().list(q=q, fields="files(id,name,modifiedTime)", orderBy="modifiedTime desc", pageSize=1).execute()
+        files = res.get("files", [])
+        if not files:
+            log.info(f"Drive'da {KEYS_FILE_NAME} bulunamadı -> yalnızca env anahtarları kullanılacak.")
+            return {}
+        from googleapiclient.http import MediaIoBaseDownload
+
+        buf = io.BytesIO()
+        downloader = MediaIoBaseDownload(buf, drive.files().get_media(fileId=files[0]["id"]))
+        done = False
+        while not done:
+            _, done = downloader.next_chunk()
+        keys = _json.loads(buf.getvalue().decode("utf-8"))
+        log.info(f"{KEYS_FILE_NAME} Drive'dan okundu (anahtarlar: {[k for k, v in keys.items() if v]})")
+        return keys
+    except Exception as e:
+        log.warning(f"Drive anahtar dosyası okunamadı: {e}")
+        return {}
+
+
+def _hydrate_env_from_keys(keys: dict) -> None:
+    """Drive'dan gelen anahtarları, env'de EKSİKSE os.environ'a enjekte eder (env her zaman öncelikli)."""
+    for k in ("CROSSPOST_ENABLED", "IG_SESSIONID", "IG_USERNAME", "IG_PASSWORD", "TIKTOK_SESSIONID", "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"):
+        v = str(keys.get(k, "")).strip()
+        if v and not os.getenv(k, "").strip():
+            os.environ[k] = v
+
+
 # Platform limitleri
 TIKTOK_MAX_CAPTION = 2100  # TikTok 2200 limiti; güvenli pay bırak
 IG_MAX_CAPTION = 2100      # Reels 2200 limiti; güvenli pay bırak
@@ -88,7 +131,11 @@ def post_instagram(video_path: Path, caption: str) -> str | None:
         cl = Client()
         cl.delay_range = [2, 6]  # insanvari bekleme aralığı
         if sid:
-            cl.login_by_sessionid(sid)
+            try:
+                cl.login_by_sessionid(sid)
+            except Exception:
+                from urllib.parse import unquote
+                cl.login_by_sessionid(unquote(sid))  # %3A kodlu ham çerez yedeği
             log.info("Instagram: sessionid ile giriş yapıldı.")
         else:
             cl.login(user, pw)
@@ -140,9 +187,13 @@ def post_tiktok(video_path: Path, caption: str) -> str | None:
         return f"HATA: {e}"
 
 
-def run_crosspost(video_path: Path, file_name: str, caption: str) -> dict:
+def run_crosspost(video_path: Path, file_name: str, caption: str, drive=None, folder_id: str = "") -> dict:
     """Ana giriş: uygunsa IG + TikTok'a yükler, sonuçları raporlar."""
     results = {"instagram": None, "tiktok": None}
+
+    # Env'de anahtar yoksa Drive'daki crosspost_keys.json'dan hidre et (GitHub workflow YAML'si kilitli)
+    if not crosspost_enabled() and drive is not None:
+        _hydrate_env_from_keys(_load_drive_keys(drive, folder_id or STOCK_FOLDER_ID))
 
     if not crosspost_enabled():
         log.info("Çapraz paylaşım kapalı veya kimlik eksik -> atlanıyor.")
