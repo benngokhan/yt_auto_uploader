@@ -23,8 +23,9 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
-DEFAULT_DRIVE_FOLDER_ID = "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br"
-DEFAULT_SHEETS_ID = "1DTXIt8wY9fDHRYRT_Kz5GVVcGe00hDaK"
+DEFAULT_DRIVE_FOLDER_ID = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"
+SECONDARY_DRIVE_FOLDER_ID = "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br"
+DEFAULT_SHEETS_ID = "1tHZ4aCtdtKRLmY7z9PqLGUTu5rVth4vj"
 MIN_SHORTS_NUMBER = 31  # 1..30 kilitli/atlandı, Shorts video_31.mp4'ten başlar
 
 CATEGORY_MAP = {
@@ -290,7 +291,11 @@ def load_table_from_drive_or_local(
 
 def list_drive_videos(drive, folder_id: str) -> list[dict]:
     videos = []
-    folders_to_visit = [folder_id]
+    seen_names = set()
+    folders_to_visit = []
+    for fid in (DEFAULT_DRIVE_FOLDER_ID, folder_id, SECONDARY_DRIVE_FOLDER_ID):
+        if fid and fid not in folders_to_visit:
+            folders_to_visit.append(fid)
     visited = set()
 
     while folders_to_visit:
@@ -312,7 +317,8 @@ def list_drive_videos(drive, folder_id: str) -> list[dict]:
                 name = f.get("name", "")
                 if mime == "application/vnd.google-apps.folder":
                     folders_to_visit.append(f["id"])
-                elif name.lower().endswith(".mp4") or "video/" in mime:
+                elif (name.lower().endswith(".mp4") or "video/" in mime) and name not in seen_names:
+                    seen_names.add(name)
                     videos.append(f)
             page_token = res.get("nextPageToken")
             if not page_token:
@@ -388,35 +394,48 @@ def update_excel_status_in_drive(
     new_status: str = "YÜKLENDİ",
     youtube_url: str = "",
 ) -> bool:
-    if not drive or not folder_id or MediaIoBaseDownload is None:
+    if not drive or MediaIoBaseDownload is None:
         return False
     try:
-        res = drive.files().list(
-            q=f"'{folder_id}' in parents and (name = 'bilgidozu_yukleme_tablosu.xlsx' or name = 'baslik.xlsx') and trashed = false",
-            pageSize=1,
-            fields="files(id, name)",
-        ).execute()
-        files = res.get("files", [])
-        if not files:
-            return False
-        fid = files[0]["id"]
+        from openpyxl.styles import Font
+        target_fid = None
+        for search_folder in (DEFAULT_DRIVE_FOLDER_ID, folder_id):
+            if not search_folder:
+                continue
+            res = drive.files().list(
+                q=f"'{search_folder}' in parents and name = 'baslik.xlsx' and trashed = false",
+                pageSize=1,
+                fields="files(id, name)",
+            ).execute()
+            files = res.get("files", [])
+            if files:
+                target_fid = files[0]["id"]
+                break
+        if not target_fid:
+            target_fid = DEFAULT_SHEETS_ID
+
         buf = io.BytesIO()
-        dl = MediaIoBaseDownload(buf, drive.files().get_media(fileId=fid))
+        dl = MediaIoBaseDownload(buf, drive.files().get_media(fileId=target_fid))
         done = False
         while not done:
             _, done = dl.next_chunk()
         buf.seek(0)
         wb = openpyxl.load_workbook(buf)
         ws = next((s for s in wb.worksheets if s.title.strip().casefold() == "drive"), wb.active)
-        green_fill = PatternFill(start_color="C6EFCE", end_color="C6EFCE", fill_type="solid")
+        green_fill = PatternFill(start_color="B6D7A8", end_color="B6D7A8", fill_type="solid")
+        green_font = Font(name="Calibri", size=10, bold=False, color="0B3B17")
+        green_bold = Font(name="Calibri", size=10, bold=True, color="0B3B17")
+        tr_now = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d %H:%M")
         updated = False
         for r in range(2, ws.max_row + 1):
             if str(ws.cell(r, 2).value or "").strip().casefold() == file_name.casefold():
                 ws.cell(r, 1).value = new_status
                 if youtube_url:
-                    ws.cell(r, 2).hyperlink = youtube_url
-                for c in range(1, 10):
+                    ws.cell(r, 10).value = youtube_url
+                ws.cell(r, 11).value = tr_now
+                for c in range(1, 14):  # A2'den M'ye kadar tam 13 sütun YEŞİL!
                     ws.cell(r, c).fill = green_fill
+                    ws.cell(r, c).font = green_bold if c in (1, 2) else green_font
                 updated = True
                 break
         if not updated:
@@ -429,8 +448,9 @@ def update_excel_status_in_drive(
             mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             resumable=False,
         )
-        drive.files().update(fileId=fid, media_body=media).execute()
+        drive.files().update(fileId=target_fid, media_body=media).execute()
+        log.info(f"Drive baslik.xlsx ({target_fid}) içinde {file_name} -> {new_status} (A..M YEŞİL) olarak işaretlendi!")
         return True
     except Exception as e:
-        log.warning(f"Drive XLSX güncellemesi atlandı (salt-okunur token olabilir, sorun değil): {e}")
+        log.warning(f"Drive XLSX güncellemesi atlandı: {e}")
         return False

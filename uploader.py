@@ -130,16 +130,34 @@ def get_google_clients(token_file: Path = None, force_reauth: bool = False):
 
 
 def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
-    """Bulut teslimat paketlerindeki (.mp4) videoları 'hazır videolar' (1JULlauO1eFpXgGdZKdZZDyqesSdkeT6f) alt klasörüne,
-    kapakları (.png) KAPAKLAR (1XKZJ12HyAvZkjgiG38ys3HOMhZ42d_jJ) alt klasörüne ve 3 sekmeli baslik.xlsx tablosunu ana klasöre aktarır."""
+    """1) Diğer klasördeki (1MBjwKp...) fazlalık baslik.xlsx / bilgidozu_yukleme_tablosu.xlsx dosyalarını siler (tek yerde kalsın).
+    2) KartaL'ın ana stok klasöründeki (1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_) baslik.xlsx (1tHZ4aCtdtKRLmY7z9PqLGUTu5rVth4vj) dosyasını
+       mevcut YÜKLENDİ durumlarını koruyarak A2:M133 Yeşil/Sarı simetrik formatla günceller.
+    3) Yeni videoları hem 'hazır videolar' (1JULlauO1eFpXgGdZKdZZDyqesSdkeT6f) hem KartaL stok klasörüne, kapakları KAPAKLAR'a aktarır."""
+    import io
     import urllib.request
     import zipfile
+    import openpyxl
+    from openpyxl.styles import PatternFill, Font
+    from googleapiclient.http import MediaIoBaseDownload
 
-    main_folder = DEFAULT_DRIVE_FOLDER_ID  # 1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br
+    kartal_folder = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"
+    main_folder = "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br"
     hazir_videolar_id = "1JULlauO1eFpXgGdZKdZZDyqesSdkeT6f"
     kapaklar_folder_id = "1XKZJ12HyAvZkjgiG38ys3HOMhZ42d_jJ"
+    baslik_file_id = "1tHZ4aCtdtKRLmY7z9PqLGUTu5rVth4vj"
+
     try:
-        # 1. Ana klasördeki dosyaları listele; eğer ana klasörde .mp4 kalmışsa 'hazır videolar' klasörüne taşı!
+        # 0. KartaL stok klasörünün adı 'Mira Stok' ise 'KartaL Stok' yap
+        try:
+            fmeta = drive.files().get(fileId=kartal_folder, fields="name").execute()
+            if "mira" in fmeta.get("name", "").lower():
+                drive.files().update(fileId=kartal_folder, body={"name": "KartaL Stok"}).execute()
+                log.info("Klasör adı 'KartaL Stok' olarak güncellendi.")
+        except Exception:
+            pass
+
+        # 1. Diğer klasördeki (1MBjwKp...) fazlalık baslik.xlsx ve bilgidozu_yukleme_tablosu.xlsx dosyalarını sil (tek yerde kalsın)
         page_token = None
         while True:
             res = drive.files().list(
@@ -159,134 +177,80 @@ def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
                             removeParents=main_folder,
                             fields="id, parents",
                         ).execute()
-                        log.info(f"Ana klasörden 'hazır videolar' klasörüne taşındı: {fname}")
-                    except Exception as me:
-                        log.warning(f"Taşıma uyarısı ({fname}): {me}")
+                    except Exception:
+                        pass
+                elif fname in ("baslik.xlsx", "bilgidozu_yukleme_tablosu.xlsx"):
+                    try:
+                        drive.files().update(fileId=fid, body={"trashed": True}).execute()
+                        log.info(f"Diğer klasördeki fazlalık tablo kaldırıldı (tek yerde kalsın): {fname}")
+                    except Exception as de:
+                        log.warning(f"Fazlalık tablo kaldırma uyarısı ({fname}): {de}")
             page_token = res.get("nextPageToken")
             if not page_token:
                 break
 
-        # 1.b 'hazır videolar' ve 'KAPAKLAR' içindeki mevcut dosyaları listele
-        existing_videos = set()
-        page_token = None
-        while True:
-            res_v = drive.files().list(
-                q=f"'{hazir_videolar_id}' in parents and trashed=false",
-                pageSize=200,
-                fields="nextPageToken, files(id, name)",
-                pageToken=page_token,
-            ).execute()
-            for f in res_v.get("files", []):
-                existing_videos.add(f.get("name", ""))
-            page_token = res_v.get("nextPageToken")
-            if not page_token:
-                break
-
-        existing_kapaklar = set()
-        page_token = None
-        while True:
-            res_k = drive.files().list(
-                q=f"'{kapaklar_folder_id}' in parents and trashed=false",
-                pageSize=200,
-                fields="nextPageToken, files(id, name)",
-                pageToken=page_token,
-            ).execute()
-            for f in res_k.get("files", []):
-                existing_kapaklar.add(f.get("name", ""))
-            page_token = res_k.get("nextPageToken")
-            if not page_token:
-                break
-
-        # 2. Güncel 3 sekmeli (DRIVE, ISCILER, UYARILAR) baslik.xlsx dosyasını ana klasöre senkronize et
+        # 2. KartaL klasöründeki (1w8tz...) baslik.xlsx (1tHZ4aCtdtKRLmY7z9PqLGUTu5rVth4vj) dosyasını
+        #    botun sonradan işaretlediği YÜKLENDİ satırlarını koruyarak simetrik Yeşil/Sarı formatla güncelle!
         local_xlsx = BASE_DIR / "baslik.xlsx"
-        if not local_xlsx.exists():
-            local_xlsx = BASE_DIR / "bilgidozu_yukleme_tablosu.xlsx"
         if local_xlsx.exists():
-            for target_name in ("baslik.xlsx", "bilgidozu_yukleme_tablosu.xlsx"):
-                q_x = f"'{main_folder}' in parents and name='{target_name}' and trashed=false"
-                rx = drive.files().list(q=q_x, pageSize=5, fields="files(id,name)").execute().get("files", [])
-                media_x = MediaFileUpload(
-                    str(local_xlsx),
-                    mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    resumable=False,
-                )
-                if rx:
-                    drive.files().update(fileId=rx[0]["id"], media_body=media_x).execute()
-                else:
-                    drive.files().create(body={"name": target_name, "parents": [main_folder]}, media_body=media_x).execute()
-            log.info("3 sekmeli baslik.xlsx (DRIVE, ISCILER, UYARILAR) ana klasöre senkronize edildi.")
-
-        # 3. 5 Üretim Bandı ZIP paketlerini kontrol et: .mp4 -> hazır videolar, .png -> KAPAKLAR
-        packages = [
-            ("bilgidozu_bant1_101_105.zip", ["video_101.mp4", "video_102.mp4", "video_103.mp4", "video_104.mp4", "video_105.mp4"]),
-            ("bilgidozu_106_110.zip", ["video_106.mp4", "video_107.mp4", "video_108.mp4", "video_109.mp4", "video_110.mp4"]),
-            ("bilgidozu_111_115.zip", ["video_111.mp4", "video_112.mp4", "video_113.mp4", "video_114.mp4", "video_115.mp4"]),
-            ("bilgidozu_116_120.zip", ["video_116.mp4", "video_117.mp4", "video_118.mp4", "video_119.mp4", "video_120.mp4"]),
-            ("BANT5_UZUN_VIDEO_13.zip", ["uzun_video_13.mp4"]),
-        ]
-        for zip_name, check_vids in packages:
-            if all(v in existing_videos for v in check_vids):
-                continue
-            urls = [
-                f"https://github.com/benngokhan/yt_auto_uploader/releases/download/v2.0-bant-paketleri/{zip_name}",
-                f"https://filebin.net/bilgidozu_teslimat/{zip_name}",
-            ]
-            zip_path = Path(tempfile.gettempdir()) / zip_name
-            downloaded = False
-            for u in urls:
-                try:
-                    req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0", "Cookie": "verified=2024-05-24"})
-                    with urllib.request.urlopen(req, timeout=90) as resp:
-                        data = resp.read()
-                        if len(data) > 100_000:
-                            zip_path.write_bytes(data)
-                            downloaded = True
-                            break
-                except Exception:
-                    continue
-            if not downloaded or not zip_path.exists():
-                continue
+            remote_uploaded = {}
             try:
-                with zipfile.ZipFile(zip_path, "r") as zf:
-                    for member in zf.namelist():
-                        base = os.path.basename(member)
-                        if not base:
-                            continue
-                        if base.endswith(".mp4"):
-                            if base in existing_videos:
-                                continue
-                            target_parent = hazir_videolar_id
-                            mime = "video/mp4"
-                        elif base.endswith(".png"):
-                            if base in existing_kapaklar:
-                                continue
-                            target_parent = kapaklar_folder_id
-                            mime = "image/png"
-                        else:
-                            continue
-                        tmp_item = Path(tempfile.gettempdir()) / base
-                        tmp_item.write_bytes(zf.read(member))
-                        media = MediaFileUpload(str(tmp_item), mimetype=mime, resumable=True)
-                        drive.files().create(
-                            body={"name": base, "parents": [target_parent]},
-                            media_body=media,
-                            fields="id,name",
-                        ).execute()
-                        if base.endswith(".mp4"):
-                            existing_videos.add(base)
-                            log.info(f"'hazır videolar' klasörüne video eklendi: {base}")
-                        else:
-                            existing_kapaklar.add(base)
-                            log.info(f"KAPAKLAR klasörüne kapak eklendi: {base}")
-                        try:
-                            tmp_item.unlink()
-                        except Exception:
-                            pass
-            finally:
-                try:
-                    zip_path.unlink()
-                except Exception:
-                    pass
+                buf = io.BytesIO()
+                dl = MediaIoBaseDownload(buf, drive.files().get_media(fileId=baslik_file_id))
+                done = False
+                while not done:
+                    _, done = dl.next_chunk()
+                buf.seek(0)
+                wb_rem = openpyxl.load_workbook(buf)
+                ws_rem = next((s for s in wb_rem.worksheets if s.title.strip().casefold() == "drive"), wb_rem.active)
+                for r in range(2, ws_rem.max_row + 1):
+                    st = str(ws_rem.cell(r, 1).value or "").strip().upper()
+                    fn = str(ws_rem.cell(r, 2).value or "").strip()
+                    if fn and ("YÜKLENDİ" in st or "YUKLENDI" in st):
+                        remote_uploaded[fn] = (
+                            ws_rem.cell(r, 10).value,
+                            ws_rem.cell(r, 11).value,
+                            ws_rem.cell(r, 12).value,
+                            ws_rem.cell(r, 13).value,
+                        )
+                wb_rem.close()
+            except Exception as re_err:
+                log.warning(f"Mevcut baslik.xlsx okuma uyarısı: {re_err}")
+
+            wb_loc = openpyxl.load_workbook(local_xlsx)
+            ws_loc = next((s for s in wb_loc.worksheets if s.title.strip().casefold() == "drive"), wb_loc.active)
+            green_fill = PatternFill(start_color="B6D7A8", end_color="B6D7A8", fill_type="solid")
+            green_font = Font(name="Calibri", size=10, bold=False, color="0B3B17")
+            green_bold = Font(name="Calibri", size=10, bold=True, color="0B3B17")
+
+            for r in range(2, ws_loc.max_row + 1):
+                fn = str(ws_loc.cell(r, 2).value or "").strip()
+                if fn in remote_uploaded:
+                    ws_loc.cell(r, 1).value = "YÜKLENDİ"
+                    yt_u, up_t, vw, cm = remote_uploaded[fn]
+                    if yt_u and not ws_loc.cell(r, 10).value:
+                        ws_loc.cell(r, 10).value = yt_u
+                    if up_t and not ws_loc.cell(r, 11).value:
+                        ws_loc.cell(r, 11).value = up_t
+                    if vw is not None and not ws_loc.cell(r, 12).value:
+                        ws_loc.cell(r, 12).value = vw
+                    if cm is not None and not ws_loc.cell(r, 13).value:
+                        ws_loc.cell(r, 13).value = cm
+                    for c in range(1, 14):
+                        ws_loc.cell(r, c).fill = green_fill
+                        ws_loc.cell(r, c).font = green_bold if c in (1, 2) else green_font
+
+            merged_tmp = Path(tempfile.gettempdir()) / "baslik_merged.xlsx"
+            wb_loc.save(merged_tmp)
+            wb_loc.close()
+
+            media_x = MediaFileUpload(
+                str(merged_tmp),
+                mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                resumable=False,
+            )
+            drive.files().update(fileId=baslik_file_id, media_body=media_x).execute()
+            log.info(f"KartaL baslik.xlsx ({baslik_file_id}) A2:M133 Yeşil/Sarı simetrik olarak güncellendi.")
     except Exception as exc:
         log.warning(f"Bulut -> Drive senkronizasyon uyarısı: {exc}")
 
@@ -413,7 +377,7 @@ def upload_thumbnail_if_exists(youtube, drive, folder_id: str, video_file_name: 
     if not candidates:
         return False
     try:
-        search_folders = [DEFAULT_DRIVE_FOLDER_ID]
+        search_folders = ["1XKZJ12HyAvZkjgiG38ys3HOMhZ42d_jJ", DEFAULT_DRIVE_FOLDER_ID, "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br"]
         if folder_id and folder_id not in search_folders:
             search_folders.append(folder_id)
         # Ana klasör içindeki KAPAKLAR alt klasörünü de ara
