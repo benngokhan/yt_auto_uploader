@@ -17,7 +17,7 @@ import os
 import socket
 import sys
 import tempfile
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 try:
@@ -234,6 +234,50 @@ def upload_to_youtube(youtube, video_path: Path, meta: dict) -> dict:
     return response
 
 
+def upload_thumbnail_if_exists(youtube, drive, folder_id: str, video_file_name: str, video_id: str) -> bool:
+    """Eğer Drive klasöründe kapak_XX.png (veya uzun_kapak_XX.png) varsa videoya otomatik kapak olarak giydirir."""
+    import re
+    m_short = re.match(r"^video_(\d+)\.mp4$", video_file_name, re.I)
+    m_long = re.match(r"^uzun_video_(\d+)\.mp4$", video_file_name, re.I)
+    candidates = []
+    if m_short:
+        num = m_short.group(1)
+        candidates = [f"kapak_{num}.png", f"kapak_{num}.jpg"]
+    elif m_long:
+        num = m_long.group(1)
+        candidates = [f"uzun_kapak_{num}.png", f"kapak_uzun_{num}.png", f"kapak_{num}.png"]
+    if not candidates:
+        return False
+    try:
+        q = f"'{folder_id}' in parents and trashed=false"
+        res = drive.files().list(q=q, pageSize=200, fields="files(id,name)").execute()
+        files = {f["name"].lower(): f["id"] for f in res.get("files", [])}
+        target_id = None
+        target_name = None
+        for c in candidates:
+            if c.lower() in files:
+                target_id = files[c.lower()]
+                target_name = c
+                break
+        if not target_id:
+            return False
+        suffix = Path(target_name).suffix or ".png"
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tf:
+            tpath = Path(tf.name)
+        try:
+            download_drive_file(drive, target_id, tpath)
+            media = MediaFileUpload(str(tpath), mimetype="image/png" if suffix == ".png" else "image/jpeg")
+            youtube.thumbnails().set(videoId=video_id, media_body=media).execute()
+            log.info(f"  Özel kapak başarıyla giydirildi: {target_name}")
+            return True
+        finally:
+            if tpath.exists():
+                tpath.unlink()
+    except Exception as e:
+        log.warning(f"  Kapak giydirme uyarısı: {e}")
+        return False
+
+
 def post_pinned_comment(youtube, video_id: str, comment_text: str) -> tuple[bool, str]:
     if not comment_text or not comment_text.strip():
         return False, "Tabloda sabit yorum metni boş."
@@ -425,6 +469,7 @@ def upload_job(
         yt_url = f"https://youtu.be/{vid_id}"
         log.info(f"YouTube yüklemesi tamamlandı: {yt_url}")
 
+        upload_thumbnail_if_exists(youtube, drive, queue_folder, file_name, vid_id)
         comment_ok, _ = post_pinned_comment(youtube, vid_id, meta.get("pinned_comment", ""))
         mark_as_uploaded(list_path, file_id, file_name, yt_url, title=meta["title"])
         update_excel_status_in_drive(drive, queue_folder, file_name, new_status="YÜKLENDİ", youtube_url=yt_url)
