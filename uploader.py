@@ -303,6 +303,18 @@ def validate_metadata_workbook(drive, queue_folder: str) -> str:
         raise RuntimeError("DRIVE sekmesi okunamadı veya hiç satır bulunamadı.")
     ready_shorts = sum(1 for r in records.values() if r.get("is_ready") and not r.get("is_long"))
     ready_longs = sum(1 for r in records.values() if r.get("is_ready") and r.get("is_long"))
+    # Çapraz paylaşım anahtar probu (Stok klasöründe crosspost_keys.json var mı?)
+    try:
+        from crosspost_worker import STOCK_FOLDER_ID, KEYS_FILE_NAME
+        q = f"'{STOCK_FOLDER_ID}' in parents and name='{KEYS_FILE_NAME}' and trashed=false"
+        kres = drive.files().list(q=q, fields="files(id,name,modifiedTime)", pageSize=1).execute()
+        if kres.get("files"):
+            f0 = kres["files"][0]
+            print(f"CROSSPOST-KEYS: BULUNDU ✓ ({f0['name']} · {f0.get('modifiedTime','?')})")
+        else:
+            print("CROSSPOST-KEYS: HENÜZ YOK ✗ (KartaL Stok klasöründe crosspost_keys.json bulunamadı)")
+    except Exception as ke:
+        print(f"CROSSPOST-KEYS probe hatası (zararsız): {ke}")
     return (
         f"bilgidozu_yukleme_tablosu.xlsx: DRIVE sekmesi doğrulandı (video_31+ başlangıç kilidi aktif); "
         f"{ready_shorts} hazır Shorts, {ready_longs} hazır Uzun Video."
