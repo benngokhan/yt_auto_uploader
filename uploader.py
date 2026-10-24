@@ -189,6 +189,47 @@ def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
             if not page_token:
                 break
 
+        # 1.b Yeni üretilen (video_101..120 ve uzun_video_13) videolar KartaL Stok klasörüne (1w8tz...) gitmişse
+        #     onları Lobi ('hazır videolar' - 1JULlauO1eFpXgGdZKdZZDyqesSdkeT6f) klasörüne geri çek ki kullanıcı kontrol edip kendi taşısın!
+        lobby_videos = {f"video_{i}.mp4" for i in range(101, 121)} | {"uzun_video_13.mp4"}
+        existing_lobby = set()
+        page_token = None
+        while True:
+            res_l = drive.files().list(
+                q=f"'{hazir_videolar_id}' in parents and trashed=false",
+                pageSize=200,
+                fields="nextPageToken, files(id, name)",
+                pageToken=page_token,
+            ).execute()
+            for f in res_l.get("files", []):
+                existing_lobby.add(f.get("name", ""))
+            page_token = res_l.get("nextPageToken")
+            if not page_token:
+                break
+
+        page_token = None
+        while True:
+            res_k = drive.files().list(
+                q=f"'{kartal_folder}' in parents and trashed=false",
+                pageSize=200,
+                fields="nextPageToken, files(id, name)",
+                pageToken=page_token,
+            ).execute()
+            for f in res_k.get("files", []):
+                fn = f.get("name", "")
+                fid = f.get("id", "")
+                if fn in lobby_videos and fn in existing_lobby:
+                    try:
+                        # Lobi'de ('hazır videolar') henüz kontrol edilmeyi bekleyen kopyası duruyorsa,
+                        # KartaL Stok içindeki erken kopyayı kaldır. Kullanıcı Lobi'den taşıdığında (existing_lobby'den çıktığında) korunur!
+                        drive.files().update(fileId=fid, body={"trashed": True}).execute()
+                        log.info(f"Kullanıcı kontrolü için yalnızca Lobi ('hazır videolar') klasöründe bırakıldı: {fn}")
+                    except Exception as le:
+                        log.warning(f"Lobi taşıma uyarısı ({fn}): {le}")
+            page_token = res_k.get("nextPageToken")
+            if not page_token:
+                break
+
         # 2. KartaL klasöründeki (1w8tz...) baslik.xlsx (1tHZ4aCtdtKRLmY7z9PqLGUTu5rVth4vj) dosyasını
         #    botun sonradan işaretlediği YÜKLENDİ satırlarını koruyarak simetrik Yeşil/Sarı formatla güncelle!
         local_xlsx = BASE_DIR / "baslik.xlsx"

@@ -290,39 +290,29 @@ def load_table_from_drive_or_local(
 
 
 def list_drive_videos(drive, folder_id: str) -> list[dict]:
+    """SADECE kullanıcının onaylayıp taşıdığı KartaL Stok (1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_) klasöründeki videoları listeler.
+    Lobi ('hazır videolar' - 1JULlauO1eFpXgGdZKdZZDyqesSdkeT6f) klasöründeki videolar kullanıcı kontrolünden geçmeden çekilmez!"""
     videos = []
     seen_names = set()
-    folders_to_visit = []
-    for fid in (DEFAULT_DRIVE_FOLDER_ID, folder_id, SECONDARY_DRIVE_FOLDER_ID):
-        if fid and fid not in folders_to_visit:
-            folders_to_visit.append(fid)
-    visited = set()
+    target_folder = DEFAULT_DRIVE_FOLDER_ID  # 1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_
 
-    while folders_to_visit:
-        curr = folders_to_visit.pop(0)
-        if curr in visited:
-            continue
-        visited.add(curr)
-
-        page_token = None
-        while True:
-            res = drive.files().list(
-                q=f"'{curr}' in parents and trashed = false",
-                pageSize=200,
-                fields="nextPageToken, files(id, name, mimeType, size)",
-                **({"pageToken": page_token} if page_token else {}),
-            ).execute()
-            for f in res.get("files", []):
-                mime = f.get("mimeType", "")
-                name = f.get("name", "")
-                if mime == "application/vnd.google-apps.folder":
-                    folders_to_visit.append(f["id"])
-                elif (name.lower().endswith(".mp4") or "video/" in mime) and name not in seen_names:
-                    seen_names.add(name)
-                    videos.append(f)
-            page_token = res.get("nextPageToken")
-            if not page_token:
-                break
+    page_token = None
+    while True:
+        res = drive.files().list(
+            q=f"'{target_folder}' in parents and trashed = false",
+            pageSize=200,
+            fields="nextPageToken, files(id, name, mimeType, size)",
+            **({"pageToken": page_token} if page_token else {}),
+        ).execute()
+        for f in res.get("files", []):
+            mime = f.get("mimeType", "")
+            name = f.get("name", "")
+            if (name.lower().endswith(".mp4") or "video/" in mime) and name not in seen_names:
+                seen_names.add(name)
+                videos.append(f)
+        page_token = res.get("nextPageToken")
+        if not page_token:
+            break
 
     videos.sort(key=lambda x: natural_sort_key(x.get("name", "")))
     return videos
