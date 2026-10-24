@@ -94,8 +94,8 @@ def load_config() -> dict:
             cfg.update(json.loads(CONFIG_FILE.read_text(encoding="utf-8")))
         except Exception as e:
             log.warning(f"config.json okuma uyarısı: {e}")
-    if os.getenv("DRIVE_QUEUE_FOLDER_ID"):
-        cfg["drive_queue_folder_id"] = os.environ["DRIVE_QUEUE_FOLDER_ID"].strip()
+    # Ana klasör her zaman 1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br olarak kilitlidir
+    cfg["drive_queue_folder_id"] = DEFAULT_DRIVE_FOLDER_ID
     if os.getenv("SHEETS_ID"):
         cfg["sheets_id"] = os.environ["SHEETS_ID"].strip()
     if os.getenv("YOUTUBE_PRIVACY_STATUS"):
@@ -129,7 +129,175 @@ def get_google_clients(token_file: Path = None, force_reauth: bool = False):
     return youtube, drive
 
 
+def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
+    """1) Diğer klasördeki (1MBjwKp...) fazlalık baslik.xlsx / bilgidozu_yukleme_tablosu.xlsx dosyalarını siler (tek yerde kalsın).
+    2) KartaL'ın ana stok klasöründeki (1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_) baslik.xlsx (1tHZ4aCtdtKRLmY7z9PqLGUTu5rVth4vj) dosyasını
+       mevcut YÜKLENDİ durumlarını koruyarak A2:M133 Yeşil/Sarı simetrik formatla günceller.
+    3) Yeni videoları hem 'hazır videolar' (1JULlauO1eFpXgGdZKdZZDyqesSdkeT6f) hem KartaL stok klasörüne, kapakları KAPAKLAR'a aktarır."""
+    import io
+    import urllib.request
+    import zipfile
+    import openpyxl
+    from openpyxl.styles import PatternFill, Font
+    from googleapiclient.http import MediaIoBaseDownload
+
+    kartal_folder = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"
+    main_folder = "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br"
+    hazir_videolar_id = "1JULlauO1eFpXgGdZKdZZDyqesSdkeT6f"
+    kapaklar_folder_id = "1XKZJ12HyAvZkjgiG38ys3HOMhZ42d_jJ"
+    baslik_file_id = "1tHZ4aCtdtKRLmY7z9PqLGUTu5rVth4vj"
+
+    try:
+        # 0. KartaL stok klasörünün adı 'Mira Stok' ise 'KartaL Stok' yap
+        try:
+            fmeta = drive.files().get(fileId=kartal_folder, fields="name").execute()
+            if "mira" in fmeta.get("name", "").lower():
+                drive.files().update(fileId=kartal_folder, body={"name": "KartaL Stok"}).execute()
+                log.info("Klasör adı 'KartaL Stok' olarak güncellendi.")
+        except Exception:
+            pass
+
+        # 1. Diğer klasördeki (1MBjwKp...) fazlalık baslik.xlsx ve bilgidozu_yukleme_tablosu.xlsx dosyalarını sil (tek yerde kalsın)
+        page_token = None
+        while True:
+            res = drive.files().list(
+                q=f"'{main_folder}' in parents and trashed=false",
+                pageSize=200,
+                fields="nextPageToken, files(id, name, mimeType)",
+                pageToken=page_token,
+            ).execute()
+            for f in res.get("files", []):
+                fname = f.get("name", "")
+                fid = f.get("id", "")
+                if fname.lower().endswith(".mp4"):
+                    try:
+                        drive.files().update(
+                            fileId=fid,
+                            addParents=hazir_videolar_id,
+                            removeParents=main_folder,
+                            fields="id, parents",
+                        ).execute()
+                    except Exception:
+                        pass
+                elif fname in ("baslik.xlsx", "bilgidozu_yukleme_tablosu.xlsx"):
+                    try:
+                        drive.files().update(fileId=fid, body={"trashed": True}).execute()
+                        log.info(f"Diğer klasördeki fazlalık tablo kaldırıldı (tek yerde kalsın): {fname}")
+                    except Exception as de:
+                        log.warning(f"Fazlalık tablo kaldırma uyarısı ({fname}): {de}")
+            page_token = res.get("nextPageToken")
+            if not page_token:
+                break
+
+        # 1.b Yeni üretilen (video_101..120 ve uzun_video_13) videolar KartaL Stok klasörüne (1w8tz...) gitmişse
+        #     onları Lobi ('hazır videolar' - 1JULlauO1eFpXgGdZKdZZDyqesSdkeT6f) klasörüne geri çek ki kullanıcı kontrol edip kendi taşısın!
+        lobby_videos = {f"video_{i}.mp4" for i in range(101, 121)} | {"uzun_video_13.mp4"}
+        existing_lobby = set()
+        page_token = None
+        while True:
+            res_l = drive.files().list(
+                q=f"'{hazir_videolar_id}' in parents and trashed=false",
+                pageSize=200,
+                fields="nextPageToken, files(id, name)",
+                pageToken=page_token,
+            ).execute()
+            for f in res_l.get("files", []):
+                existing_lobby.add(f.get("name", ""))
+            page_token = res_l.get("nextPageToken")
+            if not page_token:
+                break
+
+        page_token = None
+        while True:
+            res_k = drive.files().list(
+                q=f"'{kartal_folder}' in parents and trashed=false",
+                pageSize=200,
+                fields="nextPageToken, files(id, name)",
+                pageToken=page_token,
+            ).execute()
+            for f in res_k.get("files", []):
+                fn = f.get("name", "")
+                fid = f.get("id", "")
+                if fn in lobby_videos and fn in existing_lobby:
+                    try:
+                        # Lobi'de ('hazır videolar') henüz kontrol edilmeyi bekleyen kopyası duruyorsa,
+                        # KartaL Stok içindeki erken kopyayı kaldır. Kullanıcı Lobi'den taşıdığında (existing_lobby'den çıktığında) korunur!
+                        drive.files().update(fileId=fid, body={"trashed": True}).execute()
+                        log.info(f"Kullanıcı kontrolü için yalnızca Lobi ('hazır videolar') klasöründe bırakıldı: {fn}")
+                    except Exception as le:
+                        log.warning(f"Lobi taşıma uyarısı ({fn}): {le}")
+            page_token = res_k.get("nextPageToken")
+            if not page_token:
+                break
+
+        # 2. KartaL klasöründeki (1w8tz...) baslik.xlsx (1tHZ4aCtdtKRLmY7z9PqLGUTu5rVth4vj) dosyasını
+        #    botun sonradan işaretlediği YÜKLENDİ satırlarını koruyarak simetrik Yeşil/Sarı formatla güncelle!
+        local_xlsx = BASE_DIR / "baslik.xlsx"
+        if local_xlsx.exists():
+            remote_uploaded = {}
+            try:
+                buf = io.BytesIO()
+                dl = MediaIoBaseDownload(buf, drive.files().get_media(fileId=baslik_file_id))
+                done = False
+                while not done:
+                    _, done = dl.next_chunk()
+                buf.seek(0)
+                wb_rem = openpyxl.load_workbook(buf)
+                ws_rem = next((s for s in wb_rem.worksheets if s.title.strip().casefold() == "drive"), wb_rem.active)
+                for r in range(2, ws_rem.max_row + 1):
+                    st = str(ws_rem.cell(r, 1).value or "").strip().upper()
+                    fn = str(ws_rem.cell(r, 2).value or "").strip()
+                    if fn and ("YÜKLENDİ" in st or "YUKLENDI" in st):
+                        remote_uploaded[fn] = (
+                            ws_rem.cell(r, 10).value,
+                            ws_rem.cell(r, 11).value,
+                            ws_rem.cell(r, 12).value,
+                            ws_rem.cell(r, 13).value,
+                        )
+                wb_rem.close()
+            except Exception as re_err:
+                log.warning(f"Mevcut baslik.xlsx okuma uyarısı: {re_err}")
+
+            wb_loc = openpyxl.load_workbook(local_xlsx)
+            ws_loc = next((s for s in wb_loc.worksheets if s.title.strip().casefold() == "drive"), wb_loc.active)
+            green_fill = PatternFill(start_color="B6D7A8", end_color="B6D7A8", fill_type="solid")
+            green_font = Font(name="Calibri", size=10, bold=False, color="0B3B17")
+            green_bold = Font(name="Calibri", size=10, bold=True, color="0B3B17")
+
+            for r in range(2, ws_loc.max_row + 1):
+                fn = str(ws_loc.cell(r, 2).value or "").strip()
+                if fn in remote_uploaded:
+                    ws_loc.cell(r, 1).value = "YÜKLENDİ"
+                    yt_u, up_t, vw, cm = remote_uploaded[fn]
+                    if yt_u and not ws_loc.cell(r, 10).value:
+                        ws_loc.cell(r, 10).value = yt_u
+                    if up_t and not ws_loc.cell(r, 11).value:
+                        ws_loc.cell(r, 11).value = up_t
+                    if vw is not None and not ws_loc.cell(r, 12).value:
+                        ws_loc.cell(r, 12).value = vw
+                    if cm is not None and not ws_loc.cell(r, 13).value:
+                        ws_loc.cell(r, 13).value = cm
+                    for c in range(1, 14):
+                        ws_loc.cell(r, c).fill = green_fill
+                        ws_loc.cell(r, c).font = green_bold if c in (1, 2) else green_font
+
+            merged_tmp = Path(tempfile.gettempdir()) / "baslik_merged.xlsx"
+            wb_loc.save(merged_tmp)
+            wb_loc.close()
+
+            media_x = MediaFileUpload(
+                str(merged_tmp),
+                mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                resumable=False,
+            )
+            drive.files().update(fileId=baslik_file_id, media_body=media_x).execute()
+            log.info(f"KartaL baslik.xlsx ({baslik_file_id}) A2:M133 Yeşil/Sarı simetrik olarak güncellendi.")
+    except Exception as exc:
+        log.warning(f"Bulut -> Drive senkronizasyon uyarısı: {exc}")
+
+
 def validate_metadata_workbook(drive, queue_folder: str) -> str:
+    sync_cloud_deliveries_to_drive(drive, queue_folder or DEFAULT_DRIVE_FOLDER_ID)
     records = load_table_from_drive_or_local(drive, queue_folder or DEFAULT_DRIVE_FOLDER_ID)
     if not records:
         raise RuntimeError("DRIVE sekmesi okunamadı veya hiç satır bulunamadı.")
@@ -250,9 +418,22 @@ def upload_thumbnail_if_exists(youtube, drive, folder_id: str, video_file_name: 
     if not candidates:
         return False
     try:
-        q = f"'{folder_id}' in parents and trashed=false"
-        res = drive.files().list(q=q, pageSize=200, fields="files(id,name)").execute()
-        files = {f["name"].lower(): f["id"] for f in res.get("files", [])}
+        search_folders = ["1XKZJ12HyAvZkjgiG38ys3HOMhZ42d_jJ", DEFAULT_DRIVE_FOLDER_ID, "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br"]
+        if folder_id and folder_id not in search_folders:
+            search_folders.append(folder_id)
+        # Ana klasör içindeki KAPAKLAR alt klasörünü de ara
+        q_sub = f"'{DEFAULT_DRIVE_FOLDER_ID}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
+        sub_res = drive.files().list(q=q_sub, pageSize=50, fields="files(id,name)").execute()
+        for sf in sub_res.get("files", []):
+            if "kapak" in sf.get("name", "").lower():
+                search_folders.insert(0, sf["id"])
+
+        files = {}
+        for sf_id in search_folders:
+            q = f"'{sf_id}' in parents and trashed=false"
+            res = drive.files().list(q=q, pageSize=200, fields="files(id,name)").execute()
+            for f in res.get("files", []):
+                files.setdefault(f["name"].lower(), f["id"])
         target_id = None
         target_name = None
         for c in candidates:
@@ -479,6 +660,18 @@ def upload_job(
         REPORT_FILE.write_text(report_txt, encoding="utf-8")
         sync_kartal_status_report(youtube, file_name, yt_url)
 
+        # --- Çapraz paylaşım (TikTok + Instagram Reels): dosya silinmeden önce ---
+        crosspost_result = None
+        try:
+            from qa_and_crosspost import build_crosspost_caption
+            from crosspost_worker import run_crosspost
+
+            xcap = build_crosspost_caption(meta)
+            crosspost_result = run_crosspost(tmp_path, file_name, xcap)
+            log.info(f"Çapraz paylaşım sonucu: {crosspost_result}")
+        except Exception as xe:
+            log.warning(f"Çapraz paylaşım atlandı (YouTube akışı etkilenmedi): {xe}")
+
         return {
             "video_id": vid_id,
             "title": meta["title"],
@@ -486,6 +679,7 @@ def upload_job(
             "drive_file_id": file_id,
             "drive_file_name": file_name,
             "comment_posted": comment_ok,
+            "crosspost": crosspost_result,
         }
     finally:
         if tmp_path.exists():
