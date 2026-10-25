@@ -303,6 +303,18 @@ def validate_metadata_workbook(drive, queue_folder: str) -> str:
         raise RuntimeError("DRIVE sekmesi okunamadı veya hiç satır bulunamadı.")
     ready_shorts = sum(1 for r in records.values() if r.get("is_ready") and not r.get("is_long"))
     ready_longs = sum(1 for r in records.values() if r.get("is_ready") and r.get("is_long"))
+    # AKILLI RÖNTGEN: Tabloda hazır görünen uzunlar, Drive klasöründe fiziksel var mı?
+    try:
+        from sheets_metadata import list_drive_videos, is_long_filename
+        disk_videos = list_drive_videos(drive, queue_folder or DEFAULT_DRIVE_FOLDER_ID)
+        disk_long_names = sorted(v["name"] for v in disk_videos if is_long_filename(v["name"]))
+        ready_long_names = sorted(k for k, r in records.items() if r.get("is_ready") and r.get("is_long"))
+        kayip_longlar = [n for n in ready_long_names if n not in disk_long_names]
+        print(f"UZUN-RONTGEN: Diskte {len(disk_long_names)} uzun mp4 -> {disk_long_names}")
+        print(f"UZUN-RONTGEN: Tabloda hazır {len(ready_long_names)} satır -> {ready_long_names}")
+        print(f"UZUN-RONTGEN: Kayıp uzun: {kayip_longlar if kayip_longlar else 'YOK'}")
+    except Exception as xe:
+        print(f"UZUN-RONTGEN hata (zararsız): {xe}")
     # Çapraz paylaşım anahtar probu (Stok klasöründe crosspost_keys.json var mı?)
     try:
         from crosspost_worker import STOCK_FOLDER_ID, KEYS_FILE_NAME
