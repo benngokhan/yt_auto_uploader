@@ -668,26 +668,43 @@ def drain_lobi_to_queue(drive, queue_folder: str, lobi_id: str = "1JULlauO1eFpXg
 
 SERIES_PLAYLIST_TITLE = "Sizin Beğendikleriniz | Uzun Bilgi Serisi"
 
-def ensure_series_playlist(youtube) -> "str | None":
-    """Uzun video bölüm serisi için oynatma listesi; yoksa oluşturur."""
+SHORTS_TOPIC_RULES = [
+    ("Nörobilim & İnsan Beyni 🧠", ["beyn", "zihn", "nöro", "hafıza", "hafiza", "uyku", "bilinç", "bilinc", "rüya", "ruya", "algı", "algi", "yanılsama", "dopamin", "korku", "mutluluk", "düşünce", "dusunce"]),
+    ("Mühürlü Tarih 🏺", ["piramit", "antik", "tarih", "imparator", "medeniyet", "mısır", "misir", "roma", "osmanlı", "osmanli", "arkeol", "mühür", "tapınak", "kale", "savaş", "savas", "korsan", "mamut", "efsane", "kadim"]),
+    ("Evren & Uzay 🌌", ["uzay", "gezegen", "yıldız", "yildiz", "kara delik", "galaksi", "mars", "ay'da", "ayda", "ay ", "evren", "kuyruklu", "meteor", "nasa", "astronot", "güneş", "gunes"]),
+    ("Doğa & Canlılar 🦎", ["hayvan", "bitki", "deniz", "böcek", "bocek", "kuş", "kus", "aksolotl", "geko", "karides", "ağaç", "agac", "orman", "mantar", "kurbağa", "kurbaga", "balina", "ahtapot", "kedi", "köpek", "kopek", "yılan", "yilan", "örümcek", "orumcek", "arı", "ari", "doğa", "doga", "okyanus"]),
+]
+
+def ensure_named_playlist(youtube, title: str, description: str = "") -> "str | None":
+    """İsme göre oynatma listesi; yoksa oluşturur."""
     try:
         resp = youtube.playlists().list(part="snippet", mine=True, maxResults=50).execute()
         for it in resp.get("items", []):
-            if it.get("snippet", {}).get("title") == SERIES_PLAYLIST_TITLE:
+            if it.get("snippet", {}).get("title") == title:
                 return it["id"]
         resp = youtube.playlists().insert(
             part="snippet,status",
-            body={
-                "snippet": {"title": SERIES_PLAYLIST_TITLE, "description": "Bilgi Dozu uzun video bölüm serisi."},
-                "status": {"privacyStatus": "public"},
-            },
+            body={"snippet": {"title": title, "description": description}, "status": {"privacyStatus": "public"}},
         ).execute()
         pid = resp["id"]
-        log.info(f"OYNATMA LISTESI olusturuldu: {SERIES_PLAYLIST_TITLE} ({pid})")
+        log.info(f"OYNATMA LISTESI olusturuldu: {title} ({pid})")
         return pid
     except Exception as e:
-        log.warning(f"Oynatma listesi hazirlanamadi (zararsiz): {e}")
+        log.warning(f"Oynatma listesi hazirlanamadi [{title}] (zararsiz): {e}")
         return None
+
+
+def ensure_series_playlist(youtube) -> "str | None":
+    return ensure_named_playlist(youtube, SERIES_PLAYLIST_TITLE, "Bilgi Dozu uzun video bölüm serisi.")
+
+
+def route_short_topic(title: str) -> "str | None":
+    """Başlığa göre konulu Shorts oynatma listesi adı; hiçbiri uymazsa None."""
+    t = (title or "").lower()
+    for liste_adi, anahtarlar in SHORTS_TOPIC_RULES:
+        if any(a in t for a in anahtarlar):
+            return liste_adi
+    return None
 
 
 def add_video_to_series(youtube, video_id: str, pid: "str | None" = None) -> None:
@@ -714,20 +731,26 @@ def backfill_series_playlist(youtube, drive, queue_folder: str) -> None:
         from sheets_metadata import load_table_from_drive_or_local
         table = load_table_from_drive_or_local(drive, queue_folder)
         pid = None
+        playlist_ids = {}
         for name, rec in table.items():
-            if not str(name).startswith("uzun_video_"):
-                continue
             if str(rec.get("status", "")).upper() != "YÜKLENDİ":
                 continue
             url = str(rec.get("youtube_url") or rec.get("yt_url") or "")
             m = _re.search(r"(?:youtu\.be/|v=)([\w-]{11})", url)
             if not m:
                 continue
-            if pid is None:
-                pid = ensure_series_playlist(youtube)
+            if str(name).startswith("uzun_video_"):
+                hedef = SERIES_PLAYLIST_TITLE
+            else:
+                hedef = route_short_topic(str(rec.get("title", "")))
+            if not hedef:
+                continue
+            if hedef not in playlist_ids:
+                playlist_ids[hedef] = ensure_named_playlist(youtube, hedef) if hedef != SERIES_PLAYLIST_TITLE else ensure_series_playlist(youtube)
+            pid = playlist_ids.get(hedef)
             if pid:
                 add_video_to_series(youtube, m.group(1), pid)
-        log.info("OYNATMA LISTESI: geri donuk uzun serisi taramasi tamam.")
+        log.info("OYNATMA LISTESI: geri donuk tarama tamam (uzun serisi + konulu Shorts).")
     except Exception as e:
         log.warning(f"Oynatma listesi geri-tarama atlandi (zararsiz): {e}")
 
@@ -822,6 +845,11 @@ def upload_job(
         if file_name.startswith("uzun_"):
             add_video_to_series(youtube, vid_id)
             backfill_series_playlist(youtube, drive, queue_folder)
+        else:
+            konu_listesi = route_short_topic(meta["title"])
+            if konu_listesi:
+                pkid = ensure_named_playlist(youtube, konu_listesi)
+                add_video_to_series(youtube, vid_id, pkid)
 
         report_txt = build_telegram_report(file_name, vid_id, yt_url, meta, comment_ok)
         REPORT_FILE.write_text(report_txt, encoding="utf-8")
