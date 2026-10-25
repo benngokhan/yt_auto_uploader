@@ -823,6 +823,21 @@ def upload_job(
         log.info("DRY-RUN TAMAMLANDI: Video YouTube'a yüklenmedi, tablo eşleşmesi doğrulandı.")
         return {"dry_run": True, "file_name": file_name, "title": meta["title"], "metadata": meta}
 
+    # SERI KOPRUSU: açıklamaya oynatma listesi linkini göm (ilgili-video rozeti API'de yok -> aynı işi link yapar)
+    try:
+        if file_name.startswith("uzun_"):
+            _pid = ensure_series_playlist(youtube)
+        else:
+            _konu = route_short_topic(meta["title"])
+            _pid = ensure_named_playlist(youtube, _konu) if _konu else None
+        if _pid:
+            seri_link = f"📚 Bu serinin oynatma listesi: https://www.youtube.com/playlist?list={_pid}"
+            if "playlist?list=" not in meta["description"]:
+                meta["description"] = (meta["description"] or "").rstrip() + "\n\n" + seri_link
+            log.info(f"SERI LINKI: aciklamaya liste baglantisi eklendi ({_pid})")
+    except Exception as e:
+        log.warning(f"Seri linki atlandi (zararsiz): {e}")
+
     suffix = Path(file_name).suffix or ".mp4"
     with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
         tmp_path = Path(tmp.name)
