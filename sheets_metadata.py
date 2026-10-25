@@ -69,16 +69,17 @@ def is_skipped_by_floor(filename: str) -> bool:
 
 def decide_prime_time_video_type(now_tr: Optional[datetime] = None) -> str:
     """
-    Türkiye YouTube Prime Time Takvimi (UTC+3):
-    - 14:00 TR (Öğle Kuşağı)   -> 'short' (1. Shorts)
-    - 18:00 TR (Akşamüstü)     -> 'short' (2. Shorts)
-    - 21:00 TR (Ana Prime Time)-> 1 gün arayla (çift günler) 'long' (Uzun Video), tek günler 'short' (3. Shorts)
+    Türkiye YouTube Prime Time Takvimi (UTC+3) — Rakip Raporu Revizesi (25 Eki):
+    - 14:00 TR (Öğle Kuşağı)   -> 'short'
+    - 18:00 TR (Akşamüstü)     -> 'short'
+    - 21:00 TR (Ana Prime Time)-> 'short'
+    - UZUN VIDEO: Ayda iki kez Pazar 15:00 TR (1. ve 3. Pazar) -> 'long'
     """
     tr_tz = timezone(timedelta(hours=3))
     dt = now_tr.astimezone(tr_tz) if now_tr else datetime.now(tr_tz)
-    # 20:00 - 23:59 TR arası akşam ana Prime Time kuşağıdır
-    if dt.hour >= 20:
-        if dt.toordinal() % 2 == 0:
+    if dt.weekday() == 6 and dt.hour == 15:
+        day = dt.day
+        if (1 <= day <= 7) or (15 <= day <= 21):
             return "long"
     return "short"
 
