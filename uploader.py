@@ -623,36 +623,43 @@ def build_telegram_report(
 
 
 def drain_lobi_to_queue(drive, queue_folder: str, lobi_id: str = "1JULlauO1eFpXgGdZKdZZDyqesSdkeT6f") -> int:
-    """LOBI ONAY BASAMAĞI KALDIRILDI: 'hazır videolar' (Lobi) klasöründeki mp4'ler kontrol beklemeden doğrudan yayın kuyruğuna akar.
+    """LOBI ONAY BASAMAĞI KALDIRILDI: 'hazır videolar' (Lobi) klasöründeki mp4'ler (alt klasörleri dahil) kontrol beklemeden doğrudan yayın kuyruğuna akar.
     Kullanıcı artık elle onaylamıyor (25 Ekim 2026 kararı)."""
     try:
         from sheets_metadata import list_drive_videos
         mevcut_isimler = {v["name"] for v in list_drive_videos(drive, queue_folder)}
         moved = 0
-        page_token = None
-        while True:
-            res = drive.files().list(
-                q=f"'{lobi_id}' in parents and trashed=false",
-                fields="nextPageToken, files(id,name,mimeType)",
-                pageSize=200,
-                pageToken=page_token,
-            ).execute()
-            for f in res.get("files", []):
-                name = f.get("name", "")
-                mime = f.get("mimeType", "")
-                if not (name.lower().endswith(".mp4") or "video/" in mime):
-                    continue
-                if name in mevcut_isimler:
-                    continue
-                drive.files().update(fileId=f["id"], addParents=queue_folder, removeParents=lobi_id, fields="id").execute()
-                log.info(f"LOBI->KUYRUK: {name} otomatik aktarıldı (onay adımı kaldırıldı).")
-                mevcut_isimler.add(name)
-                moved += 1
-            page_token = res.get("nextPageToken")
-            if not page_token:
-                break
-        if moved:
-            log.info(f"LOBI->KUYRUK tamam: {moved} video otomatik aktarıldı.")
+        toplam_mp4 = 0
+        ziyaret = [lobi_id]
+        while ziyaret:
+            curr = ziyaret.pop(0)
+            page_token = None
+            while True:
+                res = drive.files().list(
+                    q=f"'{curr}' in parents and trashed=false",
+                    fields="nextPageToken, files(id,name,mimeType)",
+                    pageSize=200,
+                    pageToken=page_token,
+                ).execute()
+                for f in res.get("files", []):
+                    if f.get("mimeType") == "application/vnd.google-apps.folder":
+                        ziyaret.append(f["id"])
+                        continue
+                    name = f.get("name", "")
+                    mime = f.get("mimeType", "")
+                    if not (name.lower().endswith(".mp4") or "video/" in mime):
+                        continue
+                    toplam_mp4 += 1
+                    if name in mevcut_isimler:
+                        continue
+                    drive.files().update(fileId=f["id"], addParents=queue_folder, removeParents=curr, fields="id").execute()
+                    log.info(f"LOBI->KUYRUK: {name} otomatik aktarıldı (onay adımı kaldırıldı).")
+                    mevcut_isimler.add(name)
+                    moved += 1
+                page_token = res.get("nextPageToken")
+                if not page_token:
+                    break
+        log.info(f"LOBI durum: {toplam_mp4} mp4 bulundu, {moved} tanesi kuyruğa aktarıldı.")
         return moved
     except Exception as e:
         log.warning(f"LOBI aktarımı atlandi (zararsiz): {e}")
