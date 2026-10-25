@@ -378,7 +378,7 @@ def _kartal_llm_rank(prompt_system: str, prompt_user: str, cfg: dict) -> str:
                 break  # anahtar hatasıysa diğer modeli denemektente fayda yok
 
     gem_key = (cfg.get("gemini_api_key") or os.environ.get("GEMINI_API_KEY") or "").strip()
-    gem_modeller = ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    gem_modeller = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-flash-lite-latest", "gemini-2.5-flash"]  # 2026: 2.0 serisi emekli, 3.5 güncel
     for _model in gem_modeller if gem_key else []:
         try:
             body = _json.dumps({
