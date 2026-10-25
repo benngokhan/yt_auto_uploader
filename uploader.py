@@ -669,7 +669,7 @@ def drain_lobi_to_queue(drive, queue_folder: str, lobi_id: str = "1JULlauO1eFpXg
 SERIES_PLAYLIST_TITLE = "Sizin Beğendikleriniz | Uzun Bilgi Serisi"
 
 SHORTS_TOPIC_RULES = [
-    ("Nörobilim & İnsan Beyni 🧠", ["beyn", "zihn", "nöro", "burun", "vücud", "vucud", "organ", "kas ", "deri", "hafıza", "hafiza", "uyku", "bilinç", "bilinc", "rüya", "ruya", "algı", "algi", "yanılsama", "dopamin", "korku", "mutluluk", "düşünce", "dusunce"]),
+    ("Nörobilim & İnsan Beyni 🧠", ["beyn", "zihn", "nöro", "burn", "vücud", "vucud", "kas ", "deri", "hafıza", "hafiza", "uyku", "bilinç", "bilinc", "rüya", "ruya", "algı", "algi", "yanılsama", "dopamin", "korku", "mutluluk", "düşünce", "dusunce"]),
     ("Mühürlü Tarih 🏺", ["piramit", "antik", "tarih", "imparator", "medeniyet", "mısır", "misir", "roma", "osmanlı", "osmanli", "arkeol", "mühür", "tapınak", "kale", "savaş", "savas", "korsan", "mamut", "efsane", "kadim"]),
     ("Evren & Uzay 🌌", ["uzay", "gezegen", "yıldız", "yildiz", "satürn", "saturn", "jüpiter", "neptün", "merkür", "venüs", "uranüs", "everest", "kara delik", "galaksi", "mars", "ay'da", "ayda", "ay ", "evren", "kuyruklu", "meteor", "nasa", "astronot", "güneş", "gunes"]),
     ("Doğa & Canlılar 🦎", ["hayvan", "bitki", "deniz", "böcek", "bocek", "kuş", "kus", "aksolotl", "geko", "karides", "ağaç", "agac", "orman", "mantar", "kurbağa", "kurbaga", "balina", "ahtapot", "kedi", "köpek", "kopek", "yılan", "yilan", "örümcek", "orumcek", "arı", "ari", "doğa", "doga", "okyanus"]),
