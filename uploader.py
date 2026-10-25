@@ -303,6 +303,8 @@ def validate_metadata_workbook(drive, queue_folder: str) -> str:
         raise RuntimeError("DRIVE sekmesi okunamadı veya hiç satır bulunamadı.")
     ready_shorts = sum(1 for r in records.values() if r.get("is_ready") and not r.get("is_long"))
     ready_longs = sum(1 for r in records.values() if r.get("is_ready") and r.get("is_long"))
+    drain_lobi_to_queue(drive, queue_folder or DEFAULT_DRIVE_FOLDER_ID)
+
     # AKILLI RÖNTGEN: Tabloda hazır görünen uzunlar, Drive klasöründe fiziksel var mı?
     try:
         from sheets_metadata import list_drive_videos, is_long_filename
@@ -636,6 +638,7 @@ def upload_job(
     list_path = Path(config.get("uploaded_list", str(BASE_DIR / "uploaded.txt")))
 
     youtube, drive = get_google_clients(token_file=token_file)
+    drain_lobi_to_queue(drive, queue_folder)
     skip_ids = load_uploaded_ids(list_path)
     log.info(f"Atlanan/Tamamlanan kayıt sayısı: {len(skip_ids)} (+ video_1..30 kilidi)")
 
