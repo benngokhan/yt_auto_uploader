@@ -755,6 +755,90 @@ def backfill_series_playlist(youtube, drive, queue_folder: str) -> None:
         log.warning(f"Oynatma listesi geri-tarama atlandi (zararsiz): {e}")
 
 
+def retro_enrich_published(youtube, drive, queue_folder: str) -> None:
+    """GEÇMİŞE DÖNÜK ZENGİNLEŞTİRME: Daha önce yüklenmiş videoların açıklamasına seri oynatma listesi linkini gömer,
+    boş etiket alanlarını tablodaki Etiketler sütunundan doldurur. İzin yetersizse ilk denemede panik yapmadan vazgeçer."""
+    import re as _re
+    try:
+        from sheets_metadata import load_table_from_drive_or_local
+        table = load_table_from_drive_or_local(drive, queue_folder)
+        # Yayınlanmış satırlar + hedef video id'leri
+        hedefler = []
+        for name, rec in table.items():
+            if str(rec.get("status", "")).upper() != "YÜKLENDİ":
+                continue
+            url = str(rec.get("youtube_url") or "")
+            m = _re.search(r"(?:youtu\.be/|v=)([\w-]{11})", url)
+            if not m:
+                continue
+            hedefler.append((str(name), m.group(1), str(rec.get("title", "")), str(rec.get("description", "")), str(rec.get("tags", "") or "")))
+        if not hedefler:
+            return
+        ids = [h[1] for h in hedefler]
+        # mevcut snippet'ları toplu çek
+        mevcut = {}
+        for i in range(0, len(ids), 50):
+            resp = youtube.videos().list(part="snippet", id=",".join(ids[i:i+50])).execute()
+            for it in resp.get("items", []):
+                mevcut[it["id"]] = it["snippet"]
+        degisen = 0
+        for name, vid, title, desc, tags in hedefler:
+            snip = mevcut.get(vid)
+            if not snip:
+                continue
+            yeni_desc = desc or snip.get("description", "")
+            # seri linki hedefi
+            pid = None
+            if name.startswith("uzun_video_"):
+                if "playlist?list=" not in snip.get("description", ""):
+                    pid = ensure_series_playlist(youtube)
+            else:
+                if "playlist?list=" not in snip.get("description", ""):
+                    konu = route_short_topic(title or snip.get("title", ""))
+                    if konu:
+                        pid = ensure_named_playlist(youtube, konu)
+            seri_link = ""
+            if pid:
+                seri_link = f"\n\n📚 Bu serinin oynatma listesi: https://www.youtube.com/playlist?list={pid}"
+            yeni_tags = snip.get("tags", []) or []
+            tablo_tags = [t.strip() for t in tags.split(",") if t.strip()]
+            if not yeni_tags and tablo_tags:
+                yeni_tags = tablo_tags
+            yeni_desc_final = snip.get("description", "")
+            degisim = False
+            if seri_link and "playlist?list=" not in yeni_desc_final:
+                yeni_desc_final = yeni_desc_final.rstrip() + seri_link
+                degisim = True
+            if tablo_tags and not (snip.get("tags") or []):
+                degisim = True
+            if not degisim:
+                continue
+            try:
+                youtube.videos().update(
+                    part="snippet",
+                    body={
+                        "id": vid,
+                        "snippet": {
+                            "title": snip.get("title", ""),
+                            "description": yeni_desc_final,
+                            "tags": yeni_tags,
+                            "categoryId": snip.get("categoryId", "27"),
+                            "defaultLanguage": "tr",
+                            "defaultAudioLanguage": "tr",
+                        },
+                    },
+                ).execute()
+                degisen += 1
+                log.info(f"RETRO ZENGİN: {name} açıklama/etiket yenilendi (seri linki/etiket basıldı).")
+            except Exception as ue:
+                log.warning(f"RETRO ZENGİN izin sınırı ({ue.__class__.__name__}): ilk denemede vazgeçildi — {ue}")
+                return
+        if degisen:
+            log.info(f"RETRO ZENGİN tamam: {degisen} eski video zenginleştirildi.")
+    except Exception as e:
+        log.warning(f"Retro zenginleştirme atlandi (zararsiz): {e}")
+
+
 def upload_job(
     channel_config: dict = None,
     publish_at=None,
@@ -865,6 +949,7 @@ def upload_job(
             if konu_listesi:
                 pkid = ensure_named_playlist(youtube, konu_listesi)
                 add_video_to_series(youtube, vid_id, pkid)
+        retro_enrich_published(youtube, drive, queue_folder)
 
         report_txt = build_telegram_report(file_name, vid_id, yt_url, meta, comment_ok)
         REPORT_FILE.write_text(report_txt, encoding="utf-8")
