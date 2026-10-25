@@ -323,6 +323,23 @@ def validate_metadata_workbook(drive, queue_folder: str) -> str:
                 except Exception:
                     pnames.append(f"ID:{pid[:12]}")
             print(f"UZUN-KONUM: {f['name']} -> klasör: {pnames}")
+        # OTOMATİK ONARIM: hazır uzunlar yanlış klasördeyse gerçek kuyruk klasörüne taşı
+        qname = drive.files().get(fileId=queue_folder, fields="name").execute().get("name", "?")
+        print(f"UZUN-ONARIM: Gerçek kuyruk klasörü = '{qname}' (id {queue_folder[:8]}...)")
+        for f in res.get("files", []):
+            parents = f.get("parents", [])
+            if f["name"].startswith("uzun_video_") and parents and queue_folder not in parents:
+                try:
+                    drive.files().update(fileId=f["id"], addParents=queue_folder, removeParents=",".join(parents), fields="id").execute()
+                    print(f"UZUN-ONARIM: TAŞINDI -> {f['name']}")
+                except Exception as me:
+                    print(f"UZUN-ONARIM hata {f['name']}: {me}")
+        # Varsa aynı isimli yedek klasörleri de listele (bilgi amaçlı)
+        try:
+            fold = drive.files().list(q="mimeType='application/vnd.google-apps.folder' and name contains 'Stok' and trashed=false", fields="files(id,name)").execute()
+            print(f"UZUN-ONARIM: 'Stok' adlı klasörler: {[(f2['name'], f2['id'][:8]) for f2 in fold.get('files', [])]}")
+        except Exception as fe:
+            print(f"UZUN-ONARIM klasör listesi hata (zararsız): {fe}")
     except Exception as xe:
         print(f"UZUN-RONTGEN hata (zararsız): {xe}")
     # Çapraz paylaşım anahtar probu (Stok klasöründe crosspost_keys.json var mı?)
