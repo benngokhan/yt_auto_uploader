@@ -350,10 +350,11 @@ def _kartal_llm_rank(prompt_system: str, prompt_user: str, cfg: dict) -> str:
     import urllib.request as _u
 
     groq_key = (cfg.get("groq_api_key") or os.environ.get("GROQ_API_KEY") or "").strip()
-    if groq_key:
+    groq_modeller = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+    for _model in groq_modeller if groq_key else []:
         try:
             body = _json.dumps({
-                "model": "llama-3.1-8b-instant",
+                "model": _model,
                 "messages": [
                     {"role": "system", "content": prompt_system},
                     {"role": "user", "content": prompt_user},
@@ -372,17 +373,20 @@ def _kartal_llm_rank(prompt_system: str, prompt_user: str, cfg: dict) -> str:
             if txt.strip():
                 return txt
         except Exception as e:
-            log.warning(f"KartaL Akıllı Sıra (Groq) uyarısı: {e}")
+            log.warning(f"KartaL Akıllı Sıra (Groq/{_model}) uyarısı: {e}")
+            if "403" in str(e) or "401" in str(e):
+                break  # anahtar hatasıysa diğer modeli denemektente fayda yok
 
     gem_key = (cfg.get("gemini_api_key") or os.environ.get("GEMINI_API_KEY") or "").strip()
-    if gem_key:
+    gem_modeller = ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    for _model in gem_modeller if gem_key else []:
         try:
             body = _json.dumps({
                 "contents": [{"parts": [{"text": prompt_system + chr(10) + chr(10) + prompt_user}]}],
                 "generationConfig": {"temperature": 0.4, "maxOutputTokens": 220},
             }).encode()
             req = _u.Request(
-                f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gem_key}",
+                f"https://generativelanguage.googleapis.com/v1beta/models/{_model}:generateContent?key={gem_key}",
                 data=body, method="POST",
                 headers={"Content-Type": "application/json"},
             )
@@ -391,7 +395,10 @@ def _kartal_llm_rank(prompt_system: str, prompt_user: str, cfg: dict) -> str:
             if txt.strip():
                 return txt
         except Exception as e:
-            log.warning(f"KartaL Akıllı Sıra (Gemini) uyarısı: {e}")
+            log.warning(f"KartaL Akıllı Sıra (Gemini/{_model}) uyarısı: {e}")
+            if "403" in str(e) or "401" in str(e) or "400" in str(e):
+                break  # anahtar/istek hatasıysa model geçmek anlamsız
+    log.warning("KartaL Akıllı Sıra: tüm LLM sağlayıcıları sustu, doğal sıra kullanılacak.")
     return ""
 
 
