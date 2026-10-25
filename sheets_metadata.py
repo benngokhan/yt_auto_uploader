@@ -322,6 +322,146 @@ def list_drive_videos(drive, folder_id: str) -> list[dict]:
     return videos
 
 
+def _recent_uploaded_titles(limit: int = 3) -> list[dict]:
+    """uploaded.txt'nin son satırlarından {file_name, title} döndürür (LOCKED/MANUAL satırları atlar)."""
+    out: list[dict] = []
+    try:
+        p = Path("uploaded.txt")
+        if not p.exists():
+            return out
+        lines = [ln for ln in p.read_text(encoding="utf-8").splitlines() if "|" in ln]
+        for ln in reversed(lines):
+            parts = [x.strip() for x in ln.split("|")]
+            if len(parts) < 2:
+                continue
+            if parts[0].upper().startswith(("LOCKED_", "MANUAL_SKIP")):
+                continue
+            out.append({"file_name": parts[1], "title": parts[4] if len(parts) >= 5 else ""})
+            if len(out) >= limit:
+                break
+    except Exception:
+        pass
+    return out
+
+
+def _kartal_llm_rank(prompt_system: str, prompt_user: str, cfg: dict) -> str:
+    """Groq (llama-3.1-8b-instant) -> Gemini (gemini-2.0-flash) sırasıyla dener; ham metin döndürür."""
+    import json as _json
+    import urllib.request as _u
+
+    groq_key = (cfg.get("groq_api_key") or os.environ.get("GROQ_API_KEY") or "").strip()
+    if groq_key:
+        try:
+            body = _json.dumps({
+                "model": "llama-3.1-8b-instant",
+                "messages": [
+                    {"role": "system", "content": prompt_system},
+                    {"role": "user", "content": prompt_user},
+                ],
+                "temperature": 0.4,
+                "max_tokens": 220,
+                "response_format": {"type": "json_object"},
+            }).encode()
+            req = _u.Request(
+                "https://api.groq.com/openai/v1/chat/completions",
+                data=body, method="POST",
+                headers={"Authorization": f"Bearer {groq_key}", "Content-Type": "application/json"},
+            )
+            res = _json.loads(_u.urlopen(req, timeout=25).read().decode())
+            txt = res["choices"][0]["message"]["content"]
+            if txt.strip():
+                return txt
+        except Exception as e:
+            log.warning(f"KartaL Akıllı Sıra (Groq) uyarısı: {e}")
+
+    gem_key = (cfg.get("gemini_api_key") or os.environ.get("GEMINI_API_KEY") or "").strip()
+    if gem_key:
+        try:
+            body = _json.dumps({
+                "contents": [{"parts": [{"text": prompt_system + chr(10) + chr(10) + prompt_user}]}],
+                "generationConfig": {"temperature": 0.4, "maxOutputTokens": 220},
+            }).encode()
+            req = _u.Request(
+                f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gem_key}",
+                data=body, method="POST",
+                headers={"Content-Type": "application/json"},
+            )
+            res = _json.loads(_u.urlopen(req, timeout=25).read().decode())
+            txt = res["candidates"][0]["content"]["parts"][0]["text"]
+            if txt.strip():
+                return txt
+        except Exception as e:
+            log.warning(f"KartaL Akıllı Sıra (Gemini) uyarısı: {e}")
+    return ""
+
+
+def kartal_smart_pick(candidates: list[dict], table: dict) -> dict:
+    """KartaL Akıllı Sıra: başlık+kategori analiziyle bugünkü slot için en güçlü videoyu seçer.
+    Kesin güvence: sadece 'hazır & yüklenmemiş' aday havuzundan seçer -> tekrar İMKANSIZ.
+    LLM susarsa doğal sırayla (ilk aday) devam eder; asla turu çökertmez."""
+    if not candidates:
+        raise RuntimeError("aday havuzu boş")
+    if len(candidates) == 1:
+        return candidates[0]
+    try:
+        import json as _json
+        from datetime import datetime, timedelta
+
+        cfg: dict = {}
+        try:
+            cfg = _json.loads(Path("config.json").read_text(encoding="utf-8"))
+        except Exception:
+            cfg = {}
+
+        tr_now = datetime.utcnow() + timedelta(hours=3)
+        gun = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"][tr_now.weekday()]
+        slot = "öğle (12-15)" if tr_now.hour < 15 else ("akşamüstü (15-20)" if tr_now.hour < 20 else "prime-time gece (20-24)")
+
+        recents = _recent_uploaded_titles(3)
+        recent_lines = []
+        for r in recents:
+            cat = (table.get(r["file_name"]) or {}).get("category_name", "?")
+            recent_lines.append(f"- {r['file_name']}: {(r['title'] or '')[:80]} (kategori: {cat})")
+        recent_txt = "\n".join(recent_lines) if recent_lines else "- (yok)"
+
+        cand_lines = []
+        for c in candidates[:12]:
+            meta = c.get("metadata", {})
+            cand_lines.append(f"- {c['name']}: {meta.get('title', '')[:90]} | kategori: {meta.get('category_name', '?')} | tag: {str(meta.get('hashtags', ''))[:60]}")
+        cand_txt = "\n".join(cand_lines)
+
+        system_msg = (
+            "Sen KartaL — Bilgi Dozu (bilim/merak Shorts) kanalının içerik stratejisisin. "
+            "Görevin: verilen aday havuzundan BU slot için yayınlanmaya en uygun videoyu seçmek."
+        )
+        user_msg = (
+            f"Bugün: {gun}, slot: {slot} (TR saati).\n\n"
+            f"Son yüklenenler:\n{recent_txt}\n\n"
+            f"Aday havuzu (yalnızca bunlardan seç):\n{cand_txt}\n\n"
+            "Seçim kuralları:\n"
+            "1. Son yüklenenle AYNI kategoriden üst üste basma (çeşitlilik şart).\n"
+            "2. Hafta sonu gündüz -> şaşırtıcı/eğlenceli (hayvan, evren, garip olaylar); hafta içi akşam prime-time -> merak uyandıran (beyin, vücut, gizem).\n"
+            "3. Güçlü başlık sinyalleri: soru formu, sayı, 'neden/neden' merak boşluğu, duygu.\n"
+            "4. Sadece birini seç ve SADECE JSON döndür: {\"file_name\": \"...\", \"neden\": \"tek cümle\"}."
+        )
+
+        raw = _kartal_llm_rank(system_msg, user_msg, cfg)
+        if raw:
+            m = re.search(r"\{.*\}", raw, re.S)
+            if m:
+                data = _json.loads(m.group(0))
+                fname = str(data.get("file_name", ""))
+                neden = str(data.get("neden", ""))[:200]
+                for c in candidates:
+                    if c["name"] == fname:
+                        log.info(f"KARTAL AKILLI SIRA: {fname} seçildi — {neden}")
+                        return c
+                log.warning(f"KartaL Akıllı Sıra: LLM havuz dışı isim döndürdü ({fname}), doğal sıraya dön.")
+    except Exception as e:
+        log.warning(f"KartaL Akıllı Sıra kapalı, doğal sırayla devam: {e}")
+    return candidates[0]
+
+
 def get_next_scheduled_video(
     drive,
     folder_id: str,
@@ -337,6 +477,7 @@ def get_next_scheduled_video(
     target_type = decide_prime_time_video_type() if video_type == "auto" else video_type
 
     def find_candidate(want_long: Optional[bool]) -> Optional[dict]:
+        ready: list[dict] = []
         for v in videos:
             vid = v["id"]
             vname = v["name"]
@@ -350,7 +491,7 @@ def get_next_scheduled_video(
             if meta and not meta["is_ready"]:
                 continue
             if meta:
-                return {
+                ready.append({
                     "id": vid,
                     "name": vname,
                     "size": int(v.get("size", 0)),
@@ -363,8 +504,13 @@ def get_next_scheduled_video(
                     "pinned_comment": meta["pinned_comment"],
                     "row": meta["row"],
                     "video_type": "long" if is_long_filename(vname) else "short",
-                }
-        return None
+                })
+        if not ready:
+            return None
+        # Uzun videolar seri (Bölüm) düzeninde kalır; Shorts KartaL Akıllı Sıra'dan geçer
+        if want_long is False:
+            return kartal_smart_pick(ready, table)
+        return ready[0]
 
     if target_type == "long":
         cand = find_candidate(want_long=True)
