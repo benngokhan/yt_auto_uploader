@@ -313,6 +313,16 @@ def validate_metadata_workbook(drive, queue_folder: str) -> str:
         print(f"UZUN-RONTGEN: Diskte {len(disk_long_names)} uzun mp4 -> {disk_long_names}")
         print(f"UZUN-RONTGEN: Tabloda hazır {len(ready_long_names)} satır -> {ready_long_names}")
         print(f"UZUN-RONTGEN: Kayıp uzun: {kayip_longlar if kayip_longlar else 'YOK'}")
+        # TÜM DRIVE TARAMASI: uzun dosyalar gerçekte hangi klasörde?
+        res = drive.files().list(q="name contains 'uzun_video' and trashed=false", pageSize=100, fields="files(id,name,parents)").execute()
+        for f in res.get("files", []):
+            pnames = []
+            for pid in f.get("parents", []):
+                try:
+                    pnames.append(drive.files().get(fileId=pid, fields="name").execute().get("name", "?"))
+                except Exception:
+                    pnames.append(f"ID:{pid[:12]}")
+            print(f"UZUN-KONUM: {f['name']} -> klasör: {pnames}")
     except Exception as xe:
         print(f"UZUN-RONTGEN hata (zararsız): {xe}")
     # Çapraz paylaşım anahtar probu (Stok klasöründe crosspost_keys.json var mı?)
