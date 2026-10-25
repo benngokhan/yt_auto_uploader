@@ -949,7 +949,7 @@ def upload_job(
             if konu_listesi:
                 pkid = ensure_named_playlist(youtube, konu_listesi)
                 add_video_to_series(youtube, vid_id, pkid)
-        retro_enrich_published(youtube, drive, queue_folder)
+        # retro_enrich_published RETIRED: kullanıcı eski videoları elle düzenliyor; token ekstra yüklenmiyor (25 Ekim kararı)
 
         report_txt = build_telegram_report(file_name, vid_id, yt_url, meta, comment_ok)
         REPORT_FILE.write_text(report_txt, encoding="utf-8")
