@@ -42,52 +42,93 @@ REC_DIR.mkdir(parents=True, exist_ok=True)
 # ---------------------------------------------------------------------------
 # Gemini çağrısı: hem ?key= hem x-goog-api-key, hem v1beta hem v1, model yedeği
 # ---------------------------------------------------------------------------
-GEMINI_MODELS = ("gemini-2.5-flash", "gemini-2.0-flash", "gemini-flash-latest")
+GEMINI_MODELS = ("gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash")
 
 
-def gemini_call(parts: list[dict], temperature: float = 0.2, max_tokens: int = 800) -> str:
-    """Gemini'ye içerik gönderir. Hata varsa ayrıntılı metin döner."""
+def _list_models(key: str) -> list[str]:
+    """Anahhtarin erisebildigi, generateContent destekleyen modeller."""
+    out = []
+    for ver in ("v1beta", "v1"):
+        url = f"https://generativelanguage.googleapis.com/{ver}/models?pageSize=50"
+        try:
+            req = urllib.request.Request(url, headers={"x-goog-api-key": key})
+            with urllib.request.urlopen(req, timeout=30) as r:
+                data = json.loads(r.read().decode())
+            for m in data.get("models", []):
+                methods = m.get("supportedGenerationMethods") or []
+                if "generateContent" in methods:
+                    name = (m.get("name") or "").replace("models/", "")
+                    if name and name not in out:
+                        out.append(name)
+            if out:
+                break
+        except urllib.error.HTTPError as e:
+            if e.code in (401, 403):
+                raise
+            continue
+        except Exception:
+            continue
+    return out
+
+
+def gemini_call(parts, temperature=0.2, max_tokens=800):
+    """Gemini'ye icerik gonderir. Modeli canli listeden secer."""
     key = os.getenv("GEMINI_API_KEY", "").strip()
     if not key:
         return "(GEMINI_API_KEY yok)"
+
     payload = json.dumps({
         "contents": [{"parts": parts}],
         "generationConfig": {"temperature": temperature, "maxOutputTokens": max_tokens},
     }).encode()
 
-    models = [os.getenv("GEMINI_MODEL", "").strip()] + list(GEMINI_MODELS)
-    seen, last = set(), "bilinmeyen hata"
-    for model in [m for m in models if m]:
+    models = []
+    env_model = os.getenv("GEMINI_MODEL", "").strip()
+    if env_model:
+        models.append(env_model)
+    try:
+        models += _list_models(key)
+    except urllib.error.HTTPError as e:
+        return f"(anahtar reddedildi: HTTP {e.code} - AIza ile baslayan yeni anahtar gerekli)"
+    except Exception:
+        pass
+    models += list(GEMINI_MODELS)
+
+    seen = set()
+    last = "bilinmeyen hata"
+    for model in models:
         if model in seen:
             continue
         seen.add(model)
         for ver in ("v1beta", "v1"):
-            url = f"https://generativelanguage.googleapis.com/{ver}/models/{model}:generateContent"
             for auth in ("header", "query"):
-                u = url + (f"?key={urllib.parse.quote(key)}" if auth == "query" else "")
+                url = f"https://generativelanguage.googleapis.com/{ver}/models/{model}:generateContent"
+                if auth == "query":
+                    url += f"?key={urllib.parse.quote(key)}"
                 headers = {"Content-Type": "application/json"}
                 if auth == "header":
                     headers["x-goog-api-key"] = key
                 try:
-                    req = urllib.request.Request(u, data=payload, headers=headers)
+                    req = urllib.request.Request(url, data=payload, headers=headers)
                     with urllib.request.urlopen(req, timeout=90) as r:
                         data = json.loads(r.read().decode())
                     cand = data.get("candidates") or []
                     if not cand:
-                        last = "boş yanıt"
                         continue
                     txt = "".join(pt.get("text", "") for pt in cand[0]["content"]["parts"]).strip()
                     if txt:
+                        os.environ["GEMINI_MODEL_OK"] = model
                         return txt
                 except urllib.error.HTTPError as e:
-                    body = ""
                     try:
-                        body = e.read().decode()[:200].replace("\n", " ")
+                        body = e.read().decode()[:160].replace("\n", " ")
                     except Exception:
-                        pass
-                    last = f"HTTP {e.code} ({model}/{ver}/{auth}) {body}"
+                        body = ""
+                    last = f"HTTP {e.code} ({model}/{ver}) {body}"
                     if e.code in (401, 403):
                         return f"(anahtar reddedildi: {last})"
+                    if e.code in (404, 400):
+                        break
                 except Exception as e:
                     last = f"{type(e).__name__}: {e}"
     return f"({last})"
