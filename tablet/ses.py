@@ -86,10 +86,9 @@ def gemini_call(parts, temperature=0.2, max_tokens=800):
     env_model = os.getenv("GEMINI_MODEL", "").strip()
     if env_model:
         models.append(env_model)
+    # Liste alinamazsa yine de bilinen modelleri dene (AQ. anahtarlar ListModels'i reddedebilir)
     try:
         models += _list_models(key)
-    except urllib.error.HTTPError as e:
-        return f"(anahtar reddedildi: HTTP {e.code} - AIza ile baslayan yeni anahtar gerekli)"
     except Exception:
         pass
     models += list(GEMINI_MODELS)
