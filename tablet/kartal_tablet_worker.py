@@ -1012,6 +1012,10 @@ def handle(text: str, chat_id: str) -> None:
             say(f"⚠️ adb yok ({e}) — link tablete gönderiliyor…", chat_id)
             say(open_url(url), chat_id)
         return
+    if low in ("/motor", "/tts"):
+        out = termux_cmd("termux-tts-engines", timeout=30)
+        say("Tabletteki TTS motorlari:\n" + (out or "(bos)")[:1200], chat_id)
+        return
     if low.startswith("/konus"):
         say(speak(raw[6:].strip()), chat_id)
         return
