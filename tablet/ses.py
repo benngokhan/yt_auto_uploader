@@ -79,7 +79,11 @@ def gemini_call(parts, temperature=0.2, max_tokens=800):
 
     payload = json.dumps({
         "contents": [{"parts": parts}],
-        "generationConfig": {"temperature": temperature, "maxOutputTokens": max_tokens},
+        "generationConfig": {
+            "temperature": temperature,
+            "maxOutputTokens": max_tokens,
+            "thinkingConfig": {"thinkingBudget": 0},  # dusunme notlarini kapat
+        },
     }).encode()
 
     models = []
