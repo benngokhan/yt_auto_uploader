@@ -44,6 +44,8 @@ STATE_FILE = KARTAL_DIR / "state.json"
 for d in (KARTAL_DIR, SHOTS_DIR, DOWNLOADS_DIR):
     d.mkdir(parents=True, exist_ok=True)
 
+from ses import speak, chat_turn, listen_once, tts_available, reply_brain
+
 ADB = os.getenv("ADB_BIN", "adb")
 TARGET = os.getenv("ADB_TARGET", "").strip()  # boşsa tek cihaz varsayılır
 
@@ -703,6 +705,11 @@ HELP = """<b>🦅 Kartal AI · Tablet Kumandası</b>
 /paylas &lt;link&gt; Instagram — menüden Instagram'ı da seçer
 /studio &lt;VIDEO_ID&gt; — YouTube Studio'da videoyu açar
 
+<b>Ses</b>
+/konus &lt;metin&gt; — tableti konuştur
+/dinle — 6 sn dinle, yazıya çevir
+/sohbet — dinle → cevapla → konuş
+
 <b>Bakım</b>
 /pid — bağlantı ve pil durumu
 /durum — ajan ayakta mı
@@ -737,6 +744,7 @@ def handle(text: str, chat_id: str) -> None:
         except Exception:
             lines.append("adb: ❌ yok")
         lines.append("Shizuku/rish: " + ("✅ çalışıyor" if rish_ok() else "❌ yok"))
+        lines.append("Ses (TTS): " + ("✅ hazır" if tts_available() else "❌ yok (pkg install termux-api)"))
         say("\n".join(lines) + "\n/ekran ile tableti gör.", chat_id)
         return
     if low in ("/pid", "/pil", "/battery"):
@@ -838,6 +846,20 @@ def handle(text: str, chat_id: str) -> None:
             say(f"⚠️ adb yok ({e}) — link tablete gönderiliyor…", chat_id)
             say(open_url(url), chat_id)
         return
+    if low.startswith("/konus"):
+        say(speak(raw[6:].strip()), chat_id)
+        return
+    if low.startswith("/dinle"):
+        text, status = listen_once(6)
+        say(status, chat_id)
+        if text and not text.startswith("("):
+            say(reply_brain(text), chat_id)
+        return
+    if low in ("/sohbet", "/konus_sohbet", "/ses"):
+        for m in chat_turn(6):
+            say(m, chat_id)
+        return
+
     if low.startswith("/gorev"):
         run_task(raw[6:].strip())
         return
@@ -847,8 +869,10 @@ def handle(text: str, chat_id: str) -> None:
         say("❓ Bu komutu tanımadım.\n\n" + HELP, chat_id)
         return
 
-    # Düz metin → doğal dil görevi
-    run_task(raw)
+    # Düz metin → sesli asistan cevabı + tablet konuşur
+    ans = reply_brain(raw)
+    say(ans, chat_id)
+    say(speak(ans), chat_id)
 
 
 # --------------------------------------------------------------------------
