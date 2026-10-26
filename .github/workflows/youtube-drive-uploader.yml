@@ -21,6 +21,9 @@ on:
     - cron: "0 16 * * *"
     # 2) 20:15 TR (17:15 UTC) -> Slot 2
     - cron: "15 17 * * *"
+    # 3) 10:05 TR (07:05 UTC) -> KACIRILAN SLOT TELAFISI
+    #    Yalnizca dun eksik slot varsa calisir (kota 10:00 TR'de sifirlanir)
+    - cron: "5 7 * * *"
 
 permissions:
   actions: read
@@ -100,8 +103,51 @@ jobs:
           print(f"VALIDATION OK (0 YouTube Quota Spent): {len(manifest.get('approved_videos', {}))} approved videos in manifest.")
           PY
 
+      - name: Kacirilan slot telafisi kontrolu (yalnizca 10:05 TR)
+        id: guard
+        if: ${{ github.event_name == 'schedule' }}
+        run: |
+          python - <<'PY'
+          import os
+          from datetime import datetime, timezone, timedelta
+          from pathlib import Path
+
+          should = "true"
+          run = os.environ.get("GITHUB_EVENT_SCHEDULE", "").strip()
+          if run.startswith("5 7 "):
+              stamps = []
+              p = Path("uploaded.txt")
+              if p.exists():
+                  for line in p.read_text(encoding="utf-8").splitlines():
+                      line = line.strip()
+                      if not line or line.startswith("#"):
+                          continue
+                      parts = [x.strip() for x in line.split("|")]
+                      if len(parts) >= 4:
+                          try:
+                              stamps.append(datetime.strptime(parts[3], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc))
+                          except ValueError:
+                              pass
+              now_tr = datetime.now(timezone.utc) + timedelta(hours=3)
+              yday = (now_tr - timedelta(days=1)).date()
+              # Sadece AKSAM slotlari sayilir (18:00 TR sonrasi) — sabah/ara yuklemeler sayilmaz
+              done = sum(
+                  1
+                  for ts in stamps
+                  if (ts + timedelta(hours=3)).date() == yday and (ts + timedelta(hours=3)).hour >= 18
+              )
+              expected = 1 if yday.weekday() == 4 else 2
+              if done >= expected:
+                  should = "false"
+                  print(f"Telafi: {yday} gunu {done}/{expected} slot tamam -> sabah slotu atlaniyor.")
+              else:
+                  print(f"Telafi: {yday} gunu {done}/{expected} slot -> KACIRILAN SLOT YAKALANIYOR.")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write(f"should_run={should}\n")
+          PY
+
       - name: Upload one queued video (Prime Time Schedule)
-        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
+        if: ${{ (github.event_name == 'schedule' && steps.guard.outputs.should_run != 'false') || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
         env:
           INPUT_VIDEO_TYPE: ${{ inputs.video_type || 'auto' }}
         run: |
