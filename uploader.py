@@ -507,12 +507,167 @@ def post_pinned_comment(youtube, video_id: str, comment_text: str) -> tuple[bool
         return False, str(e)
 
 
+def _extract_yt_vid_id(url: str) -> str:
+    if not url:
+        return ""
+    import re as _re
+    m = _re.search(r"(?:youtu\.be/|shorts/|watch\?v=)([A-Za-z0-9_-]{11})", str(url))
+    return m.group(1) if m else ""
+
+
+def backlink_previous_episode(
+    youtube,
+    drive,
+    queue_folder: str,
+    list_path: Path,
+    current_file: str,
+    new_vid_id: str,
+    new_title: str,
+) -> dict:
+    """
+    Zincirli Shorts serisinde (video_131 -> 132 -> 133 ...) yeni bölüm yayınlandığı anda
+    bir önceki bölümün (video_{N-1}) YouTube açıklamasını ve kanalın ilk/sabit yorumunu
+    otomatik güncelleyerek sıradaki bölüme doğrudan yönlendirme ekler.
+    (Not: Shorts oynatıcısındaki yerleşik 'İlgili Video' hapı YouTube Data API v3'te
+    açık olmadığı için Telegram kartına ayrıca 1-tık Studio düzenleme butonu eklenir.)
+    """
+    import re as _re
+    info = {
+        "prev_file": "",
+        "prev_vid_id": "",
+        "desc_updated": False,
+        "comment_updated": False,
+        "studio_edit_url": "",
+    }
+    m = _re.match(r"^video_(\d+)\.mp4$", (current_file or "").strip(), _re.I)
+    if not m:
+        return info
+    cur_num = int(m.group(1))
+    if cur_num <= 131:
+        return info
+
+    prev_file = f"video_{cur_num - 1}.mp4"
+    info["prev_file"] = prev_file
+    prev_vid_id = ""
+
+    # 1) uploaded.txt üzerinden önceki bölümün video ID'sini ara
+    if list_path and list_path.exists():
+        for line in reversed(list_path.read_text(encoding="utf-8", errors="ignore").splitlines()):
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            parts = [p.strip() for p in line.split("|")]
+            if len(parts) >= 3 and parts[1].lower() == prev_file.lower():
+                prev_vid_id = _extract_yt_vid_id(parts[2])
+                if prev_vid_id:
+                    break
+
+    # 2) Drive / yerel tablo üzerinden yedek arama
+    all_recs = {}
+    try:
+        all_recs = load_table_from_drive_or_local(drive, queue_folder)
+        if not prev_vid_id and prev_file in all_recs:
+            prev_vid_id = _extract_yt_vid_id(all_recs[prev_file].get("youtube_url", ""))
+    except Exception:
+        pass
+
+    # 3) Kanalın son yüklemeleri üzerinden başlık eşleşmesiyle yedek arama
+    if not prev_vid_id and prev_file in all_recs:
+        prev_expected_title = (all_recs[prev_file].get("title") or "").split("#")[0].strip().lower()
+        if prev_expected_title:
+            try:
+                ch_res = youtube.channels().list(part="contentDetails", mine=True).execute()
+                upl = ch_res["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+                pl_res = youtube.playlistItems().list(part="snippet,contentDetails", playlistId=upl, maxResults=15).execute()
+                for it in pl_res.get("items", []):
+                    cand_id = it["contentDetails"]["videoId"]
+                    cand_title = (it.get("snippet", {}).get("title") or "").lower()
+                    if cand_id != new_vid_id and prev_expected_title[:24] in cand_title:
+                        prev_vid_id = cand_id
+                        break
+            except Exception:
+                pass
+
+    if not prev_vid_id:
+        log.info(f"  Zincir geri-bağlantı: {prev_file} için henüz yayında YouTube ID bulunamadı.")
+        return info
+
+    info["prev_vid_id"] = prev_vid_id
+    info["studio_edit_url"] = f"https://studio.youtube.com/video/{prev_vid_id}/edit"
+    clean_next = new_title.replace("#bilgidozu", "").replace("#shorts", "").strip()
+    short_link = f"https://youtube.com/shorts/{new_vid_id}"
+    banner_line = f"⏭️ SIRADAKİ BÖLÜM YAYINDA: {clean_next}\n👉 {short_link}"
+
+    # Katman 1: Önceki videonun açıklamasını (videos.update) güncelle
+    try:
+        vr = youtube.videos().list(part="snippet", id=prev_vid_id).execute()
+        vitems = vr.get("items", [])
+        if vitems:
+            snip = vitems[0]["snippet"]
+            cur_desc = (snip.get("description") or "").strip()
+            if new_vid_id not in cur_desc and "SIRADAKİ BÖLÜM YAYINDA" not in cur_desc:
+                updated_desc = f"{banner_line}\n\n{cur_desc}".strip()[:4900]
+                youtube.videos().update(
+                    part="snippet",
+                    body={
+                        "id": prev_vid_id,
+                        "snippet": {
+                            "title": snip.get("title", ""),
+                            "description": updated_desc,
+                            "tags": snip.get("tags", []),
+                            "categoryId": str(snip.get("categoryId", "27")),
+                            "defaultLanguage": snip.get("defaultLanguage", "tr"),
+                            "defaultAudioLanguage": snip.get("defaultAudioLanguage", "tr"),
+                        },
+                    },
+                ).execute()
+                info["desc_updated"] = True
+                log.info(f"  Zincir geri-bağlantı ✓: {prev_file} ({prev_vid_id}) açıklamasına {current_file} linki eklendi.")
+            else:
+                info["desc_updated"] = True
+    except Exception as e:
+        log.warning(f"  Zincir açıklama güncelleme uyarısı ({prev_file}): {e}")
+
+    # Katman 2: Önceki videodaki kanal yorumunu (comments.update) güncelle
+    try:
+        ch_res = youtube.channels().list(part="id", mine=True).execute()
+        my_ch_id = ch_res["items"][0]["id"] if ch_res.get("items") else ""
+        ct_res = youtube.commentThreads().list(part="snippet", videoId=prev_vid_id, maxResults=30).execute()
+        own_cid, own_txt = "", ""
+        for ct in ct_res.get("items", []):
+            top = ct.get("snippet", {}).get("topLevelComment", {})
+            csnip = top.get("snippet", {})
+            if my_ch_id and csnip.get("authorChannelId", {}).get("value", "") == my_ch_id:
+                own_cid = top.get("id", "")
+                own_txt = (csnip.get("textOriginal") or csnip.get("textDisplay") or "").strip()
+                break
+        comment_addon = f"⏭️ Videoda bahsettiğimiz sıradaki bölüm yayında: \"{clean_next}\" 👉 https://youtu.be/{new_vid_id} (@bilgidozuofficial)"
+        if own_cid and new_vid_id not in own_txt and "sıradaki bölüm yayında" not in own_txt.lower():
+            youtube.comments().update(
+                part="snippet",
+                body={"id": own_cid, "snippet": {"textOriginal": f"{own_txt}\n\n{comment_addon}".strip()}},
+            ).execute()
+            info["comment_updated"] = True
+            log.info(f"  Zincir yorum güncellemesi ✓: {prev_file} sabit yorumuna sıradaki bölüm eklendi.")
+        elif not own_cid:
+            youtube.commentThreads().insert(
+                part="snippet",
+                body={"snippet": {"videoId": prev_vid_id, "topLevelComment": {"snippet": {"textOriginal": comment_addon}}}},
+            ).execute()
+            info["comment_updated"] = True
+    except Exception as e:
+        log.warning(f"  Zincir yorum güncelleme uyarısı ({prev_file}): {e}")
+
+    return info
+
+
 def build_telegram_report(
     file_name: str,
     vid_id: str,
     yt_url: str,
     meta: dict,
     comment_ok: bool,
+    backlink_info: dict | None = None,
 ) -> str:
     import html as _html
     raw_title = meta.get("title", "")
@@ -533,10 +688,22 @@ def build_telegram_report(
             1 for k, r in all_recs.items()
             if r.get("is_ready") and r.get("is_long") and k not in done_ids and k != file_name
         )
-        days_left = round((rem_shorts + rem_longs) / 3, 1)
+        days_left = round((rem_shorts + rem_longs) / 2, 1)
         stock_line = f"📦 <b>Kalan Stok:</b> <code>{rem_shorts} Shorts · {rem_longs} Uzun (~{days_left} Gün)</code>\n\n"
     except Exception:
         stock_line = ""
+
+    chain_line = ""
+    extra_buttons = []
+    if backlink_info and backlink_info.get("prev_vid_id"):
+        pf = backlink_info.get("prev_file", "önceki bölüm")
+        chain_line = (
+            f"🔗 <b>Zincir Geri-Bağlantı ({_html.escape(pf)}):</b> Açıklama + Yorum otomatik bağlandı ✅\n"
+            f"<i>(Shorts alt 'İlgili Video' hapı YouTube API'de kapalıdır; aşağıdaki butonla 2 sn'de seçebilirsin)</i>\n\n"
+        )
+        extra_buttons.append(
+            [{"text": f"🔗 {pf} -> 'İlgili Video' Seç (Studio)", "url": backlink_info["studio_edit_url"]}]
+        )
 
     if comment_ok:
         comment_header = "✅ <b>SABİT YORUM (Otomatik Atıldı · Sabitle):</b>"
@@ -557,6 +724,7 @@ def build_telegram_report(
         f"🎬 <b>{_html.escape(clean_title)}</b>\n"
         f"📂 <code>{_html.escape(file_name)}</code> · <b>{vtype_label}</b>\n"
         f"{stock_line}"
+        f"{chain_line}"
         f"{comment_header}\n"
         f"<pre>{_html.escape(pinned)}</pre>\n\n"
         f"📢 <b>YOUTUBE GÖNDERİLER METNİ (1 Kez Dokun Tamamı Kopyalanır):</b>\n"
@@ -577,6 +745,7 @@ def build_telegram_report(
                     {"text": "▶️ Videoyu İzle", "url": yt_url},
                     {"text": "📌 Yorumu Sabitle", "url": studio_comments_url},
                 ],
+                *extra_buttons,
                 [
                     {"text": "📢 Gönderiler (Topluluk) Sekmesini Aç", "url": community_url},
                 ],
@@ -1217,6 +1386,9 @@ def upload_job(
         comment_ok, _ = post_pinned_comment(youtube, vid_id, meta.get("pinned_comment", ""))
         mark_as_uploaded(list_path, file_id, file_name, yt_url, title=meta["title"])
         update_excel_status_in_drive(drive, queue_folder, file_name, new_status="YÜKLENDİ", youtube_url=yt_url)
+        backlink_info = backlink_previous_episode(
+            youtube, drive, queue_folder, list_path, file_name, vid_id, meta["title"]
+        )
         if file_name.startswith("uzun_"):
             add_video_to_series(youtube, vid_id)
             backfill_series_playlist(youtube, drive, queue_folder)
@@ -1227,7 +1399,7 @@ def upload_job(
                 add_video_to_series(youtube, vid_id, pkid)
         # retro_enrich_published RETIRED: kullanıcı eski videoları elle düzenliyor; token ekstra yüklenmiyor (25 Ekim kararı)
 
-        report_txt = build_telegram_report(file_name, vid_id, yt_url, meta, comment_ok)
+        report_txt = build_telegram_report(file_name, vid_id, yt_url, meta, comment_ok, backlink_info=backlink_info)
         REPORT_FILE.write_text(report_txt, encoding="utf-8")
         sync_kartal_status_report(youtube, file_name, yt_url)
 
