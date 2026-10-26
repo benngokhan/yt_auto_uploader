@@ -1,0 +1,32 @@
+{
+  "policy": "YALNIZ_YENI_ONAYLI_SERI_SURUMDE",
+  "created_at": "2026-10-26",
+  "queue_folder_name": "YENI_SERI_ONAYLI_STOK",
+  "queue_folder_id": "1GOsIP3xZWV5jjeKZulEkUjyIzc_jFNZ6",
+  "kapaklar_folder_id": "1muy62IFhN8RQc4LpWdGB2hSFtum6BplD",
+  "legacy_kartal_stok_untouched": "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_",
+  "min_shorts_number": 131,
+  "min_long_number": 101,
+  "approved_videos": {
+    "video_131.mp4": {
+      "drive_file_id": "1Er2PPct2YtiamlJK08UTyUktMbfCk-xX",
+      "kapak_file_id": "1gwd2HlFCWtvrJ90G5bbCLwl2yM9RZUQW",
+      "sha256": "f8c488ecbd0c2bb42824abdf6fee0da2c5c83b6a936ed15d5d47808e29a0f547",
+      "size_bytes": 28802341,
+      "duration_sec": 56.52,
+      "lufs": -14.08,
+      "title": "Kâğıt Kesiği Neden Bu Kadar Acıtır? 🩹",
+      "slot": "2026-10-26 19:00 TR (Pazartesi Slot 1 — Beden & Beyin)"
+    },
+    "video_132.mp4": {
+      "drive_file_id": "188kH963Jo8fyTaUjZWPDD2oSl6nox9Q1",
+      "kapak_file_id": "1dMpZxW1y4QgV0L5SOBqbiw6j5fqCVkz1",
+      "sha256": "89455144d5888284311cb5d94b849bba1187140ee6f5f671ea0c53acd4a2328d",
+      "size_bytes": 20743022,
+      "duration_sec": 53.6,
+      "lufs": -14.04,
+      "title": "Baldırın İkinci Kalbin: Kanı Kalbe O Taşıyor! 🦵",
+      "slot": "2026-10-26 21:30 TR (Pazartesi Slot 2 — Beden & Beyin)"
+    }
+  }
+}

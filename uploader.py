@@ -140,8 +140,8 @@ def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
     from openpyxl.styles import PatternFill, Font
     from googleapiclient.http import MediaIoBaseDownload
 
-    kartal_folder = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"
-    baslik_file_id = "1tHZ4aCtdtKRLmY7z9PqLGUTu5rVth4vj"
+    kartal_folder = queue_folder or DEFAULT_DRIVE_FOLDER_ID
+    baslik_file_id = ""
 
     try:
         local_xlsx = BASE_DIR / "bilgidozu_yukleme_tablosu.xlsx"
@@ -151,7 +151,7 @@ def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
             return
 
         remote_uploaded = {}
-        remote_extra_rows = {}  # Drive'da olup yerel repoda henüz olmayan yeni satırlar (video_122+ vb.)
+        remote_extra_rows = {}  # Drive'da olup yerel repoda henüz olmayan yeni satırlar (video_131+ vb.)
 
         # uploaded.txt içindeki kesin YÜKLENDİ kayıtlarını da al
         up_txt = BASE_DIR / "uploaded.txt"
@@ -164,8 +164,8 @@ def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
                 if len(parts) >= 4 and parts[1].endswith(".mp4") and not parts[0].startswith(("LOCKED_", "MANUAL_SKIP")):
                     remote_uploaded[parts[1]] = (parts[2], parts[3], None, None)
 
-        # Drive'daki tüm güncel tablo adaylarını oku (hem bilgidozu_yukleme_tablosu.xlsx hem baslik.xlsx)
-        remote_file_ids = [baslik_file_id]
+        # Yalnızca aktif kuyruk klasöründeki (YENI_SERI_ONAYLI_STOK) tabloları oku; eski KartaL Stok tablosuna dokunma!
+        remote_file_ids = [baslik_file_id] if baslik_file_id else []
         try:
             q_tabs = f"'{kartal_folder}' in parents and trashed=false and (name='bilgidozu_yukleme_tablosu.xlsx' or name='baslik.xlsx')"
             res_t = drive.files().list(q=q_tabs, pageSize=10, fields="files(id,name,modifiedTime)").execute()
@@ -297,27 +297,9 @@ def validate_metadata_workbook(drive, queue_folder: str) -> str:
         print(f"UZUN-RONTGEN: Diskte {len(disk_long_names)} uzun mp4 -> {disk_long_names}")
         print(f"UZUN-RONTGEN: Tabloda hazır {len(ready_long_names)} satır -> {ready_long_names}")
         print(f"UZUN-RONTGEN: Kayıp uzun: {kayip_longlar if kayip_longlar else 'YOK'}")
-        # TÜM DRIVE TARAMASI: uzun dosyalar gerçekte hangi klasörde?
-        res = drive.files().list(q="name contains 'uzun_video' and trashed=false", pageSize=100, fields="files(id,name,parents)").execute()
-        for f in res.get("files", []):
-            pnames = []
-            for pid in f.get("parents", []):
-                try:
-                    pnames.append(drive.files().get(fileId=pid, fields="name").execute().get("name", "?"))
-                except Exception:
-                    pnames.append(f"ID:{pid[:12]}")
-            print(f"UZUN-KONUM: {f['name']} -> klasör: {pnames}")
-        # OTOMATİK ONARIM: hazır uzunlar yanlış klasördeyse gerçek kuyruk klasörüne taşı
+        # Yeni seri kilidi: eski klasörlerdeki uzun_video_* dosyaları ASLA YENI_SERI_ONAYLI_STOK içine taşınmaz!
         qname = drive.files().get(fileId=queue_folder, fields="name").execute().get("name", "?")
-        print(f"UZUN-ONARIM: Gerçek kuyruk klasörü = '{qname}' (id {queue_folder[:8]}...)")
-        for f in res.get("files", []):
-            parents = f.get("parents", [])
-            if f["name"].startswith("uzun_video_") and parents and queue_folder not in parents:
-                try:
-                    drive.files().update(fileId=f["id"], addParents=queue_folder, removeParents=",".join(parents), fields="id").execute()
-                    print(f"UZUN-ONARIM: TAŞINDI -> {f['name']}")
-                except Exception as me:
-                    print(f"UZUN-ONARIM hata {f['name']}: {me}")
+        print(f"YENI-SERI-KLASOR: Aktif kuyruk klasörü = '{qname}' (id {queue_folder[:8]}...) — eski stok taşıma kapalı.")
         # Varsa aynı isimli yedek klasörleri de listele (bilgi amaçlı)
         try:
             fold = drive.files().list(q="mimeType='application/vnd.google-apps.folder' and name contains 'Stok' and trashed=false", fields="files(id,name)").execute()
@@ -458,7 +440,7 @@ def upload_thumbnail_if_exists(youtube, drive, folder_id: str, video_file_name: 
     if not candidates:
         return False
     try:
-        search_folders = ["1XKZJ12HyAvZkjgiG38ys3HOMhZ42d_jJ", DEFAULT_DRIVE_FOLDER_ID, "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br"]
+        search_folders = ["1muy62IFhN8RQc4LpWdGB2hSFtum6BplD", DEFAULT_DRIVE_FOLDER_ID, "1XKZJ12HyAvZkjgiG38ys3HOMhZ42d_jJ", "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br"]
         if folder_id and folder_id not in search_folders:
             search_folders.append(folder_id)
         # Ana klasör içindeki KAPAKLAR alt klasörünü de ara
@@ -610,8 +592,8 @@ def build_telegram_report(
 
 
 def drain_lobi_to_queue(drive, queue_folder: str, lobi_id: str = "1JULlauO1eFpXgGdZKdZZDyqesSdkeT6f") -> int:
-    """LOBI ONAY BASAMAĞI KALDIRILDI: 'hazır videolar' (Lobi) klasöründeki mp4'ler (alt klasörleri dahil) kontrol beklemeden doğrudan yayın kuyruğuna akar.
-    Kullanıcı artık elle onaylamıyor (25 Ekim 2026 kararı)."""
+    """YENİ SERİ KİLİDİ (26.10.2026): Eski lobi klasöründen otomatik dosya taşıma tamamen kapatıldı."""
+    return 0
     try:
         from sheets_metadata import list_drive_videos
         mevcut_isimler = {v["name"] for v in list_drive_videos(drive, queue_folder)}
@@ -1208,7 +1190,20 @@ def upload_job(
         tmp_path = Path(tmp.name)
 
     try:
+        from sheets_metadata import is_skipped_by_floor
+        if is_skipped_by_floor(file_name):
+            raise RuntimeError(f"GÜVENLİK KİLİDİ: Eski stok videosu yayına alınamaz ({file_name}).")
         download_drive_file(drive, file_id, tmp_path)
+        manifest_path = BASE_DIR / "approved_new_series_manifest.json"
+        if manifest_path.exists():
+            import hashlib as _hashlib
+            mdata = json.loads(manifest_path.read_text(encoding="utf-8")).get("approved_videos", {})
+            if file_name in mdata:
+                actual_sha = _hashlib.sha256(tmp_path.read_bytes()).hexdigest()
+                expected_sha = mdata[file_name].get("sha256", "")
+                if expected_sha and actual_sha != expected_sha:
+                    raise RuntimeError(f"SHA256 UYUŞMAZLIĞI ({file_name}): beklenen {expected_sha[:12]} != {actual_sha[:12]}")
+                log.info(f"  SHA256 Onay Manifesti Doğrulandı ✓ ({file_name} -> {actual_sha[:16]}...)")
         if publish_at is not None:
             aware = publish_at if publish_at.tzinfo else publish_at.astimezone()
             meta["publishAt"] = aware.isoformat(timespec="seconds")

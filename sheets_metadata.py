@@ -23,9 +23,10 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
-DEFAULT_DRIVE_FOLDER_ID = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"
-DEFAULT_SHEETS_ID = "1DTXIt8wY9fDHRYRT_Kz5GVVcGe00hDaK"
+DEFAULT_DRIVE_FOLDER_ID = "1GOsIP3xZWV5jjeKZulEkUjyIzc_jFNZ6"  # YENI_SERI_ONAYLI_STOK (eski KartaL Stok 1w8tz_... dokunulmadan korundu)
+DEFAULT_SHEETS_ID = ""
 MIN_SHORTS_NUMBER = 131  # Eski stok (video_1..130) silinmeden askıda; yalnız yeni onaylı seri (131+) sürüme girer
+MIN_LONG_NUMBER = 101    # Eski uzun_video_1..100 silinmeden askıda; yalnız yeni onaylı uzun seri (101+) sürüme girer
 
 CATEGORY_MAP = {
     "uzay ve astronomi": "28",
@@ -62,7 +63,7 @@ def is_skipped_by_floor(filename: str) -> bool:
     name = os.path.basename(filename).lower()
     if name.startswith("video_") and extract_video_number(name) < MIN_SHORTS_NUMBER:
         return True
-    if name in ("uzun_video_1.mp4", "uzun_video_2.mp4"):
+    if name.startswith("uzun_") and extract_video_number(name) < MIN_LONG_NUMBER:
         return True
     return False
 
@@ -72,7 +73,7 @@ BEDEN_BEYIN_FILES = {
     "video_67.mp4", "video_72.mp4", "video_77.mp4",
     "video_106.mp4", "video_107.mp4", "video_108.mp4", "video_109.mp4", "video_110.mp4",
     "video_83.mp4", "video_91.mp4", "video_100.mp4", "video_121.mp4",
-    "video_131.mp4",
+    "video_131.mp4", "video_132.mp4", "video_133.mp4",
 }
 
 
@@ -205,10 +206,10 @@ def parse_drive_sheet(xlsx_source) -> dict[str, dict]:
         if col_group == "doz_disi" and "doz dışı" not in [t.lower() for t in tags]:
             tags = (tags + ["doz dışı"])[:25]
 
-        # KESİN KURAL: YouTube Link dolu olan veya YÜKLENDİ olan dosya adları ASLA kuyruğa alınmaz!
+        # KESİN KURAL: YouTube Link dolu olan, YÜKLENDİ veya ASKIDA olan dosya adları ASLA kuyruğa alınmaz!
         is_done = (
             has_yt_link
-            or any(w in status_up for w in ("YÜKLENDİ", "YUKLENDI", "YAYINLANDI", "UPLOADED", "PUBLISHED", "TAMAM"))
+            or any(w in status_up for w in ("YÜKLENDİ", "YUKLENDI", "YAYINLANDI", "UPLOADED", "PUBLISHED", "TAMAM", "ASKIDA"))
             or is_skipped_by_floor(fname)
         )
         has_title = bool(title)
@@ -246,9 +247,6 @@ def _download_workbook_bytes_from_drive(drive, folder_id: str, sheets_id: str = 
             f"'{folder_id}' in parents and trashed = false and "
             f"(name = 'bilgidozu_yukleme_tablosu.xlsx' or name = 'baslik.xlsx' or mimeType = 'application/vnd.google-apps.spreadsheet')"
         )
-    queries.append(
-        "trashed = false and (name = 'bilgidozu_yukleme_tablosu.xlsx' or name = 'baslik.xlsx')"
-    )
 
     for q in queries:
         try:
