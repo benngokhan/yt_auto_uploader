@@ -25,6 +25,7 @@ import os
 import re
 import shlex
 import socket
+import threading
 import shutil
 import subprocess
 import sys
@@ -766,10 +767,35 @@ def reconnect(timeout_scan: int = 120) -> str:
 
     ips = _local_ips()
     opens: list[tuple[str, int]] = []
+
+    # A) Anında yol: sistemde dinleyen portları oku (taramasız)
+    listen: list[int] = []
+    for path in ("/proc/net/tcp", "/proc/net/tcp6"):
+        try:
+            with open(path, errors="ignore") as f:
+                next(f, None)
+                for line in f:
+                    c = line.split()
+                    if len(c) > 3 and c[3] == "0A":
+                        try:
+                            prt = int(c[1].rsplit(":", 1)[1], 16)
+                        except ValueError:
+                            continue
+                        if 1024 <= prt <= 65535 and prt not in listen:
+                            listen.append(prt)
+        except Exception:
+            continue
     for h in ips:
-        for p in range(30000, 65536):
-            if _tcp_ok(h, p):
-                opens.append((h, p))
+        for prt in listen:
+            if _tcp_ok(h, prt):
+                opens.append((h, prt))
+
+    # B) Yedek: hızlı tarama (yalnız bulunamazsa)
+    if not opens:
+        for h in ips:
+            for prt in range(30000, 65536):
+                if _tcp_ok(h, prt):
+                    opens.append((h, prt))
     for h, p in opens:
         t = f"{h}:{p}"
         try:
@@ -891,9 +917,16 @@ def handle(text: str, chat_id: str) -> None:
         say(health_report(), chat_id)
         return
     if low in ("/baglan", "/reconnect"):
-        say("🔄 Bağlantı yeniden kuruluyor… (30-90 sn)", chat_id)
-        say(reconnect(), chat_id)
-        say(health_report(), chat_id)
+        say("🔄 Bağlantı yeniden kuruluyor… bitince yazacağım.", chat_id)
+
+        def _bg():
+            try:
+                say(reconnect(), chat_id)
+                say(health_report(), chat_id)
+            except Exception as e:
+                say(f"❌ Bağlanamadı: {e}", chat_id)
+
+        threading.Thread(target=_bg, daemon=True).start()
         return
     if low in ("/pid", "/pil", "/battery"):
         try:
@@ -1107,7 +1140,13 @@ def main() -> None:
                     say("🔐 Bu sohbet sahibi olarak kilitlendi. /menu", chat_id)
                 if chat_id != owner:
                     continue
-                handle(text, chat_id)
+                try:
+                    handle(text, chat_id)
+                except Exception as _e:
+                    import traceback
+                    tb = traceback.format_exc()[-400:]
+                    print(tb)
+                    say(f"⚠️ Komut hatası: <code>{type(_e).__name__}: {_e}</code>", chat_id)
         except urllib.error.HTTPError as e:
             print(f"[telegram] HTTP {e.code} — yeniden denenecek")
             time.sleep(backoff)
