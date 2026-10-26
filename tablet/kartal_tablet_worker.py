@@ -253,7 +253,7 @@ def ensure_device() -> None:
             return
     except AdbError:
         pass
-    target = TARGET or state_get("last_target", "")
+    target = TARGET or os.getenv("ADB_TARGET", "").strip() or state_get("last_target", "")
     if target:
         try:
             adb("connect", target)
@@ -840,6 +840,13 @@ def handle(text: str, chat_id: str) -> None:
 # --------------------------------------------------------------------------
 def main() -> None:
     load_env()
+    global TARGET
+    TARGET = os.getenv("ADB_TARGET", "").strip()
+    if TARGET:
+        try:
+            _adb_raw("connect", TARGET, timeout=20)
+        except Exception:
+            pass
     token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
     if not token:
         print("❌ TELEGRAM_BOT_TOKEN yok. Önce: bash kur.sh")
