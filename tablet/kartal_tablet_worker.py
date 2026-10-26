@@ -335,6 +335,7 @@ def ui_dump() -> list[dict]:
                 "cy": (y1 + y2) // 2,
                 "clickable": n.get("clickable") == "true",
                 "cls": (n.get("class") or "").split(".")[-1],
+                "rid": (n.get("resource-id") or ""),
                 "bounds": [x1, y1, x2, y2],
             }
         )
@@ -705,6 +706,10 @@ HELP = """<b>🦅 Kartal AI · Tablet Kumandası</b>
 /dinle — 6 sn dinle, yazıya çevir
 /sohbet — dinle → cevapla → konuş
 
+<b>Panel</b>
+/panel — KartaL AI paneline gir (şifre kayıtlıysa)
+/panel &lt;şifre&gt; — şifreyi kaydet ve gir
+
 <b>Bakım</b>
 /bak — her şey yolunda mı (tek mesaj)
 /api &lt;anahtar&gt; — Gemini anahtarını tek mesajla kur
@@ -824,6 +829,80 @@ def reconnect(timeout_scan: int = 120) -> str:
             "• Aç/kapa yaptıysan port değişir — tekrar /baglan yaz.")
 
 
+def _find_edit(nodes: list[dict]) -> dict | None:
+    """Ekrandaki ilk yazı alanını bulur (şifre kutusu)."""
+    for n in nodes:
+        rid = (n.get("rid") or "").lower()
+        if "password" in rid or "mira-entry" in rid:
+            return n
+    for n in nodes:
+        if "EditText" in (n.get("cls") or ""):
+            return n
+    for n in nodes:
+        if "şifre" in (n.get("label") or "").lower() or "giriş" in (n.get("label") or "").lower():
+            return n
+    return None
+
+
+def panel_login(sifre: str = "", url: str = "") -> list[str]:
+    """KartaL AI panelini açar ve şifreyle giriş yapar."""
+    msgs: list[str] = []
+    url = url or os.getenv("PANEL_URL", "https://qkn0.up.railway.app/").strip()
+    sifre = sifre or os.getenv("PANEL_PASS", "").strip()
+
+    msgs.append(f"🌐 Panel açılıyor… <code>{url}</code>")
+    try:
+        adb("shell", f"am start -a android.intent.action.VIEW -d '{url}'", timeout=30)
+    except Exception:
+        msgs.append(open_url(url))
+    time.sleep(7)
+
+    try:
+        nodes = ui_dump()
+    except Exception as e:
+        msgs.append(f"❌ Ekran okunamadı: {e}")
+        return msgs
+
+    kutu = _find_edit(nodes)
+    if not kutu:
+        msgs.append("ℹ️ Şifre kutusu görünmüyor — sayfa hâlâ yükleniyor olabilir ya da zaten giriş yapılmış.")
+        msgs.append(f"Görünen: {_visible_list(nodes, 12)}")
+        return msgs
+
+    msgs.append(f"🔑 Şifre kutusu bulundu ({kutu['cx']},{kutu['cy']})")
+    tap(kutu["cx"], kutu["cy"])
+    time.sleep(0.8)
+
+    if not sifre:
+        msgs.append("⚠️ Şifre yok. Şöyle kullan: <code>/panel ŞİFRE</code>")
+        return msgs
+
+    type_text(sifre)
+    time.sleep(0.7)
+    key("enter")
+    time.sleep(3)
+
+    # Giriş butonu varsa ona da bas
+    try:
+        nodes2 = ui_dump()
+        btn = find_node(nodes2, "KartaL AI'ya gir") or find_node(nodes2, "gir")
+        if btn:
+            tap(btn["cx"], btn["cy"])
+            msgs.append(f"👆 '{btn['label']}' dokunuldu")
+            time.sleep(5)
+    except Exception:
+        pass
+
+    try:
+        shot = screenshot("panel")
+        send_photo(shot, "🖥 Panel ekranı", os.getenv("TELEGRAM_CHAT_ID", "").strip())
+        nodes3 = ui_dump()
+        msgs.append("✅ Giriş denendi. Ekranda: " + _visible_list(nodes3, 10))
+    except Exception as e:
+        msgs.append(f"(ekran alınamadı: {e})")
+    return msgs
+
+
 def health_report() -> str:
     """Tabletin ve köprünün durumunu tek mesajda özetler."""
     lines = ["<b>🩺 Kartal Kontrol</b>"]
@@ -922,6 +1001,21 @@ def handle(text: str, chat_id: str) -> None:
         return
     if low in ("/bak", "/kontrol"):
         say(health_report(), chat_id)
+        return
+    if low.startswith("/panel"):
+        arg = raw[6:].strip()
+        def _p():
+            if arg and "http" not in arg:
+                # şifre verildi → kaydet
+                env_path = KARTAL_DIR / ".env"
+                rows = [r for r in (env_path.read_text(encoding="utf-8").splitlines() if env_path.exists() else []) if not r.startswith("PANEL_PASS=")]
+                rows.append(f"PANEL_PASS={arg}")
+                env_path.write_text("\n".join(rows).strip() + "\n", encoding="utf-8")
+                env_path.chmod(0o600)
+                os.environ["PANEL_PASS"] = arg
+            for m in panel_login(arg if "http" not in arg else ""):
+                say(m, chat_id)
+        threading.Thread(target=_p, daemon=True).start()
         return
     if low.startswith("/klasor") or low.startswith("/drive"):
         arg = raw.split(None, 1)[1].strip() if len(raw.split(None, 1)) > 1 else ""
