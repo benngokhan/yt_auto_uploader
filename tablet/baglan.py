@@ -211,6 +211,27 @@ def main() -> int:
 
     adb("start-server", timeout=20)
 
+    # 1b) Eşleştirme modu: python baglan.py pair [IP:PORT] [KOD]
+    args = [a for a in sys.argv[1:] if a]
+    if args and args[0].lower() in ("pair", "eslestir", "eşleştir"):
+        host = wifi_ip()
+        pport = args[1] if len(args) > 1 else ""
+        code = args[2] if len(args) > 2 else ""
+        if not pport:
+            pport = input(f"Eşleştirme portu [{host}:PORT] → ").strip().split(":")[-1]
+        if not code:
+            code = input("6 haneli kod → ").strip()
+        if pport.isdigit() and code:
+            out = adb("pair", f"{host}:{pport}", code, timeout=45)
+            msg = (out.stdout + out.stderr).strip()
+            print(msg)
+            if "uccess" in msg:
+                ok("Eşleştirme tamam. Şimdi bağlanılıyor…")
+                sys.argv = [sys.argv[0]]
+                return main()
+        err("Eşleştirme başarısız.")
+        return 1
+
     # 2) Elle verildiyse
     if len(sys.argv) > 1 and sys.argv[1].strip():
         hp = sys.argv[1].strip()
@@ -271,6 +292,22 @@ def main() -> int:
 
     candidates = candidates[:15]
     try:
+        adb("mdns", "check", timeout=10)
+        for svc in ("_adb-tls-connect._tcp", "_adb._tcp", "_adb-tls-pairing._tcp", ""):
+            args = ["mdns", "services"] + ([svc] if svc else [])
+            for ln in adb(*args, timeout=12).stdout.splitlines():
+                toks = ln.split()
+                if not toks:
+                    continue
+                hp = toks[-1].strip()
+                if ":" in hp and hp.split(":")[-1].isdigit() and ("_adb" in ln or "." in hp):
+                    h2, p2 = hp.rsplit(":", 1)
+                    if (h2, int(p2)) not in candidates:
+                        candidates.insert(0, (h2, int(p2)))
+                        info(f"mDNS: {hp}")
+    except Exception:
+        pass
+    try:
         mdns = adb("mdns", "services", timeout=10).stdout
         for ln in mdns.splitlines():
             if "_adb-tls-connect" in ln or "_adb._tcp" in ln:
@@ -300,6 +337,12 @@ def main() -> int:
         info(f"{h}:{p} adbd değil, geçildi.")
 
     if not need_pair:
+        print()
+        print()
+        print(f"{B}ONCE ESLEŞTIRME (Android 11+ zorunlu){X}")
+        print("  Ayarlar > Gelistirici secenekleri > Kablosuz hata ayiklama")
+        print("  > 'Cihaz eslestirme ile eslestir' > 6 haneli kod + IP:PORT")
+        print("  Sonra:  python baglan.py pair")
         print()
         print(f"{B}Tabletten portu oku (10 saniye){X}")
         print("  Ayarlar > Gelistirici secenekleri > 'Kablosuz hata ayiklama' YAZISINA dokun")
