@@ -770,53 +770,75 @@ def _iso_duration_seconds(dur: str) -> int:
     return h * 3600 + mi * 60 + s
 
 
-def clean_shorts_from_long_playlist(youtube) -> int:
-    """'Sizin Beğendikleriniz | Uzun Bilgi Serisi' oynatma listesindeki Shorts videolarını (<120 sn veya #shorts) temizler."""
+def _is_actual_youtube_short(vid: str, vtitle: str = "", secs: int = 999) -> bool:
+    """YouTube'un gerçekten Shorts saydığı videoları (/shorts/<id> -> 200; 16:9 uzunlar -> 303 /watch) kesin tespit eder."""
+    if "#shorts" in (vtitle or "").lower() or (0 < secs <= 65):
+        return True
+    try:
+        import urllib.request as _ur
+
+        class _NoRedir(_ur.HTTPRedirectHandler):
+            def redirect_request(self, req, fp, code, msg, headers, newurl):
+                return None
+
+        opener = _ur.build_opener(_NoRedir)
+        req = _ur.Request(f"https://www.youtube.com/shorts/{vid}", method="HEAD", headers={"User-Agent": "Mozilla/5.0"})
+        resp = opener.open(req, timeout=8)
+        return resp.status == 200
+    except _ur.HTTPError as he:
+        if he.code in (301, 302, 303, 307, 308):
+            return False  # /watch?v= sayfasına yönleniyor -> gerçek 16:9 uzun video!
+        return False
+    except Exception:
+        return False
+
+
+def clean_shorts_from_long_playlist(youtube, drive=None, queue_folder: str = "") -> int:
+    """'Uzun Bilgi Serisi' oynatma listesindeki gerçek Shorts videolarını temizler, 16:9 uzun bölümleri korur."""
     removed = 0
     try:
+        if drive and queue_folder:
+            backfill_series_playlist(youtube, drive, queue_folder)
         resp = youtube.playlists().list(part="snippet", mine=True, maxResults=50).execute()
-        pl_id = None
+        pl_ids = []
         for it in resp.get("items", []):
-            if "uzun bilgi serisi" in it.get("snippet", {}).get("title", "").lower():
-                pl_id = it["id"]
-                break
-        if not pl_id:
-            return 0
-
-        items = []
-        ptok = None
-        while True:
-            pr = youtube.playlistItems().list(
-                part="id,snippet,contentDetails",
-                playlistId=pl_id,
-                maxResults=50,
-                **({"pageToken": ptok} if ptok else {}),
-            ).execute()
-            items.extend(pr.get("items", []))
-            ptok = pr.get("nextPageToken")
-            if not ptok:
-                break
-
-        if not items:
-            return 0
-
-        vids = [it["contentDetails"]["videoId"] for it in items if it.get("contentDetails", {}).get("videoId")]
-        dur_map = {}
-        for i in range(0, len(vids), 50):
-            vr = youtube.videos().list(part="contentDetails,snippet", id=",".join(vids[i:i + 50])).execute()
-            for v in vr.get("items", []):
-                secs = _iso_duration_seconds(v.get("contentDetails", {}).get("duration", ""))
-                vtitle = v.get("snippet", {}).get("title", "")
-                dur_map[v["id"]] = (secs, vtitle)
-
-        for it in items:
-            vid = it.get("contentDetails", {}).get("videoId", "")
-            secs, vtitle = dur_map.get(vid, (999, ""))
-            if (0 < secs <= 120) or ("#shorts" in vtitle.lower()):
-                youtube.playlistItems().delete(id=it["id"]).execute()
-                removed += 1
-                print(f"UZUN-LISTE-TEMIZLIK: Shorts cikarildi -> {vid} ({secs}s | {vtitle[:55]})")
-        print(f"UZUN-LISTE-TEMIZLIK: Toplam {removed} Shorts uzun serisinden temizlendi.")
+            ptitle = it.get("snippet", {}).get("title", "")
+            if "uzun" in ptitle.lower():
+                pl_ids.append((it["id"], ptitle))
+        for pl_id, ptitle in pl_ids:
+            items = []
+            ptok = None
+            while True:
+                pr = youtube.playlistItems().list(
+                    part="id,snippet,contentDetails",
+                    playlistId=pl_id,
+                    maxResults=50,
+                    **({"pageToken": ptok} if ptok else {}),
+                ).execute()
+                items.extend(pr.get("items", []))
+                ptok = pr.get("nextPageToken")
+                if not ptok:
+                    break
+            if not items:
+                continue
+            vids = [it["contentDetails"]["videoId"] for it in items if it.get("contentDetails", {}).get("videoId")]
+            dur_map = {}
+            for i in range(0, len(vids), 50):
+                vr = youtube.videos().list(part="contentDetails,snippet", id=",".join(vids[i:i + 50])).execute()
+                for v in vr.get("items", []):
+                    secs = _iso_duration_seconds(v.get("contentDetails", {}).get("duration", ""))
+                    vtitle = v.get("snippet", {}).get("title", "")
+                    dur_map[v["id"]] = (secs, vtitle)
+            for it in items:
+                vid = it.get("contentDetails", {}).get("videoId", "")
+                secs, vtitle = dur_map.get(vid, (999, ""))
+                is_sh = _is_actual_youtube_short(vid, vtitle, secs)
+                print(f"UZUN-LISTE-KONTROL [{ptitle}]: {vid} | {secs}s | short={is_sh} | {vtitle[:55]}")
+                if is_sh:
+                    youtube.playlistItems().delete(id=it["id"]).execute()
+                    removed += 1
+                    print(f"UZUN-LISTE-TEMIZLIK: Shorts cikarildi -> {vid} ({secs}s | {vtitle[:55]})")
+        print(f"UZUN-LISTE-TEMIZLIK: Toplam {removed} gerçek Shorts uzun serisinden temizlendi.")
     except Exception as e:
         print(f"UZUN-LISTE-TEMIZLIK uyarisi: {e}")
     return removed
@@ -912,7 +934,7 @@ def run_ops_maintenance_and_report(youtube, drive, queue_folder: str) -> dict:
     from googleapiclient.http import MediaIoBaseDownload, MediaIoBaseUpload
     from sheets_metadata import compute_queue_stats, load_table_from_drive_or_local
 
-    clean_shorts_from_long_playlist(youtube)
+    clean_shorts_from_long_playlist(youtube, drive, queue_folder)
     apply_video8_reputation_fix(youtube)
 
     # Kanaldaki tüm yüklenmiş videoları çek (sayfalı)
