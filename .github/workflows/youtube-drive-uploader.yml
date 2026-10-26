@@ -19,8 +19,8 @@ on:
     # Türkiye Saati (UTC+3) Strateji Masası 2 Slot Kuralı (aynı gün aynı sütun; Cuma Uzun Video):
     # 1) 19:00 TR (16:00 UTC) -> Slot 1
     - cron: "0 16 * * *"
-    # 2) 21:30 TR (18:30 UTC) -> Slot 2
-    - cron: "30 18 * * *"
+    # 2) 20:15 TR (17:15 UTC) -> Slot 2
+    - cron: "15 17 * * *"
 
 permissions:
   actions: read

@@ -664,7 +664,7 @@ def get_next_scheduled_video(
         ready.sort(key=lambda item: (item["row"], natural_sort_key(item["name"])))
         return ready
 
-    # Aynı gün 2 slot varsa İKİSİ DE AYNI SÜTUNDAN olacak (19:00 ne açtıysa 21:30 aynı sütundan devam eder)
+    # Aynı gün 2 slot varsa İKİSİ DE AYNI SÜTUNDAN olacak (19:00 ne açtıysa 20:15 aynı sütundan devam eder)
     locked_col = daily_col
     locked_subcat = None
     if todays_uploads and video_type == "auto":

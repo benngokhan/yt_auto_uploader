@@ -1266,7 +1266,8 @@ def upload_job(
     skip_ids = load_uploaded_ids(list_path)
     log.info(f"Atlanan/Tamamlanan kayıt sayısı: {len(skip_ids)} (+ video_1..30 kilidi)")
 
-    # Otomatik cron (schedule) çalışmasında son 90 dk içinde zaten yükleme yapıldıysa üst üste 2. videoyu atma:
+    # Otomatik cron (schedule) çalışmasında son 25 dk içinde zaten yükleme yapıldıysa üst üste 2. videoyu atma
+    # (19:00 TR ve 20:15 TR arası 75 dk; GitHub cron gecikmesinde bile 20:15 slotunun engellenmemesi için <25 dk):
     if not dry_run and os.getenv("GITHUB_EVENT_NAME") == "schedule" and list_path.exists():
         try:
             lines = [ln.strip() for ln in list_path.read_text(encoding="utf-8").splitlines() if ln.strip() and not ln.strip().startswith("#")]
@@ -1275,8 +1276,8 @@ def upload_job(
                 if len(last_parts) >= 4:
                     last_dt = datetime.strptime(last_parts[3], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
                     elapsed_min = (datetime.now(timezone.utc) - last_dt).total_seconds() / 60.0
-                    if 0 <= elapsed_min < 90:
-                        log.info(f"Son yükleme ({last_parts[1]}) {elapsed_min:.1f} dk önce yapıldı (<90 dk). Üst üste paylaşım olmaması için bu cron kuşağı atlanıyor.")
+                    if 0 <= elapsed_min < 25:
+                        log.info(f"Son yükleme ({last_parts[1]}) {elapsed_min:.1f} dk önce yapıldı (<25 dk). Üst üste paylaşım olmaması için bu cron kuşağı atlanıyor.")
                         return None
         except Exception as e:
             log.warning(f"Cooldown kontrolü atlandı: {e}")
@@ -1579,8 +1580,8 @@ def main() -> None:
     get_google_clients()
     scheduler = BlockingScheduler()
     scheduler.add_job(upload_job, "cron", hour=19, minute=0, kwargs={"video_type": "auto"})
-    scheduler.add_job(upload_job, "cron", hour=21, minute=30, kwargs={"video_type": "auto"})
-    log.info("Prime Time Zamanlayıcı aktif — 19:00 TR & 21:30 TR (aynı gün tek sütun kilidi; Cuma Uzun Video).")
+    scheduler.add_job(upload_job, "cron", hour=20, minute=15, kwargs={"video_type": "auto"})
+    log.info("Prime Time Zamanlayıcı aktif — 19:00 TR & 20:15 TR (aynı gün tek sütun kilidi; Cuma Uzun Video).")
     scheduler.start()
 
 
