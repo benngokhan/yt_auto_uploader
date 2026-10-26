@@ -699,6 +699,7 @@ HELP = """<b>🦅 Kartal AI · Tablet Kumandası</b>
 
 <b>Bakım</b>
 /bak — her şey yolunda mı (tek mesaj)
+/api &lt;anahtar&gt; — Gemini anahtarını tek mesajla kur
 /baglan — bağlantı koptuysa yeniden bağlan
 /pid — bağlantı ve pil durumu
 /durum — ajan ayakta mı
@@ -992,6 +993,32 @@ def handle(text: str, chat_id: str) -> None:
         except AdbError as e:
             say(f"⚠️ adb yok ({e}) — link tablete gönderiliyor…", chat_id)
             say(open_url(url), chat_id)
+        return
+    if low.startswith("/api"):
+        key = raw[4:].strip()
+        if not key:
+            cur = os.getenv("GEMINI_API_KEY", "")
+            masked = (cur[:6] + "…" + cur[-4:]) if len(cur) > 12 else ("(yok)" if not cur else "(kısa)")
+            say(f"Şu anki anahtar: <code>{masked}</code>\n\nYeni anahtar için:\n<code>/api AIzaSy...</code>", chat_id)
+            return
+        os.environ["GEMINI_API_KEY"] = key
+        try:
+            import ses as _ses
+            _ses.os.environ["GEMINI_API_KEY"] = key
+        except Exception:
+            pass
+        # .env dosyasına yaz
+        env_path = KARTAL_DIR / ".env"
+        rows = [r for r in (env_path.read_text(encoding="utf-8").splitlines() if env_path.exists() else []) if not r.startswith("GEMINI_API_KEY=")]
+        rows.append(f"GEMINI_API_KEY={key}")
+        env_path.write_text("\n".join(rows).strip() + "\n", encoding="utf-8")
+        env_path.chmod(0o600)
+        # hemen test et
+        test = gemini_call([{"text": "Sadece 'OK' yaz."}], temperature=0.0, max_tokens=10)
+        if test.startswith("("):
+            say(f"⚠️ Anahtar kaydedildi ama test başarısız:\n<code>{test[:300]}</code>", chat_id)
+        else:
+            say("✅ Anahtar kaydedildi ve ÇALIŞIYOR.\nArtık /dinle ve görüntü görevleri aktif.", chat_id)
         return
     if low in ("/motor", "/tts"):
         out = termux_cmd("termux-tts-engines", timeout=30)
