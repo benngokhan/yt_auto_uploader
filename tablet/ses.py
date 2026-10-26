@@ -39,6 +39,60 @@ REC_DIR = Path.home() / "kartal_tablet" / "kayitlar"
 REC_DIR.mkdir(parents=True, exist_ok=True)
 
 
+# ---------------------------------------------------------------------------
+# Gemini çağrısı: hem ?key= hem x-goog-api-key, hem v1beta hem v1, model yedeği
+# ---------------------------------------------------------------------------
+GEMINI_MODELS = ("gemini-2.5-flash", "gemini-2.0-flash", "gemini-flash-latest")
+
+
+def gemini_call(parts: list[dict], temperature: float = 0.2, max_tokens: int = 800) -> str:
+    """Gemini'ye içerik gönderir. Hata varsa ayrıntılı metin döner."""
+    key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not key:
+        return "(GEMINI_API_KEY yok)"
+    payload = json.dumps({
+        "contents": [{"parts": parts}],
+        "generationConfig": {"temperature": temperature, "maxOutputTokens": max_tokens},
+    }).encode()
+
+    models = [os.getenv("GEMINI_MODEL", "").strip()] + list(GEMINI_MODELS)
+    seen, last = set(), "bilinmeyen hata"
+    for model in [m for m in models if m]:
+        if model in seen:
+            continue
+        seen.add(model)
+        for ver in ("v1beta", "v1"):
+            url = f"https://generativelanguage.googleapis.com/{ver}/models/{model}:generateContent"
+            for auth in ("header", "query"):
+                u = url + (f"?key={urllib.parse.quote(key)}" if auth == "query" else "")
+                headers = {"Content-Type": "application/json"}
+                if auth == "header":
+                    headers["x-goog-api-key"] = key
+                try:
+                    req = urllib.request.Request(u, data=payload, headers=headers)
+                    with urllib.request.urlopen(req, timeout=90) as r:
+                        data = json.loads(r.read().decode())
+                    cand = data.get("candidates") or []
+                    if not cand:
+                        last = "boş yanıt"
+                        continue
+                    txt = "".join(pt.get("text", "") for pt in cand[0]["content"]["parts"]).strip()
+                    if txt:
+                        return txt
+                except urllib.error.HTTPError as e:
+                    body = ""
+                    try:
+                        body = e.read().decode()[:200].replace("\n", " ")
+                    except Exception:
+                        pass
+                    last = f"HTTP {e.code} ({model}/{ver}/{auth}) {body}"
+                    if e.code in (401, 403):
+                        return f"(anahtar reddedildi: {last})"
+                except Exception as e:
+                    last = f"{type(e).__name__}: {e}"
+    return f"({last})"
+
+
 def _run(cmd: list[str], timeout: int = 90) -> str:
     try:
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
@@ -95,6 +149,13 @@ def record(seconds: int = 6) -> Path | None:
     """Mikrofonu kaydeder (m4a)."""
     if shutil.which("termux-microphone-record") is None:
         return None
+    # Mikrofon izni kontrolü (termux-microphone-record yoksa da buraya gelinmez)
+    try:
+        st = _run(["termux-microphone-record", "-i"], timeout=15)
+        if "yok" in st:
+            return None
+    except Exception:
+        pass
     path = REC_DIR / f"kayit_{int(time.time())}.m4a"
     _run(["termux-microphone-record", "-f", str(path), "-e", "aac", "-b", "64000"], timeout=10)
     time.sleep(max(1, seconds))
@@ -105,67 +166,31 @@ def record(seconds: int = 6) -> Path | None:
 
 def transcribe(path: Path) -> str:
     """Gemini ile sesi yazıya çevirir."""
-    key = os.getenv("GEMINI_API_KEY", "").strip()
-    if not key:
+    if not os.getenv("GEMINI_API_KEY", "").strip():
         return "(Gemini anahtarı yok → ses yazıya çevrilemiyor)"
-    model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip()
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{model}:generateContent?key={urllib.parse.quote(key)}"
+    return gemini_call(
+        [
+            {"text": "Bu ses kaydını Türkçe olarak yazıya çevir. Sadece duyduğun metni yaz, açıklama ekleme."},
+            {"inline_data": {"mime_type": "audio/mp4", "data": base64.b64encode(path.read_bytes()).decode()}},
+        ],
+        temperature=0.0,
     )
-    mime = "audio/mp4"
-    body = {
-        "contents": [{
-            "parts": [
-                {"text": "Bu ses kaydını Türkçe olarak yazıya çevir. Sadece duyduğun metni yaz, açıklama ekleme."},
-                {"inline_data": {"mime_type": mime, "data": base64.b64encode(path.read_bytes()).decode()}},
-            ]
-        }],
-        "generationConfig": {"temperature": 0.0, "maxOutputTokens": 512},
-    }
-    try:
-        req = urllib.request.Request(
-            url, data=json.dumps(body).encode(), headers={"Content-Type": "application/json"}
-        )
-        with urllib.request.urlopen(req, timeout=90) as r:
-            data = json.loads(r.read().decode())
-        return "".join(p.get("text", "") for p in data["candidates"][0]["content"]["parts"]).strip() \
-            or "(anlaşılamadı)"
-    except Exception as e:
-        return f"(çeviri hatası: {e})"
 
 
 def reply_brain(user_text: str) -> str:
-    """Kısa, doğal bir yanıt üretir (Gemini yoksa basit kalıp)."""
-    key = os.getenv("GEMINI_API_KEY", "").strip()
-    if not key:
+    """Kısa, doğal bir yanıt üretir."""
+    if not os.getenv("GEMINI_API_KEY", "").strip():
         return f"Duydum: {user_text}"
-    model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip()
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{model}:generateContent?key={urllib.parse.quote(key)}"
+    out = gemini_call(
+        [{"text": (
+            "Sen Kartal'sın: Bilgi Dozu YouTube kanalının tablet asistanı. "
+            "Türkçe, samimi, kısa (en fazla 2 cümle) cevap ver. "
+            f"Kullanıcı şöyle dedi: {user_text}"
+        )}],
+        temperature=0.6,
+        max_tokens=300,
     )
-    body = {
-        "contents": [{
-            "parts": [{
-                "text": (
-                    "Sen Kartal'sın: Bilgi Dozu YouTube kanalının tablet asistanı. "
-                    "Türkçe, samimi, kısa (en fazla 2 cümle) cevap ver. "
-                    f"Kullanıcı şöyle dedi: {user_text}"
-                )
-            }]
-        }],
-        "generationConfig": {"temperature": 0.6, "maxOutputTokens": 300},
-    }
-    try:
-        req = urllib.request.Request(
-            url, data=json.dumps(body).encode(), headers={"Content-Type": "application/json"}
-        )
-        with urllib.request.urlopen(req, timeout=60) as r:
-            data = json.loads(r.read().decode())
-        return "".join(p.get("text", "") for p in data["candidates"][0]["content"]["parts"]).strip()
-    except Exception:
-        return f"Duydum: {user_text}"
+    return out if not out.startswith("(") else f"Duydum: {user_text}"
 
 
 def listen_once(seconds: int = 6) -> tuple[str, str]:

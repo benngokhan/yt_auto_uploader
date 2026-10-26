@@ -45,7 +45,7 @@ STATE_FILE = KARTAL_DIR / "state.json"
 for d in (KARTAL_DIR, SHOTS_DIR, DOWNLOADS_DIR):
     d.mkdir(parents=True, exist_ok=True)
 
-from ses import speak, chat_turn, listen_once, tts_available, reply_brain
+from ses import speak, chat_turn, listen_once, tts_available, reply_brain, gemini_call
 
 # Termux'ta pkg ile kurulan araçlar PATH'te olmayabilir — kendimiz ekliyoruz
 for _p in ("/data/data/com.termux/files/usr/bin", "/system/bin", "/system/xbin"):
@@ -509,41 +509,22 @@ def share_file_termux(path: Path, title: str = "") -> str:
 # 4. GEMINI GÖRÜNTÜ KATMANI (opsiyonel)
 # --------------------------------------------------------------------------
 def gemini_see(png: Path, question: str) -> str:
-    """Ekran görüntüsünü Gemini'ye sorar; anahtar yoksa boş döner."""
-    api_key = os.getenv("GEMINI_API_KEY", "").strip()
-    if not api_key:
+    """Ekran görüntüsünü Gemini'ye sorar (ortak hata toleranslı katman)."""
+    if not os.getenv("GEMINI_API_KEY", "").strip():
         return ""
-    model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip()
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{model}:generateContent?key={urllib.parse.quote(api_key)}"
-    )
-    body = {
-        "contents": [
-            {
-                "parts": [
-                    {"text": question},
-                    {"inline_data": {"mime_type": "image/png", "data": base64.b64encode(png.read_bytes()).decode()}},
-                ]
-            }
-        ],
-        "generationConfig": {"temperature": 0.1, "maxOutputTokens": 512},
-    }
     try:
-        req = urllib.request.Request(
-            url, data=json.dumps(body).encode("utf-8"), headers={"Content-Type": "application/json"}
+        return gemini_call(
+            [
+                {"text": question},
+                {"inline_data": {"mime_type": "image/png", "data": base64.b64encode(png.read_bytes()).decode()}},
+            ],
+            temperature=0.1,
+            max_tokens=512,
         )
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-        parts = data["candidates"][0]["content"]["parts"]
-        return "".join(p.get("text", "") for p in parts).strip()
     except Exception as e:
         return f"(görüntü modeli hatası: {e})"
 
 
-# --------------------------------------------------------------------------
-# 5. GÖREV DÖNGÜSÜ (doğal dil -> adım adım eylem)
-# --------------------------------------------------------------------------
 ACTION_SCHEMA = """SADECE şu JSON'u döndür, başka hiçbir şey yazma:
 {"action":"tap_text|tap_xy|swipe|type|key|open_app|done","label":"","x":0,"y":0,"direction":"up","text":"","app":"","note":"kısa gerekçe"}"""
 
