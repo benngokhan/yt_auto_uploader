@@ -130,114 +130,55 @@ def get_google_clients(token_file: Path = None, force_reauth: bool = False):
 
 
 def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
-    """1) Diğer klasördeki (1MBjwKp...) fazlalık baslik.xlsx / bilgidozu_yukleme_tablosu.xlsx dosyalarını siler (tek yerde kalsın).
-    2) KartaL'ın ana stok klasöründeki (1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_) baslik.xlsx (1tHZ4aCtdtKRLmY7z9PqLGUTu5rVth4vj) dosyasını
-       mevcut YÜKLENDİ durumlarını koruyarak A2:M133 Yeşil/Sarı simetrik formatla günceller.
-    3) Yeni videoları hem 'hazır videolar' (1JULlauO1eFpXgGdZKdZZDyqesSdkeT6f) hem KartaL stok klasörüne, kapakları KAPAKLAR'a aktarır."""
+    """KartaL'ın ana stok klasöründeki (1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_) baslik.xlsx (1tHZ4aCtdtKRLmY7z9PqLGUTu5rVth4vj) dosyasını:
+    - Mevcut YÜKLENDİ durumlarını (Drive + uploaded.txt) koruyarak,
+    - Drive'a doğrudan eklenmiş yeni satırları (video_121+ vb.) ASLA silmeden koruyarak,
+    Yeşil/Sarı simetrik formatla günceller."""
     import io
-    import urllib.request
-    import zipfile
     import openpyxl
+    from copy import copy
     from openpyxl.styles import PatternFill, Font
     from googleapiclient.http import MediaIoBaseDownload
 
     kartal_folder = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"
-    main_folder = "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br"
-    hazir_videolar_id = "1JULlauO1eFpXgGdZKdZZDyqesSdkeT6f"
-    kapaklar_folder_id = "1XKZJ12HyAvZkjgiG38ys3HOMhZ42d_jJ"
     baslik_file_id = "1tHZ4aCtdtKRLmY7z9PqLGUTu5rVth4vj"
 
     try:
-        # 0. KartaL stok klasörünün adı 'Mira Stok' ise 'KartaL Stok' yap
+        local_xlsx = BASE_DIR / "bilgidozu_yukleme_tablosu.xlsx"
+        if not local_xlsx.exists():
+            local_xlsx = BASE_DIR / "baslik.xlsx"
+        if not local_xlsx.exists():
+            return
+
+        remote_uploaded = {}
+        remote_extra_rows = {}  # Drive'da olup yerel repoda henüz olmayan yeni satırlar (video_122+ vb.)
+
+        # uploaded.txt içindeki kesin YÜKLENDİ kayıtlarını da al
+        up_txt = BASE_DIR / "uploaded.txt"
+        if up_txt.exists():
+            for line in up_txt.read_text(encoding="utf-8", errors="ignore").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#") or "|" not in line:
+                    continue
+                parts = [p.strip() for p in line.split("|")]
+                if len(parts) >= 4 and parts[1].endswith(".mp4") and not parts[0].startswith(("LOCKED_", "MANUAL_SKIP")):
+                    remote_uploaded[parts[1]] = (parts[2], parts[3], None, None)
+
+        # Drive'daki tüm güncel tablo adaylarını oku (hem bilgidozu_yukleme_tablosu.xlsx hem baslik.xlsx)
+        remote_file_ids = [baslik_file_id]
         try:
-            fmeta = drive.files().get(fileId=kartal_folder, fields="name").execute()
-            if "mira" in fmeta.get("name", "").lower():
-                drive.files().update(fileId=kartal_folder, body={"name": "KartaL Stok"}).execute()
-                log.info("Klasör adı 'KartaL Stok' olarak güncellendi.")
+            q_tabs = f"'{kartal_folder}' in parents and trashed=false and (name='bilgidozu_yukleme_tablosu.xlsx' or name='baslik.xlsx')"
+            res_t = drive.files().list(q=q_tabs, pageSize=10, fields="files(id,name,modifiedTime)").execute()
+            for ft in res_t.get("files", []):
+                if ft["id"] not in remote_file_ids:
+                    remote_file_ids.insert(0, ft["id"])
         except Exception:
             pass
 
-        # 1. Diğer klasördeki (1MBjwKp...) fazlalık baslik.xlsx ve bilgidozu_yukleme_tablosu.xlsx dosyalarını sil (tek yerde kalsın)
-        page_token = None
-        while True:
-            res = drive.files().list(
-                q=f"'{main_folder}' in parents and trashed=false",
-                pageSize=200,
-                fields="nextPageToken, files(id, name, mimeType)",
-                pageToken=page_token,
-            ).execute()
-            for f in res.get("files", []):
-                fname = f.get("name", "")
-                fid = f.get("id", "")
-                if fname.lower().endswith(".mp4"):
-                    try:
-                        drive.files().update(
-                            fileId=fid,
-                            addParents=hazir_videolar_id,
-                            removeParents=main_folder,
-                            fields="id, parents",
-                        ).execute()
-                    except Exception:
-                        pass
-                elif fname in ("baslik.xlsx", "bilgidozu_yukleme_tablosu.xlsx"):
-                    try:
-                        drive.files().update(fileId=fid, body={"trashed": True}).execute()
-                        log.info(f"Diğer klasördeki fazlalık tablo kaldırıldı (tek yerde kalsın): {fname}")
-                    except Exception as de:
-                        log.warning(f"Fazlalık tablo kaldırma uyarısı ({fname}): {de}")
-            page_token = res.get("nextPageToken")
-            if not page_token:
-                break
-
-        # 1.b Yeni üretilen (video_101..120 ve uzun_video_13) videolar KartaL Stok klasörüne (1w8tz...) gitmişse
-        #     onları Lobi ('hazır videolar' - 1JULlauO1eFpXgGdZKdZZDyqesSdkeT6f) klasörüne geri çek ki kullanıcı kontrol edip kendi taşısın!
-        lobby_videos = {f"video_{i}.mp4" for i in range(101, 121)} | {"uzun_video_13.mp4"}
-        existing_lobby = set()
-        page_token = None
-        while True:
-            res_l = drive.files().list(
-                q=f"'{hazir_videolar_id}' in parents and trashed=false",
-                pageSize=200,
-                fields="nextPageToken, files(id, name)",
-                pageToken=page_token,
-            ).execute()
-            for f in res_l.get("files", []):
-                existing_lobby.add(f.get("name", ""))
-            page_token = res_l.get("nextPageToken")
-            if not page_token:
-                break
-
-        page_token = None
-        while True:
-            res_k = drive.files().list(
-                q=f"'{kartal_folder}' in parents and trashed=false",
-                pageSize=200,
-                fields="nextPageToken, files(id, name)",
-                pageToken=page_token,
-            ).execute()
-            for f in res_k.get("files", []):
-                fn = f.get("name", "")
-                fid = f.get("id", "")
-                if fn in lobby_videos and fn in existing_lobby:
-                    try:
-                        # Lobi'de ('hazır videolar') henüz kontrol edilmeyi bekleyen kopyası duruyorsa,
-                        # KartaL Stok içindeki erken kopyayı kaldır. Kullanıcı Lobi'den taşıdığında (existing_lobby'den çıktığında) korunur!
-                        drive.files().update(fileId=fid, body={"trashed": True}).execute()
-                        log.info(f"Kullanıcı kontrolü için yalnızca Lobi ('hazır videolar') klasöründe bırakıldı: {fn}")
-                    except Exception as le:
-                        log.warning(f"Lobi taşıma uyarısı ({fn}): {le}")
-            page_token = res_k.get("nextPageToken")
-            if not page_token:
-                break
-
-        # 2. KartaL klasöründeki (1w8tz...) baslik.xlsx (1tHZ4aCtdtKRLmY7z9PqLGUTu5rVth4vj) dosyasını
-        #    botun sonradan işaretlediği YÜKLENDİ satırlarını koruyarak simetrik Yeşil/Sarı formatla güncelle!
-        local_xlsx = BASE_DIR / "baslik.xlsx"
-        if local_xlsx.exists():
-            remote_uploaded = {}
+        for rfid in remote_file_ids:
             try:
                 buf = io.BytesIO()
-                dl = MediaIoBaseDownload(buf, drive.files().get_media(fileId=baslik_file_id))
+                dl = MediaIoBaseDownload(buf, drive.files().get_media(fileId=rfid))
                 done = False
                 while not done:
                     _, done = dl.next_chunk()
@@ -245,53 +186,94 @@ def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
                 wb_rem = openpyxl.load_workbook(buf)
                 ws_rem = next((s for s in wb_rem.worksheets if s.title.strip().casefold() == "drive"), wb_rem.active)
                 for r in range(2, ws_rem.max_row + 1):
-                    st = str(ws_rem.cell(r, 1).value or "").strip().upper()
+                    st = str(ws_rem.cell(r, 1).value or "").strip()
                     fn = str(ws_rem.cell(r, 2).value or "").strip()
-                    if fn and ("YÜKLENDİ" in st or "YUKLENDI" in st):
+                    if not fn:
+                        continue
+                    row_vals = [ws_rem.cell(r, c).value for c in range(1, 14)]
+                    if fn not in remote_extra_rows and row_vals[2]:
+                        remote_extra_rows[fn] = row_vals
+                    if "YÜKLENDİ" in st.upper() or "YUKLENDI" in st.upper():
+                        # Yalnızca gerçek YouTube linki olan veya uploaded.txt'de doğrulananları koru
+                        prev = remote_uploaded.get(fn, (None, None, None, None))
                         remote_uploaded[fn] = (
-                            ws_rem.cell(r, 10).value,
-                            ws_rem.cell(r, 11).value,
-                            ws_rem.cell(r, 12).value,
-                            ws_rem.cell(r, 13).value,
+                            ws_rem.cell(r, 10).value or prev[0],
+                            ws_rem.cell(r, 11).value or prev[1],
+                            ws_rem.cell(r, 12).value if ws_rem.cell(r, 12).value is not None else prev[2],
+                            ws_rem.cell(r, 13).value if ws_rem.cell(r, 13).value is not None else prev[3],
                         )
                 wb_rem.close()
             except Exception as re_err:
-                log.warning(f"Mevcut baslik.xlsx okuma uyarısı: {re_err}")
+                log.warning(f"Drive tablo okuma uyarısı ({rfid}): {re_err}")
 
-            wb_loc = openpyxl.load_workbook(local_xlsx)
-            ws_loc = next((s for s in wb_loc.worksheets if s.title.strip().casefold() == "drive"), wb_loc.active)
-            green_fill = PatternFill(start_color="B6D7A8", end_color="B6D7A8", fill_type="solid")
-            green_font = Font(name="Calibri", size=10, bold=False, color="0B3B17")
-            green_bold = Font(name="Calibri", size=10, bold=True, color="0B3B17")
+        wb_loc = openpyxl.load_workbook(local_xlsx)
+        ws_loc = next((s for s in wb_loc.worksheets if s.title.strip().casefold() == "drive"), wb_loc.active)
+        green_fill = PatternFill(start_color="B6D7A8", end_color="B6D7A8", fill_type="solid")
+        green_font = Font(name="Calibri", size=10, bold=False, color="0B3B17")
+        green_bold = Font(name="Calibri", size=10, bold=True, color="0B3B17")
+        yellow_fill = PatternFill(start_color="FFF2CC", end_color="FFF2CC", fill_type="solid")
+        yellow_font = Font(name="Calibri", size=10, bold=False, color="333333")
+        yellow_bold = Font(name="Calibri", size=10, bold=True, color="333333")
 
-            for r in range(2, ws_loc.max_row + 1):
-                fn = str(ws_loc.cell(r, 2).value or "").strip()
-                if fn in remote_uploaded:
-                    ws_loc.cell(r, 1).value = "YÜKLENDİ"
-                    yt_u, up_t, vw, cm = remote_uploaded[fn]
-                    if yt_u and not ws_loc.cell(r, 10).value:
-                        ws_loc.cell(r, 10).value = yt_u
-                    if up_t and not ws_loc.cell(r, 11).value:
-                        ws_loc.cell(r, 11).value = up_t
-                    if vw is not None and not ws_loc.cell(r, 12).value:
-                        ws_loc.cell(r, 12).value = vw
-                    if cm is not None and not ws_loc.cell(r, 13).value:
-                        ws_loc.cell(r, 13).value = cm
-                    for c in range(1, 14):
-                        ws_loc.cell(r, c).fill = green_fill
-                        ws_loc.cell(r, c).font = green_bold if c in (1, 2) else green_font
+        local_fns = set()
+        last_data_row = 1
+        for r in range(2, ws_loc.max_row + 1):
+            fn = str(ws_loc.cell(r, 2).value or "").strip()
+            if not fn:
+                continue
+            local_fns.add(fn)
+            last_data_row = r
+            if fn in remote_uploaded:
+                ws_loc.cell(r, 1).value = "YÜKLENDİ"
+                yt_u, up_t, vw, cm = remote_uploaded[fn]
+                if yt_u and not ws_loc.cell(r, 10).value:
+                    ws_loc.cell(r, 10).value = yt_u
+                if up_t and not ws_loc.cell(r, 11).value:
+                    ws_loc.cell(r, 11).value = up_t
+                if vw is not None and not ws_loc.cell(r, 12).value:
+                    ws_loc.cell(r, 12).value = vw
+                if cm is not None and not ws_loc.cell(r, 13).value:
+                    ws_loc.cell(r, 13).value = cm
+                for c in range(1, 14):
+                    ws_loc.cell(r, c).fill = green_fill
+                    ws_loc.cell(r, c).font = green_bold if c in (1, 2) else green_font
 
-            merged_tmp = Path(tempfile.gettempdir()) / "baslik_merged.xlsx"
-            wb_loc.save(merged_tmp)
-            wb_loc.close()
+        # Drive'da yeni eklenmiş satırlar varsa sonuna koruyarak ekle (ASLA ezme!)
+        for fn, row_vals in remote_extra_rows.items():
+            if fn not in local_fns:
+                last_data_row += 1
+                is_up = fn in remote_uploaded or "YÜKLENDİ" in str(row_vals[0] or "").upper()
+                for c in range(1, 14):
+                    cell = ws_loc.cell(last_data_row, c, value=row_vals[c - 1])
+                    if is_up:
+                        cell.fill = green_fill
+                        cell.font = green_bold if c in (1, 2) else green_font
+                    else:
+                        cell.fill = yellow_fill
+                        cell.font = yellow_bold if c in (1, 2) else yellow_font
+                if ws_loc.row_dimensions[133].height:
+                    ws_loc.row_dimensions[last_data_row].height = ws_loc.row_dimensions[133].height
+                for c in range(1, 14):
+                    ref = ws_loc.cell(2, c)
+                    if ref.has_style:
+                        ws_loc.cell(last_data_row, c).alignment = copy(ref.alignment)
+                        ws_loc.cell(last_data_row, c).border = copy(ref.border)
 
-            media_x = MediaFileUpload(
-                str(merged_tmp),
-                mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                resumable=False,
-            )
-            drive.files().update(fileId=baslik_file_id, media_body=media_x).execute()
-            log.info(f"KartaL baslik.xlsx ({baslik_file_id}) A2:M133 Yeşil/Sarı simetrik olarak güncellendi.")
+        merged_tmp = Path(tempfile.gettempdir()) / "baslik_merged.xlsx"
+        wb_loc.save(merged_tmp)
+        wb_loc.close()
+
+        for target_id in remote_file_ids:
+            try:
+                media_x = MediaFileUpload(
+                    str(merged_tmp),
+                    mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    resumable=False,
+                )
+                drive.files().update(fileId=target_id, media_body=media_x).execute()
+                log.info(f"KartaL Drive tablosu ({target_id}) kayıpsız senkronize edildi ({last_data_row - 1} video).")
+            except Exception as ue:
+                log.warning(f"Drive tablo güncelleme uyarısı ({target_id}): {ue}")
     except Exception as exc:
         log.warning(f"Bulut -> Drive senkronizasyon uyarısı: {exc}")
 
@@ -669,11 +651,24 @@ def drain_lobi_to_queue(drive, queue_folder: str, lobi_id: str = "1JULlauO1eFpXg
 SERIES_PLAYLIST_TITLE = "Sizin Beğendikleriniz | Uzun Bilgi Serisi"
 
 SHORTS_TOPIC_RULES = [
-    ("Nörobilim & İnsan Beyni 🧠", ["beyn", "zihn", "nöro", "burn", "vücud", "vucud", "kas ", "deri", "hafıza", "hafiza", "uyku", "bilinç", "bilinc", "rüya", "ruya", "algı", "algi", "yanılsama", "dopamin", "korku", "mutluluk", "düşünce", "dusunce"]),
-    ("Mühürlü Tarih 🏺", ["piramit", "antik", "tarih", "imparator", "medeniyet", "mısır", "misir", "roma", "osmanlı", "osmanli", "arkeol", "mühür", "tapınak", "kale", "savaş", "savas", "korsan", "mamut", "efsane", "kadim"]),
-    ("Evren & Uzay 🌌", ["uzay", "gezegen", "yıldız", "yildiz", "satürn", "saturn", "jüpiter", "neptün", "merkür", "venüs", "uranüs", "everest", "kara delik", "galaksi", "mars", "ay'da", "ayda", "ay ", "evren", "kuyruklu", "meteor", "nasa", "astronot", "güneş", "gunes"]),
-    ("Doğa & Canlılar 🦎", ["hayvan", "bitki", "deniz", "böcek", "bocek", "kuş", "kus", "aksolotl", "geko", "karides", "ağaç", "agac", "orman", "mantar", "kurbağa", "kurbaga", "balina", "ahtapot", "kedi", "köpek", "kopek", "yılan", "yilan", "örümcek", "orumcek", "arı", "ari", "doğa", "doga", "okyanus"]),
+    ("Mühürlü Tarih 🏺", ["piramit", "antik", "tarih", "imparator", "medeniyet", "mısır", "misir", "roma", "osmanlı", "osmanli", "arkeol", "mühür", "tapınak", "tapinak", "göbekli", "gobekli", "voynich", "antikythera", "sümer", "sumer", "babil", "aztek", "maya", "viking", "kale", "savaş", "savas", "korsan", "mamut", "firavun", "kadim", "enkaz", "yazıt", "el yazması", "elyazması"]),
+    ("Evren & Uzay 🌌", ["uzay", "gezegen", "yıldız", "yildiz", "satürn", "saturn", "jüpiter", "jupiter", "neptün", "neptun", "merkür", "merkur", "venüs", "venus", "uranüs", "uranus", "titan", "europa", "olympus", "kara delik", "karadelik", "süpernova", "supernova", "galaksi", "mars", "ay'da", "ayda", "ay ", "evren", "kuyruklu", "meteor", "astreoit", "asteroit", "nasa", "astronot", "güneş", "gunes", "ışık yılı", "isik yili", "yörünge"]),
+    ("Doğa & Canlılar 🦎", ["hayvan", "bitki", "deniz", "böcek", "bocek", "kuş", "kus", "aksolotl", "geko", "karides", "karga", "karınca", "karinca", "yunus", "fil ", "filler", "wombat", "tardigrad", "denizyıldız", "denizanası", "balık", "balik", "mariana", "ağaç", "agac", "orman", "mantar", "kurbağa", "kurbaga", "balina", "ahtapot", "kedi", "köpek", "kopek", "yılan", "yilan", "örümcek", "orumcek", "arı", "ari", "doğa", "doga", "okyanus"]),
+    ("Nörobilim & İnsan Beyni 🧠", ["beyn", "beyin", "zihn", "zihin", "nöro", "noro", "burn", "burun", "vücud", "vucud", "kas ", "deri", "göz", "goz", "gıdık", "gidik", "hafıza", "hafiza", "uyku", "bilinç", "bilinc", "rüya", "ruya", "algı", "algi", "yanılsama", "dopamin", "korku", "mutluluk", "düşünce", "dusunce", "psikoloj", "dna"]),
 ]
+
+CATEGORY_TO_PLAYLIST = {
+    "tarih": "Mühürlü Tarih 🏺",
+    "arkeoloji": "Mühürlü Tarih 🏺",
+    "uzay": "Evren & Uzay 🌌",
+    "astronomi": "Evren & Uzay 🌌",
+    "doğa": "Doğa & Canlılar 🦎",
+    "hayvan": "Doğa & Canlılar 🦎",
+    "beyin": "Nörobilim & İnsan Beyni 🧠",
+    "psikoloji": "Nörobilim & İnsan Beyni 🧠",
+    "nörobilim": "Nörobilim & İnsan Beyni 🧠",
+    "insan vücudu": "Nörobilim & İnsan Beyni 🧠",
+}
 
 def ensure_named_playlist(youtube, title: str, description: str = "") -> "str | None":
     """İsme göre oynatma listesi; yoksa oluşturur."""
@@ -698,8 +693,12 @@ def ensure_series_playlist(youtube) -> "str | None":
     return ensure_named_playlist(youtube, SERIES_PLAYLIST_TITLE, "Bilgi Dozu uzun video bölüm serisi.")
 
 
-def route_short_topic(title: str) -> "str | None":
-    """Başlığa göre konulu Shorts oynatma listesi adı; hiçbiri uymazsa None."""
+def route_short_topic(title: str, category_name: str = "") -> "str | None":
+    """Kategori veya başlığa göre konulu Shorts oynatma listesi adı; hiçbiri uymazsa None."""
+    cat_low = (category_name or "").lower()
+    for key, pl_name in CATEGORY_TO_PLAYLIST.items():
+        if key in cat_low:
+            return pl_name
     t = (title or "").lower()
     for liste_adi, anahtarlar in SHORTS_TOPIC_RULES:
         if any(a in t for a in anahtarlar):
@@ -742,7 +741,7 @@ def backfill_series_playlist(youtube, drive, queue_folder: str) -> None:
             if str(name).startswith("uzun_video_"):
                 hedef = SERIES_PLAYLIST_TITLE
             else:
-                hedef = route_short_topic(str(rec.get("title", "")))
+                hedef = route_short_topic(str(rec.get("title", "")), str(rec.get("category_name", "")))
             if not hedef:
                 continue
             if hedef not in playlist_ids:
@@ -912,7 +911,7 @@ def upload_job(
         if file_name.startswith("uzun_"):
             _pid = ensure_series_playlist(youtube)
         else:
-            _konu = route_short_topic(meta["title"])
+            _konu = route_short_topic(meta["title"], meta.get("category_name", ""))
             _pid = ensure_named_playlist(youtube, _konu) if _konu else None
         if _pid:
             seri_link = f"📚 Bu serinin oynatma listesi: https://www.youtube.com/playlist?list={_pid}"
@@ -945,7 +944,7 @@ def upload_job(
             add_video_to_series(youtube, vid_id)
             backfill_series_playlist(youtube, drive, queue_folder)
         else:
-            konu_listesi = route_short_topic(meta["title"])
+            konu_listesi = route_short_topic(meta["title"], meta.get("category_name", ""))
             if konu_listesi:
                 pkid = ensure_named_playlist(youtube, konu_listesi)
                 add_video_to_series(youtube, vid_id, pkid)

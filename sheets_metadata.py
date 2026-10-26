@@ -23,7 +23,7 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
-DEFAULT_DRIVE_FOLDER_ID = "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br"
+DEFAULT_DRIVE_FOLDER_ID = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"
 DEFAULT_SHEETS_ID = "1DTXIt8wY9fDHRYRT_Kz5GVVcGe00hDaK"
 MIN_SHORTS_NUMBER = 31  # 1..30 kilitli/atlandı, Shorts video_31.mp4'ten başlar
 
@@ -179,6 +179,7 @@ def parse_drive_sheet(xlsx_source) -> dict[str, dict]:
             "category_name": raw_cat,
             "categoryId": cat_id,
             "source": source,
+            "youtube_url": str(ws.cell(r, 10).value or "").strip(),
             "is_long": is_long_filename(fname),
             "has_title": has_title,
             "is_ready": (not is_done) and has_title,

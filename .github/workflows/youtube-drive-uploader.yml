@@ -56,7 +56,7 @@ jobs:
         env:
           GOOGLE_CLIENT_SECRETS_JSON: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON || vars.GOOGLE_CLIENT_SECRETS_JSON }}
           GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON || vars.GOOGLE_TOKEN_JSON }}
-          DRIVE_QUEUE_FOLDER_ID: ${{ secrets.DRIVE_QUEUE_FOLDER_ID || vars.DRIVE_QUEUE_FOLDER_ID || vars.DRIVE_QUEUE_FOLDER || '1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br' }}
+          DRIVE_QUEUE_FOLDER_ID: ${{ secrets.DRIVE_QUEUE_FOLDER_ID || vars.DRIVE_QUEUE_FOLDER_ID || vars.DRIVE_QUEUE_FOLDER || '1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_' }}
           SHEETS_ID: ${{ secrets.SHEETS_ID || vars.SHEETS_ID || '1DTXIt8wY9fDHRYRT_Kz5GVVcGe00hDaK' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || vars.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || vars.GROQ_API_KEY || vars.AGROQ_API_KEY }}
@@ -71,7 +71,10 @@ jobs:
           Path("client_secrets.json").write_text(os.environ["GOOGLE_CLIENT_SECRETS_JSON"], encoding="utf-8")
           Path("token.json").write_text(os.environ["GOOGLE_TOKEN_JSON"], encoding="utf-8")
           cfg = json.loads(Path("config.json").read_text(encoding="utf-8")) if Path("config.json").exists() else {}
-          cfg["drive_queue_folder_id"] = os.getenv("DRIVE_QUEUE_FOLDER_ID", "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br").strip()
+          raw_folder = os.getenv("DRIVE_QUEUE_FOLDER_ID", "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_").strip()
+          if not raw_folder or raw_folder == "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br":
+              raw_folder = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"
+          cfg["drive_queue_folder_id"] = raw_folder
           cfg["sheets_id"] = os.getenv("SHEETS_ID", "1DTXIt8wY9fDHRYRT_Kz5GVVcGe00hDaK").strip()
           cfg["privacy_status"] = "public"
           if os.getenv("GEMINI_API_KEY"): cfg["gemini_api_key"] = os.environ["GEMINI_API_KEY"]
