@@ -24,6 +24,7 @@ import json
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 import time
@@ -180,7 +181,7 @@ class AdbError(RuntimeError):
     pass
 
 
-def adb(*args: str, timeout: int = 25, text: bool = True) -> str:
+def _adb_raw(*args: str, timeout: int = 25, text: bool = True) -> str:
     cmd = [ADB] + (["-s", TARGET] if TARGET else []) + list(args)
     try:
         p = subprocess.run(cmd, capture_output=True, timeout=timeout)
@@ -193,6 +194,55 @@ def adb(*args: str, timeout: int = 25, text: bool = True) -> str:
     if p.returncode != 0:
         raise AdbError((err or out or "adb hatası").strip())
     return out
+
+
+RISH_BIN = os.getenv("RISH_BIN", "rish")
+
+
+def rish_ok() -> bool:
+    """Shizuku köprüsü (rish) çalışıyor mu? uid 2000 dönerse evet."""
+    try:
+        r = subprocess.run([RISH_BIN, "-c", "id"], capture_output=True, text=True, timeout=20)
+        return "uid=2000" in (r.stdout + r.stderr)
+    except Exception:
+        return False
+
+
+def rish(cmd: str, timeout: int = 40) -> str:
+    """Shizuku üzerinden shell komutu (adb olmadan)."""
+    try:
+        r = subprocess.run([RISH_BIN, "-c", cmd], capture_output=True, text=True, timeout=timeout)
+        out = (r.stdout + r.stderr).strip()
+        if r.returncode != 0 and not out:
+            raise AdbError(f"rish hata: exit {r.returncode}")
+        return out
+    except FileNotFoundError:
+        # -c desteklemiyorsa: stdin ile dene
+        try:
+            r2 = subprocess.run([RISH_BIN], input=cmd, capture_output=True, text=True, timeout=timeout)
+            return (r2.stdout + r2.stderr).strip()
+        except FileNotFoundError:
+            raise AdbError("rish yok (Shizuku kurulu değil)")
+    except subprocess.TimeoutExpired:
+        raise AdbError("rish zaman aşımı")
+
+
+def shell(cmd: str, timeout: int = 40) -> str:
+    """Birleşik kabuk: önce adb, olmazsa Shizuku/rish."""
+    try:
+        return _adb_raw("shell", cmd, timeout=timeout)
+    except AdbError as e:
+        if rish_ok():
+            return rish(cmd, timeout=timeout)
+        raise AdbError(f"{e} · rish de yok")
+
+
+def adb(*args: str, timeout: int = 25, text: bool = True) -> str:
+    """Geriye uyumluluk: shell çağrıları birleşik katmana yönlenir."""
+    if args and args[0] == "shell":
+        rest = " ".join(a for a in args[1:])
+        return shell(rest, timeout=max(timeout, 40))
+    return _adb_raw(*args, timeout=timeout, text=text)
 
 
 def ensure_device() -> None:
@@ -214,15 +264,31 @@ def ensure_device() -> None:
 def screenshot(name: str = "shot") -> Path:
     ensure_device()
     path = SHOTS_DIR / f"{name}_{int(time.time())}.png"
-    raw = subprocess.run(
-        [ADB] + (["-s", TARGET] if TARGET else []) + ["exec-out", "screencap", "-p"],
-        capture_output=True,
-        timeout=40,
-    )
-    if raw.returncode != 0 or not raw.stdout:
-        raise AdbError("Ekran görüntüsü alınamadı (adb bağlantısı?)")
-    path.write_bytes(raw.stdout)
-    return path
+    try:
+        raw = subprocess.run(
+            [ADB] + (["-s", TARGET] if TARGET else []) + ["exec-out", "screencap", "-p"],
+            capture_output=True,
+            timeout=40,
+        )
+        if raw.returncode == 0 and raw.stdout and raw.stdout[:4] == b"\x89PNG":
+            path.write_bytes(raw.stdout)
+            return path
+    except Exception:
+        pass
+
+    # rish yedeği: /sdcard'a yaz, Termux depolamasından kopyala
+    if rish_ok():
+        far = "/sdcard/Download/kartal_shot.png"
+        shell(f"screencap -p {far}", timeout=40)
+        for src in (os.path.expanduser("~/storage/downloads/kartal_shot.png"),
+                    os.path.expanduser("~/storage/shared/Download/kartal_shot.png"),
+                    "/sdcard/Download/kartal_shot.png"):
+            if os.path.exists(src) and os.path.getsize(src) > 1000:
+                shutil.copy(src, path)
+                return path
+        raise AdbError("screencap yazıldı ama dosya okunamadı (termux-setup-storage çalıştır)")
+
+    raise AdbError("Ekran görüntüsü alınamadı (adb ve rish yok)")
 
 
 _XML_PATH = "/sdcard/kartal_ui.xml"
@@ -652,8 +718,15 @@ def handle(text: str, chat_id: str) -> None:
     if low in ("/yardim", "/menu", "/start", "yardim", "menu"):
         say(HELP, chat_id)
         return
-    if low in ("/durum", "/status"):
-        say("🟢 Kartal Tablet Ajanı çalışıyor. /ekran ile tabletin gözüyle bak.", chat_id)
+    if low in ("/durum", "/status", "/kabuk"):
+        lines = ["🟢 Kartal Tablet Ajanı çalışıyor."]
+        try:
+            devs = _adb_raw("devices")
+            lines.append("adb: " + ("✅ bağlı" if "\tdevice" in devs else "❌ yok"))
+        except Exception:
+            lines.append("adb: ❌ yok")
+        lines.append("Shizuku/rish: " + ("✅ çalışıyor" if rish_ok() else "❌ yok"))
+        say("\n".join(lines) + "\n/ekran ile tableti gör.", chat_id)
         return
     if low in ("/pid", "/pil", "/battery"):
         try:
