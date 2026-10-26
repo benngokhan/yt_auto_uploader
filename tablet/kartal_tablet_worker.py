@@ -397,6 +397,41 @@ def _visible_list(nodes: list[dict], limit: int = 18) -> str:
 
 
 # --------------------------------------------------------------------------
+# 3b. TERMUX:API YEDEĞİ (adb olmadan da çalışan işler)
+# --------------------------------------------------------------------------
+def termux_cmd(name: str, *args: str, timeout: int = 45) -> str:
+    """termux-api komutunu çalıştırır (Termux:API uygulaması kuruluysa)."""
+    try:
+        r = subprocess.run([name, *args], capture_output=True, text=True, timeout=timeout)
+        return (r.stdout + r.stderr).strip()
+    except FileNotFoundError:
+        return f"( {name} yok — pkg install termux-api )"
+    except subprocess.TimeoutExpired:
+        return f"( {name} zaman aşımı )"
+
+
+def open_url(url: str) -> str:
+    """adb yoksa bile bir linki/uygulama derin bağlantısını açar."""
+    try:
+        adb("shell", f"am start -a android.intent.action.VIEW -d '{url}'", timeout=20)
+        return f"✅ adb ile açıldı: {url}"
+    except Exception:
+        out = termux_cmd("termux-open-url", url, timeout=30)
+        return f"✅ termux-open-url: {out or url}"
+
+
+def share_file_termux(path: Path, title: str = "") -> str:
+    """Android paylaşım menüsünü termux-share ile açar (adb gerekmez)."""
+    args = ["-a", "send", "-t", "video/mp4"]
+    if title:
+        args += ["-c", title]
+    args.append(str(path))
+    out = termux_cmd("termux-share", *args, timeout=60)
+    return f"✅ termux-share açıldı {path.name}" if "yok" not in out else out
+
+
+
+# --------------------------------------------------------------------------
 # 4. GEMINI GÖRÜNTÜ KATMANI (opsiyonel)
 # --------------------------------------------------------------------------
 def gemini_see(png: Path, question: str) -> str:
@@ -556,7 +591,13 @@ def share_video(source: str, target: str = "") -> None:
     try:
         adb("shell", f'am start -a android.intent.action.SEND -t video/mp4 --eu android.intent.extra.STREAM "file://{path}" --grant-read-uri-permission')
     except AdbError as e:
-        say(f"⚠️ file:// engellendi ({e}). Termux:API yolu deneniyor…", chat)
+        say(f"⚠️ adb paylaşımı olmadı ({e}). Termux:API yolu deneniyor…", chat)
+        res = share_file_termux(path, path.stem)
+        say(res, chat)
+        if res.startswith("✅"):
+            shot = screenshot("paylasim")
+            send_photo(shot, f"Ekran: {path.name} paylaşım akışı", chat)
+            return
         try:
             adb("shell", f"am start -a android.intent.action.VIEW -d file://{path} -t video/mp4")
         except AdbError as e2:
@@ -615,6 +656,15 @@ def handle(text: str, chat_id: str) -> None:
         say("🟢 Kartal Tablet Ajanı çalışıyor. /ekran ile tabletin gözüyle bak.", chat_id)
         return
     if low in ("/pid", "/pil", "/battery"):
+        try:
+            out = termux_cmd("termux-battery-status", timeout=20)
+            if out.startswith("{"):
+                import json as _json
+                b = _json.loads(out)
+                say(f"🔋 Pil: %{b.get('percentage')} · {b.get('status')}", chat_id)
+                return
+        except Exception:
+            pass
         try:
             out = adb("shell", "dumpsys battery")
             lvl = re.search(r"level:\s*(\d+)", out)
@@ -695,12 +745,14 @@ def handle(text: str, chat_id: str) -> None:
         if not vid:
             say("Kullanım: /studio MOxaXPkS0zw", chat_id)
             return
+        url = f"https://studio.youtube.com/video/{vid}/edit"
         try:
-            adb("shell", f"am start -a android.intent.action.VIEW -d 'https://studio.youtube.com/video/{vid}/edit'")
+            adb("shell", f"am start -a android.intent.action.VIEW -d '{url}'")
             time.sleep(3)
             send_photo(screenshot("studio"), f"YouTube Studio · {vid}", chat_id)
         except AdbError as e:
-            say(f"❌ {e}", chat_id)
+            say(f"⚠️ adb yok ({e}) — link tablete gönderiliyor…", chat_id)
+            say(open_url(url), chat_id)
         return
     if low.startswith("/gorev"):
         run_task(raw[6:].strip())

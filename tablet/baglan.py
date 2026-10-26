@@ -111,7 +111,7 @@ def scan_ports(host: str, start: int = PORT_START, end: int = PORT_END) -> list[
 
     def check(p: int):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(0.35)
+        s.settimeout(0.28)
         try:
             if s.connect_ex((host, p)) == 0:
                 return p
@@ -121,11 +121,36 @@ def scan_ports(host: str, start: int = PORT_START, end: int = PORT_END) -> list[
             s.close()
         return None
 
-    with ThreadPoolExecutor(max_workers=300) as ex:
+    with ThreadPoolExecutor(max_workers=500) as ex:
         for p in ex.map(check, range(start, end)):
             if p:
                 found.append(p)
     return sorted(found)
+
+
+def listening_ports() -> list[int]:
+    """/proc/net/tcp + tcp6 içinden LISTEN (0A) durumundaki yerel portları okur — tarama gerekmez."""
+    ports: set[int] = set()
+    for path in ("/proc/net/tcp", "/proc/net/tcp6"):
+        try:
+            with open(path, "r", encoding="utf-8", errors="ignore") as f:
+                next(f, None)
+                for line in f:
+                    cols = line.split()
+                    if len(cols) < 4 or cols[3] != "0A":
+                        continue
+                    local = cols[1]
+                    if ":" not in local:
+                        continue
+                    try:
+                        port = int(local.rsplit(":", 1)[1], 16)
+                    except ValueError:
+                        continue
+                    if 1024 <= port <= 65535:
+                        ports.add(port)
+        except Exception:
+            continue
+    return sorted(ports)
 
 
 def try_connect(host: str, port: int) -> str:
@@ -215,16 +240,24 @@ def main() -> int:
     info(f"Tabletin IP'si: {ip}")
 
     # 4) Portları tara
+    proc_ports = [p for p in listening_ports() if PORT_START <= p <= PORT_END]
+    if proc_ports:
+        info("Sistemde dinleyen portlar (tarama gerekmez): " + ", ".join(str(x) for x in proc_ports))
     info(f"Kablosuz hata ayıklama portu taranıyor ({PORT_START}-{PORT_END})… 5-20 sn")
-    hosts = ["127.0.0.1"]
-    if ip not in hosts:
-        hosts.append(ip)
+    hosts = [ip] if ip else []
+    if "127.0.0.1" not in hosts:
+        hosts.append("127.0.0.1")
     candidates: list[tuple[str, int]] = []
-    for h in hosts:
-        for p in scan_ports(h):
+    for p in proc_ports:
+        for h in hosts[:1]:
             candidates.append((h, p))
-        if candidates:
-            break
+    for h in hosts:
+        found = scan_ports(h)
+        if found:
+            info(f"{h} üzerinde açık port: " + ", ".join(str(x) for x in found))
+        candidates += [(h, p) for p in found]
+    if not candidates:
+        info("Hiç açık port yok — kablosuz hata ayıklama kapalı olabilir.")
 
     if not candidates:
         err("Açık port bulunamadı. Kablosuz hata ayıklama AÇIK mı?")
@@ -237,6 +270,18 @@ def main() -> int:
             return 1
 
     candidates = candidates[:15]
+    try:
+        mdns = adb("mdns", "services", timeout=10).stdout
+        for ln in mdns.splitlines():
+            if "_adb-tls-connect" in ln or "_adb._tcp" in ln:
+                hp = ln.split()[-1].strip()
+                if ":" in hp:
+                    h2, p2 = hp.rsplit(":", 1)
+                    if p2.isdigit() and (h2, int(p2)) not in candidates:
+                        candidates.insert(0, (h2, int(p2)))
+                        info(f"mDNS servisi: {hp}")
+    except Exception:
+        pass
     info("Aday portlar: " + ", ".join(f"{h}:{p}" for h, p in candidates))
 
     # 5) Sırayla bağlan
@@ -253,6 +298,29 @@ def main() -> int:
             pair_host, pair_port_found = h, p
             break
         info(f"{h}:{p} adbd değil, geçildi.")
+
+    if not need_pair:
+        print()
+        print(f"{B}Tabletten portu oku (10 saniye){X}")
+        print("  Ayarlar > Gelistirici secenekleri > 'Kablosuz hata ayiklama' YAZISINA dokun")
+        print("  -> 'IP adresi ve baglanti noktasi' satirindaki sayi (or. 10.136.3.175:41234)")
+        try:
+            p_manual = input("Port (bos = cik): ").strip().lstrip(":")
+        except EOFError:
+            p_manual = ""
+        if p_manual.split(":")[-1].isdigit():
+            h_manual = p_manual.split(":")[0] if ":" in p_manual else ip
+            p_int = int(p_manual.split(":")[-1])
+            state = try_connect(h_manual, p_int)
+            if state == "device":
+                ok(f"Baglandi: {h_manual}:{p_int}")
+                save_target(f"{h_manual}:{p_int}")
+                _post_setup()
+                return 0
+            if state in ("auth", "unauthorized"):
+                need_pair = True
+                pair_host = h_manual
+                candidates = [(h_manual, p_int)]
 
     if need_pair:
         if pairing_flow(pair_host):
