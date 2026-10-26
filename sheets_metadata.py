@@ -67,21 +67,58 @@ def is_skipped_by_floor(filename: str) -> bool:
     return False
 
 
-def decide_prime_time_video_type(now_tr: Optional[datetime] = None) -> str:
+BEDEN_BEYIN_FILES = {
+    "video_47.mp4", "video_52.mp4", "video_57.mp4", "video_62.mp4",
+    "video_67.mp4", "video_72.mp4", "video_77.mp4",
+    "video_106.mp4", "video_107.mp4", "video_108.mp4", "video_109.mp4", "video_110.mp4",
+    "video_83.mp4", "video_91.mp4", "video_100.mp4", "video_121.mp4",
+}
+
+
+def classify_strategy_column(filename: str, raw_cat: str = "") -> str:
+    """Strateji Masası 3 sütun kuralı: 'uzun' | 'beden_beyin' | 'doz_disi'."""
+    fn = os.path.basename(filename).strip()
+    if is_long_filename(fn):
+        return "uzun"
+    if fn in BEDEN_BEYIN_FILES:
+        return "beden_beyin"
+    cl = (raw_cat or "").lower()
+    if any(k in cl for k in ("beyin", "psikoloj", "vücut", "vucut", "nörobilim", "norobilim", "insan bedeni", "insan vücudu")):
+        return "beden_beyin"
+    return "doz_disi"
+
+
+def classify_doz_disi_subcat(raw_cat: str = "", title: str = "") -> str:
+    """Doz Dışı gününde aynı gün 2 slotun aynı alt kategoride kalması için alt sütun."""
+    c = f"{raw_cat} {title}".lower()
+    if any(k in c for k in ("tarih", "arkeol", "antik", "piramit", "roma")):
+        return "tarih"
+    if any(k in c for k in ("uzay", "evren", "astronomi", "gezegen", "yıldız", "güneş", "ay ")):
+        return "uzay"
+    if any(k in c for k in ("doğa", "doga", "hayvan", "canlı", "okyanus")):
+        return "doga"
+    return "fizik"
+
+
+def decide_daily_column(now_tr: Optional[datetime] = None) -> str:
     """
-    Türkiye YouTube Prime Time Takvimi (UTC+3) — Rakip Raporu Revizesi (25 Eki):
-    - 14:00 TR (Öğle Kuşağı)   -> 'short'
-    - 18:00 TR (Akşamüstü)     -> 'short'
-    - 21:00 TR (Ana Prime Time)-> 'short'
-    - UZUN VIDEO: Ayda iki kez Pazar 15:00 TR (1. ve 3. Pazar) -> 'long'
+    Strateji Masası Haftalık Sıralama Kuralı (26.10.2026):
+    - Cuma (weekday==4)                        -> 'uzun' (haftada 1)
+    - Pazar (weekday==6)                       -> 'doz_disi' (haftada 1, etiketli)
+    - Pzt, Sal, Çar, Per, Cmt (haftada 5 gün) -> 'beden_beyin'
     """
     tr_tz = timezone(timedelta(hours=3))
     dt = now_tr.astimezone(tr_tz) if now_tr else datetime.now(tr_tz)
-    if dt.weekday() == 6 and dt.hour == 15:
-        day = dt.day
-        if (1 <= day <= 7) or (15 <= day <= 21):
-            return "long"
-    return "short"
+    if dt.weekday() == 4:
+        return "uzun"
+    if dt.weekday() == 6:
+        return "doz_disi"
+    return "beden_beyin"
+
+
+def decide_prime_time_video_type(now_tr: Optional[datetime] = None) -> str:
+    """Cuma günü 'long', diğer 6 gün 'short'."""
+    return "long" if decide_daily_column(now_tr) == "uzun" else "short"
 
 
 def sanitize_title(raw_title: str, max_len: int = 100) -> str:
@@ -161,15 +198,23 @@ def parse_drive_sheet(xlsx_source) -> dict[str, dict]:
         cat_id = map_category_id(raw_cat)
 
         status_up = status.upper()
+        yt_url = str(ws.cell(r, 10).value or "").strip()
+        has_yt_link = bool(yt_url and ("youtu" in yt_url.lower() or yt_url.startswith("http")))
+        col_group = classify_strategy_column(fname, raw_cat)
+        if col_group == "doz_disi" and "doz dışı" not in [t.lower() for t in tags]:
+            tags = (tags + ["doz dışı"])[:25]
+
+        # KESİN KURAL: YouTube Link dolu olan veya YÜKLENDİ olan dosya adları ASLA kuyruğa alınmaz!
         is_done = (
-            any(w in status_up for w in ("YÜKLENDİ", "YUKLENDI", "YAYINLANDI", "UPLOADED", "PUBLISHED", "TAMAM"))
+            has_yt_link
+            or any(w in status_up for w in ("YÜKLENDİ", "YUKLENDI", "YAYINLANDI", "UPLOADED", "PUBLISHED", "TAMAM"))
             or is_skipped_by_floor(fname)
         )
         has_title = bool(title)
 
         records[fname] = {
             "row": r,
-            "status": "YÜKLENDİ" if is_skipped_by_floor(fname) else (status or "BEKLEMEDE"),
+            "status": "YÜKLENDİ" if is_done else (status or "BEKLEMEDE"),
             "file_name": fname,
             "title": title,
             "description": full_desc,
@@ -179,7 +224,9 @@ def parse_drive_sheet(xlsx_source) -> dict[str, dict]:
             "category_name": raw_cat,
             "categoryId": cat_id,
             "source": source,
-            "youtube_url": str(ws.cell(r, 10).value or "").strip(),
+            "youtube_url": yt_url,
+            "has_youtube_link": has_yt_link,
+            "column_group": col_group,
             "is_long": is_long_filename(fname),
             "has_title": has_title,
             "is_ready": (not is_done) and has_title,
@@ -290,38 +337,88 @@ def load_table_from_drive_or_local(
     return base_records
 
 
+def list_drive_videos_with_stats(drive, folder_id: str) -> tuple[list[dict], int]:
+    """KartaL Stok klasöründeki .mp4 dosyalarını tarar, mükerrer dosya sayısını hesaplar ve
+    aynı dosya adından birden fazla varsa yalnızca EN ESKİ (orijinal) kopyayı tutar."""
+    raw_videos = []
+    if not drive or not folder_id:
+        return [], 0
+
+    page_token = None
+    while True:
+        res = drive.files().list(
+            q=f"'{folder_id}' in parents and trashed = false",
+            pageSize=200,
+            fields="nextPageToken, files(id, name, mimeType, size, createdTime)",
+            **({"pageToken": page_token} if page_token else {}),
+        ).execute()
+        for f in res.get("files", []):
+            mime = f.get("mimeType", "")
+            name = f.get("name", "")
+            if mime == "application/vnd.google-apps.folder":
+                continue  # KAPAKLAR veya karantina alt klasörlerine inme
+            if name.lower().endswith(".mp4") or "video/" in mime:
+                raw_videos.append(f)
+        page_token = res.get("nextPageToken")
+        if not page_token:
+            break
+
+    by_name: dict[str, list[dict]] = {}
+    for f in raw_videos:
+        key = f.get("name", "").strip()
+        if key:
+            by_name.setdefault(key, []).append(f)
+
+    unique_videos = []
+    duplicate_count = 0
+    for key, items in by_name.items():
+        items.sort(key=lambda x: x.get("createdTime", ""))
+        unique_videos.append(items[0])  # en eski (orijinal) kopya
+        if len(items) > 1:
+            duplicate_count += len(items) - 1
+
+    unique_videos.sort(key=lambda x: natural_sort_key(x.get("name", "")))
+    return unique_videos, duplicate_count
+
+
 def list_drive_videos(drive, folder_id: str) -> list[dict]:
-    videos = []
-    folders_to_visit = [folder_id]
-    visited = set()
+    unique_videos, _ = list_drive_videos_with_stats(drive, folder_id)
+    return unique_videos
 
-    while folders_to_visit:
-        curr = folders_to_visit.pop(0)
-        if curr in visited:
-            continue
-        visited.add(curr)
 
-        page_token = None
-        while True:
-            res = drive.files().list(
-                q=f"'{curr}' in parents and trashed = false",
-                pageSize=200,
-                fields="nextPageToken, files(id, name, mimeType, size)",
-                **({"pageToken": page_token} if page_token else {}),
-            ).execute()
-            for f in res.get("files", []):
-                mime = f.get("mimeType", "")
-                name = f.get("name", "")
-                if mime == "application/vnd.google-apps.folder":
-                    folders_to_visit.append(f["id"])
-                elif name.lower().endswith(".mp4") or "video/" in mime:
-                    videos.append(f)
-            page_token = res.get("nextPageToken")
-            if not page_token:
-                break
-
-    videos.sort(key=lambda x: natural_sort_key(x.get("name", "")))
-    return videos
+def compute_queue_stats(
+    drive,
+    folder_id: str,
+    table: Optional[dict] = None,
+    skip_ids: Optional[set] = None,
+) -> dict:
+    """Strateji Masası 3 sayılı kuyruk raporu: benzersiz video / mükerrer / yayınlanmış."""
+    skip_ids = skip_ids or set()
+    if table is None:
+        table = load_table_from_drive_or_local(drive, folder_id)
+    unique_videos, duplicate_count = list_drive_videos_with_stats(drive, folder_id)
+    published_count = 0
+    ready_count = 0
+    for v in unique_videos:
+        fn = v.get("name", "")
+        vid = v.get("id", "")
+        rec = table.get(fn)
+        is_pub = (
+            is_skipped_by_floor(fn)
+            or fn in skip_ids
+            or vid in skip_ids
+            or bool(rec and (rec.get("has_youtube_link") or not rec.get("is_ready")))
+        )
+        if is_pub:
+            published_count += 1
+        elif rec and rec.get("is_ready"):
+            ready_count += 1
+    return {
+        "unique_videos": len(unique_videos),
+        "duplicate_videos": duplicate_count,
+        "published_videos": published_count,
+        "ready_videos": ready_count,
+    }
 
 
 def _recent_uploaded_titles(limit: int = 3) -> list[dict]:
@@ -471,6 +568,35 @@ def kartal_smart_pick(candidates: list[dict], table: dict) -> dict:
     return candidates[0]
 
 
+def _todays_uploaded_filenames(now_tr: Optional[datetime] = None) -> list[str]:
+    """Bugün (TR tarihiyle) yüklenmiş dosya adlarını uploaded.txt'den döndürür."""
+    tr_tz = timezone(timedelta(hours=3))
+    dt_tr = now_tr.astimezone(tr_tz) if now_tr else datetime.now(tr_tz)
+    today_str = dt_tr.strftime("%Y-%m-%d")
+    names: list[str] = []
+    try:
+        p = Path(__file__).parent / "uploaded.txt"
+        if not p.exists():
+            p = Path("uploaded.txt")
+        if not p.exists():
+            return names
+        for ln in p.read_text(encoding="utf-8", errors="ignore").splitlines():
+            if "|" not in ln or ln.strip().startswith("#"):
+                continue
+            parts = [x.strip() for x in ln.split("|")]
+            if len(parts) < 4 or parts[0].upper().startswith(("LOCKED_", "MANUAL_SKIP")):
+                continue
+            try:
+                utc_dt = datetime.strptime(parts[3], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+                if utc_dt.astimezone(tr_tz).strftime("%Y-%m-%d") == today_str:
+                    names.append(parts[1])
+            except Exception:
+                continue
+    except Exception:
+        pass
+    return names
+
+
 def get_next_scheduled_video(
     drive,
     folder_id: str,
@@ -483,57 +609,88 @@ def get_next_scheduled_video(
     table = load_table_from_drive_or_local(drive, folder_id, sheets_id=sheets_id, local_fallback=local_xlsx)
     videos = list_drive_videos(drive, folder_id) if drive else []
 
-    target_type = decide_prime_time_video_type() if video_type == "auto" else video_type
+    # YAYINLANMIŞ DOSYA ADI FİLTRESİ: DRIVE sekmesinde YouTube Link dolu olan veya hazır olmayan adlar ASLA alınmaz
+    published_names = {
+        fname for fname, rec in table.items()
+        if rec.get("has_youtube_link") or rec.get("youtube_url") or not rec.get("is_ready")
+    }
 
-    def find_candidate(want_long: Optional[bool]) -> Optional[dict]:
+    daily_col = decide_daily_column()  # 'beden_beyin' (5 gün) | 'uzun' (Cuma) | 'doz_disi' (Pazar)
+    todays_uploads = _todays_uploaded_filenames()
+
+    # Cuma kuralı: haftada 1 Uzun video. Cuma günü uzun video zaten çıktıysa 2. slotta Shorts karıştırma!
+    if video_type == "auto" and daily_col == "uzun":
+        if any(is_long_filename(fn) for fn in todays_uploads):
+            log.info("CUMA KURALI: Haftalık Uzun Video bugün zaten yayınlandı; aynı gün farklı kategori açılmaz.")
+            return None
+
+    def collect_ready(want_long: Optional[bool], want_col: Optional[str] = None, subcat_lock: Optional[str] = None) -> list[dict]:
         ready: list[dict] = []
         for v in videos:
             vid = v["id"]
             vname = v["name"]
             if is_skipped_by_floor(vname):
                 continue
-            if vid in skip_ids or vname in skip_ids:
+            if vid in skip_ids or vname in skip_ids or vname in published_names:
                 continue
             if want_long is not None and is_long_filename(vname) != want_long:
                 continue
             meta = table.get(vname)
-            if meta and not meta["is_ready"]:
+            if not meta or not meta.get("is_ready") or meta.get("has_youtube_link") or meta.get("youtube_url"):
                 continue
-            if meta:
-                ready.append({
-                    "id": vid,
-                    "name": vname,
-                    "size": int(v.get("size", 0)),
-                    "video": v,
-                    "metadata": meta,
-                    "title": meta["title"],
-                    "description": meta["description"],
-                    "tags": meta["tags"],
-                    "categoryId": meta["categoryId"],
-                    "pinned_comment": meta["pinned_comment"],
-                    "row": meta["row"],
-                    "video_type": "long" if is_long_filename(vname) else "short",
-                })
-        if not ready:
-            return None
-        # Uzun videolar seri (Bölüm) düzeninde kalır; Shorts KartaL Akıllı Sıra'dan geçer
-        if want_long is False:
-            return kartal_smart_pick(ready, table)
-        return ready[0]
+            col = meta.get("column_group") or classify_strategy_column(vname, meta.get("category_name", ""))
+            if want_col and col != want_col:
+                continue
+            if subcat_lock and classify_doz_disi_subcat(meta.get("category_name", ""), meta.get("title", "")) != subcat_lock:
+                continue
+            ready.append({
+                "id": vid,
+                "name": vname,
+                "size": int(v.get("size", 0)),
+                "video": v,
+                "metadata": meta,
+                "title": meta["title"],
+                "description": meta["description"],
+                "tags": meta["tags"],
+                "categoryId": meta["categoryId"],
+                "category_name": meta.get("category_name", ""),
+                "column_group": col,
+                "pinned_comment": meta["pinned_comment"],
+                "row": meta["row"],
+                "video_type": "long" if is_long_filename(vname) else "short",
+            })
+        # Strateji Masası tablo sırasını birebir uygula (row sırası)
+        ready.sort(key=lambda item: (item["row"], natural_sort_key(item["name"])))
+        return ready
 
-    if target_type == "long":
-        cand = find_candidate(want_long=True)
-        if cand:
-            return cand
-        log.info("Sırada hazır uzun video bulunamadı, otomatik olarak sıradaki Shorts videosuna geçiliyor.")
-        return find_candidate(want_long=False)
-    elif target_type == "short":
-        cand = find_candidate(want_long=False)
-        if cand:
-            return cand
-        return find_candidate(want_long=True)
-    else:
-        return find_candidate(want_long=None)
+    # Aynı gün 2 slot varsa İKİSİ DE AYNI SÜTUNDAN olacak (19:00 ne açtıysa 21:30 aynı sütundan devam eder)
+    locked_col = daily_col
+    locked_subcat = None
+    if todays_uploads and video_type == "auto":
+        first_today = todays_uploads[0]
+        first_meta = table.get(first_today) or {}
+        locked_col = first_meta.get("column_group") or classify_strategy_column(first_today, first_meta.get("category_name", ""))
+        if locked_col == "doz_disi":
+            locked_subcat = classify_doz_disi_subcat(first_meta.get("category_name", ""), first_meta.get("title", ""))
+
+    if video_type == "long" or (video_type == "auto" and locked_col == "uzun"):
+        cands = collect_ready(want_long=True, want_col="uzun")
+        return cands[0] if cands else None
+
+    if video_type == "short" and locked_col == "uzun":
+        locked_col = "beden_beyin"
+
+    # Önce günün kilitli sütunundan (ve varsa aynı alt kategoriden) seç
+    cands = collect_ready(want_long=False, want_col=locked_col, subcat_lock=locked_subcat)
+    if not cands and locked_subcat:
+        cands = collect_ready(want_long=False, want_col=locked_col, subcat_lock=None)
+    if not cands and not todays_uploads:
+        # Yalnızca günün ilk slotunda o sütun tamamen bittiyse sıradaki Beden&Beyin -> Doz Dışı yedeklemesi
+        for fallback_col in ("beden_beyin", "doz_disi"):
+            cands = collect_ready(want_long=False, want_col=fallback_col)
+            if cands:
+                break
+    return cands[0] if cands else None
 
 
 def update_excel_status_in_drive(
@@ -548,44 +705,50 @@ def update_excel_status_in_drive(
     try:
         res = drive.files().list(
             q=f"'{folder_id}' in parents and (name = 'bilgidozu_yukleme_tablosu.xlsx' or name = 'baslik.xlsx') and trashed = false",
-            pageSize=1,
+            pageSize=10,
             fields="files(id, name)",
         ).execute()
         files = res.get("files", [])
         if not files:
             return False
-        fid = files[0]["id"]
-        buf = io.BytesIO()
-        dl = MediaIoBaseDownload(buf, drive.files().get_media(fileId=fid))
-        done = False
-        while not done:
-            _, done = dl.next_chunk()
-        buf.seek(0)
-        wb = openpyxl.load_workbook(buf)
-        ws = next((s for s in wb.worksheets if s.title.strip().casefold() == "drive"), wb.active)
-        green_fill = PatternFill(start_color="C6EFCE", end_color="C6EFCE", fill_type="solid")
-        updated = False
-        for r in range(2, ws.max_row + 1):
-            if str(ws.cell(r, 2).value or "").strip().casefold() == file_name.casefold():
-                ws.cell(r, 1).value = new_status
-                if youtube_url:
-                    ws.cell(r, 2).hyperlink = youtube_url
-                for c in range(1, 10):
-                    ws.cell(r, c).fill = green_fill
-                updated = True
-                break
-        if not updated:
-            return False
-        out_buf = io.BytesIO()
-        wb.save(out_buf)
-        out_buf.seek(0)
-        media = MediaIoBaseUpload(
-            out_buf,
-            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            resumable=False,
-        )
-        drive.files().update(fileId=fid, media_body=media).execute()
-        return True
+        now_tr_str = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d %H:%M")
+        any_ok = False
+        for fobj in files:
+            fid = fobj["id"]
+            buf = io.BytesIO()
+            dl = MediaIoBaseDownload(buf, drive.files().get_media(fileId=fid))
+            done = False
+            while not done:
+                _, done = dl.next_chunk()
+            buf.seek(0)
+            wb = openpyxl.load_workbook(buf)
+            ws = next((s for s in wb.worksheets if s.title.strip().casefold() == "drive"), wb.active)
+            green_fill = PatternFill(start_color="B6D7A8", end_color="B6D7A8", fill_type="solid")
+            updated = False
+            for r in range(2, ws.max_row + 1):
+                if str(ws.cell(r, 2).value or "").strip().casefold() == file_name.casefold():
+                    ws.cell(r, 1).value = new_status
+                    if youtube_url:
+                        ws.cell(r, 2).hyperlink = youtube_url
+                        ws.cell(r, 10).value = youtube_url
+                    ws.cell(r, 11).value = now_tr_str
+                    for c in range(1, 14):
+                        ws.cell(r, c).fill = green_fill
+                    updated = True
+                    break
+            if updated:
+                out_buf = io.BytesIO()
+                wb.save(out_buf)
+                out_buf.seek(0)
+                media = MediaIoBaseUpload(
+                    out_buf,
+                    mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    resumable=False,
+                )
+                drive.files().update(fileId=fid, media_body=media).execute()
+                any_ok = True
+            wb.close()
+        return any_ok
     except Exception as e:
         log.warning(f"Drive XLSX güncellemesi atlandı (salt-okunur token olabilir, sorun değil): {e}")
         return False

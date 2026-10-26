@@ -16,14 +16,11 @@ on:
         type: string
         default: "auto"
   schedule:
-    # Türkiye Saati (UTC+3) Prime Time Kuşakları:
-    # 1) 14:00 TR (11:00 UTC) -> 1. Shorts
-    - cron: "0 11 * * *"
-    # 2) 18:00 TR (15:00 UTC) -> 2. Shorts
-    - cron: "0 15 * * *"
-    # 3) 21:00 TR (18:00 UTC) -> Normal gün 3. Shorts | 1 gün arayla (çift günler) 1 Uzun Video
-    - cron: "0 18 * * *"
-    - cron: "0 12 * * 0"
+    # Türkiye Saati (UTC+3) Strateji Masası 2 Slot Kuralı (aynı gün aynı sütun; Cuma Uzun Video):
+    # 1) 19:00 TR (16:00 UTC) -> Slot 1
+    - cron: "0 16 * * *"
+    # 2) 21:30 TR (18:30 UTC) -> Slot 2
+    - cron: "30 18 * * *"
 
 permissions:
   actions: read
@@ -93,12 +90,14 @@ jobs:
           granted_scopes = set(creds.scopes or [])
           if "https://www.googleapis.com/auth/youtube.upload" not in granted_scopes:
               raise SystemExit("OAuth token is missing the youtube.upload scope; re-authorize with uploader.py's configured scopes.")
-          _, drive = get_google_clients()
+          youtube, drive = get_google_clients()
           drive.files().list(q=f"'{cfg['drive_queue_folder_id']}' in parents and trashed=false", pageSize=5, fields="files(id,name)").execute()
           print(validate_metadata_workbook(drive, cfg["drive_queue_folder_id"]))
-          # Build preview payload for video_20.mp4 so manual dry-run / push shows the clean card
-          m20 = load_excel_metadata(drive, cfg["drive_queue_folder_id"], "preview", "video_20.mp4", cfg)
-          build_telegram_report("video_20.mp4 (Sıradaki Önizleme)", "nO9zzEKwYIQ", "https://youtu.be/nO9zzEKwYIQ", m20, comment_ok=False)
+          from uploader import run_ops_maintenance_and_report
+          run_ops_maintenance_and_report(youtube, drive, cfg["drive_queue_folder_id"])
+          # Build preview payload for video_47.mp4 so manual dry-run / push shows the clean card
+          m47 = load_excel_metadata(drive, cfg["drive_queue_folder_id"], "preview", "video_47.mp4", cfg)
+          build_telegram_report("video_47.mp4 (Sıradaki Beden&Beyin Önizleme)", "nO9zzEKwYIQ", "https://youtu.be/nO9zzEKwYIQ", m47, comment_ok=False)
           print("VALIDATION OK: YouTube scope, Drive access, and Excel metadata workbook passed. No video uploaded.")
           PY
 

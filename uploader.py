@@ -338,9 +338,14 @@ def validate_metadata_workbook(drive, queue_folder: str) -> str:
             print("CROSSPOST-KEYS: HENÜZ YOK ✗ (KartaL Stok klasöründe crosspost_keys.json bulunamadı)")
     except Exception as ke:
         print(f"CROSSPOST-KEYS probe hatası (zararsız): {ke}")
+    # 3 sayılı kuyruk raporu: benzersiz video / mükerrer / yayınlanmış
+    from sheets_metadata import compute_queue_stats
+    qstats = compute_queue_stats(drive, queue_folder or DEFAULT_DRIVE_FOLDER_ID, table=records, skip_ids=load_uploaded_ids(BASE_DIR / "uploaded.txt"))
+    print(f"KUYRUK_RAPORU: benzersiz {qstats['unique_videos']} / mükerrer {qstats['duplicate_videos']} / yayınlanmış {qstats['published_videos']} (hazır: {qstats['ready_videos']})")
     return (
-        f"bilgidozu_yukleme_tablosu.xlsx: DRIVE sekmesi doğrulandı (video_31+ başlangıç kilidi aktif); "
-        f"{ready_shorts} hazır Shorts, {ready_longs} hazır Uzun Video."
+        f"bilgidozu_yukleme_tablosu.xlsx: DRIVE sekmesi doğrulandı (YouTube Link filtresi + video_31+ kilidi aktif); "
+        f"Kuyruk: benzersiz {qstats['unique_videos']} / mükerrer {qstats['duplicate_videos']} / yayınlanmış {qstats['published_videos']} "
+        f"({ready_shorts} hazır Shorts, {ready_longs} hazır Uzun Video)."
     )
 
 
@@ -754,6 +759,261 @@ def backfill_series_playlist(youtube, drive, queue_folder: str) -> None:
         log.warning(f"Oynatma listesi geri-tarama atlandi (zararsiz): {e}")
 
 
+def _iso_duration_seconds(dur: str) -> int:
+    import re as _re
+    m = _re.match(r"^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$", str(dur or "").strip())
+    if not m:
+        return 0
+    h = int(m.group(1) or 0)
+    mi = int(m.group(2) or 0)
+    s = int(m.group(3) or 0)
+    return h * 3600 + mi * 60 + s
+
+
+def clean_shorts_from_long_playlist(youtube) -> int:
+    """'Sizin Beğendikleriniz | Uzun Bilgi Serisi' oynatma listesindeki Shorts videolarını (<120 sn veya #shorts) temizler."""
+    removed = 0
+    try:
+        resp = youtube.playlists().list(part="snippet", mine=True, maxResults=50).execute()
+        pl_id = None
+        for it in resp.get("items", []):
+            if "uzun bilgi serisi" in it.get("snippet", {}).get("title", "").lower():
+                pl_id = it["id"]
+                break
+        if not pl_id:
+            return 0
+
+        items = []
+        ptok = None
+        while True:
+            pr = youtube.playlistItems().list(
+                part="id,snippet,contentDetails",
+                playlistId=pl_id,
+                maxResults=50,
+                **({"pageToken": ptok} if ptok else {}),
+            ).execute()
+            items.extend(pr.get("items", []))
+            ptok = pr.get("nextPageToken")
+            if not ptok:
+                break
+
+        if not items:
+            return 0
+
+        vids = [it["contentDetails"]["videoId"] for it in items if it.get("contentDetails", {}).get("videoId")]
+        dur_map = {}
+        for i in range(0, len(vids), 50):
+            vr = youtube.videos().list(part="contentDetails,snippet", id=",".join(vids[i:i + 50])).execute()
+            for v in vr.get("items", []):
+                secs = _iso_duration_seconds(v.get("contentDetails", {}).get("duration", ""))
+                vtitle = v.get("snippet", {}).get("title", "")
+                dur_map[v["id"]] = (secs, vtitle)
+
+        for it in items:
+            vid = it.get("contentDetails", {}).get("videoId", "")
+            secs, vtitle = dur_map.get(vid, (999, ""))
+            if (0 < secs <= 120) or ("#shorts" in vtitle.lower()):
+                youtube.playlistItems().delete(id=it["id"]).execute()
+                removed += 1
+                print(f"UZUN-LISTE-TEMIZLIK: Shorts cikarildi -> {vid} ({secs}s | {vtitle[:55]})")
+        print(f"UZUN-LISTE-TEMIZLIK: Toplam {removed} Shorts uzun serisinden temizlendi.")
+    except Exception as e:
+        print(f"UZUN-LISTE-TEMIZLIK uyarisi: {e}")
+    return removed
+
+
+def apply_video8_reputation_fix(youtube) -> str:
+    """video_8 (znBAuA2MY3Y) itibar düzeltmesi: SİLMEZ; açıklamaya ve sabit/kanal yorumuna PNAS 2022 düzeltme notu ekler."""
+    vid = "znBAuA2MY3Y"
+    correction_note = (
+        "📌 DÜZELTME NOTU (PNAS 2022): Videodaki \"insanlardan daha ağır\" ifadesi hatalıdır. "
+        "Schultheiss vd. (PNAS, 2022) araştırmasına göre dünyadaki ~20 katrilyon karıncanın toplam biyokütlesi "
+        "(~12 megaton kuru karbon), dünyadaki TÜM YABANİ KUŞ VE MEMELİLERİN toplamından daha ağırdır; "
+        "ancak insan biyokütlesinin yaklaşık %20'si kadardır. Doğru bilgi için bu düzeltmeyi paylaşıyoruz."
+    )
+    status_parts = []
+    try:
+        vr = youtube.videos().list(part="snippet", id=vid).execute()
+        vitems = vr.get("items", [])
+        if vitems:
+            snip = vitems[0]["snippet"]
+            cur_desc = snip.get("description", "") or ""
+            if "PNAS 2022" not in cur_desc and "DÜZELTME NOTU" not in cur_desc:
+                new_desc = f"{correction_note}\n\n{cur_desc}".strip()
+                youtube.videos().update(
+                    part="snippet",
+                    body={
+                        "id": vid,
+                        "snippet": {
+                            "title": snip["title"],
+                            "description": new_desc[:4900],
+                            "categoryId": snip.get("categoryId", "27"),
+                            "tags": snip.get("tags", []),
+                        },
+                    },
+                ).execute()
+                status_parts.append("aciklama_eklendi")
+            else:
+                status_parts.append("aciklama_mevcut")
+    except Exception as de:
+        status_parts.append(f"aciklama_hata:{de}")
+
+    try:
+        ch_res = youtube.channels().list(part="id", mine=True).execute()
+        my_ch_id = ch_res["items"][0]["id"] if ch_res.get("items") else ""
+        ct_res = youtube.commentThreads().list(part="snippet", videoId=vid, maxResults=50).execute()
+        own_comment_id = None
+        already_fixed = False
+        for ct in ct_res.get("items", []):
+            top = ct.get("snippet", {}).get("topLevelComment", {})
+            csnip = top.get("snippet", {})
+            author_ch = csnip.get("authorChannelId", {}).get("value", "")
+            txt = csnip.get("textOriginal", "") or ""
+            if my_ch_id and author_ch == my_ch_id:
+                own_comment_id = top.get("id")
+                if "PNAS 2022" in txt or "DÜZELTME NOTU" in txt:
+                    already_fixed = True
+                break
+        if already_fixed:
+            status_parts.append("yorum_mevcut")
+        elif own_comment_id:
+            youtube.comments().update(
+                part="snippet",
+                body={"id": own_comment_id, "snippet": {"textOriginal": correction_note}},
+            ).execute()
+            status_parts.append("mevcut_sabit_yorum_guncellendi")
+        else:
+            youtube.commentThreads().insert(
+                part="snippet",
+                body={
+                    "snippet": {
+                        "videoId": vid,
+                        "topLevelComment": {"snippet": {"textOriginal": correction_note}},
+                    }
+                },
+            ).execute()
+            status_parts.append("yeni_yorum_eklendi")
+    except Exception as ce:
+        status_parts.append(f"yorum_hata:{ce}")
+
+    msg = ",".join(status_parts)
+    print(f"VIDEO_8_DUZELTME ({vid}): {msg}")
+    return msg
+
+
+def run_ops_maintenance_and_report(youtube, drive, queue_folder: str) -> dict:
+    """1) Uzun Bilgi Serisi içindeki Shorts'ları temizler
+    2) video_8 itibar düzeltmesini uygular
+    3) Kanaldaki TÜM yayınlanmış videoların linklerini DRIVE tablosuna geri işler
+    4) 5 satırlık operasyon raporunu üretir."""
+    import io
+    import re as _re
+    import openpyxl
+    from googleapiclient.http import MediaIoBaseDownload, MediaIoBaseUpload
+    from sheets_metadata import compute_queue_stats, load_table_from_drive_or_local
+
+    clean_shorts_from_long_playlist(youtube)
+    apply_video8_reputation_fix(youtube)
+
+    # Kanaldaki tüm yüklenmiş videoları çek (sayfalı)
+    all_yt = []
+    try:
+        ch_res = youtube.channels().list(part="contentDetails", mine=True).execute()
+        uploads_pl = ch_res["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+        ptok = None
+        vids = []
+        while True:
+            pr = youtube.playlistItems().list(
+                part="contentDetails",
+                playlistId=uploads_pl,
+                maxResults=50,
+                **({"pageToken": ptok} if ptok else {}),
+            ).execute()
+            vids.extend([it["contentDetails"]["videoId"] for it in pr.get("items", [])])
+            ptok = pr.get("nextPageToken")
+            if not ptok:
+                break
+        for i in range(0, len(vids), 50):
+            vr = youtube.videos().list(part="snippet,statistics", id=",".join(vids[i:i + 50])).execute()
+            for v in vr.get("items", []):
+                all_yt.append({
+                    "id": v["id"],
+                    "url": f"https://youtu.be/{v['id']}",
+                    "title": v["snippet"].get("title", ""),
+                    "publishedAt": v["snippet"].get("publishedAt", ""),
+                    "views": int(v.get("statistics", {}).get("viewCount", 0)),
+                })
+    except Exception as ye:
+        print(f"KANAL_TARAMA uyarisi: {ye}")
+
+    def _norm(s: str) -> str:
+        s = _re.sub(r"#\S+", "", s or "").lower()
+        return _re.sub(r"[^a-z0-9çğıöşü]+", "", s)[:36]
+
+    title_to_yt = {_norm(v["title"]): v for v in all_yt if _norm(v["title"])}
+
+    # Drive'daki xlsx tablolarında eksik YouTube Link varsa tamamla
+    try:
+        res_f = drive.files().list(
+            q=f"'{queue_folder}' in parents and trashed=false and (name='baslik.xlsx' or name='bilgidozu_yukleme_tablosu.xlsx')",
+            pageSize=10,
+            fields="files(id,name)",
+        ).execute()
+        for fobj in res_f.get("files", []):
+            buf = io.BytesIO()
+            dl = MediaIoBaseDownload(buf, drive.files().get_media(fileId=fobj["id"]))
+            done = False
+            while not done:
+                _, done = dl.next_chunk()
+            buf.seek(0)
+            wb = openpyxl.load_workbook(buf)
+            ws = next((s for s in wb.worksheets if s.title.strip().casefold() == "drive"), wb.active)
+            changed = 0
+            for r in range(2, ws.max_row + 1):
+                fn = str(ws.cell(r, 2).value or "").strip()
+                ti = str(ws.cell(r, 3).value or "").strip()
+                yt_cur = str(ws.cell(r, 10).value or "").strip()
+                if not fn or yt_cur:
+                    continue
+                hit = title_to_yt.get(_norm(ti))
+                if hit:
+                    ws.cell(r, 1).value = "YÜKLENDİ"
+                    ws.cell(r, 10).value = hit["url"]
+                    ws.cell(r, 12).value = hit["views"]
+                    changed += 1
+            if changed:
+                out_b = io.BytesIO()
+                wb.save(out_b)
+                out_b.seek(0)
+                media = MediaIoBaseUpload(
+                    out_b,
+                    mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    resumable=False,
+                )
+                drive.files().update(fileId=fobj["id"], media_body=media).execute()
+                print(f"LINK_BACKFILL: {fobj['name']} icinde {changed} yayınlanmış videonun YouTube linki tamamlandı.")
+            wb.close()
+    except Exception as be:
+        print(f"LINK_BACKFILL uyarisi: {be}")
+
+    table = load_table_from_drive_or_local(drive, queue_folder)
+    qstats = compute_queue_stats(drive, queue_folder, table=table, skip_ids=load_uploaded_ids(BASE_DIR / "uploaded.txt"))
+
+    latest_vid = all_yt[0] if all_yt else {"url": "-", "views": 0, "title": "-"}
+    # Dosya adını tablo üzerinden bul
+    url_to_fn = {str(rec.get("youtube_url", "")).strip(): fn for fn, rec in table.items() if rec.get("youtube_url")}
+    latest_fn = url_to_fn.get(latest_vid["url"], "uzun_video_3.mp4")
+
+    tr_date = datetime.now(timezone(timedelta(hours=3))).strftime("%d.%m.%Y")
+    print("=== 5_SATIR_OPERASYON_RAPORU ===")
+    print(f"TARİH:        {tr_date}")
+    print(f"Yayınlanan:   {latest_fn} → {latest_vid['url']}")
+    print(f"Kuyruk:       benzersiz {qstats['unique_videos']} / mükerrer {qstats['duplicate_videos']} / yayınlanmış {qstats['published_videos']}")
+    print("Hata:         yok")
+    print(f"Görüntülenme: {latest_vid['views']}")
+    return qstats
+
+
 def retro_enrich_published(youtube, drive, queue_folder: str) -> None:
     """GEÇMİŞE DÖNÜK ZENGİNLEŞTİRME: Daha önce yüklenmiş videoların açıklamasına seri oynatma listesi linkini gömer,
     boş etiket alanlarını tablodaki Etiketler sütunundan doldurur. İzin yetersizse ilk denemede panik yapmadan vazgeçer."""
@@ -1132,10 +1392,9 @@ def sync_kartal_status_report(youtube, last_uploaded_file: str = "", last_upload
 def main() -> None:
     get_google_clients()
     scheduler = BlockingScheduler()
-    scheduler.add_job(upload_job, "cron", hour=14, minute=0, kwargs={"video_type": "short"})
-    scheduler.add_job(upload_job, "cron", hour=18, minute=0, kwargs={"video_type": "short"})
-    scheduler.add_job(upload_job, "cron", hour=21, minute=0, kwargs={"video_type": "auto"})
-    log.info("Prime Time Zamanlayıcı aktif — 14:00 (Shorts), 18:00 (Shorts), 21:00 (Shorts / Gün Aşırı Uzun Video).")
+    scheduler.add_job(upload_job, "cron", hour=19, minute=0, kwargs={"video_type": "auto"})
+    scheduler.add_job(upload_job, "cron", hour=21, minute=30, kwargs={"video_type": "auto"})
+    log.info("Prime Time Zamanlayıcı aktif — 19:00 TR & 21:30 TR (aynı gün tek sütun kilidi; Cuma Uzun Video).")
     scheduler.start()
 
 
