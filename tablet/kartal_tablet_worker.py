@@ -24,6 +24,7 @@ import json
 import os
 import re
 import shlex
+import socket
 import shutil
 import subprocess
 import sys
@@ -717,6 +718,7 @@ HELP = """<b>🦅 Kartal AI · Tablet Kumandası</b>
 
 <b>Bakım</b>
 /bak — her şey yolunda mı (tek mesaj)
+/baglan — bağlantı koptuysa yeniden bağlan
 /pid — bağlantı ve pil durumu
 /durum — ajan ayakta mı
 """
@@ -728,6 +730,83 @@ def _norm(t: str) -> str:
     for a, b in (("i", "i"), ("s", "s"), ("g", "g"), ("u", "u"), ("o", "o"), ("c", "c")):
         t = t.replace(a, b)
     return t.replace("ı", "i").replace("İ", "i").replace("ş", "s").replace("ğ", "g").replace("ü", "u").replace("ö", "o").replace("ç", "c")
+
+
+def _tcp_ok(host: str, port: int, to: float = 0.25) -> bool:
+    sk = socket.socket()
+    sk.settimeout(to)
+    try:
+        return sk.connect_ex((host, port)) == 0
+    except Exception:
+        return False
+    finally:
+        sk.close()
+
+
+def _local_ips() -> list[str]:
+    ips = ["127.0.0.1"]
+    try:
+        out = termux_cmd("termux-wifi-connectioninfo", timeout=15)
+        if out.strip().startswith("{"):
+            ip = json.loads(out).get("ip", "")
+            if ip and ip not in ips:
+                ips.append(ip)
+    except Exception:
+        pass
+    try:
+        sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sk.connect(("10.255.255.255", 1))
+        ip = sk.getsockname()[0]
+        sk.close()
+        if ip and ip not in ips:
+            ips.append(ip)
+    except Exception:
+        pass
+    return ips
+
+
+def reconnect(timeout_scan: int = 120) -> str:
+    """ADB bağlantısını yeniden kurar: kayıtlı hedef -> port taraması."""
+    global TARGET
+    saved = os.getenv("ADB_TARGET", "").strip() or state_get("last_target", "")
+    if saved:
+        try:
+            _adb_raw("connect", saved, timeout=20)
+        except Exception:
+            pass
+        time.sleep(0.8)
+        try:
+            if "\tdevice" in _adb_raw("devices", timeout=15):
+                TARGET = saved
+                return f"✅ Zaten bağlı: {saved}"
+        except Exception:
+            pass
+
+    ips = _local_ips()
+    opens: list[tuple[str, int]] = []
+    for h in ips:
+        for p in range(30000, 65536):
+            if _tcp_ok(h, p):
+                opens.append((h, p))
+    for h, p in opens:
+        t = f"{h}:{p}"
+        try:
+            _adb_raw("disconnect", t, timeout=8)
+            _adb_raw("connect", t, timeout=15)
+        except Exception:
+            continue
+        time.sleep(0.6)
+        try:
+            if "\tdevice" in _adb_raw("devices", timeout=15):
+                TARGET = t
+                state_set("last_target", t)
+                return f"✅ Bağlandı: {t}"
+        except Exception:
+            continue
+    return ("❌ Bağlanamadı.\n"
+            "• Tablette **Kablosuz hata ayıklama** açık mı?\n"
+            "• Wi-Fi bağlı mı?\n"
+            "• Aç/kapa yaptıysan port değişir — tekrar /baglan yaz.")
 
 
 def health_report() -> str:
@@ -742,13 +821,40 @@ def health_report() -> str:
     lines.append(("✅" if rish_ok() else "➖") + " Shizuku")
     lines.append(("✅" if tts_available() else "➖") + " Ses (konuşma)")
 
+    # --- Pil: önce termux-api, sonra shell ---
     try:
+        out = termux_cmd("termux-battery-status", timeout=20)
+        if out.strip().startswith("{"):
+            b = json.loads(out)
+            pct = b.get("percentage")
+            chg = str(b.get("status", "")).upper()
+            lines.append(f"🔋 Pil: %{pct} · {'şarjda' if 'CHARGING' in chg or 'FULL' in chg else 'prizde değil'}")
+            if "CHARGING" not in chg and "FULL" not in chg:
+                lines.append("⚠️ Şarja tak — pil tasarrufu Wi-Fi'yi uyutuyor")
+            raise StopIteration
         out = shell("dumpsys battery", timeout=25)
         lvl = re.search(r"level:\s*(\d+)", out)
         chg = re.search(r"status:\s*(\d+)", out)
         lines.append(f"🔋 Pil: %{lvl.group(1) if lvl else '?'} · {'şarjda' if chg and chg.group(1) == '2' else 'prizde değil'}")
         if chg and chg.group(1) != "2":
             lines.append("⚠️ Şarja tak — pil tasarrufu Wi-Fi'yi uyutuyor")
+    except StopIteration:
+        pass
+    except Exception:
+        pass
+
+    # --- Wi-Fi: termux-api (adb gerekmez) ---
+    try:
+        info = termux_cmd("termux-wifi-connectioninfo", timeout=20)
+        if info.strip().startswith("{"):
+            j = json.loads(info)
+            ip = j.get("ip") or j.get("ip4")
+            ssid = j.get("ssid") or "?"
+            if ip:
+                lines.append(f"✅ Wi-Fi: {ssid} · IP {ip}")
+                lines.append("")
+                lines.append("Yardım için /menu")
+                return "\n".join(lines)
     except Exception:
         pass
 
@@ -800,6 +906,11 @@ def handle(text: str, chat_id: str) -> None:
         say("\n".join(lines) + "\n/ekran ile tableti gör.", chat_id)
         return
     if low in ("/bak", "/kontrol"):
+        say(health_report(), chat_id)
+        return
+    if low in ("/baglan", "/reconnect"):
+        say("🔄 Bağlantı yeniden kuruluyor… (30-90 sn)", chat_id)
+        say(reconnect(), chat_id)
         say(health_report(), chat_id)
         return
     if low in ("/pid", "/pil", "/battery"):
