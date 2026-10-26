@@ -95,9 +95,9 @@ jobs:
           print(validate_metadata_workbook(drive, cfg["drive_queue_folder_id"]))
           from uploader import run_ops_maintenance_and_report
           run_ops_maintenance_and_report(youtube, drive, cfg["drive_queue_folder_id"])
-          # Build preview payload for video_47.mp4 so manual dry-run / push shows the clean card
-          m47 = load_excel_metadata(drive, cfg["drive_queue_folder_id"], "preview", "video_47.mp4", cfg)
-          build_telegram_report("video_47.mp4 (Sıradaki Beden&Beyin Önizleme)", "nO9zzEKwYIQ", "https://youtu.be/nO9zzEKwYIQ", m47, comment_ok=False)
+          # Build preview payload for video_131.mp4 (Yeni Seri Başlangıcı)
+          m131 = load_excel_metadata(drive, cfg["drive_queue_folder_id"], "preview", "video_131.mp4", cfg)
+          build_telegram_report("video_131.mp4 (Yeni Seri Önizleme - START Bekleniyor)", "nO9zzEKwYIQ", "https://youtu.be/nO9zzEKwYIQ", m131, comment_ok=False)
           print("VALIDATION OK: YouTube scope, Drive access, and Excel metadata workbook passed. No video uploaded.")
           PY
 

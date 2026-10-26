@@ -25,7 +25,7 @@ log = logging.getLogger(__name__)
 
 DEFAULT_DRIVE_FOLDER_ID = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"
 DEFAULT_SHEETS_ID = "1DTXIt8wY9fDHRYRT_Kz5GVVcGe00hDaK"
-MIN_SHORTS_NUMBER = 31  # 1..30 kilitli/atlandı, Shorts video_31.mp4'ten başlar
+MIN_SHORTS_NUMBER = 131  # Eski stok (video_1..130) silinmeden askıda; yalnız yeni onaylı seri (131+) sürüme girer
 
 CATEGORY_MAP = {
     "uzay ve astronomi": "28",
@@ -72,6 +72,7 @@ BEDEN_BEYIN_FILES = {
     "video_67.mp4", "video_72.mp4", "video_77.mp4",
     "video_106.mp4", "video_107.mp4", "video_108.mp4", "video_109.mp4", "video_110.mp4",
     "video_83.mp4", "video_91.mp4", "video_100.mp4", "video_121.mp4",
+    "video_131.mp4",
 }
 
 
