@@ -46,6 +46,11 @@ for d in (KARTAL_DIR, SHOTS_DIR, DOWNLOADS_DIR):
 
 from ses import speak, chat_turn, listen_once, tts_available, reply_brain
 
+# Termux'ta pkg ile kurulan araçlar PATH'te olmayabilir — kendimiz ekliyoruz
+for _p in ("/data/data/com.termux/files/usr/bin", "/system/bin", "/system/xbin"):
+    if os.path.isdir(_p) and _p not in os.environ.get("PATH", ""):
+        os.environ["PATH"] = _p + ":" + os.environ.get("PATH", "")
+
 ADB = os.getenv("ADB_BIN", "adb")
 TARGET = os.getenv("ADB_TARGET", "").strip()  # boşsa tek cihaz varsayılır
 

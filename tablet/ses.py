@@ -30,6 +30,11 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+# Termux araçlarının yeri sabit olabilir; PATH'e ekle
+for _p in ("/data/data/com.termux/files/usr/bin",):
+    if os.path.isdir(_p) and _p not in os.environ.get("PATH", ""):
+        os.environ["PATH"] = _p + ":" + os.environ.get("PATH", "")
+
 REC_DIR = Path.home() / "kartal_tablet" / "kayitlar"
 REC_DIR.mkdir(parents=True, exist_ok=True)
 
