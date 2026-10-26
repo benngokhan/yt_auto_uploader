@@ -79,26 +79,25 @@ jobs:
           Path("config.json").write_text(json.dumps(cfg, indent=2, ensure_ascii=False), encoding="utf-8")
           PY
 
-      - name: Validate configuration (manual dry run)
+      - name: Validate configuration (manual dry run — ZERO YouTube API quota!)
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
         run: |
           python - <<'PY'
+          import json
+          from pathlib import Path
           from google.oauth2.credentials import Credentials
-          from uploader import get_google_clients, load_config, validate_metadata_workbook, build_telegram_report, load_excel_metadata
+          from uploader import get_google_clients, load_config, validate_metadata_workbook
           cfg = load_config()
           creds = Credentials.from_authorized_user_file("token.json")
           granted_scopes = set(creds.scopes or [])
           if "https://www.googleapis.com/auth/youtube.upload" not in granted_scopes:
               raise SystemExit("OAuth token is missing the youtube.upload scope; re-authorize with uploader.py's configured scopes.")
-          youtube, drive = get_google_clients()
-          drive.files().list(q=f"'{cfg['drive_queue_folder_id']}' in parents and trashed=false", pageSize=5, fields="files(id,name)").execute()
+          # SADECE Drive ve Tablo doğrulanır — YouTube Data API kotasından 0 birim harcanır!
+          _youtube, drive = get_google_clients()
+          drive.files().list(q=f"'{cfg['drive_queue_folder_id']}' in parents and trashed=false", pageSize=10, fields="files(id,name)").execute()
           print(validate_metadata_workbook(drive, cfg["drive_queue_folder_id"]))
-          from uploader import run_ops_maintenance_and_report
-          run_ops_maintenance_and_report(youtube, drive, cfg["drive_queue_folder_id"])
-          # Build preview payload for video_131.mp4 (Yeni Seri Başlangıcı)
-          m131 = load_excel_metadata(drive, cfg["drive_queue_folder_id"], "preview", "video_131.mp4", cfg)
-          build_telegram_report("video_131.mp4 (Yeni Seri Önizleme - START Bekleniyor)", "nO9zzEKwYIQ", "https://youtu.be/nO9zzEKwYIQ", m131, comment_ok=False)
-          print("VALIDATION OK: YouTube scope, Drive access, and Excel metadata workbook passed. No video uploaded.")
+          manifest = json.loads(Path("approved_new_series_manifest.json").read_text(encoding="utf-8"))
+          print(f"VALIDATION OK (0 YouTube Quota Spent): {len(manifest.get('approved_videos', {}))} approved videos in manifest.")
           PY
 
       - name: Upload one queued video (Prime Time Schedule)
@@ -121,7 +120,8 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add uploaded.txt status_report.json bilgidozu_yukleme_tablosu.xlsx baslik.xlsx
-            git diff --cached --quiet || git commit -m "chore: record uploaded Bilgi Dozu video"
+            [ -f .healed_131_thumb ] && git add -f .healed_131_thumb || true
+            git diff --cached --quiet || git commit -m "chore: record uploaded Bilgi Dozu video [skip ci]"
             git push
           fi
 

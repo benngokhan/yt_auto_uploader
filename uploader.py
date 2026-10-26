@@ -880,34 +880,9 @@ def add_video_to_series(youtube, video_id: str, pid: "str | None" = None) -> Non
 
 
 def backfill_series_playlist(youtube, drive, queue_folder: str) -> None:
-    """Daha once ELDEN yuklenmis uzun bolumleri (uzun_1, uzun_2 gibi) tablodaki YT linklerinden bulup listeye geri ekler."""
-    import re as _re
-    try:
-        from sheets_metadata import load_table_from_drive_or_local
-        table = load_table_from_drive_or_local(drive, queue_folder)
-        pid = None
-        playlist_ids = {}
-        for name, rec in table.items():
-            if str(rec.get("status", "")).upper() != "YÜKLENDİ":
-                continue
-            url = str(rec.get("youtube_url") or rec.get("yt_url") or "")
-            m = _re.search(r"(?:youtu\.be/|v=)([\w-]{11})", url)
-            if not m:
-                continue
-            if str(name).startswith("uzun_video_"):
-                hedef = SERIES_PLAYLIST_TITLE
-            else:
-                hedef = route_short_topic(str(rec.get("title", "")), str(rec.get("category_name", "")))
-            if not hedef:
-                continue
-            if hedef not in playlist_ids:
-                playlist_ids[hedef] = ensure_named_playlist(youtube, hedef) if hedef != SERIES_PLAYLIST_TITLE else ensure_series_playlist(youtube)
-            pid = playlist_ids.get(hedef)
-            if pid:
-                add_video_to_series(youtube, m.group(1), pid)
-        log.info("OYNATMA LISTESI: geri donuk tarama tamam (uzun serisi + konulu Shorts).")
-    except Exception as e:
-        log.warning(f"Oynatma listesi geri-tarama atlandi (zararsiz): {e}")
+    """KOTA KORUMA KİLİDİ (26.10.2026): Her çalışmada 39+ eski videoya playlistItems.insert (39x50=1950 birim)
+    çağrısı yaparak günlük 10.000 YouTube API kotasını tükettiği tespit edildiği için kalıcı olarak kapatıldı."""
+    return
 
 
 def _iso_duration_seconds(dur: str) -> int:
@@ -1377,12 +1352,34 @@ def upload_job(
             aware = publish_at if publish_at.tzinfo else publish_at.astimezone()
             meta["publishAt"] = aware.isoformat(timespec="seconds")
 
-        response = upload_to_youtube(youtube, tmp_path, meta)
+        try:
+            response = upload_to_youtube(youtube, tmp_path, meta)
+        except Exception as up_err:
+            if "quotaExceeded" in str(up_err):
+                log.warning(f"KOTA KORUMASI: Günlük 10.000 YouTube API kotası dolu ({file_name} kuyrukta korundu, bir sonraki slotta yüklenecek).")
+                REPORT_FILE.write_text(
+                    "⏳ <b>Bilgi Dozu — Kota Sıfırlaması Bekleniyor</b>\n\n"
+                    f"📦 <b>Sıradaki Bölüm:</b> <code>{file_name}</code> (Kuyrukta korundu)\n"
+                    "🛡️ <b>Durum:</b> Günlük 10.000 YouTube API kotası dolduğu için bölüm atlanmadı; "
+                    "sabah <b>10:00 TR</b> (Pasifik gece yarısı) kota sıfırlamasından sonraki ilk slotta "
+                    "kapak + yorum + zincir bağlantısıyla otomatik yayınlanacak.",
+                    encoding="utf-8",
+                )
+                return None
+            raise
         vid_id = response["id"]
         yt_url = f"https://youtu.be/{vid_id}"
         log.info(f"YouTube yüklemesi tamamlandı: {yt_url}")
 
         upload_thumbnail_if_exists(youtube, drive, queue_folder, file_name, vid_id)
+        # 26.10.2026: video_131.mp4 (MOxaXPkS0zw) kota sınırına denk geldiği için tek seferlik kapak telafisi
+        heal_flag = BASE_DIR / ".healed_131_thumb"
+        if not heal_flag.exists() and file_name != "video_131.mp4":
+            try:
+                upload_thumbnail_if_exists(youtube, drive, queue_folder, "video_131.mp4", "MOxaXPkS0zw")
+                heal_flag.write_text("ok\n", encoding="utf-8")
+            except Exception:
+                pass
         comment_ok, _ = post_pinned_comment(youtube, vid_id, meta.get("pinned_comment", ""))
         mark_as_uploaded(list_path, file_id, file_name, yt_url, title=meta["title"])
         update_excel_status_in_drive(drive, queue_folder, file_name, new_status="YÜKLENDİ", youtube_url=yt_url)
