@@ -35,6 +35,15 @@ def adb_shell(cmd: str, timeout: int = 60) -> str:
         return _sh(cmd, timeout)  # adb yoksa dogrudan dene (Termux icinde)
 
 
+def drive_direct(url: str) -> str:
+    """Google Drive paylasim linkini dogrudan indirme linkine cevirir."""
+    m = re.search(r"/file/d/([A-Za-z0-9_-]{20,})", url) or re.search(r"[?&]id=([A-Za-z0-9_-]{20,})", url)
+    if not m:
+        return url
+    fid = m.group(1)
+    return f"https://drive.usercontent.google.com/download?id={fid}&export=download&confirm=t"
+
+
 def download(url: str, ad: str = "") -> Path | None:
     ad = ad or os.path.basename(urllib.parse.urlparse(url).path) or f"video_{int(time.time())}.mp4"
     if not ad.endswith(".mp4"):
@@ -43,6 +52,8 @@ def download(url: str, ad: str = "") -> Path | None:
     hedef = INDIR / ad
     if hedef.exists() and hedef.stat().st_size > 100_000:
         return hedef
+    if "drive.google.com" in url:
+        url = drive_direct(url)
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(req, timeout=180) as r, open(hedef, "wb") as f:

@@ -47,7 +47,7 @@ for d in (KARTAL_DIR, SHOTS_DIR, DOWNLOADS_DIR):
     d.mkdir(parents=True, exist_ok=True)
 
 from ses import speak, chat_turn, listen_once, tts_available, reply_brain, gemini_call
-from paylas2 import download, galeriye_kopyala, paylas, ac_uygulama, PAKETLER
+from paylas2 import download as indir_video, galeriye_kopyala, paylas, ac_uygulama, PAKETLER
 
 # Termux'ta pkg ile kurulan araçlar PATH'te olmayabilir — kendimiz ekliyoruz
 for _p in ("/data/data/com.termux/files/usr/bin", "/system/bin", "/system/xbin"):
@@ -932,7 +932,7 @@ def handle(text: str, chat_id: str) -> None:
 
         def _is():
             say(f"⬇️ İndiriliyor…\n<code>{url[:80]}</code>", chat_id)
-            dosya = download(url)
+            dosya = indir_video(url)
             if not dosya:
                 say("❌ İndirilemedi. Link herkese açık mı? (Drive'da 'bağlantıya sahip olan herkes' olmalı)", chat_id)
                 return
