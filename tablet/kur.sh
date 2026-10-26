@@ -93,13 +93,22 @@ cat > "$KARTAL_DIR/baslat.sh" <<'EOS'
 #!/data/data/com.termux/files/usr/bin/bash
 termux-wake-lock 2>/dev/null || true
 cd "$HOME/kartal_tablet"
-if adb devices 2>/dev/null | grep -q "	device"; then :; else
+if ! adb devices 2>/dev/null | grep -q "	device"; then
+  # Önce kayıtlı hedefe, olmazsa mDNS otomatik keşfe
   TGT=$(grep '^ADB_TARGET=' .env 2>/dev/null | cut -d= -f2-)
   [ -n "$TGT" ] && adb connect "$TGT" >/dev/null 2>&1
+  adb devices 2>/dev/null | grep -q "	device" || bash "$HOME/kartal_tablet/adbbaglan.sh" >/dev/null 2>&1
 fi
 exec python kartal_tablet_worker.py
 EOS
 chmod +x "$KARTAL_DIR/baslat.sh"
+
+# Otomatik bağlanıcıyı da yanına koy
+if [ -f "$KARTAL_DIR/adbbaglan.sh" ]; then
+  chmod +x "$KARTAL_DIR/adbbaglan.sh"
+elif [ -f "$(dirname "$0")/adbbaglan.sh" ]; then
+  cp "$(dirname "$0")/adbbaglan.sh" "$KARTAL_DIR/" && chmod +x "$KARTAL_DIR/adbbaglan.sh"
+fi
 
 echo
 echo -e "${GREEN}${BOLD}✅ Kurulum bitti!${RESET}"
