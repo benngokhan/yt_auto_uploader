@@ -716,6 +716,7 @@ HELP = """<b>🦅 Kartal AI · Tablet Kumandası</b>
 /sohbet — dinle → cevapla → konuş
 
 <b>Bakım</b>
+/bak — her şey yolunda mı (tek mesaj)
 /pid — bağlantı ve pil durumu
 /durum — ajan ayakta mı
 """
@@ -727,6 +728,52 @@ def _norm(t: str) -> str:
     for a, b in (("i", "i"), ("s", "s"), ("g", "g"), ("u", "u"), ("o", "o"), ("c", "c")):
         t = t.replace(a, b)
     return t.replace("ı", "i").replace("İ", "i").replace("ş", "s").replace("ğ", "g").replace("ü", "u").replace("ö", "o").replace("ç", "c")
+
+
+def health_report() -> str:
+    """Tabletin ve köprünün durumunu tek mesajda özetler."""
+    lines = ["<b>🩺 Kartal Kontrol</b>"]
+    try:
+        devs = _adb_raw("devices", timeout=15)
+        ok_adb = "\tdevice" in devs
+        lines.append(("✅" if ok_adb else "❌") + " Bağlantı")
+    except Exception:
+        lines.append("❌ Bağlantı")
+    lines.append(("✅" if rish_ok() else "➖") + " Shizuku")
+    lines.append(("✅" if tts_available() else "➖") + " Ses (konuşma)")
+
+    try:
+        out = shell("dumpsys battery", timeout=25)
+        lvl = re.search(r"level:\s*(\d+)", out)
+        chg = re.search(r"status:\s*(\d+)", out)
+        lines.append(f"🔋 Pil: %{lvl.group(1) if lvl else '?'} · {'şarjda' if chg and chg.group(1) == '2' else 'prizde değil'}")
+        if chg and chg.group(1) != "2":
+            lines.append("⚠️ Şarja tak — pil tasarrufu Wi-Fi'yi uyutuyor")
+    except Exception:
+        pass
+
+    try:
+        wifi = shell("dumpsys wifi | grep -m1 'Wi-Fi is'", timeout=20)
+        if "enabled" in wifi.lower():
+            lines.append("✅ Wi-Fi açık")
+        elif wifi:
+            lines.append("❌ Wi-Fi kapalı!")
+    except Exception:
+        pass
+
+    try:
+        ip = shell("ip -4 -o addr show wlan0", timeout=15)
+        m = re.search(r"inet (\d{1,3}(?:\.\d{1,3}){3})", ip)
+        if m:
+            lines.append(f"🌐 IP: {m.group(1)}")
+        elif ip:
+            lines.append("❌ Wi-Fi IP yok")
+    except Exception:
+        pass
+
+    lines.append("")
+    lines.append("Yardım için /menu")
+    return "\n".join(lines)
 
 
 def handle(text: str, chat_id: str) -> None:
@@ -751,6 +798,9 @@ def handle(text: str, chat_id: str) -> None:
         lines.append("Shizuku/rish: " + ("✅ çalışıyor" if rish_ok() else "❌ yok"))
         lines.append("Ses (TTS): " + ("✅ hazır" if tts_available() else "❌ yok (pkg install termux-api)"))
         say("\n".join(lines) + "\n/ekran ile tableti gör.", chat_id)
+        return
+    if low in ("/bak", "/kontrol"):
+        say(health_report(), chat_id)
         return
     if low in ("/pid", "/pil", "/battery"):
         try:
