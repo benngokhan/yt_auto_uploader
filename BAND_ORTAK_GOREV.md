@@ -7,27 +7,26 @@ Emir metninde sana BANT_NO söylendi (1-5). Şeritin ve nişen:
 
 | BANT_NO | Nişe | Shorts şeridi | Konu bloğu |
 |---|---|---|---|
-| 1 | Kozmik Felaketler & Uzay | video_121–125 | BANT 1 tablosu |
-| 2 | Nörobilim & İnsan Beyni | video_126–130 | BANT 2 tablosu |
-| 3 | Yasak Coğrafyalar & Esrarengiz | video_131–135 | BANT 3 tablosu |
-| 4 | Mühürlü Tarih & Antik | video_136–140 | BANT 4 tablosu |
-| 5 | Uzun Video Birleştirme | uzun_video_4+ | BANT 5 derleme paketleri |
+| 1 | Kozmik Felaketler & Uzay + Nörobilim | video_121–130 | BANT 1 + BANT 2 tabloları |
+| 2 | Yasak Coğrafyalar + Mühürlü Tarih | video_131–140 | BANT 3 + BANT 4 tabloları |
+
+(Uzun video üretimi şimdilik merkezde; bandlara sonradan tek tek emir gelir.)
 
 Konu listesi tek dosyada: ilk iş olarak şunu çek ve kendi BANT bölümünü uygula:
 `https://raw.githubusercontent.com/benngokhan/yt_auto_uploader/main/URETIM_BANDI_ARASTIRMA_25.md`
 
-## SES (değişmez)
-- Referans: Google Drive > "Bilgi Dozu Official" > `ornek_ses_voice04.mp3`
-- Her video voice04 klonuyla seslendirilir. Alternatif ses aramak/seçmek YASAK.
+## SES (değişmez, 5 Kasım 2026 revizyonu)
+- Kilit marka sesi merkezde üretilir: **erkek, sakin ve gerçekçi anlatıcı** (CEO onaylı). Band ASLA ses sentezi yapmaz: TTS, edge-tts, klon denemesi — hepsi YASAK.
+- VO'lar `BANTx_SES_PAKETI_*.zip` paketinde repo Release'den gelir. Pakette `video_N_vo.wav` (44100 Hz mono) + her videoya `script.txt` vardır.
 - Soru sorma: "ses değişsin mi" diye hiçbir zaman sorma.
 
-## SES QA (üretime başlamadan ÖNCE tek sefer)
-- Her band oturumu, üretime geçmeden önce 5 saniyelik TEST SESİ üretir: "Bu bir Bilgi Dozu ses testidir."
-- Test, Drive'daki `ornek_ses_voice04.mp3` referansıyla TONU aynı olmalı. Benzeşmiyorsa (robotik/düz TTS çıkıyorsa):
-  **ÜRETİM BAŞLAMAZ.** Rapora yaz: "SES_KLON_HATASI — klonlama aracım voice04'ü üretemiyor." ve dur.
-- Robotik sesle video üreten = hurda üreten. HAZIR yazılmaz, YENILE işaretlenir.
+## SES QA (üretime başlamadan ÖNCE)
+- Bant görevinde ses paketi linki verilmiş olmalı. Paket YOKSA veya içinde şeride ait `*_vo.wav` eksikse:
+  **ÜRETİM BAŞLAMAZ.** Rapora yaz: "SES_PAKET_YOK — Bant N için ses paketi bekleniyor." ve dur.
+- Paket var ama voice kalitesi şüpheliyse: "SES_KALITE_SUPHE" de, dur.
 
 ## ÜRETİM KURALLARI
+0. KANCA KURALI (yeni): videonun ilk cümlesi TEK kısa soru (en fazla ~6 kelime). İzleyici soruyu aklında tutabilmeli; uzun giriş YASAK.
 1. Dosya adı: `video_N.mp4` (N = şeridindeki sıradaki boş numara) veya `uzun_video_N.mp4`.
 2. Shorts: karaoke altyazı ZORUNLU (kelime kelime yanar).
 3. Uzun/derleme: karaoke YASAK — sade küçük alt satır veya altyazısız.
