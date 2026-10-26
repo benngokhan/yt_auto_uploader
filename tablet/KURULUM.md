@@ -67,7 +67,19 @@ Kurulum sonunda şu çıktıyı görmelisin:
 
 ---
 
-## 5. Başlat
+## 5. ADB bağlantısı (tek komut, IP/port ezberlemek yok)
+
+```bash
+python ~/kartal_kaynak/tablet/baglan.py
+```
+
+Bu komut: tabletin IP'sini kendi bulur → kablosuz hata ayıklama portunu tarar → gerekirse **1 kez** 6 haneli eşleştirme kodunu sorar → bağlanıp hedefi `.env`'e yazar.
+
+Başarı çıktısı: `✔ Bağlandı: 10.x.x.x:41234`
+
+> Elle vermek istersen: `python ~/kartal_kaynak/tablet/baglan.py 10.136.3.175:41234`
+
+## 6. Başlat
 
 ```bash
 bash ~/kartal_tablet/baslat.sh
@@ -88,7 +100,7 @@ Tablet her yeniden başladığında ajan otomatik ayağa kalkar.
 
 ---
 
-## 6. Telefondan komutlar (kopyala-yapıştır)
+## 7. Telefondan komutlar (kopyala-yapıştır)
 
 ### 👁 Göz
 | Komut | Ne yapar |
@@ -122,7 +134,7 @@ Tablet her yeniden başladığında ajan otomatik ayağa kalkar.
 
 ---
 
-## 7. Günlük akış: bot YouTube'a atar → Kartal tablete Reels/TikTok atar
+## 8. Günlük akış: bot YouTube'a atar → Kartal tablete Reels/TikTok atar
 
 1. `19:00` / `20:15` slotlarında bot YouTube'a yükler, Telegram'a kart atar.
 2. Kartal tablete `/paylas <Drive linki> Instagram` yazarsın (veya ben bunu tam otomatiğe bağlarım).
@@ -133,7 +145,7 @@ Tablet her yeniden başladığında ajan otomatik ayağa kalkar.
 
 ---
 
-## 8. Sorun giderme
+## 9. Sorun giderme
 
 | Belirti | Çözüm |
 |---|---|
@@ -146,7 +158,7 @@ Tablet her yeniden başladığında ajan otomatik ayağa kalkar.
 
 ---
 
-## 9. Güvenlik
+## 10. Güvenlik
 
 - Bot token, Gemini anahtarı **sadece** `~/kartal_tablet/.env` içinde (`chmod 600`). Depoya **asla** gitmez.
 - Ajan **tek sohbet** ile kilitli; ilk mesajı atan hesap sahibi olur.

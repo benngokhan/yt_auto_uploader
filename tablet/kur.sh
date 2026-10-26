@@ -103,12 +103,14 @@ exec python kartal_tablet_worker.py
 EOS
 chmod +x "$KARTAL_DIR/baslat.sh"
 
-# Otomatik bağlanıcıyı da yanına koy
-if [ -f "$KARTAL_DIR/adbbaglan.sh" ]; then
-  chmod +x "$KARTAL_DIR/adbbaglan.sh"
-elif [ -f "$(dirname "$0")/adbbaglan.sh" ]; then
-  cp "$(dirname "$0")/adbbaglan.sh" "$KARTAL_DIR/" && chmod +x "$KARTAL_DIR/adbbaglan.sh"
-fi
+# Otomatik bağlanıcıları da yanına koy
+SRC_DIR="$(cd "$(dirname "$0")" && pwd)"
+for f in baglan.py adbbaglan.sh baglan.sh; do
+  if [ -f "$SRC_DIR/$f" ]; then
+    cp -f "$SRC_DIR/$f" "$KARTAL_DIR/" && chmod +x "$KARTAL_DIR/$f"
+  fi
+done
+[ -f "$KARTAL_DIR/adbbaglan.sh" ] && chmod +x "$KARTAL_DIR/adbbaglan.sh"
 
 echo
 echo -e "${GREEN}${BOLD}✅ Kurulum bitti!${RESET}"
