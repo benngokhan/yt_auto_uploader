@@ -933,9 +933,12 @@ def handle(text: str, chat_id: str) -> None:
 # --------------------------------------------------------------------------
 # 8. ANA DÖNGÜ
 # --------------------------------------------------------------------------
+_last_net_warn = 0.0
+
+
 def main() -> None:
     load_env()
-    global TARGET
+    global TARGET, _last_net_warn
     TARGET = os.getenv("ADB_TARGET", "").strip()
     if TARGET:
         try:
@@ -983,12 +986,17 @@ def main() -> None:
                     continue
                 handle(text, chat_id)
         except urllib.error.HTTPError as e:
-            print(f"[telegram] HTTP {e.code}")
+            print(f"[telegram] HTTP {e.code} — yeniden denenecek")
             time.sleep(backoff)
             backoff = min(backoff * 2, 60)
         except Exception as e:
-            print(f"[döngü] {e}")
-            time.sleep(backoff)
+            # Ağ yoksa ekranı doldurmayalım: 30 saniyede bir tek satır
+            msg = str(e)
+            now = time.time()
+            if now - _last_net_warn > 30:
+                print(f"[ağ] internet yok — Wi-Fi'yi kontrol et ({msg[:60]})")
+                _last_net_warn = now
+            time.sleep(max(backoff, 5))
             backoff = min(backoff * 2, 60)
 
 
