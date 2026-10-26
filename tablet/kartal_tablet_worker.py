@@ -842,6 +842,11 @@ def handle(text: str, chat_id: str) -> None:
         run_task(raw[6:].strip())
         return
 
+    # Tanınmayan /komut -> görev olarak koşturma, menüyü göster
+    if low.startswith("/"):
+        say("❓ Bu komutu tanımadım.\n\n" + HELP, chat_id)
+        return
+
     # Düz metin → doğal dil görevi
     run_task(raw)
 
