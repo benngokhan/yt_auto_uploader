@@ -73,7 +73,7 @@ BEDEN_BEYIN_FILES = {
     "video_67.mp4", "video_72.mp4", "video_77.mp4",
     "video_106.mp4", "video_107.mp4", "video_108.mp4", "video_109.mp4", "video_110.mp4",
     "video_83.mp4", "video_91.mp4", "video_100.mp4", "video_121.mp4",
-    "video_131.mp4", "video_132.mp4", "video_133.mp4",
+    "video_131.mp4", "video_132.mp4", "video_133.mp4", "video_134.mp4", "video_135.mp4",
 }
 
 
@@ -188,7 +188,8 @@ def parse_drive_sheet(xlsx_source) -> dict[str, dict]:
         source = str(ws.cell(r, 9).value or "").strip()
 
         full_desc = desc
-        if pinned and pinned not in full_desc:
+        has_structured_chapters = ("bölümler" in full_desc.lower() or "00:00" in full_desc)
+        if pinned and pinned not in full_desc and not has_structured_chapters:
             full_desc = f"💬 {pinned}\n\n{full_desc}".strip()
         if source and "kaynak" not in full_desc.lower():
             full_desc = f"{full_desc}\n\n📚 Kaynak: {source}".strip()
