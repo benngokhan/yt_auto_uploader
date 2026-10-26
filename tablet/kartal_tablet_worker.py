@@ -709,11 +709,22 @@ HELP = """<b>🦅 Kartal AI · Tablet Kumandası</b>
 """
 
 
+def _norm(t: str) -> str:
+    """Turkce karakterleri sadelestirip kucuk harfe cevirir (menu -> menu)."""
+    t = (t or "").strip().lower()
+    for a, b in (("i", "i"), ("s", "s"), ("g", "g"), ("u", "u"), ("o", "o"), ("c", "c")):
+        t = t.replace(a, b)
+    return t.replace("ı", "i").replace("İ", "i").replace("ş", "s").replace("ğ", "g").replace("ü", "u").replace("ö", "o").replace("ç", "c")
+
+
 def handle(text: str, chat_id: str) -> None:
     raw = (text or "").strip()
     if not raw:
         return
-    low = raw.lower()
+    low = _norm(raw)
+    if low in ("menu", "/menu", "merhaba", "selam", "start", "/start", "help", "/help"):
+        say(HELP, chat_id)
+        return
 
     if low in ("/yardim", "/menu", "/start", "yardim", "menu"):
         say(HELP, chat_id)
@@ -854,7 +865,12 @@ def main() -> None:
 
     owner = os.getenv("TELEGRAM_CHAT_ID", "").strip()
     offset = state_get("tg_offset", 0)
-    print("🦅 Kartal Tablet Ajanı hazır. Telegram'dan /menu yaz.")
+    print("Kartal Tablet Ajani hazir. Telegram'dan /menu yaz.")
+    who = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+    if who:
+        say("Kartal Tablet Ajani acildi. Komutlar icin /menu yaz.", who)
+    else:
+        print("TELEGRAM_CHAT_ID yok - telefondan botuna ilk mesaji atinca kilitlenecek.")
     try:
         ensure_device()
     except Exception:
