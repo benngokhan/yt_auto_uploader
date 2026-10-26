@@ -1,0 +1,6 @@
+# Kartal tablet ajanı — gizli anahtarlar asla depoya girmez
+.env
+*.env
+shots/
+indirilenler/
+state.json
