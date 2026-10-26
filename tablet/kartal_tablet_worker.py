@@ -47,6 +47,7 @@ for d in (KARTAL_DIR, SHOTS_DIR, DOWNLOADS_DIR):
     d.mkdir(parents=True, exist_ok=True)
 
 from ses import speak, chat_turn, listen_once, tts_available, reply_brain, gemini_call
+from paylas2 import download, galeriye_kopyala, paylas, ac_uygulama, PAKETLER
 
 # Termux'ta pkg ile kurulan araçlar PATH'te olmayabilir — kendimiz ekliyoruz
 for _p in ("/data/data/com.termux/files/usr/bin", "/system/bin", "/system/xbin"):
@@ -689,12 +690,15 @@ HELP = """<b>🦅 Kartal AI · Tablet Kumandası</b>
   örn: <i>/gorev Instagram'ı aç ve keşfet akışına geç</i>
 
 <b>Kanal işleri</b>
+/yukle &lt;link&gt; tiktok — indir, galeriye at, paylaşım menüsünü aç
+/yukle &lt;link&gt; studio — YouTube Studio'da aç
 /paylas &lt;dosya ya da https://...&gt; — paylaşım menüsü
 /paylas &lt;link&gt; Instagram — menüden Instagram'ı da seçer
 /studio &lt;VIDEO_ID&gt; — YouTube Studio'da videoyu açar
 
 <b>Ses</b>
 /konus &lt;metin&gt; — tableti konuştur
+/sus — sesli cevapları kapat · /sesac — aç
 /dinle — 6 sn dinle, yazıya çevir
 /sohbet — dinle → cevapla → konuş
 
@@ -916,6 +920,44 @@ def handle(text: str, chat_id: str) -> None:
     if low in ("/bak", "/kontrol"):
         say(health_report(), chat_id)
         return
+    if low.startswith("/yukle"):
+        arg = raw[6:].strip()
+        if not arg:
+            say("Kullanım:\n<code>/yukle https://.../video_132.mp4 tiktok</code>\n"
+                "Hedefler: youtube · studio · tiktok · instagram", chat_id)
+            return
+        parts = arg.split()
+        url = parts[0]
+        hedef = (parts[1].lower() if len(parts) > 1 else "tiktok")
+
+        def _is():
+            say(f"⬇️ İndiriliyor…\n<code>{url[:80]}</code>", chat_id)
+            dosya = download(url)
+            if not dosya:
+                say("❌ İndirilemedi. Link herkese açık mı? (Drive'da 'bağlantıya sahip olan herkes' olmalı)", chat_id)
+                return
+            say(f"✅ İndi: {dosya.name} ({dosya.stat().st_size // (1024*1024)} MB)", chat_id)
+            g = galeriye_kopyala(dosya)
+            say("📂 Galeriye kaydedildi, paylaşım menüsü açılıyor…", chat_id)
+            sonuc = paylas(g)
+            durum, det = sonuc.split("|", 1)
+            if durum != "OK":
+                say(f"❌ Paylaşım açılamadı: {det[:200]}", chat_id)
+                return
+            time.sleep(2.5)
+            if hedef in PAKETLER:
+                ac_uygulama(PAKETLER[hedef])
+                time.sleep(2)
+            try:
+                shot = screenshot(f"paylas_{hedef}")
+                send_photo(shot, f"📲 {hedef} ekranı — gönder'i sen onayla", chat_id)
+            except Exception:
+                pass
+            say("👆 Ekranda uygulamayı seç, videoyu onayla ve 'Paylaş'a bas.\n"
+                "Tek dokunuş senin, gerisi otomatik.", chat_id)
+
+        threading.Thread(target=_is, daemon=True).start()
+        return
     if low in ("/baglan", "/reconnect"):
         say("🔄 Bağlantı yeniden kuruluyor… bitince yazacağım.", chat_id)
 
@@ -1053,6 +1095,14 @@ def handle(text: str, chat_id: str) -> None:
         else:
             say("✅ Anahtar kaydedildi ve ÇALIŞIYOR.\nArtık /dinle ve görüntü görevleri aktif.", chat_id)
         return
+    if low in ("/sus", "/sessiz"):
+        state_set("tts_muted", True)
+        say("🔇 Sesli cevaplar kapatıldı. Açmak için /sesac", chat_id)
+        return
+    if low in ("/sesac", "/sessizac"):
+        state_set("tts_muted", False)
+        say("🔊 Sesli cevaplar açıldı.", chat_id)
+        return
     if low in ("/motor", "/tts"):
         out = termux_cmd("termux-tts-engines", timeout=30)
         say("Tabletteki TTS motorlari:\n" + (out or "(bos)")[:1200], chat_id)
@@ -1080,10 +1130,11 @@ def handle(text: str, chat_id: str) -> None:
         say("❓ Bu komutu tanımadım.\n\n" + HELP, chat_id)
         return
 
-    # Düz metin → sesli asistan cevabı + tablet konuşur
+    # Düz metin → asistan cevabı (+ ses, susturulmadıysa)
     ans = reply_brain(raw)
     say(ans, chat_id)
-    say(speak(ans), chat_id)
+    if not state_get("tts_muted", False):
+        say(speak(ans), chat_id)
 
 
 # --------------------------------------------------------------------------
