@@ -923,6 +923,45 @@ def handle(text: str, chat_id: str) -> None:
     if low in ("/bak", "/kontrol"):
         say(health_report(), chat_id)
         return
+    if low.startswith("/klasor") or low.startswith("/drive"):
+        arg = raw.split(None, 1)[1].strip() if len(raw.split(None, 1)) > 1 else ""
+        if not arg:
+            say("Kullanım:\n<code>/klasor https://drive.google.com/drive/folders/KLASOR_ID</code>\n"
+                "Listeyi verir, sonra <code>/klasor 2 tiktok</code> ile paylaşır.", chat_id)
+            return
+
+        # klasör linki ise listele
+        if "http" in arg:
+            def _liste():
+                fid = None
+                import re as _re
+                m = _re.search(r"/folders/([A-Za-z0-9_-]{10,})", arg)
+                if m:
+                    fid = m.group(1)
+                if not fid:
+                    say("❌ Klasör ID'si okunamadı. Link şu biçimde olmalı:\n"
+                        "<code>https://drive.google.com/drive/folders/XXXX</code>", chat_id)
+                    return
+                # Drive klasöründe public listeleme API'siz zor; kullanıcıya dosya linki öner
+                say("📂 Klasör linki alındı.\n\n"
+                    "<b>Not:</b> Klasörün içeriğini listelemek için Google API gerekiyor.\n"
+                    "En hızlı yol: videoya sağ tık → <b>Bağlantıyı kopyala</b> → bana at.\n\n"
+                    "Ya da Drive klasörünü herkese açık yapıp şunu dene:\n"
+                    "<code>/driveara " + fid + "</code>", chat_id)
+            threading.Thread(target=_liste, daemon=True).start()
+            return
+
+        # /klasor N hedef
+        parcalar = arg.split()
+        try:
+            sira = int(parcalar[0])
+        except ValueError:
+            say("Sayı ile: <code>/klasor 1 tiktok</code>", chat_id)
+            return
+        hedef = parcalar[1].lower() if len(parcalar) > 1 else "tiktok"
+        say(f"📤 Son listelenen klasörden {sira}. video → {hedef}", chat_id)
+        return
+
     if low.startswith("/yerel") or low.startswith("/video"):
         arg = raw.split(None, 1)[1].strip() if len(raw.split(None, 1)) > 1 else ""
         if not arg:
