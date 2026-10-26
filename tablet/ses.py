@@ -60,15 +60,35 @@ def speak(text: str) -> str:
         return "❌ Söylenecek metin yok."
     if not tts_available():
         return "❌ termux-tts-speak yok → pkg install termux-api (Termux:API uygulaması da gerekli)"
-    # Türkçe ses varsa kullan; yoksa cihaz varsayılanı
-    out = _run([
-        "termux-tts-speak",
-        "-l", os.getenv("TTS_LANG", "tr-TR"),
-        "-r", os.getenv("TTS_RATE", "1.0"),
-        "-p", os.getenv("TTS_PITCH", "1.0"),
-        text[:3000],
-    ])
-    return f"🔊 Konuşuyor: {text[:120]}{'…' if len(text) > 120 else ''}" if "yok" not in out else f"❌ {out}"
+    # Türkçe ses yoksa Android sessizce İngilizce okur. Sıra: tr-TR -> tr -> cihaz varsayılanı
+    langs = [os.getenv("TTS_LANG", "tr-TR").strip() or "tr-TR", "tr", ""]
+    last = ""
+    for lang in langs:
+        args = ["termux-tts-speak"]
+        if lang:
+            args += ["-l", lang]
+        args += ["-r", os.getenv("TTS_RATE", "1.0"), "-p", os.getenv("TTS_PITCH", "1.0"), text[:3000]]
+        out = _run(args)
+        last = out
+        if "yok" in out:
+            return f"❌ {out}"
+        # Android hata vermeyip yine de okur; ilk denemede bırak
+        break
+    hint = ""
+    if not tts_lang_installed():
+        hint = ("\n\n⚠️ Tablette Türkçe ses paketi YOK — İngilizce okuyor.\n"
+                "Ayarlar → Dil ve klavye → Metin okuma → Google konuşma hizmetleri\n"
+                "→ 'Dilleri yükle' → Türkçe → İndir")
+    return f"🔊 Konuşuyor: {text[:120]}{'…' if len(text) > 120 else ''}{hint}"
+
+
+def tts_lang_installed() -> bool:
+    """Türkçe TTS ses paketi kurulu mu? (termux-tts-engines ile kontrol edilir)"""
+    out = _run(["termux-tts-engines"], timeout=25)
+    low = (out or "").lower()
+    if "yok" in low:
+        return False
+    return "tr" in low and ("tur" in low or "türk" in low or "tr-tr" in low or "tr_tr" in low)
 
 
 def record(seconds: int = 6) -> Path | None:
