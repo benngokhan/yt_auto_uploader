@@ -121,3 +121,64 @@ PAKETLER = {
     "tiktok": "com.zhiliaoapp.musically",
     "instagram": "com.instagram.android",
 }
+
+
+# ---------------------------------------------------------------------------
+# Yerel videolar: tablette zaten olan dosyalar (galeri/indirilenler)
+# ---------------------------------------------------------------------------
+ARAMA_YERLERI = [
+    "/sdcard/Download",
+    "/sdcard/Downloads",
+    "/sdcard/Movies",
+    "/sdcard/DCIM/Camera",
+    "/sdcard/DCIM",
+    "/sdcard/WhatsApp/Media/WhatsApp Video",
+    "/sdcard/Telegram",
+    "/sdcard/Video",
+]
+UZANTI = (".mp4", ".mkv", ".mov", ".webm", ".m4v", ".3gp")
+
+
+def yerel_videolar(limit: int = 40) -> list[Path]:
+    """Tablet hafizasindaki videolari bulur (yeni -> eski)."""
+    bulunan: list[Path] = []
+    for yer in ARAMA_YERLERI:
+        kok = Path(yer)
+        if not kok.exists():
+            continue
+        try:
+            for f in kok.rglob("*"):
+                try:
+                    if f.is_file() and f.suffix.lower() in UZANTI and f.stat().st_size > 200_000:
+                        bulunan.append(f)
+                except Exception:
+                    continue
+        except Exception:
+            continue
+        if len(bulunan) >= limit * 4:
+            break
+    bulunan.sort(key=lambda f: f.stat().st_mtime, reverse=True)
+    # tekrarlari at
+    gorulen, tekil = set(), []
+    for f in bulunan:
+        if f.name in gorulen:
+            continue
+        gorulen.add(f.name)
+        tekil.append(f)
+    return tekil[:limit]
+
+
+def yerel_sec(sira: int) -> Path | None:
+    liste = yerel_videolar()
+    if not liste:
+        return None
+    if 1 <= sira <= len(liste):
+        return liste[sira - 1]
+    return None
+
+
+def boyut_mb(p: Path) -> float:
+    try:
+        return round(p.stat().st_size / (1024 * 1024), 1)
+    except Exception:
+        return 0.0

@@ -47,7 +47,8 @@ for d in (KARTAL_DIR, SHOTS_DIR, DOWNLOADS_DIR):
     d.mkdir(parents=True, exist_ok=True)
 
 from ses import speak, chat_turn, listen_once, tts_available, reply_brain, gemini_call
-from paylas2 import download as indir_video, galeriye_kopyala, paylas, ac_uygulama, PAKETLER
+from paylas2 import (download as indir_video, galeriye_kopyala, paylas, ac_uygulama, PAKETLER,
+                     yerel_videolar, yerel_sec, boyut_mb)
 
 # Termux'ta pkg ile kurulan araçlar PATH'te olmayabilir — kendimiz ekliyoruz
 for _p in ("/data/data/com.termux/files/usr/bin", "/system/bin", "/system/xbin"):
@@ -690,6 +691,8 @@ HELP = """<b>🦅 Kartal AI · Tablet Kumandası</b>
   örn: <i>/gorev Instagram'ı aç ve keşfet akışına geç</i>
 
 <b>Kanal işleri</b>
+/yerel — tabletteki videoları listele
+/yerel 1 tiktok — 1. videoyu TikTok'a hazırla
 /yukle &lt;link&gt; tiktok — indir, galeriye at, paylaşım menüsünü aç
 /yukle &lt;link&gt; studio — YouTube Studio'da aç
 /paylas &lt;dosya ya da https://...&gt; — paylaşım menüsü
@@ -919,6 +922,55 @@ def handle(text: str, chat_id: str) -> None:
         return
     if low in ("/bak", "/kontrol"):
         say(health_report(), chat_id)
+        return
+    if low.startswith("/yerel") or low.startswith("/video"):
+        arg = raw.split(None, 1)[1].strip() if len(raw.split(None, 1)) > 1 else ""
+        if not arg:
+            def _liste():
+                vids = yerel_videolar(25)
+                if not vids:
+                    say("📭 Tablet hafızasında video bulunamadı.\n"
+                        "Beklenen yerler: Download · Movies · DCIM · WhatsApp", chat_id)
+                    return
+                satirlar = ["<b>🎬 Tablet Hafızasındaki Videolar</b>", ""]
+                for i, v in enumerate(vids, 1):
+                    satirlar.append(f"<b>{i}.</b> {v.name} — {boyut_mb(v)} MB")
+                satirlar += ["", "Paylaşmak için:", "<code>/yerel 1 tiktok</code>",
+                             "<code>/yerel 2 instagram</code>", "<code>/yerel 3 studio</code>"]
+                say("\n".join(satirlar), chat_id)
+            threading.Thread(target=_liste, daemon=True).start()
+            return
+
+        parcalar = arg.split()
+        try:
+            sira = int(parcalar[0])
+        except ValueError:
+            say("Sayı ile seç kanka: <code>/yerel 1 tiktok</code>", chat_id)
+            return
+        hedef = parcalar[1].lower() if len(parcalar) > 1 else "tiktok"
+
+        def _paylas():
+            v = yerel_sec(sira)
+            if not v:
+                say(f"❌ {sira}. video bulunamadı. /yerel ile listeye bak.", chat_id)
+                return
+            say(f"📤 Paylaşılıyor: <code>{v.name}</code> ({boyut_mb(v)} MB) → {hedef}", chat_id)
+            g = galeriye_kopyala(v)
+            durum, det = paylas(g).split("|", 1)
+            if durum != "OK":
+                say(f"❌ Paylaşım açılamadı: {det[:200]}", chat_id)
+                return
+            time.sleep(2.5)
+            if hedef in PAKETLER:
+                ac_uygulama(PAKETLER[hedef])
+                time.sleep(2)
+            try:
+                send_photo(screenshot(f"yerel_{hedef}"), f"📲 {hedef} ekranı", chat_id)
+            except Exception:
+                pass
+            say("👆 Uygulamayı seç, videoyu onayla, 'Paylaş'a bas.", chat_id)
+
+        threading.Thread(target=_paylas, daemon=True).start()
         return
     if low.startswith("/yukle"):
         arg = raw[6:].strip()
