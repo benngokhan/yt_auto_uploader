@@ -21,6 +21,12 @@ Konu listesi tek dosyada: ilk iş olarak şunu çek ve kendi BANT bölümünü u
 - Her video voice04 klonuyla seslendirilir. Alternatif ses aramak/seçmek YASAK.
 - Soru sorma: "ses değişsin mi" diye hiçbir zaman sorma.
 
+## SES QA (üretime başlamadan ÖNCE tek sefer)
+- Her band oturumu, üretime geçmeden önce 5 saniyelik TEST SESİ üretir: "Bu bir Bilgi Dozu ses testidir."
+- Test, Drive'daki `ornek_ses_voice04.mp3` referansıyla TONU aynı olmalı. Benzeşmiyorsa (robotik/düz TTS çıkıyorsa):
+  **ÜRETİM BAŞLAMAZ.** Rapora yaz: "SES_KLON_HATASI — klonlama aracım voice04'ü üretemiyor." ve dur.
+- Robotik sesle video üreten = hurda üreten. HAZIR yazılmaz, YENILE işaretlenir.
+
 ## ÜRETİM KURALLARI
 1. Dosya adı: `video_N.mp4` (N = şeridindeki sıradaki boş numara) veya `uzun_video_N.mp4`.
 2. Shorts: karaoke altyazı ZORUNLU (kelime kelime yanar).
