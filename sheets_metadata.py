@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 
 DEFAULT_DRIVE_FOLDER_ID = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"  # KartaL Stok (27.10 karar: TEK kuyruk klasörü — eski YENI_SERI_ONAYLI_STOK buraya taşındı)
 DEFAULT_SHEETS_ID = ""
-MIN_SHORTS_NUMBER = 131  # Eski stok (video_1..130) silinmeden askıda; yalnız yeni onaylı seri (131+) sürüme girer
+MIN_SHORTS_NUMBER = 47   # CEO kararı 28.10: video_47+ kullanılabilir; 1..46 arşivde (zaten yayınlanmış)
 MIN_LONG_NUMBER = 101    # Eski uzun_video_1..100 silinmeden askıda; yalnız yeni onaylı uzun seri (101+) sürüme girer
 
 CATEGORY_MAP = {
