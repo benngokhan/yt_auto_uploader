@@ -474,7 +474,12 @@ def upload_thumbnail_if_exists(youtube, drive, folder_id: str, video_file_name: 
             download_drive_file(drive, target_id, tpath)
             media = MediaFileUpload(str(tpath), mimetype="image/png" if suffix == ".png" else "image/jpeg")
             youtube.thumbnails().set(videoId=video_id, media_body=media).execute()
-            log.info(f"  Özel kapak başarıyla giydirildi: {target_name}")
+            # Shorts'ta platform API kapağını sergilemez (Data API sınırlaması; görsel = video karesi).
+            # Uzun videoda gerçekten sergilenir. Log dürüst olsun (EMIR 025d).
+            if video_file_name.lower().startswith("video_"):
+                log.info(f"  Kapak API'ye gönderildi: {target_name} (NOT: Shorts'ta YouTube bunu sergilemez — kanal görseli video karesidir)")
+            else:
+                log.info(f"  Özel kapak başarıyla giydirildi: {target_name}")
             return True
         finally:
             if tpath.exists():
