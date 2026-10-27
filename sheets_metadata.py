@@ -231,6 +231,7 @@ def parse_drive_sheet(xlsx_source) -> dict[str, dict]:
             "source": source,
             "youtube_url": yt_url,
             "has_youtube_link": has_yt_link,
+            "uploaded_at": str(ws.cell(r, 11).value or "").strip(),
             "column_group": col_group,
             "is_long": is_long_filename(fname),
             "has_title": has_title,

@@ -432,11 +432,12 @@ def upload_thumbnail_if_exists(youtube, drive, folder_id: str, video_file_name: 
     import re
     m_short = re.match(r"^video_(\d+)\.mp4$", video_file_name, re.I)
     m_long = re.match(r"^uzun_video_(\d+)\.mp4$", video_file_name, re.I)
-    candidates = []
     if m_short:
-        num = m_short.group(1)
-        candidates = [f"kapak_{num}.png", f"kapak_{num}.jpg"]
-    elif m_long:
+        # Shorts'ta platform API kapağını sergilemiyor (Data API sınırlaması) -> 50 unit kota boşa gitmesin
+        log.info("  Kapak adımı atlandı: Shorts'ta YouTube API kapağını sergilemiyor (görsel = video karesi)")
+        return False
+    candidates = []
+    if m_long:
         num = m_long.group(1)
         candidates = [f"uzun_kapak_{num}.png", f"kapak_uzun_{num}.png", f"kapak_{num}.png"]
     if not candidates:
@@ -474,12 +475,7 @@ def upload_thumbnail_if_exists(youtube, drive, folder_id: str, video_file_name: 
             download_drive_file(drive, target_id, tpath)
             media = MediaFileUpload(str(tpath), mimetype="image/png" if suffix == ".png" else "image/jpeg")
             youtube.thumbnails().set(videoId=video_id, media_body=media).execute()
-            # Shorts'ta platform API kapağını sergilemez (Data API sınırlaması; görsel = video karesi).
-            # Uzun videoda gerçekten sergilenir. Log dürüst olsun (EMIR 025d).
-            if video_file_name.lower().startswith("video_"):
-                log.info(f"  Kapak API'ye gönderildi: {target_name} (NOT: Shorts'ta YouTube bunu sergilemez — kanal görseli video karesidir)")
-            else:
-                log.info(f"  Özel kapak başarıyla giydirildi: {target_name}")
+            log.info(f"  Özel kapak başarıyla giydirildi: {target_name} (uzun video)")
             return True
         finally:
             if tpath.exists():
@@ -550,11 +546,33 @@ def backlink_previous_episode(
     if not m:
         return info
     cur_num = int(m.group(1))
-    if cur_num <= 131:
-        return info
 
-    prev_file = f"video_{cur_num - 1}.mp4"
+    # EMIR 026: RASTGELE SEÇİM DÖNEMİ — zincir hedefi "numara-1" değil:
+    # aynı konunun (kategori) en son YAYINLANMIŞ videosu. Eşleşme yoksa: genel en son yayın.
+    all_recs = {}
+    try:
+        all_recs = load_table_from_drive_or_local(drive, queue_folder)
+    except Exception:
+        all_recs = {}
+    cur_cat = (all_recs.get((current_file or "").strip(), {}).get("category_name") or "").strip().lower()
+    cur_key = (current_file or "").strip().lower()
+    pub_pool = [
+        (fn, rec) for fn, rec in all_recs.items()
+        if rec.get("has_youtube_link") and rec.get("youtube_url")
+        and not rec.get("is_long") and fn.lower() != cur_key
+    ]
+    if not pub_pool:
+        log.info("  Zincir geri-bağlantı: yayında başka video yok, zincir atlandı.")
+        return info
+    same_topic = [
+        (fn, rec) for fn, rec in pub_pool
+        if cur_cat and (rec.get("category_name") or "").strip().lower() == cur_cat
+    ]
+    target = same_topic or pub_pool
+    target.sort(key=lambda x: (str(x[1].get("uploaded_at") or ""), x[1].get("row") or 0), reverse=True)
+    prev_file = target[0][0]
     info["prev_file"] = prev_file
+    info["chain_mode"] = "konu" if same_topic else "genel"
     prev_vid_id = ""
 
     # 1) uploaded.txt üzerinden önceki bölümün video ID'sini ara
@@ -570,13 +588,8 @@ def backlink_previous_episode(
                     break
 
     # 2) Drive / yerel tablo üzerinden yedek arama
-    all_recs = {}
-    try:
-        all_recs = load_table_from_drive_or_local(drive, queue_folder)
-        if not prev_vid_id and prev_file in all_recs:
-            prev_vid_id = _extract_yt_vid_id(all_recs[prev_file].get("youtube_url", ""))
-    except Exception:
-        pass
+    if not prev_vid_id and prev_file in all_recs:
+        prev_vid_id = _extract_yt_vid_id(all_recs[prev_file].get("youtube_url", ""))
 
     # 3) Kanalın son yüklemeleri üzerinden başlık eşleşmesiyle yedek arama
     if not prev_vid_id and prev_file in all_recs:
