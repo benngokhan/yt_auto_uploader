@@ -43,7 +43,9 @@ from sheets_metadata import (
     DEFAULT_SHEETS_ID,
     decide_prime_time_video_type,
     get_next_scheduled_video,
+    iscilers_heartbeat,
     load_table_from_drive_or_local,
+    log_uyari_drive,
     sanitize_title,
     update_excel_status_in_drive,
 )
@@ -1263,6 +1265,11 @@ def upload_job(
 
     youtube, drive = get_google_clients(token_file=token_file)
     drain_lobi_to_queue(drive, queue_folder)
+    # EMİR 024: İŞÇİLER canlı tick — her cron çalışmasında tabloya yazılır
+    try:
+        iscilers_heartbeat(drive, queue_folder)
+    except Exception as _hb_err:
+        log.warning(f"İŞÇİLER heartbeat atlandı (zararsız): {_hb_err}")
     skip_ids = load_uploaded_ids(list_path)
     log.info(f"Atlanan/Tamamlanan kayıt sayısı: {len(skip_ids)} (+ video_1..30 kilidi)")
 
@@ -1291,6 +1298,10 @@ def upload_job(
     )
     if not scheduled:
         log.info("Kuyrukta yüklenecek yeni video bulunamadı.")
+        try:
+            log_uyari_drive(drive, queue_folder, "STOK", "Bu slot için video bulunamadı — kuyruk boş (STOK BİTTİ) veya tür/sütun uyuşması yok")
+        except Exception:
+            pass
         return None
 
     file_id = scheduled["id"]
@@ -1358,6 +1369,10 @@ def upload_job(
         except Exception as up_err:
             if "quotaExceeded" in str(up_err):
                 log.warning(f"KOTA KORUMASI: Günlük 10.000 YouTube API kotası dolu ({file_name} kuyrukta korundu, bir sonraki slotta yüklenecek).")
+                try:
+                    log_uyari_drive(drive, queue_folder, "KOTA", f"{file_name}: YouTube API kotası doldu — sonraki slotta otomatik denenir")
+                except Exception:
+                    pass
                 REPORT_FILE.write_text(
                     "⏳ <b>Bilgi Dozu — Kota Sıfırlaması Bekleniyor</b>\n\n"
                     f"📦 <b>Sıradaki Bölüm:</b> <code>{file_name}</code> (Kuyrukta korundu)\n"
@@ -1595,6 +1610,17 @@ if __name__ == "__main__":
     if "--dry-run" in sys.argv:
         upload_job(dry_run=True, video_type=vtype)
     elif "--now" in sys.argv:
-        upload_job(dry_run=False, video_type=vtype)
+        try:
+            upload_job(dry_run=False, video_type=vtype)
+        except Exception as _crash:
+            # EMİR 024 KURAL 8: görev çökmesi → UYARILAR sekmesine otomatik satır (sonra tekrar fırlat)
+            try:
+                _cfg = load_config()
+                _qf = _cfg.get("drive_queue_folder_id", DEFAULT_DRIVE_FOLDER_ID).strip() or DEFAULT_DRIVE_FOLDER_ID
+                _, _drive = get_google_clients(token_file=Path(_cfg["token_file"]) if _cfg.get("token_file") else None)
+                log_uyari_drive(_drive, _qf, "HATA", f"Görev çöktü: {str(_crash)[:400]}")
+            except Exception:
+                pass
+            raise
     else:
         main()

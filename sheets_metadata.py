@@ -8,6 +8,7 @@ Bilgi Dozu (@bilgidozuofficial) — Google Drive & Excel (DRIVE Sekmesi) Metadat
 import io
 import logging
 import os
+import random
 import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -23,7 +24,7 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
-DEFAULT_DRIVE_FOLDER_ID = "1GOsIP3xZWV5jjeKZulEkUjyIzc_jFNZ6"  # YENI_SERI_ONAYLI_STOK (eski KartaL Stok 1w8tz_... dokunulmadan korundu)
+DEFAULT_DRIVE_FOLDER_ID = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"  # KartaL Stok (27.10 karar: TEK kuyruk klasörü — eski YENI_SERI_ONAYLI_STOK buraya taşındı)
 DEFAULT_SHEETS_ID = ""
 MIN_SHORTS_NUMBER = 131  # Eski stok (video_1..130) silinmeden askıda; yalnız yeni onaylı seri (131+) sürüme girer
 MIN_LONG_NUMBER = 101    # Eski uzun_video_1..100 silinmeden askıda; yalnız yeni onaylı uzun seri (101+) sürüme girer
@@ -259,7 +260,9 @@ def _download_workbook_bytes_from_drive(drive, folder_id: str, sheets_id: str = 
             ).execute()
             files = res.get("files", [])
             if files:
-                f = files[0]
+                # EMİR 024: ana tablo her zaman bilgidozu_yukleme_tablosu.xlsx (baslik.xlsx = arşiv, dokunulmaz)
+                preferred = [x for x in files if x.get("name") == "bilgidozu_yukleme_tablosu.xlsx"]
+                f = preferred[0] if preferred else files[0]
                 fid = f["id"]
                 mime = f.get("mimeType", "")
                 buf = io.BytesIO()
@@ -691,7 +694,105 @@ def get_next_scheduled_video(
             cands = collect_ready(want_long=False, want_col=fallback_col)
             if cands:
                 break
-    return cands[0] if cands else None
+    # EMİR 024: shorts — tablo sırası DEĞİL, hazır havuzdan RASTGELE (uzun video path'i sıralı kalır)
+    return random.choice(cands) if cands else None
+
+
+# ---------------------------------------------------------------------------
+# EMİR 024 — UYARILAR / İŞÇİLER otomatik kayıt (KURAL 8)
+# ---------------------------------------------------------------------------
+
+def _find_primary_table(drive, folder_id: str) -> Optional[str]:
+    """Kuyruk klasöründeki ana tablonun Drive ID'si (bilgidozu tablosu; yoksa baslik.xlsx)."""
+    if not drive or not folder_id:
+        return None
+    try:
+        res = drive.files().list(
+            q=f"'{folder_id}' in parents and (name = 'bilgidozu_yukleme_tablosu.xlsx' or name = 'baslik.xlsx') and trashed = false",
+            pageSize=10,
+            fields="files(id, name)",
+        ).execute()
+        files = res.get("files", [])
+        for fobj in files:
+            if fobj.get("name") == "bilgidozu_yukleme_tablosu.xlsx":
+                return fobj["id"]
+        return files[0]["id"] if files else None
+    except Exception as e:
+        log.warning(f"Ana tablo aranırken hata (zararsız): {e}")
+        return None
+
+
+def _drive_table_write(drive, table_file_id: str, writer) -> bool:
+    """Drive tablosunu indir, writer(wb) uygula, geri yaz. Hata akışı bozmaz."""
+    if not drive or MediaIoBaseDownload is None:
+        return False
+    try:
+        buf = io.BytesIO()
+        dl = MediaIoBaseDownload(buf, drive.files().get_media(fileId=table_file_id))
+        done = False
+        while not done:
+            _, done = dl.next_chunk()
+        buf.seek(0)
+        wb = openpyxl.load_workbook(buf)
+        writer(wb)
+        out_buf = io.BytesIO()
+        wb.save(out_buf)
+        wb.close()
+        out_buf.seek(0)
+        media = MediaIoBaseUpload(
+            out_buf,
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        drive.files().update(fileId=table_file_id, media_body=media).execute()
+        return True
+    except Exception as e:
+        log.warning(f"Drive tablo yazımı atlandı (akış bozulmaz): {e}")
+        return False
+
+
+def log_uyari_drive(drive, folder_id: str, kategori: str, mesaj: str) -> bool:
+    """EMİR 024 KURAL 8: her RED/hata → ana tablonun UYARILAR sekmesine otomatik satır."""
+    fid = _find_primary_table(drive, folder_id)
+    if not fid:
+        return False
+    now_str = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d %H:%M")
+
+    def writer(wb):
+        ws = wb["UYARILAR"] if "UYARILAR" in wb.sheetnames else wb.create_sheet("UYARILAR")
+        if not ws.cell(1, 1).value:
+            ws.append(["Kontrol Noktası", "Durum", "Seviye", "Son Kontrol", "Detay ve Çözüm"])
+        ws.append([kategori, "HATA", "Kırmızı", now_str, str(mesaj)[:500]])
+
+    return _drive_table_write(drive, fid, writer)
+
+
+def iscilers_heartbeat(drive, folder_id: str) -> bool:
+    """EMİR 024: her cron çalışmasında İŞÇİLER sekmesindeki tüm işçilerin 'Son Güncelleme Zamanı' canlanır."""
+    fid = _find_primary_table(drive, folder_id)
+    if not fid:
+        return False
+    now_str = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d %H:%M")
+
+    def writer(wb):
+        ws = None
+        for name in ("İŞÇİLER", "ISCILER"):
+            if name in wb.sheetnames:
+                ws = wb[name]
+                break
+        if ws is None:
+            ws = wb.create_sheet("İŞÇİLER")
+        if not ws.cell(1, 1).value:
+            ws.append(["İşçi Adı", "Durum", "Son Güncelleme Zamanı", "Son Hata Mesajı", "Kaç İş Yaptı", "Son İşlem Özeti"])
+        rows = [r for r in range(2, ws.max_row + 1) if ws.cell(r, 1).value]
+        if not rows:
+            ws.append(["Yükleyici (Drive -> YouTube)", "Çalışıyor", now_str, "", "", "EMİR 024: otomatik tick aktif"])
+            rows = [ws.max_row]
+        for r in rows:
+            if not ws.cell(r, 2).value:
+                ws.cell(r, 2).value = "Çalışıyor"
+            ws.cell(r, 3).value = now_str
+
+    return _drive_table_write(drive, fid, writer)
 
 
 def update_excel_status_in_drive(
@@ -712,6 +813,10 @@ def update_excel_status_in_drive(
         files = res.get("files", [])
         if not files:
             return False
+        # EMİR 024: yalnız ana tabloya yaz (baslik.xlsx = arşiv, dokunma)
+        primary = [x for x in files if x.get("name") == "bilgidozu_yukleme_tablosu.xlsx"]
+        if primary:
+            files = primary
         now_tr_str = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d %H:%M")
         any_ok = False
         for fobj in files:
