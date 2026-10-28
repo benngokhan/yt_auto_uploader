@@ -35,7 +35,7 @@ jobs:
       - name: Install yt-dlp + openpyxl
         run: pip install -q yt-dlp openpyxl
 
-      - name: View sayilari topla (YouTube API kotası: 0)
+      - name: "View sayilari topla (YouTube API kota 0)"
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             python stats_views.py --dry-run
