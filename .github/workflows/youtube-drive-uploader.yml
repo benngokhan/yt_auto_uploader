@@ -16,12 +16,14 @@ on:
         type: string
         default: "auto"
   schedule:
-    # Türkiye Saati (UTC+3) Strateji Masası 2 Slot Kuralı (aynı gün aynı sütun; Cuma Uzun Video):
+    # Türkiye Saati (UTC+3) 3 Slot Kuralı (29.10 karar: günde 3; Cuma 19:00 = Uzun Video):
     # 1) 19:00 TR (16:00 UTC) -> Slot 1
     - cron: "0 16 * * *"
     # 2) 20:30 TR (17:30 UTC) -> Slot 2
     - cron: "30 17 * * *"
-    # 3) 10:05 TR telafi slotu KAPATILDI (28.10, kullanicinin 2-slot karari)
+    # 3) 21:30 TR (18:30 UTC) -> Slot 3 (29.10, kullanicinin "gunde 3" karari)
+    - cron: "30 18 * * *"
+    # 4) 10:05 TR telafi slotu KAPATILDI (28.10, kullanicinin 2-slot karari)
 
 permissions:
   actions: read
