@@ -1,0 +1,138 @@
+name: Slot Watchdog
+# DEAD-MAN-SWITCH: cron sessiz kalmazsa bile Telegram'a alarm.
+# Mevcut bildirim "basilip FAIL oldu"yi yakalar; bu workflow "BASILMADI"yi yakalar.
+# GitHub cron gecikmeleri gorsel olarak 30-50 dk -> ilk kontrol slot+45dk, sonda slot+75dk.
+
+on:
+  schedule:
+    - cron: "50 7 * * *"   # 10:55 TR -> 10:05 slotunu izler
+    - cron: "45 16 * * *"  # 19:45 TR -> 19:00 slotunu izler
+    - cron: "15 18 * * *"  # 21:15 TR -> 20:30 slotunu izler
+  workflow_dispatch: {}
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout (uploaded.txt icin)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Slot run baslatildi mi?
+        id: c
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          from datetime import datetime, timezone, timedelta
+
+          schedule = os.environ.get("GITHUB_EVENT_SCHEDULE", "").strip()
+          if schedule.startswith("5 7"):
+              slot_tr, kind = "10:05", "auto"   # telafi guard'a bagli
+          elif schedule.startswith("0 16"):
+              slot_tr, kind = "19:00", "yes"
+          elif schedule.startswith("30 17"):
+              slot_tr, kind = "20:30", "yes"
+          else:
+              slot_tr, kind = "manual", "yes"
+
+          # 10:05: ana workflow'un telafi guard'inin kopyasi — dunun akşam slotlari
+          # tamamsa bu slot yasal olarak ATLANIYOR -> alarm verme.
+          if kind == "auto":
+              stamps = []
+              p = os.path.join(os.getcwd(), "uploaded.txt")
+              if os.path.exists(p):
+                  for line in open(p, encoding="utf-8"):
+                      line = line.strip()
+                      if not line or line.startswith("#"):
+                          continue
+                      parts = [x.strip() for x in line.split("|")]
+                      if len(parts) >= 4:
+                          try:
+                              stamps.append(datetime.strptime(parts[3], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc))
+                          except ValueError:
+                              pass
+              now_tr = datetime.now(timezone.utc) + timedelta(hours=3)
+              yday = (now_tr - timedelta(days=1)).date()
+              done = sum(
+                  1 for ts in stamps
+                  if (ts + timedelta(hours=3)).date() == yday and (ts + timedelta(hours=3)).hour >= 18
+              )
+              exp = 1 if yday.weekday() == 4 else 2
+              if done >= exp:
+                  print(f"10:05 slotu calismasi GEREKMEZ (dun {done}/{exp} aksam slotu tamam) -> alarm yok.")
+                  raise SystemExit(0)
+
+          def run_started(window_min: int) -> bool:
+              url = f"https://api.github.com/repos/{os.environ['REPO']}/actions/runs?per_page=20"
+              req = urllib.request.Request(url, headers={
+                  "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+                  "Accept": "application/vnd.github+json",
+              })
+              d = json.load(urllib.request.urlopen(req, timeout=30))
+              cutoff = datetime.now(timezone.utc) - timedelta(minutes=window_min)
+              for r in d.get("workflow_runs", []):
+                  if r.get("name") != "YouTube Drive Uploader" or r.get("event") != "schedule":
+                      continue
+                  try:
+                      created = datetime.fromisoformat(r["created_at"].replace("Z", "+00:00"))
+                  except Exception:
+                      continue
+                  if created >= cutoff:
+                      return True
+              return False
+
+          if run_started(55):
+              print(f"{slot_tr} slotunun run'i basladi ✓")
+              raise SystemExit(0)
+          print(f"{slot_tr} sonrasi 55 dkda run yok -> 20 dk bekleniyor (cron gecikmesi payi)...")
+          import time
+          time.sleep(1200)
+          if run_started(80):
+              print(f"{slot_tr} slotunun run'i gecikmeli de olsa basladi ✓")
+              raise SystemExit(0)
+          print(f"ALARM: {slot_tr} slotunun run'i 75 dkda baslatilamadi!")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write("alert=true\n")
+          PY
+
+      - name: Telegram alarmi
+        if: steps.c.outputs.alert == 'true'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || vars.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || vars.TELEGRAM_CHAT_ID }}
+          SCHEDULE: ${{ github.event.schedule || 'manual' }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}/actions
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+          chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+          if not token or not chat_id:
+              raise SystemExit(0)
+          sched = os.environ.get("SCHEDULE", "?").strip()
+          slot = {"5 7": "10:05", "0 16": "19:00", "30 17": "20:30"}.get(sched[:5], "slot")
+          text = (
+              "🚨 <b>SLOT ATEŞLENMEDİ</b>\n\n"
+              f"<code>{slot} TR</code> slotunun run'ı 75 dakika içinde başlatılamadı.\n"
+              "Cron takmış olabilir veya workflow devre dışı kalmış olabilir.\n\n"
+              f"Kontrol: <a href=\"{os.environ.get('REPO_URL', '')}\">Actions</a>"
+          )
+          payload = {"chat_id": chat_id, "text": text, "parse_mode": "HTML", "disable_web_page_preview": True}
+          req = urllib.request.Request(
+              f"https://api.telegram.org/bot{token}/sendMessage",
+              data=json.dumps(payload).encode("utf-8"),
+              headers={"Content-Type": "application/json; charset=utf-8"},
+              method="POST",
+          )
+          urllib.request.urlopen(req, timeout=15).read()
+          print("Alarm gonderildi.")
+          PY
