@@ -5,7 +5,7 @@ name: Goruntülenme Raporu (yt-dlp)
 
 on:
   schedule:
-    - cron: "0 6 * * *"   # 09:00 TR
+    - cron: "45 6 * * *"   # 09:45 TR (off-peak; 06:00Z tam saat atlandi)
   workflow_dispatch:
     inputs:
       dry_run:
