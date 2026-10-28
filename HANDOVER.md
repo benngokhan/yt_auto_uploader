@@ -68,7 +68,7 @@ _Tarih: 28.10.2026 · Yazan: bir önceki agent · Amaç: yeni sunucudaki agent h
 
 **Görev (öncekiyle aynı):** yazılım + GitHub tek sorumlu + fikir danışmanı. Video üretmez.
 
-**İlk okuması gerekenler (işlem gerektirmez):** bu dosya → `/home/user/google_drive/BANT_DURUM.md` (bekleyen işler listesi dosyanın sonunda) → Drive tablosunun UYARILAR sekmesi.
+**İlk okuması gerekenler (işlem gerektirmez):** bu dosya → `URETIM_SABLONU.md` (üretim + rapor şablonu, tek sohbet kuralı) → `/home/user/google_drive/BANT_DURUM.md` (bekleyen işler listesi dosyanın sonunda) → Drive tablosunun UYARILAR sekmesi.
 
 **Yapabilecekleri:**
 - 29.10 slotlarını izle (yeni sistemlerin ilk günü): 10:05/19:00/20:30 yayınlandı mı? 09:00 view raporu geldi mi? Watchdog alarmı geldi mi?
