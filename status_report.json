@@ -1,17 +1,17 @@
 {
-  "updated_at": "2026-10-28 19:37",
-  "updated_at_iso": "2026-10-28T19:37:37.624638+03:00",
+  "updated_at": "2026-10-28 21:10",
+  "updated_at_iso": "2026-10-28T21:10:12.757373+03:00",
   "overall_status": "ok",
   "overall_label": "Her şey çalışıyor",
   "summary": {
-    "total_views": 38357,
+    "total_views": 38819,
     "subscribers": 49,
-    "total_videos_published": 72,
-    "weekly_uploaded": 23,
+    "total_videos_published": 73,
+    "weekly_uploaded": 24,
     "total_comments": 34,
-    "total_likes": 246,
+    "total_likes": 241,
     "failed_jobs": 0,
-    "stock_shorts": 62,
+    "stock_shorts": 61,
     "stock_long": 10
   },
   "workers": [
@@ -20,9 +20,9 @@
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-28 19:37",
-      "jobs_done": 72,
-      "last_action": "video_100.mp4 yayınlandı (https://youtu.be/j8J7rqtyyFg)",
+      "updated_at": "2026-10-28 21:10",
+      "jobs_done": 73,
+      "last_action": "video_86.mp4 yayınlandı (https://youtu.be/Bn5vzNjsnWo)",
       "error_message": ""
     },
     {
@@ -30,8 +30,8 @@
       "name": "Yorumcu ve kapak işçisi",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-28 19:37",
-      "jobs_done": 72,
+      "updated_at": "2026-10-28 21:10",
+      "jobs_done": 73,
       "last_action": "OAuth (youtube.force-ssl) aktif · İlk yorum otomatik yazılır",
       "error_message": ""
     },
@@ -40,7 +40,7 @@
       "name": "Analitik çekici (YouTube API)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-28 19:37",
+      "updated_at": "2026-10-28 21:10",
       "jobs_done": 30,
       "last_action": "30 videonun gerçek görüntülenme ve yorum verisi güncellendi",
       "error_message": ""
@@ -50,8 +50,8 @@
       "name": "Telegram bildirim işçisi",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-28 19:37",
-      "jobs_done": 72,
+      "updated_at": "2026-10-28 21:10",
+      "jobs_done": 73,
       "last_action": "Yayın kartı ve sabit yorum metni gönderildi",
       "error_message": ""
     }
@@ -62,7 +62,7 @@
       "title": "YouTube API günlük kotası",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-28 19:37",
+      "updated_at": "2026-10-28 21:10",
       "detail": "Günlük 10.000 birim kotası aktif ve yeterli."
     },
     {
@@ -70,19 +70,28 @@
       "title": "Google Drive ve Sheets bağlantısı",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-28 19:37",
-      "detail": "Drive klasörü ve 3 sekmeli yükleme tablosu canlı bağlı (Stok: 62 Shorts, 10 Uzun)."
+      "updated_at": "2026-10-28 21:10",
+      "detail": "Drive klasörü ve 3 sekmeli yükleme tablosu canlı bağlı (Stok: 61 Shorts, 10 Uzun)."
     },
     {
       "id": "comment_worker",
       "title": "Yorum ve kapak işçisi yetkisi",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-28 19:37",
+      "updated_at": "2026-10-28 21:10",
       "detail": "youtube.force-ssl yetkisi aktif."
     }
   ],
   "videos": [
+    {
+      "id": "j8J7rqtyyFg",
+      "url": "https://youtu.be/j8J7rqtyyFg",
+      "title": "Utandığında Neden Sadece Yüzün ve Kulakların Kızarır? 😳 #bilgidozu #shorts",
+      "publishedAt": "2026-10-28T16:37:53Z",
+      "views": 0,
+      "likes": 0,
+      "comments": 1
+    },
     {
       "id": "0vGKrBpJh0Q",
       "url": "https://youtu.be/0vGKrBpJh0Q",
@@ -97,7 +106,7 @@
       "url": "https://youtu.be/7DG1etjQlR4",
       "title": "Voynich El Yazması: 600 Yıldır Kimsenin Okuyamadığı Şifreli Kitap! 📜 #bilgidozu #shorts",
       "publishedAt": "2026-10-28T07:58:42Z",
-      "views": 40,
+      "views": 48,
       "likes": 1,
       "comments": 1
     },
@@ -106,7 +115,7 @@
       "url": "https://youtu.be/LGXmOwTtGOw",
       "title": "Güneşe Dönünce Hapşırıyor musun? Bu Bir Refleks: ACHOO! ☀️🤧 #bilgidozu #shorts",
       "publishedAt": "2026-10-27T22:00:54Z",
-      "views": 66,
+      "views": 65,
       "likes": 2,
       "comments": 1
     },
@@ -115,7 +124,7 @@
       "url": "https://youtu.be/zynVVf8GQTw",
       "title": "Bir Esnedin, Etraf da Esnedi! Esnemenin Bulaşma Sırrı 😮🧠 #bilgidozu #shorts",
       "publishedAt": "2026-10-27T20:09:45Z",
-      "views": 34,
+      "views": 44,
       "likes": 1,
       "comments": 1
     },
@@ -124,7 +133,7 @@
       "url": "https://youtu.be/obPceKVDg3k",
       "title": "Göz Kapağın Neden Kendi Kendine Seğirir? Anlamı Bu! 👁🧠 #bilgidozu #shorts",
       "publishedAt": "2026-10-27T16:34:24Z",
-      "views": 183,
+      "views": 196,
       "likes": 2,
       "comments": 1
     },
@@ -133,7 +142,7 @@
       "url": "https://youtu.be/8HI5KUWLQuM",
       "title": "Baldır Kasların Aslında İkinci Kalbin! Kanı Kalbe Nasıl Taşıyor? 🦵💪 #bilgidozu #shorts",
       "publishedAt": "2026-10-27T07:48:17Z",
-      "views": 640,
+      "views": 642,
       "likes": 4,
       "comments": 1
     },
@@ -142,7 +151,7 @@
       "url": "https://youtu.be/MOxaXPkS0zw",
       "title": "Küçücük Kâğıt Kesiği Neden Bu Kadar Çok Acıtır? 🩹⚡ #bilgidozu #shorts",
       "publishedAt": "2026-10-26T16:37:10Z",
-      "views": 674,
+      "views": 665,
       "likes": 9,
       "comments": 1
     },
@@ -305,7 +314,7 @@
       "title": "Dünyanın En Yaşlı Canlısı Bir Hayvan Değil, 80.000 Yaşındaki Bu Orman! 🌲⚡ #bilgidozu #shorts",
       "publishedAt": "2026-10-21T08:47:12Z",
       "views": 1168,
-      "likes": 19,
+      "likes": 18,
       "comments": 1
     },
     {
@@ -340,17 +349,8 @@
       "url": "https://youtu.be/znBAuA2MY3Y",
       "title": "Dünyadaki Tüm Karıncalar İnsanlardan Daha Ağır Çekiyor! 🐜⚖️ #bilgidozu #shorts",
       "publishedAt": "2026-10-20T12:01:45Z",
-      "views": 1109,
+      "views": 1111,
       "likes": 18,
-      "comments": 1
-    },
-    {
-      "id": "kZ41nV2oLi0",
-      "url": "https://youtu.be/kZ41nV2oLi0",
-      "title": "Bal Arıları Sıfır Kavramını ve Matematiği Anlayabiliyor! 🐝🔢 #bilgidozu #shorts",
-      "publishedAt": "2026-10-20T10:22:07Z",
-      "views": 949,
-      "likes": 4,
       "comments": 1
     }
   ]
