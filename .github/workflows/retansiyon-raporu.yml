@@ -1,0 +1,42 @@
+name: Retansiyon Raporu (Analytics API)
+# Her gün 11:30 TR (08:30 UTC): son 30 günün ortalama izlenme süresi + % izlenen'i tabloya.
+# 09:00 TR view raporu (yt-dlp) sonrasında çalışır; commit + push ile tablo,
+# ana uploader'ın push run'ında Drive'a sync'lenir (mevcut ikili senkron kuralı).
+# YouTube API kotası: 0 (Analytics API ayrı havuz, sadece readonly okuma).
+
+on:
+  schedule:
+    - cron: "30 8 * * *"   # 11:30 TR
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rapor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Kurulum
+        run: pip install -q openpyxl
+
+      - name: Retansiyon verisini tabloya yaz
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_ANALYTICS_REFRESH_TOKEN: ${{ secrets.YT_ANALYTICS_REFRESH_TOKEN }}
+        run: python3 retansiyon_raporu.py
+
+      - name: Tabloyu commit + push (Drive sync sonraki ana run'da)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bilgidozu_yukleme_tablosu.xlsx stats_retansiyon.json
+          git diff --cached --quiet || git commit -m "chore: retansiyon raporu (Analytics API)"
+          git push

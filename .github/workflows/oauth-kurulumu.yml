@@ -1,0 +1,53 @@
+name: OAuth Kurulumu (tek seferlik)
+# YouTube Analytics OAuth: Google consent'ten alinan ?code= kodu bu run'a girilir,
+# kod -> refresh token takasi yapilir, Analytics API testi calisir,
+# tum gizliler (client id/secret + refresh token) repo secret'ina SIFRELI yazilir.
+# Tekrar calistirilirse: eski refresh token korunur, kimlikler tazelenir.
+
+on:
+  workflow_dispatch:
+    inputs:
+      kod:
+        description: "Panel sayfasindaki ?code= degeri (10 dk gecerli)"
+        required: true
+        type: string
+      client_id:
+        description: "OAuth Client ID (Google Cloud Console)"
+        required: true
+        type: string
+      client_secret:
+        description: "OAuth Client Secret (Google Cloud Console)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  kurulum:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log'larda maskele
+        run: |
+          echo "::add-mask::${{ inputs.client_secret }}"
+          echo "::add-mask::${{ inputs.kod }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Kurulum (kriptografi)
+        run: pip install -q cryptography
+
+      - name: Kod -> refresh token + secret'lari kaydet
+        env:
+          KOD: ${{ inputs.kod }}
+          YT_CLIENT_ID: ${{ inputs.client_id }}
+          YT_CLIENT_SECRET: ${{ inputs.client_secret }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: python3 oauth_kurulumu.py
