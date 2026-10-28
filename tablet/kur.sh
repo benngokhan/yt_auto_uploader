@@ -24,19 +24,18 @@ ok "python + adb + termux-api hazır"
 termux-wake-lock 2>/dev/null && ok "Uyandırma kilidi alındı (ajan arka planda çalışır)" || info "termux-wake-lock yok (Termux:API uygulaması kurulunca aktif olur)"
 
 # 3) Ajanı indir (depo herkese açık, şifre gerekmez)
+# ÖNEMLİ: worker + ses.py + paylas2.py + bekci.py BİRLİKTE kopyalanmalı,
+# yoksa worker import hatasıyla açılır.
 info "Kartal Ajanı indiriliyor…"
-if [ -f "$KARTAL_DIR/kartal_tablet_worker.py" ]; then
-  ok "Ajan zaten var, korunuyor"
+if command -v git >/dev/null 2>&1; then
+  TMP="$HOME/.kartal_repo"
+  rm -rf "$TMP"
+  git clone --depth 1 https://github.com/benngokhan/yt_auto_uploader.git "$TMP" >/dev/null 2>&1
+  cp -f "$TMP/tablet/"*.py "$KARTAL_DIR/" && ok "Ajan dosyaları kopyalandı (worker + ses + paylas + bekci)" || err "Kopyalanamadı"
+  cp -f "$TMP/tablet/"*.sh "$KARTAL_DIR/" 2>/dev/null || true
+  rm -rf "$TMP"
 else
-  if command -v git >/dev/null 2>&1; then
-    TMP="$HOME/.kartal_repo"
-    rm -rf "$TMP"
-    git clone --depth 1 https://github.com/benngokhan/yt_auto_uploader.git "$TMP" >/dev/null 2>&1
-    cp "$TMP/tablet/kartal_tablet_worker.py" "$KARTAL_DIR/" && ok "Ajan kopyalandı" || err "Kopyalanamadı"
-    rm -rf "$TMP"
-  else
-    err "git yok. 'pkg install git' çalıştır."
-  fi
+  err "git yok. 'pkg install git' çalıştır."
 fi
 
 # 4) Telegram bot anahtarı
@@ -88,18 +87,32 @@ if [ -n "$TGT" ]; then
   ok "Bağlantı denendi (yukarıda 'device' yazmalı)"
 fi
 
-# 6) Başlatma kısayolu
+# 6) Başlatma kısayolu (worker + bekçi, arka plan)
 cat > "$KARTAL_DIR/baslat.sh" <<'EOS'
 #!/data/data/com.termux/files/usr/bin/bash
+# KartaL Tablet Ajanı — başlat: worker + bekçi (arka planda)
+KARTAL="$HOME/kartal_tablet"
+mkdir -p "$KARTAL/log"
 termux-wake-lock 2>/dev/null || true
-cd "$HOME/kartal_tablet"
+pkill -f kartal_tablet_worker.py 2>/dev/null || true
+pkill -f "bekci.py" 2>/dev/null || true
+sleep 1
 if ! adb devices 2>/dev/null | grep -q "	device"; then
-  # Önce kayıtlı hedefe, olmazsa mDNS otomatik keşfe
-  TGT=$(grep '^ADB_TARGET=' .env 2>/dev/null | cut -d= -f2-)
+  TGT=$(grep '^ADB_TARGET=' "$KARTAL/.env" 2>/dev/null | cut -d= -f2-)
   [ -n "$TGT" ] && adb connect "$TGT" >/dev/null 2>&1
-  adb devices 2>/dev/null | grep -q "	device" || bash "$HOME/kartal_tablet/adbbaglan.sh" >/dev/null 2>&1
+  adb devices 2>/dev/null | grep -q "	device" || bash "$KARTAL/adbbaglan.sh" >/dev/null 2>&1 || true
 fi
-exec python kartal_tablet_worker.py
+cd "$KARTAL"
+nohup python kartal_tablet_worker.py >> "$KARTAL/log/ajan.log" 2>&1 &
+nohup python bekci.py >> "$KARTAL/log/bekci.log" 2>&1 &
+sleep 3
+if pgrep -f kartal_tablet_worker.py >/dev/null; then
+  echo "🦅 Kartal Tablet Ajanı ayakta (worker + bekçi)"
+  echo "   Telefona /menu yaz. Sesli mesaj da işe yarar."
+else
+  echo "❌ Worker başlamadı — log sonu:"
+  tail -10 "$KARTAL/log/ajan.log" 2>/dev/null
+fi
 EOS
 chmod +x "$KARTAL_DIR/baslat.sh"
 

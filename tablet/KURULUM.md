@@ -85,7 +85,9 @@ Başarı çıktısı: `✔ Bağlandı: 10.x.x.x:41234`
 bash ~/kartal_tablet/baslat.sh
 ```
 
-Ekranda `🦅 Kartal Tablet Ajanı hazır` yazınca, **telefonundan** botuna **`/menu`** yaz.
+Ekranda `🦅 Kartal Tablet Ajanı ayakta (worker + bekçi)` yazınca, **telefonundan** botuna **`/menu`** yaz.
+
+> **Güncelleme = kurulumu tekrar çalıştırmak.** Dosya peşinde koşmayacaksın; her yeni sürümde tek komut: `bash ~/kartal_kaynak/tablet/kur.sh` (önce `git -C ~/kartal_kaynak pull`).
 
 > **İlk kilit:** İlk mesajı hangi Telegram hesabından atarsan ajan sadece o hesaba bağlanır. Başkası yazamaz.
 
@@ -125,12 +127,23 @@ Tablet her yeniden başladığında ajan otomatik ayağa kalkar.
 | `/gorev Instagram'ı aç ve keşfet akışına geç` | Ekranı okur, adım adım kendi yapar, her adımı Telegram'a yazar |
 | *(doğrudan cümle yazarsan)* | Otomatik olarak `/gorev` sayılır |
 
+### 🎙 Sesli mesaj (tablete KONUSMA — telefondan sesli mesaj at)
+| Yaptığın | Ne olur |
+|---|---|
+| Telefondan bota sesli mesaj: **"YouTube aç"** | Gemini duyup yazıya çevirir → "🎧 Duydum: YouTube aç" → beyin tablette yapar |
+| **"Mail oku"** | Gmail'i açar, gelen kutusunu görür, özetler |
+| **`/mail`** (yazılı) | Aynı işi komutla |
+
+> Neden telefondan? Telefon mikrofonu + Gemini tanıması, tabletteki ucuz tanınmadan 10 kat isabetli.
+> Sesli mesaj için **Gemini anahtarı şart** (yoksa: `/api AIzaSy...`). Maks 3 dk, Türkçe konuş.
+
 ### 📺 Kanal işleri
 | Komut | Ne yapar |
 |---|---|
 | `/paylas /sdcard/Download/video_132.mp4` | Android paylaşım menüsünü açar |
 | `/paylas https://drive.google.com/.../video_132.mp4 Instagram` | Linki indirir, menüden Instagram'ı da seçer |
 | `/studio MOxaXPkS0zw` | YouTube Studio'da o videoyu açar (İlgili Video için) |
+| `/mail` | Gmail'i açar, gelen kutusunu okur, özetini atar |
 
 ---
 

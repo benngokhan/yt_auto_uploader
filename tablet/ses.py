@@ -221,6 +221,29 @@ def transcribe(path: Path) -> str:
     )
 
 
+def transcribe_file(path: Path, mime: str = "audio/ogg") -> str:
+    """Telegram sesli mesajı (OGG/Opus) gibi dosyaları Gemini ile yazıya çevirir."""
+    key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not key:
+        return "(Gemini anahtarı yok → ses yazıya çevrilemiyor. /api AIzaSy... ile ekle)"
+    try:
+        data = base64.b64encode(path.read_bytes()).decode()
+    except Exception as e:
+        return f"(dosya okunamadı: {e})"
+    return gemini_call(
+        [
+            {"text": (
+                "Bu ses kaydını Türkçe olarak aynen yazıya çevir. "
+                "Sadece duyduğun metni yaz; açıklama, tırnak veya komut sembolü ekleme. "
+                "Kullanıcı bir komut söylediyse (örn. 'YouTube aç', 'mail oku') onu aynen yaz."
+            )},
+            {"inline_data": {"mime_type": mime, "data": data}},
+        ],
+        temperature=0.0,
+        max_tokens=300,
+    )
+
+
 def reply_brain(user_text: str) -> str:
     """Kısa, doğal bir yanıt üretir."""
     if not os.getenv("GEMINI_API_KEY", "").strip():

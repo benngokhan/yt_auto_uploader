@@ -1254,6 +1254,43 @@ def handle(text: str, chat_id: str) -> None:
             say(f"⚠️ adb yok ({e}) — link tablete gönderiliyor…", chat_id)
             say(open_url(url), chat_id)
         return
+    if low.startswith("/mail") or low.startswith("/posta"):
+        def _mail():
+            try:
+                ac_uygulama("com.google.android.gm")
+                time.sleep(4.5)
+                shot = screenshot("mail")
+                send_photo(shot, "📧 Gmail — gelen kutusu", chat_id)
+                nodes = ui_dump()
+                if os.getenv("GEMINI_API_KEY", "").strip():
+                    ozet = gemini_see(
+                        shot,
+                        "Bu Gmail gelen kutusu ekranı. Görünen ilk 5 e-postayı numaralandırarak listele: "
+                        "gönderen, konu ve 1 cümlelik özet. Okunmamış (kalın) olanların başına ● koy. "
+                        "Ekranda e-posta görünmüyorsa bunu açıkça söyle.",
+                    )
+                    say("📧 <b>Mail özeti:</b>\n" + ozet[:1800], chat_id)
+                else:
+                    satirlar: list[str] = []
+                    seen: set[str] = set()
+                    for n in nodes:
+                        t = (n.get("label") or "").strip()
+                        if 6 < len(t) < 120 and t not in seen and not t.startswith(
+                            ("Gmail", "Search", "Menu", "Settings", "Account")
+                        ):
+                            seen.add(t)
+                            satirlar.append(t)
+                        if len(satirlar) >= 8:
+                            break
+                    if satirlar:
+                        say("📧 Ekranda görünen:\n" + "\n".join(satirlar)
+                            + "\n\nÖzetli mod için Gemini anahtarı: <code>/api AIzaSy...</code>", chat_id)
+                    else:
+                        say("📧 Ekran okunamadı — Gmail açıldı mı? /ekran ile bak.", chat_id)
+            except Exception as e:
+                say(f"❌ {e}", chat_id)
+        threading.Thread(target=_mail, daemon=True).start()
+        return
     if low.startswith("/api"):
         key = raw[4:].strip()
         if not key:
@@ -1323,6 +1360,67 @@ def handle(text: str, chat_id: str) -> None:
 
 
 # --------------------------------------------------------------------------
+# 7b. TELEGRAM SESLİ MESAJ → GÖREV
+# --------------------------------------------------------------------------
+def _handle_voice(msg: dict, chat_id: str) -> None:
+    """Sesli mesajı indir, Gemini ile yazıya çevir, komut/görev olarak çalıştır."""
+    v = msg.get("voice") or msg.get("audio")
+    if not v:
+        return
+    fid = str(v.get("file_id", ""))
+    dur = int(v.get("duration", 0) or 0)
+    if not fid:
+        return
+    if dur > 180:
+        say("⏱ Ses 3 dakikadan uzun — daha kısa tut.", chat_id)
+        return
+    say("🎧 Dinliyorum…", chat_id)
+
+    local: Path | None = None
+    try:
+        meta = tg("getFile", {"file_id": fid})
+        fpath = str((meta.get("result") or {}).get("file_path", ""))
+        if not fpath:
+            say("❌ Ses dosyası indirilemedi.", chat_id)
+            return
+        token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+        url = f"https://api.telegram.org/file/bot{token}/{fpath}"
+        rec_dir = KARTAL_DIR / "kayitlar"
+        rec_dir.mkdir(parents=True, exist_ok=True)
+        local = rec_dir / f"ses_{int(time.time())}.ogg"
+        with urllib.request.urlopen(url, timeout=120) as r, open(local, "wb") as f:
+            shutil.copyfileobj(r, f)
+        if local.stat().st_size < 2000:
+            say("❌ Ses boş görünüyor — bir daha dene.", chat_id)
+            return
+    except Exception as e:
+        say(f"❌ Ses indirilemedi: {e}", chat_id)
+        return
+
+    from ses import transcribe_file
+    text = transcribe_file(local, mime="audio/ogg")
+    if local:
+        try:
+            local.unlink()
+        except Exception:
+            pass
+    if not text or text.startswith("("):
+        say("❌ Sesi anlayamadım. " + (text or ""), chat_id)
+        return
+    text = text.strip().strip('"“”')
+    if len(text) < 2:
+        say("🤔 Çok kısık geldi — net tekrar et.", chat_id)
+        return
+    say(f"🎧 Duydum: <b>{text[:300]}</b>", chat_id)
+    low = _norm(text)
+    if low.startswith("/") or low in ("durum", "bak", "menu", "yardim", "help"):
+        handle(text, chat_id)
+    else:
+        # Cümle → beyin görevi: "YouTube aç" deyince gerçekten açar
+        threading.Thread(target=run_task, args=(text,), daemon=True).start()
+
+
+# --------------------------------------------------------------------------
 # 8. ANA DÖNGÜ
 # --------------------------------------------------------------------------
 _last_net_warn = 0.0
@@ -1366,7 +1464,8 @@ def main() -> None:
                 msg = upd.get("message") or {}
                 chat_id = str((msg.get("chat") or {}).get("id", ""))
                 text = msg.get("text", "")
-                if not chat_id or not text:
+                has_voice = bool(msg.get("voice") or msg.get("audio"))
+                if not chat_id or (not text and not has_voice):
                     continue
                 if not owner:
                     # İlk mesajı gönderen kilitlenir (tek seferlik eşleştirme)
@@ -1377,7 +1476,10 @@ def main() -> None:
                 if chat_id != owner:
                     continue
                 try:
-                    handle(text, chat_id)
+                    if has_voice and not text:
+                        _handle_voice(msg, chat_id)
+                    else:
+                        handle(text, chat_id)
                 except Exception as _e:
                     import traceback
                     tb = traceback.format_exc()[-400:]
