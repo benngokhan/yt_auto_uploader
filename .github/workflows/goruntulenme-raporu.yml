@@ -1,4 +1,4 @@
-name: Goruntülenme Raporu (yt-dlp)
+name: Goruntulenme Raporu (yt-dlp)
 # Haftalik "yayincinin tabloya view yazmasi" isini otomatize eder.
 # SIHIR YouTube API kotası harcamaz (yt-dlp scraping); her gün 09:00 TR.
 # Tablo repo master'a yazilir; sonraki ana workflow run'i Drive'a sync'ler (ikili senkron kurali).
