@@ -13,7 +13,7 @@ _Tarih: 28.10.2026 · Yazan: bir önceki agent · Amaç: yeni sunucudaki agent h
 
 1. **Stok:** mp4 + kapak dosyaları Drive "KartaL Stok" klasöründe.
 2. **Tablo (tek kaynak):** `bilgidozu_yukleme_tablosu.xlsx` — video başına 1 satır: Durum · Dosya Adı · Başlık · Açıklama · Hashtag · Etiket · Sabit Yorum · Konu/Kategori · Kaynak · YouTube Link · Yüklenme Zamanı · Görüntülenme.
-3. **Slot'lar (10:05 / 19:00 / 20:30 TR):** GitHub Actions kalkar → havuzdan **rastgele** 1 video seçer (tekrar yasağı, floor 51) → manifestte varsa SHA256 doğrular → YouTube API ile public yükleme → tabloya link + zaman yazar → repo master'ı Drive'a senkronlar → Telegram kartı (butonlar: Videoyu İzle · Yorumu Sabitle · Gönderi Metnini Kopyala · İlgili Video önerisi · Topluluk sekmesini Aç).
+3. **Slot'lar (19:00 / 20:30 TR — 28.10'dan itibaren 2 slot; 10:05 telafi KULLANICI KARARIyla kapatıldı):** GitHub Actions kalkar → havuzdan **rastgele** 1 video seçer (tekrar yasağı, floor 51) → manifestte varsa SHA256 doğrular → YouTube API ile public yükleme → tabloya link + zaman yazar → repo master'ı Drive'a senkronlar → Telegram kartı (butonlar: Videoyu İzle · Yorumu Sabitle · Gönderi Metnini Kopyala · İlgili Video önerisi · Topluluk sekmesini Aç).
 4. **İlgili video (zincir):** aynı konu (kategori, lower'da birebir) içinde en son YAYINLANAN; yoksa genel en son yayın.
 5. **Slot Watchdog:** slotun run'ı 75 dk içinde başlamazsa Telegram "🚨 SLOT ATEŞLENMEDİ" alarmı (harici servis yok, aynı repoda 2. workflow).
 6. **Görüntülenme Raporu:** her gün 09:00 TR, **sıfır YouTube kotası** (yt-dlp scraping) → tablonun Görüntülenme sütununu günceller + Telegram özet (toplam, günlük artış, top 3).
@@ -71,7 +71,7 @@ _Tarih: 28.10.2026 · Yazan: bir önceki agent · Amaç: yeni sunucudaki agent h
 **İlk okuması gerekenler (işlem gerektirmez):** bu dosya → `URETIM_SABLONU.md` (üretim + rapor şablonu, tek sohbet kuralı) → `/home/user/google_drive/BANT_DURUM.md` (bekleyen işler listesi dosyanın sonunda) → Drive tablosunun UYARILAR sekmesi.
 
 **Yapabilecekleri:**
-- 29.10 slotlarını izle (yeni sistemlerin ilk günü): 10:05/19:00/20:30 yayınlandı mı? 09:00 view raporu geldi mi? Watchdog alarmı geldi mi?
+- 29.10 slotlarını izle (yeni sistemlerin ilk günü): 19:00/20:30 yayınlandı mı? 09:00 view raporu geldi mi? Watchdog alarmı geldi mi?
 - Yeni stok ekle: mp4 (+kapak) KartaL Stok'a → tabloya satır (Durum=BEKLEMEDE, başlık, açıklama, kaynak) → manifeste sha256 → commit+push. Bot otomatik çeker.
 - "Neden?" sorularını KANITLA cevapla (workflow logu, kanal taraması, kod).
 - Kullanıcı isterse özellik ekle (retention analizi, trend kaynaklı konu seçimi vb.) — karar kullanıcının.
@@ -85,7 +85,7 @@ _Tarih: 28.10.2026 · Yazan: bir önceki agent · Amaç: yeni sunucudaki agent h
 | Floor | Havuza girebilecek en küçük video numarası (51) |
 | Havuz | Durum=BEKLEMEDE + başlık dolu + link yok + numara ≥ floor olan satırlar |
 | ESKİ_STOK_ASKIDA | Arşiv durumu — asla seçilmez |
-| Telafi | 10:05 slotu: önceki günün eksik akşam slotlarını telafi eder; önceki gün tamamsa sabah slotu atlanır |
+| Telafi | KAPALI (28.10): 10:05 telafi slotu ve 10:55 watchdog alarmı kaldırıldı; bot tam 2/gün yayınlar (19:00 + 20:30) |
 | KartaL Stok | Drive'daki stok klasörü |
 | BANT | Kullanıcının üretim bandı dokümanı — tetik yetkisi yalnız CEO'da |
 | KİLİT | Bu dokümanın 5. bölümündeki kalıcı kurallar |

@@ -5,7 +5,6 @@ name: Slot Watchdog
 
 on:
   schedule:
-    - cron: "50 7 * * *"   # 10:55 TR -> 10:05 slotunu izler
     - cron: "45 16 * * *"  # 19:45 TR -> 19:00 slotunu izler
     - cron: "15 18 * * *"  # 21:15 TR -> 20:30 slotunu izler
   workflow_dispatch: {}
