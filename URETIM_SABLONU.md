@@ -36,9 +36,11 @@ konu seç → script → voice-00 sesi → render (SHA şablon) → QC → stok 
 ```
 
 1. **QC (yayın öncesi zorunlu):** gerçek dosyaya band_qc (sha'ya değil DOSYAYA bak) + başlık/altyazı yazım kontrolü + 1. kare & orta kare binme kontrolü.
+2. **KANCA QC (yayın öncesi zorunlu):** script'in 1. cümlesi TEK soru + ≤6 kelime mi? Değilse **FAIL** — cümle yeniden yazılır, üretim devam etmez. (51 vs 649 view farkının kaynağı burada.)
 2. **Stok:** mp4 → Drive "KartaL Stok" → tabloya satır (Durum=BEKLEMEDE · Başlık · Açıklama · Sabit Yorum · Konu · Kaynak) → manifeste sha256 → **commit+push** (repo = tek kaynak; bot kendisi çeker).
 3. **Yayın:** bot slot saatlerinde (10:05 / 19:00 / 20:30 TR) seçer + yükler + tabloyu doldurur. Ritim değişikliği = yalnız kullanıcı kararı.
 4. **Yayın sonrası:** zincir geri-bağlantı (aynı kategorideki son yayın) + sabit yorum otomatik; link + view haftalık tabloya.
+5. **RETANSİYON GERİ BİLDİRİMİ (haftalık):** YouTube Studio'dan 3. saniye retention verisi tabloya işlenir (veri kaynağı: kullanıcı kararı — API entegrasyonu ya da haftalık ekran görüntüsü). 3. sn retention'ı düşük olan videonun kanca cümlesi analiz edilir; sonraki scriptlerde o örüntü düzeltilir. View sayısı değil, RETANSİYON konsept seçiminin girdisidir.
 
 ## 4. YAYIN RAPORU ŞABLONU (standart format)
 
