@@ -1,17 +1,17 @@
 {
-  "updated_at": "2026-10-28 01:00",
-  "updated_at_iso": "2026-10-28T01:00:46.625818+03:00",
+  "updated_at": "2026-10-28 10:58",
+  "updated_at_iso": "2026-10-28T10:58:19.191288+03:00",
   "overall_status": "ok",
   "overall_label": "Her şey çalışıyor",
   "summary": {
-    "total_views": 37009,
+    "total_views": 38357,
     "subscribers": 48,
-    "total_videos_published": 69,
+    "total_videos_published": 70,
     "weekly_uploaded": 23,
     "total_comments": 36,
-    "total_likes": 267,
+    "total_likes": 268,
     "failed_jobs": 0,
-    "stock_shorts": 65,
+    "stock_shorts": 64,
     "stock_long": 10
   },
   "workers": [
@@ -20,9 +20,9 @@
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-28 01:00",
-      "jobs_done": 69,
-      "last_action": "video_135.mp4 yayınlandı (https://youtu.be/LGXmOwTtGOw)",
+      "updated_at": "2026-10-28 10:58",
+      "jobs_done": 70,
+      "last_action": "video_108.mp4 yayınlandı (https://youtu.be/7DG1etjQlR4)",
       "error_message": ""
     },
     {
@@ -30,8 +30,8 @@
       "name": "Yorumcu ve kapak işçisi",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-28 01:00",
-      "jobs_done": 69,
+      "updated_at": "2026-10-28 10:58",
+      "jobs_done": 70,
       "last_action": "OAuth (youtube.force-ssl) aktif · İlk yorum otomatik yazılır",
       "error_message": ""
     },
@@ -40,7 +40,7 @@
       "name": "Analitik çekici (YouTube API)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-28 01:00",
+      "updated_at": "2026-10-28 10:58",
       "jobs_done": 30,
       "last_action": "30 videonun gerçek görüntülenme ve yorum verisi güncellendi",
       "error_message": ""
@@ -50,8 +50,8 @@
       "name": "Telegram bildirim işçisi",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-28 01:00",
-      "jobs_done": 69,
+      "updated_at": "2026-10-28 10:58",
+      "jobs_done": 70,
       "last_action": "Yayın kartı ve sabit yorum metni gönderildi",
       "error_message": ""
     }
@@ -62,7 +62,7 @@
       "title": "YouTube API günlük kotası",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-28 01:00",
+      "updated_at": "2026-10-28 10:58",
       "detail": "Günlük 10.000 birim kotası aktif ve yeterli."
     },
     {
@@ -70,15 +70,15 @@
       "title": "Google Drive ve Sheets bağlantısı",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-28 01:00",
-      "detail": "Drive klasörü ve 3 sekmeli yükleme tablosu canlı bağlı (Stok: 65 Shorts, 10 Uzun)."
+      "updated_at": "2026-10-28 10:58",
+      "detail": "Drive klasörü ve 3 sekmeli yükleme tablosu canlı bağlı (Stok: 64 Shorts, 10 Uzun)."
     },
     {
       "id": "comment_worker",
       "title": "Yorum ve kapak işçisi yetkisi",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-28 01:00",
+      "updated_at": "2026-10-28 10:58",
       "detail": "youtube.force-ssl yetkisi aktif."
     }
   ],
@@ -87,8 +87,8 @@
       "id": "LGXmOwTtGOw",
       "url": "https://youtu.be/LGXmOwTtGOw",
       "title": "Güneşe Dönünce Hapşırıyor musun? Bu Bir Refleks: ACHOO! ☀️🤧 #bilgidozu #shorts",
-      "publishedAt": "2026-10-27T22:00:30Z",
-      "views": 0,
+      "publishedAt": "2026-10-27T22:00:54Z",
+      "views": 6,
       "likes": 0,
       "comments": 1
     },
@@ -97,7 +97,7 @@
       "url": "https://youtu.be/zynVVf8GQTw",
       "title": "Bir Esnedin, Etraf da Esnedi! Esnemenin Bulaşma Sırrı 😮🧠 #bilgidozu #shorts",
       "publishedAt": "2026-10-27T20:09:45Z",
-      "views": 5,
+      "views": 29,
       "likes": 0,
       "comments": 1
     },
@@ -106,7 +106,7 @@
       "url": "https://youtu.be/obPceKVDg3k",
       "title": "Göz Kapağın Neden Kendi Kendine Seğirir? Anlamı Bu! 👁🧠 #bilgidozu #shorts",
       "publishedAt": "2026-10-27T16:34:24Z",
-      "views": 84,
+      "views": 155,
       "likes": 1,
       "comments": 1
     },
@@ -115,8 +115,8 @@
       "url": "https://youtu.be/8HI5KUWLQuM",
       "title": "Baldır Kasların Aslında İkinci Kalbin! Kanı Kalbe Nasıl Taşıyor? 🦵💪 #bilgidozu #shorts",
       "publishedAt": "2026-10-27T07:48:17Z",
-      "views": 410,
-      "likes": 2,
+      "views": 607,
+      "likes": 3,
       "comments": 1
     },
     {
@@ -124,7 +124,7 @@
       "url": "https://youtu.be/MOxaXPkS0zw",
       "title": "Küçücük Kâğıt Kesiği Neden Bu Kadar Çok Acıtır? 🩹⚡ #bilgidozu #shorts",
       "publishedAt": "2026-10-26T16:37:10Z",
-      "views": 418,
+      "views": 577,
       "likes": 8,
       "comments": 1
     },
@@ -133,7 +133,7 @@
       "url": "https://youtu.be/jrySNivbPcQ",
       "title": "Kışın Kalbi Durup Buz Tutan, Baharda Çözülüp Canlanan Kurbağa! 🐸❄️ #bilgidozu #shorts",
       "publishedAt": "2026-10-26T11:39:23Z",
-      "views": 539,
+      "views": 589,
       "likes": 7,
       "comments": 1
     },
@@ -142,7 +142,7 @@
       "url": "https://youtu.be/AoaTRIpChhw",
       "title": "Beynin Senden Sakladığı 3 Yanılsama! Özgür İraden Bile Senin Değil 🧠⚡ #bilgidozu",
       "publishedAt": "2026-10-25T18:20:29Z",
-      "views": 44,
+      "views": 54,
       "likes": 1,
       "comments": 1
     },
@@ -151,7 +151,7 @@
       "url": "https://youtu.be/q6YFVt6JV4c",
       "title": "Mısır Piramitleri Yapılırken Dünya'da Hâlâ Tüylü Mamutlar Yaşıyordu! 🦣⏳ #bilgidozu #shorts",
       "publishedAt": "2026-10-25T15:29:36Z",
-      "views": 41,
+      "views": 42,
       "likes": 0,
       "comments": 1
     },
@@ -160,7 +160,7 @@
       "url": "https://youtu.be/UEpxfr912Ao",
       "title": "Ay'daki Ayak İzleri Neden Milyonlarca Yıl Boyunca Silinmeyecek? 🌕👨‍🚀 #bilgidozu #shorts",
       "publishedAt": "2026-10-25T15:23:02Z",
-      "views": 102,
+      "views": 103,
       "likes": 3,
       "comments": 3
     },
@@ -169,7 +169,7 @@
       "url": "https://youtu.be/DrqVzn372Hk",
       "title": "Gekolar Cam ve Tavanda Yapıştırıcı Olmadan Nasıl Düşmeden Yürüyor? 🦎🧲 #bilgidozu #shorts",
       "publishedAt": "2026-10-25T11:25:10Z",
-      "views": 146,
+      "views": 147,
       "likes": 0,
       "comments": 1
     },
@@ -178,7 +178,7 @@
       "url": "https://youtu.be/07gRpcD8Hp0",
       "title": "Bu Minik Karides Avını Kıskacıyla Değil, Patlayan Kabarcıkla Vuruyor! 🦐💥 #bilgidozu #shorts",
       "publishedAt": "2026-10-24T20:23:49Z",
-      "views": 145,
+      "views": 146,
       "likes": 2,
       "comments": 1
     },
@@ -187,7 +187,7 @@
       "url": "https://youtu.be/5b2Xru597kk",
       "title": "Bu Hayvanın Dışkısı Yuvarlak Değil Küp Şeklinde! Peki Ama Neden? 🦘🟫 #bilgidozu #shorts",
       "publishedAt": "2026-10-24T20:19:12Z",
-      "views": 312,
+      "views": 313,
       "likes": 2,
       "comments": 1
     },
@@ -196,7 +196,7 @@
       "url": "https://youtu.be/HUAR-nBaEQQ",
       "title": "Bu Canlı Kaybettiği Bacağını ve Hatta Organlarını Yeniden Büyütüyor! 🦎🧬 #bilgidozu #shorts",
       "publishedAt": "2026-10-24T18:19:15Z",
-      "views": 103,
+      "views": 104,
       "likes": 2,
       "comments": 1
     },
@@ -205,7 +205,7 @@
       "url": "https://youtu.be/da3y0_DfWYQ",
       "title": "Vücudundaki Tüm Acıyı Yöneten Beynin Kendisi Acı Hissedemez! 🧠⚡ #bilgidozu #shorts",
       "publishedAt": "2026-10-24T15:22:39Z",
-      "views": 186,
+      "views": 187,
       "likes": 1,
       "comments": 1
     },
@@ -214,7 +214,7 @@
       "url": "https://youtu.be/tCuQNw_V74I",
       "title": "Tam Uykuya Dalarken Neden Boşluğa Düşer Gibi Sıçrarsın? 😴⚡ #bilgidozu #shorts",
       "publishedAt": "2026-10-24T11:25:14Z",
-      "views": 110,
+      "views": 111,
       "likes": 1,
       "comments": 1
     },
@@ -223,7 +223,7 @@
       "url": "https://youtu.be/sh9zYFybcHY",
       "title": "Kendini Neden Gıdıklayamazsın? Beynin Hamleni Önceden Biliyor! 🧠🤭 #bilgidozu #shorts",
       "publishedAt": "2026-10-23T18:25:00Z",
-      "views": 78,
+      "views": 79,
       "likes": 0,
       "comments": 1
     },
@@ -232,7 +232,7 @@
       "url": "https://youtu.be/mANNR6Tf21o",
       "title": "Burnun Nöbetleşe Çalışıyor: İki Delik Aynı Anda Eşit Nefes Almaz! 👃🔄 #bilgidozu #shorts",
       "publishedAt": "2026-10-23T15:29:55Z",
-      "views": 961,
+      "views": 962,
       "likes": 9,
       "comments": 1
     },
@@ -241,7 +241,7 @@
       "url": "https://youtu.be/c0lcGGWy-hw",
       "title": "Gözünde Bir Kör Nokta Var — Beynin Boşluğu Gizliyor! 👁️🧠 #bilgidozu #shorts",
       "publishedAt": "2026-10-23T11:44:52Z",
-      "views": 453,
+      "views": 454,
       "likes": 10,
       "comments": 1
     },
@@ -250,7 +250,7 @@
       "url": "https://youtu.be/JO2Vxbd5gLM",
       "title": "Gözlerinize İnanmayın: Yıldırımlar Aslında Aşağıdan Yukarıya Çakar! ⚡🌩️ #bilgidozu #shorts",
       "publishedAt": "2026-10-22T17:30:15Z",
-      "views": 1041,
+      "views": 1042,
       "likes": 13,
       "comments": 1
     },
@@ -259,7 +259,7 @@
       "url": "https://youtu.be/CPITUvh_5rs",
       "title": "Birinin Sizden Hoşlandığını Anlamanın En Kesin Yolu! 👁️✨ #bilgidozu #shorts",
       "publishedAt": "2026-10-22T15:30:03Z",
-      "views": 1084,
+      "views": 1085,
       "likes": 18,
       "comments": 1
     },
@@ -268,7 +268,7 @@
       "url": "https://youtu.be/IrutrnRqyWM",
       "title": "Bu Canlı Uzay Boşluğunda ve Radyasyonda Bile Ölmüyor! 🐻🔬 #bilgidozu #shorts",
       "publishedAt": "2026-10-22T09:30:13Z",
-      "views": 1331,
+      "views": 1332,
       "likes": 24,
       "comments": 1
     },
@@ -277,7 +277,7 @@
       "url": "https://youtu.be/DEhC0RBlZvM",
       "title": "Jüpiter'de Dünya'dan Büyük Bir Fırtına 350 Yıldır DÖNÜYOR! 🌪️🪐 #bilgidozu #shorts",
       "publishedAt": "2026-10-21T08:47:47Z",
-      "views": 1004,
+      "views": 1005,
       "likes": 23,
       "comments": 3
     },
@@ -286,7 +286,7 @@
       "url": "https://youtu.be/qYzG9jVSLDw",
       "title": "Dünyanın En Yaşlı Canlısı Bir Hayvan Değil, 80.000 Yaşındaki Bu Orman! 🌲⚡ #bilgidozu #shorts",
       "publishedAt": "2026-10-21T08:47:12Z",
-      "views": 1167,
+      "views": 1168,
       "likes": 19,
       "comments": 1
     },
@@ -295,7 +295,7 @@
       "url": "https://youtu.be/OuOe6-JsAnI",
       "title": "Gökten Yağmur Değil Dev Elmaslar Yağan Gezegenler! 💎🪐 #bilgidozu #shorts",
       "publishedAt": "2026-10-20T19:04:22Z",
-      "views": 985,
+      "views": 986,
       "likes": 22,
       "comments": 1
     },
@@ -304,7 +304,7 @@
       "url": "https://youtu.be/ah1-d0TQepk",
       "title": "2000 Yıllık Roma Binaları Neden Yıkılmıyor? Beton Kendi Kendini Onarıyor! 🏛️⚡ #bilgidozu #shorts",
       "publishedAt": "2026-10-20T18:48:56Z",
-      "views": 519,
+      "views": 520,
       "likes": 24,
       "comments": 1
     },
@@ -313,7 +313,7 @@
       "url": "https://youtu.be/5lREZUglUqU",
       "title": "Jüpiter'in Bu Uydusunda Dünya'dan 2 Kat Fazla Su Var! 🪐🌊 #bilgidozu #shorts",
       "publishedAt": "2026-10-20T15:51:20Z",
-      "views": 1045,
+      "views": 1046,
       "likes": 23,
       "comments": 1
     },
