@@ -1266,6 +1266,126 @@ def retro_enrich_published(youtube, drive, queue_folder: str) -> None:
         log.warning(f"Retro zenginleştirme atlandi (zararsiz): {e}")
 
 
+def _ilgili_tablo_oku(drive, queue_folder: str) -> tuple | None:
+    """Drive'daki ana tabloyu oku -> (headers, {dosya_adi_kucuk: row_tuple})."""
+    import openpyxl
+    from googleapiclient.http import MediaIoBaseDownload
+    res = drive.files().list(
+        q=f"'{queue_folder}' in parents and (name = 'bilgidozu_yukleme_tablosu.xlsx' or name = 'baslik.xlsx') and trashed = false",
+        pageSize=10, fields="files(id, name)").execute()
+    files = res.get("files", [])
+    if not files:
+        return None
+    primary = [x for x in files if x.get("name") == "bilgidozu_yukleme_tablosu.xlsx"]
+    fid = (primary or files)[0]["id"]
+    buf = io.BytesIO()
+    dl = MediaIoBaseDownload(buf, drive.files().get_media(fileId=fid))
+    done = False
+    while not done:
+        _, done = dl.next_chunk()
+    buf.seek(0)
+    wb = openpyxl.load_workbook(buf, read_only=True)
+    ws = next((s for s in wb.worksheets if s.title.strip().casefold() == "drive"), wb.active)
+    rows = [list(r) for r in ws.iter_rows(values_only=True)]
+    wb.close()
+    if not rows:
+        return None
+    headers = [str(h or "") for h in rows[0]]
+    data = {}
+    c_ad = next((i for i, h in enumerate(headers) if h.strip().casefold() == "dosya adı"), None)
+    if c_ad is None:
+        return None
+    for row in rows[1:]:
+        ad = str(row[c_ad] or "").strip()
+        if ad:
+            data[ad.casefold()] = row
+    return headers, data
+
+
+def sync_related_links(youtube, drive, queue_folder: str, this_file_name: str, this_vid_id: str) -> str:
+    """SERİ ZİNCİRİ — YouTube Studio 'İlgili Video' otomatik bağlantısı (API: relatedVideos).
+    - UZUN yayınlandığında -> tablonun 'İlgili Video' sütunundaki 3 shorttan yayınlanmış olanların
+      relatedVideos alanına uzun videosu bağlanır; uzun videonun kendi ilgili alanı ilk short'a.
+    - SHORT yayınlandığında -> onu kapsayan uzun video yayınlanmışsa short.relatedVideos = uzun video
+      (uzun videonun ilgili alanı boşsa, ilk yayınlanan short'a bağlanır).
+    Best-effort: hata yükleme akışını durdurmaz. Özet metin Telegram raporu için döner.
+    """
+    import re as _re
+    try:
+        okunan = _ilgili_tablo_oku(drive, queue_folder)
+        if not okunan:
+            return ""
+        headers, data = okunan
+        def col(name: str):
+            return next((i for i, h in enumerate(headers) if h.strip().casefold() == name.casefold()), None)
+        c_ad, c_link, c_rel = col("Dosya Adı"), col("YouTube Link"), col("İlgili Video")
+        if c_ad is None or c_link is None or c_rel is None:
+            return ""
+
+        def _link_of(row):
+            return _extract_yt_vid_id(str(row[c_link] or "")) if row else ""
+
+        def _bos_ilgili_mi(youtube, vid: str) -> bool:
+            r = youtube.videos().list(part="relatedVideos", id=vid).execute()
+            items = r.get("items", [])
+            if not items:
+                return True
+            return not (items[0].get("relatedVideos") or {}).get("videoId")
+
+        def _bagla(short_vid: str, hedef_vid: str) -> bool:
+            youtube.videos().update(part="relatedVideos", id=short_vid,
+                                    body={"relatedVideos": {"videoId": hedef_vid}}).execute()
+            return True
+
+        baglanan = []
+        is_long = this_file_name.startswith("uzun_")
+        if is_long:
+            row = data.get(this_file_name.casefold())
+            if not row:
+                return ""
+            hedefler = [t.strip() for t in str(row[c_rel] or "").split(",") if t.strip()]
+            for h in hedefler:
+                kvid = _link_of(data.get(h.casefold()))
+                if not kvid:
+                    continue  # short henüz yayınlanmadı
+                try:
+                    _bagla(kvid, this_vid_id)
+                    baglanan.append(h)
+                except Exception as e:
+                    log.warning(f"İLGİLİ VİDEO: {h} -> {this_file_name} bağlanamadı: {e}")
+            if baglanan and _bos_ilgili_mi(youtube, this_vid_id):
+                ilk = _link_of(data.get(baglanan[0].casefold()))
+                if ilk:
+                    try:
+                        _bagla(this_vid_id, ilk)
+                        log.info(f"İLGİLİ VİDEO: {this_file_name} -> {baglanan[0]} (uzun kendi bağlantısı)")
+                    except Exception as e:
+                        log.warning(f"İLGİLİ VİDEO: uzun videosunun kendi bağlantısı kurulamadı: {e}")
+        else:
+            # Short: onu kapsayan uzun video satırını bul
+            for ad, row in data.items():
+                if ad.startswith("uzun_") and this_file_name.casefold() in [t.strip().casefold() for t in str(row[c_rel] or "").split(",") if t.strip()]:
+                    lvid = _link_of(row)
+                    if not lvid:
+                        return ""  # uzun video henüz yayınlanmadı
+                    try:
+                        _bagla(this_vid_id, lvid)
+                        baglanan.append(ad)
+                        if _bos_ilgili_mi(youtube, lvid):
+                            _bagla(lvid, this_vid_id)
+                            log.info(f"İLGİLİ VİDEO: {ad} -> {this_file_name} (uzun kendi bağlantısı)")
+                    except Exception as e:
+                        log.warning(f"İLGİLİ VİDEO: {this_file_name} -> {ad} bağlanamadı: {e}")
+                    break
+        if baglanan:
+            log.info(f"İLGİLİ VİDEO: {len(baglanan) if is_long else len(baglanan)} bağlantı kuruldu: {', '.join(baglanan)}")
+            return f"🔗 İlgili video: {len(baglanan)} bağlantı ({', '.join(baglanan)[:80]})"
+        return ""
+    except Exception as e:
+        log.warning(f"İLGİLİ VİDEO zinciri atlandı (zararsız): {e}")
+        return ""
+
+
 def upload_job(
     channel_config: dict = None,
     publish_at=None,
@@ -1428,6 +1548,13 @@ def upload_job(
             if konu_listesi:
                 pkid = ensure_named_playlist(youtube, konu_listesi)
                 add_video_to_series(youtube, vid_id, pkid)
+        # SERİ ZİNCİRİ: 'İlgili Video' (relatedVideos) otomatik bağlantı — short ve uzun için de
+        try:
+            rel_ozet = sync_related_links(youtube, drive, queue_folder, file_name, vid_id)
+            if rel_ozet:
+                backlink_info = (backlink_info or "") + f" | {rel_ozet}"
+        except Exception as re_err:
+            log.warning(f"İlgili video zinciri atlandı (zararsız): {re_err}")
         # retro_enrich_published RETIRED: kullanıcı eski videoları elle düzenliyor; token ekstra yüklenmiyor (25 Ekim kararı)
 
         report_txt = build_telegram_report(file_name, vid_id, yt_url, meta, comment_ok, backlink_info=backlink_info)
