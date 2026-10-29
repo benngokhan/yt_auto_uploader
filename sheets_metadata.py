@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 DEFAULT_DRIVE_FOLDER_ID = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"  # KartaL Stok (27.10 karar: TEK kuyruk klasörü — eski YENI_SERI_ONAYLI_STOK buraya taşındı)
 DEFAULT_SHEETS_ID = ""
 MIN_SHORTS_NUMBER = 51   # CEO kararı 29.10: havuz 51+ (47-50 arşive); 1..50 ESKİ_STOK_ASKIDA; 48 zaten yayınlanmış
-MIN_LONG_NUMBER = 101    # Eski uzun_video_1..100 silinmeden askıda; yalnız yeni onaylı uzun seri (101+) sürüme girer
+MIN_LONG_NUMBER = 14     # 29.10 REİS karari: stok uzun 14-16 + yeni seri 17+ yayina onayli; eski 1..13 kilitli (Drive'da 14 ust uzun dosyasi yok, dogrulandi)
 
 CATEGORY_MAP = {
     "uzay ve astronomi": "28",
