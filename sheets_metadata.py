@@ -620,6 +620,7 @@ def get_next_scheduled_video(
     sheets_id: str = DEFAULT_SHEETS_ID,
     local_xlsx: Optional[Path] = None,
     video_type: str = "auto",
+    force_file: str = None,
 ) -> Optional[dict]:
     skip_ids = skip_ids or set()
     table = load_table_from_drive_or_local(drive, folder_id, sheets_id=sheets_id, local_fallback=local_xlsx)
@@ -692,6 +693,14 @@ def get_next_scheduled_video(
     if video_type == "long" or (video_type == "auto" and locked_col == "uzun"):
         cands = collect_ready(want_long=True, want_col="uzun")
         return cands[0] if cands else None
+
+    # FORCE (29.10): REİS'in özel videosu — bu dosya sabitlendi, havuzda hazırsa O çıkar; değilse normal akış
+    if force_file:
+        fc = [c for c in collect_ready(want_long=None, want_col=None) if c["name"] == force_file]
+        if fc:
+            log.info(f"FORCE: {force_file} bu slot için sabitlendi (satır {fc[0]['row']})")
+            return fc[0]
+        log.info(f"FORCE: {force_file} havuzda hazır değil -> normal akışa dönülüyor")
 
     if video_type == "short" and locked_col == "uzun":
         locked_col = "beden_beyin"

@@ -15,6 +15,11 @@ on:
         required: false
         type: string
         default: "auto"
+      force_file:
+        description: "Özel video: tam dosya adı (örn. video_148.mp4). Boş = normal akış."
+        required: false
+        type: string
+        default: ""
   schedule:
     # Türkiye Saati (UTC+3) SABİT 3 Slot (29.10 REİS kararı — saatler değişmez):
     # 1) 12:30 TR (09:30 UTC) -> Slot 1
@@ -23,6 +28,9 @@ on:
     - cron: "30 15 * * *"
     # 3) 20:30 TR (17:30 UTC) -> Slot 3
     - cron: "30 17 * * *"
+    # 4) TEK GÜNLÜK 29.10: 19:30 TR (16:30 UTC) -> Cloud'un bugünkü özel videosu (force_next_video.txt);
+    #    30.10 sabahı BU SATIR + force_next_video.txt KALDIRILACAK (CEO iş günlüğü'nde)
+    - cron: "30 16 * * *"
     # Not: Haftalik UZUN video SABİT Cuma 18:30 TR slotunda yayinlanir (REİS karari 29.10);
     #      20:30 slotu telafidir (18:30 kacarsa uzun 20:30'ta cikar). Cuma 12:30 + diger gunler = short.
     # 10:05 TR telafi slotu KAPATILDI (28.10, kullanicinin 2-slot karari)
@@ -152,13 +160,21 @@ jobs:
         if: ${{ (github.event_name == 'schedule' && steps.guard.outputs.should_run != 'false') || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
         env:
           INPUT_VIDEO_TYPE: ${{ inputs.video_type || 'auto' }}
+          INPUT_FORCE_FILE: ${{ inputs.force_file || '' }}
         run: |
+          FILE_ARG=""
+          if [ -n "$INPUT_FORCE_FILE" ]; then
+            FILE_ARG="--file $INPUT_FORCE_FILE"
+          elif [ -f force_next_video.txt ]; then
+            FILE_ARG="--file $(cat force_next_video.txt)"
+            echo "force_next_video.txt bulundu: $FILE_ARG"
+          fi
           if [ "$INPUT_VIDEO_TYPE" = "short" ]; then
-            python uploader.py --now --short
+            python uploader.py --now --short $FILE_ARG
           elif [ "$INPUT_VIDEO_TYPE" = "long" ]; then
-            python uploader.py --now --long
+            python uploader.py --now --long $FILE_ARG
           else
-            python uploader.py --now
+            python uploader.py --now $FILE_ARG
           fi
 
       - name: Persist duplicate-prevention log

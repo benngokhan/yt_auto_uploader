@@ -1391,6 +1391,7 @@ def upload_job(
     publish_at=None,
     dry_run: bool = False,
     video_type: str = "auto",
+    force_file: str = None,
 ) -> dict | None:
     log.info("─" * 60)
     resolved_type = decide_prime_time_video_type() if video_type == "auto" else video_type
@@ -1433,6 +1434,7 @@ def upload_job(
         skip_ids=skip_ids,
         sheets_id=config.get("sheets_id", DEFAULT_SHEETS_ID),
         video_type=resolved_type,
+        force_file=force_file,
     )
     if not scheduled:
         log.info("Kuyrukta yüklenecek yeni video bulunamadı.")
@@ -1751,12 +1753,15 @@ if __name__ == "__main__":
         vtype = "short"
     elif "--long" in sys.argv:
         vtype = "long"
+    force_file = None
+    if "--file" in sys.argv:
+        force_file = sys.argv[sys.argv.index("--file") + 1]
 
     if "--dry-run" in sys.argv:
-        upload_job(dry_run=True, video_type=vtype)
+        upload_job(dry_run=True, video_type=vtype, force_file=force_file)
     elif "--now" in sys.argv:
         try:
-            upload_job(dry_run=False, video_type=vtype)
+            upload_job(dry_run=False, video_type=vtype, force_file=force_file)
         except Exception as _crash:
             # EMİR 024 KURAL 8: görev çökmesi → UYARILAR sekmesine otomatik satır (sonra tekrar fırlat)
             try:
