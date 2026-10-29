@@ -124,6 +124,12 @@ jobs:
 
           should = "true"
           run = os.environ.get("GITHUB_EVENT_SCHEDULE", "").strip()
+          if run.startswith("30 16 "):
+              # TEK GUNLUK 29.10 slotu: 29.10.2026 TR gecesinden sonra KENDILIGINDEN emekli olur (REİS: sadece bu video icin)
+              bugun_tr = (datetime.now(timezone.utc) + timedelta(hours=3)).date()
+              if bugun_tr > datetime(2026, 10, 29).date():
+                  should = "false"
+                  print("19:30 tek gunluk slotu (29.10) suresi doldu -> otomatik kapatildi.")
           if run.startswith("5 7 "):
               stamps = []
               p = Path("uploaded.txt")
