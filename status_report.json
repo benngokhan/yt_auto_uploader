@@ -1,13 +1,13 @@
 {
-  "updated_at": "2026-10-29 19:17",
-  "updated_at_iso": "2026-10-29T19:17:40.797118+03:00",
+  "updated_at": "2026-10-29 19:30",
+  "updated_at_iso": "2026-10-29T19:30:14.000000+03:00",
   "overall_status": "ok",
   "overall_label": "Her şey çalışıyor",
   "summary": {
     "total_views": 39454,
     "subscribers": 50,
-    "total_videos_published": 74,
-    "weekly_uploaded": 23,
+    "total_videos_published": 75,
+    "weekly_uploaded": 24,
     "total_comments": 34,
     "total_likes": 227,
     "failed_jobs": 0,
@@ -20,9 +20,9 @@
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-29 19:17",
-      "jobs_done": 74,
-      "last_action": "video_139.mp4 yayınlandı (https://youtu.be/3qAWP_dS5kM)",
+      "updated_at": "2026-10-29 19:30",
+      "jobs_done": 75,
+      "last_action": "video_157.mp4 yayınlandı (https://youtu.be/t2lphcITKXs)",
       "error_message": ""
     },
     {
@@ -83,6 +83,15 @@
     }
   ],
   "videos": [
+    {
+      "id": "t2lphcITKXs",
+      "url": "https://youtu.be/t2lphcITKXs",
+      "title": "Üçgen ve Açı Kelimelerini Atatürk'ün Bizzat Türettiğini Biliyor muydun? 🇹🇷 #bilgidozu #shorts",
+      "publishedAt": "2026-10-29T16:30:08Z",
+      "views": 0,
+      "likes": 0,
+      "comments": 0
+    },
     {
       "id": "Bn5vzNjsnWo",
       "url": "https://youtu.be/Bn5vzNjsnWo",
