@@ -121,8 +121,19 @@ def decide_daily_column(now_tr: Optional[datetime] = None) -> str:
 
 
 def decide_prime_time_video_type(now_tr: Optional[datetime] = None) -> str:
-    """Cuma günü 'long', diğer 6 gün 'short'."""
-    return "long" if decide_daily_column(now_tr) == "uzun" else "short"
+    """SABİT slot tipi (29.10 REİS kararı — yayın saatleri 12:30/18:30/20:30 TR):
+    - Cuma 18:30 slotu (TR saat 18-19)  -> 'long' (haftalık UZUN = sabit 18:30)
+    - Cuma 20:30 slotu (TR saat 20-21)  -> 'long' (telafi: 18:30 kaçırdıysa uzun buradan çıkar;
+      uzun 18:30'ta çıktıysa kuyrukta uzun yok -> slot boş kalır, mevcut davranış)
+    - Cuma 12:30 slotu + diğer tüm günler -> 'short'
+    """
+    if decide_daily_column(now_tr) != "uzun":
+        return "short"
+    tr_tz = timezone(timedelta(hours=3))
+    dt = now_tr.astimezone(tr_tz) if now_tr else datetime.now(tr_tz)
+    if dt.hour in (18, 19, 20, 21):
+        return "long"
+    return "short"
 
 
 def sanitize_title(raw_title: str, max_len: int = 100) -> str:

@@ -23,7 +23,8 @@ on:
     - cron: "30 15 * * *"
     # 3) 20:30 TR (17:30 UTC) -> Slot 3
     - cron: "30 17 * * *"
-    # Not: Cuma gunu tum slotlar "uzun" tipinde -> haftalik UZUN ilk slot (12:30 TR)'ta yayinlanir.
+    # Not: Haftalik UZUN video SABİT Cuma 18:30 TR slotunda yayinlanir (REİS karari 29.10);
+    #      20:30 slotu telafidir (18:30 kacarsa uzun 20:30'ta cikar). Cuma 12:30 + diger gunler = short.
     # 10:05 TR telafi slotu KAPATILDI (28.10, kullanicinin 2-slot karari)
 
 permissions:
