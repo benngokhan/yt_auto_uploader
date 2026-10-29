@@ -16,14 +16,15 @@ on:
         type: string
         default: "auto"
   schedule:
-    # Türkiye Saati (UTC+3) 3 Slot Kuralı (29.10 karar: günde 3; Cuma 19:00 = Uzun Video):
-    # 1) 19:00 TR (16:00 UTC) -> Slot 1
-    - cron: "0 16 * * *"
-    # 2) 20:30 TR (17:30 UTC) -> Slot 2
+    # Türkiye Saati (UTC+3) SABİT 3 Slot (29.10 REİS kararı — saatler değişmez):
+    # 1) 12:30 TR (09:30 UTC) -> Slot 1
+    - cron: "30 9 * * *"
+    # 2) 18:30 TR (15:30 UTC) -> Slot 2
+    - cron: "30 15 * * *"
+    # 3) 20:30 TR (17:30 UTC) -> Slot 3
     - cron: "30 17 * * *"
-    # 3) 21:30 TR (18:30 UTC) -> Slot 3 (29.10, kullanicinin "gunde 3" karari)
-    - cron: "30 18 * * *"
-    # 4) 10:05 TR telafi slotu KAPATILDI (28.10, kullanicinin 2-slot karari)
+    # Not: Cuma gunu tum slotlar "uzun" tipinde -> haftalik UZUN ilk slot (12:30 TR)'ta yayinlanir.
+    # 10:05 TR telafi slotu KAPATILDI (28.10, kullanicinin 2-slot karari)
 
 permissions:
   actions: read
