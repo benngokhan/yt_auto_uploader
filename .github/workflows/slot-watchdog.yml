@@ -6,8 +6,7 @@ name: Slot Watchdog
 on:
   schedule:
     - cron: "15 10 * * *"  # 13:15 TR -> 12:30 slotunu izler
-    - cron: "15 16 * * *"  # 19:15 TR -> 18:30 slotunu izler
-    - cron: "15 18 * * *"  # 21:15 TR -> 20:30 slotunu izler
+    - cron: "15 17 * * *"  # 20:15 TR -> 19:30 slotunu izler
   workflow_dispatch: {}
 
 permissions:
@@ -39,10 +38,8 @@ jobs:
               slot_tr, kind = "10:05", "auto"   # telafi guard'a bagli
           elif schedule.startswith("30 9"):
               slot_tr, kind = "12:30", "yes"
-          elif schedule.startswith("30 15"):
-              slot_tr, kind = "18:30", "yes"
-          elif schedule.startswith("30 17"):
-              slot_tr, kind = "20:30", "yes"
+          elif schedule.startswith("30 16"):
+              slot_tr, kind = "19:30", "yes"
           else:
               slot_tr, kind = "manual", "yes"
 

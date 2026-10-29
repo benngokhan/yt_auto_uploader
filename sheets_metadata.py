@@ -121,18 +121,21 @@ def decide_daily_column(now_tr: Optional[datetime] = None) -> str:
 
 
 def decide_prime_time_video_type(now_tr: Optional[datetime] = None) -> str:
-    """SABİT slot tipi (29.10 REİS kararı — yayın saatleri 12:30/18:30/20:30 TR):
-    - Cuma 18:30 slotu (TR saat 18-19)  -> 'long' (haftalık UZUN = sabit 18:30)
-    - Cuma 20:30 slotu (TR saat 20-21)  -> 'long' (telafi: 18:30 kaçırdıysa uzun buradan çıkar;
-      uzun 18:30'ta çıktıysa kuyrukta uzun yok -> slot boş kalır, mevcut davranış)
-    - Cuma 12:30 slotu + diğer tüm günler -> 'short'
+    """SABİT slot tipi (30.10 REİS kararı — yayın saatleri 12:30 + 19:30 TR):
+    - Cuma 12:30 slotu (TR 12-13) -> 'long' (haftalık UZUN = sabit Cuma 12:30)
+    - Cuma 19:30 slotu (TR 19-20) -> 'long' telafi: bugün UZUN henüz çıkmadıysa uzun buradan
+      çıkar; bugün çıktıysa -> 'short' (akşam Shorts saati)
+    - Diğer tüm günlerin her iki slotu -> 'short'
     """
-    if decide_daily_column(now_tr) != "uzun":
-        return "short"
     tr_tz = timezone(timedelta(hours=3))
     dt = now_tr.astimezone(tr_tz) if now_tr else datetime.now(tr_tz)
-    if dt.hour in (18, 19, 20, 21):
-        return "long"
+    if dt.weekday() == 4:  # Cuma
+        if dt.hour in (12, 13):
+            return "long"
+        if dt.hour in (19, 20):
+            if any(is_long_filename(fn) for fn in _todays_uploaded_filenames()):
+                return "short"
+            return "long"
     return "short"
 
 
@@ -695,12 +698,16 @@ def get_next_scheduled_video(
         return cands[0] if cands else None
 
     # FORCE (29.10): REİS'in özel videosu — bu dosya sabitlendi, havuzda hazırsa O çıkar; değilse normal akış
+    # 30.10: UZUN slotunda (Cuma 12:30) short FORCE uygulanmaz — tür uyumsuz dosya sonraki short slot'a kalır
     if force_file:
-        fc = [c for c in collect_ready(want_long=None, want_col=None) if c["name"] == force_file]
-        if fc:
-            log.info(f"FORCE: {force_file} bu slot için sabitlendi (satır {fc[0]['row']})")
-            return fc[0]
-        log.info(f"FORCE: {force_file} havuzda hazır değil -> normal akışa dönülüyor")
+        if video_type == "long" and not is_long_filename(force_file):
+            log.info(f"FORCE: {force_file} short video — UZUN slotuna uygulanmaz (sonraki short slot'ta bekletilir)")
+        else:
+            fc = [c for c in collect_ready(want_long=None, want_col=None) if c["name"] == force_file]
+            if fc:
+                log.info(f"FORCE: {force_file} bu slot için sabitlendi (satır {fc[0]['row']})")
+                return fc[0]
+            log.info(f"FORCE: {force_file} havuzda hazır değil -> normal akışa dönülüyor")
 
     if video_type == "short" and locked_col == "uzun":
         locked_col = "beden_beyin"

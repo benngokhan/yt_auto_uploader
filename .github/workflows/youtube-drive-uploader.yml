@@ -21,15 +21,14 @@ on:
         type: string
         default: ""
   schedule:
-    # Türkiye Saati (UTC+3) SABİT 3 Slot (29.10 REİS kararı — saatler değişmez):
+    # Türkiye Saati (UTC+3) SABİT 2 Slot (30.10 REİS kararı — 12:30 + 19:30):
     # 1) 12:30 TR (09:30 UTC) -> Slot 1
     - cron: "30 9 * * *"
-    # 2) 18:30 TR (15:30 UTC) -> Slot 2
-    - cron: "30 15 * * *"
-    # 3) 20:30 TR (17:30 UTC) -> Slot 3
-    - cron: "30 17 * * *"
-    # Not: Haftalik UZUN video SABİT Cuma 18:30 TR slotunda yayinlanir (REİS karari 29.10);
-    #      20:30 slotu telafidir (18:30 kacarsa uzun 20:30'ta cikar). Cuma 12:30 + diger gunler = short.
+    # 2) 19:30 TR (16:30 UTC) -> Slot 2 (akşam Shorts saati)
+    - cron: "30 16 * * *"
+    # Not: Haftalik UZUN video SABİT Cuma 12:30 TR slotunda yayinlanir (REİS karari 30.10);
+    #      Cuma 19:30 telafidir (12:30 kacarsa uzun 19:30'ta cikar). Uzun ciktiginda 19:30 short'a doner.
+    #      Diger gunlerin iki slotu da short.
     # 10:05 TR telafi slotu KAPATILDI (28.10, kullanicinin 2-slot karari)
 
 permissions:
@@ -164,6 +163,7 @@ jobs:
             FILE_ARG="--file $INPUT_FORCE_FILE"
           elif [ -f force_next_video.txt ]; then
             FILE_ARG="--file $(cat force_next_video.txt)"
+            echo "FORCE_USED=$(cat force_next_video.txt)" >> "$GITHUB_ENV"
             echo "force_next_video.txt bulundu: $FILE_ARG"
           fi
           if [ "$INPUT_VIDEO_TYPE" = "short" ]; then
@@ -180,7 +180,13 @@ jobs:
           if [ -f uploaded.txt ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            # FORCE dosyasi bu slot'ta kullanildiyse tuset (sonraki slot tekrar calismasin)
+            if [ -n "${FORCE_USED:-}" ] && [ -f force_next_video.txt ] && [ "$(cat force_next_video.txt)" = "$FORCE_USED" ]; then
+              rm -f force_next_video.txt
+              echo "force_next_video.txt tusetildi (bu slot'ta kullandl: $FORCE_USED)"
+            fi
             git add uploaded.txt status_report.json bilgidozu_yukleme_tablosu.xlsx baslik.xlsx
+            git add -A -- force_next_video.txt 2>/dev/null || true
             [ -f .healed_131_thumb ] && git add -f .healed_131_thumb || true
             git diff --cached --quiet || git commit -m "chore: record uploaded Bilgi Dozu video [skip ci]"
             git push
