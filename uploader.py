@@ -1439,9 +1439,10 @@ def repair_video() -> None:
         cur_title = (cur.get("title") or "").strip()
         if not cur_title:
             raise SystemExit(f"Onarım: {vid} basligi alinamadi — aciklama guncellenmedi (güvenli dur)")
+        cur_cat = (cur.get("categoryId") or "").strip() or "22"
         youtube.videos().update(
             part="snippet",
-            body={"id": vid, "snippet": {"title": cur_title, "description": new_desc}},
+            body={"id": vid, "snippet": {"title": cur_title, "categoryId": cur_cat, "description": new_desc}},
         ).execute()
         log.info(f"Onarım: aciklama guncellendi ({len(new_desc)} kr) -> {vid}")
 
