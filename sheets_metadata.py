@@ -250,6 +250,7 @@ def parse_drive_sheet(xlsx_source) -> dict[str, dict]:
             "is_long": is_long_filename(fname),
             "has_title": has_title,
             "is_ready": (not is_done) and has_title,
+            "related_video": str(ws.cell(r, 14).value or "").strip(),
         }
     wb.close()
     return records
@@ -727,6 +728,21 @@ def get_next_scheduled_video(
             cands = collect_ready(want_long=False, want_col=fallback_col)
             if cands:
                 break
+    # CUMA İKİZ KURALI (30.10, CLOUD bildirimi MADDE 5): bugün uzun video yayınlandıysa
+    # 19:30 slotu = o uzunun "İlgili Video" hücresindeki 1'e 1 twin short'u (SERİ ZİNCİRİ trafiği).
+    if cuma_short_flip and cands:
+        try:
+            today_long = next((fn for fn in todays_uploads if is_long_filename(fn)), None)
+            if today_long and today_long in table:
+                twin_names = [t.strip() for t in str(table[today_long].get("related_video") or "").split(",") if t.strip()]
+                for tn in twin_names:
+                    hit = next((c for c in cands if c["name"].casefold() == tn.casefold()), None)
+                    if hit:
+                        log.info(f"CUMA İKİZ: {today_long}'un twin'i {hit['name']} 19:30'a sabitlendi (CLOUD MADDE 5).")
+                        return hit
+        except Exception as e:
+            log.warning(f"Cuma ikiz kuralı atlandı (zararsız): {e}")
+
     # EMİR 024: shorts — tablo sırası DEĞİL, hazır havuzdan RASTGELE (uzun video path'i sıralı kalır)
     return random.choice(cands) if cands else None
 

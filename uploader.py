@@ -1386,6 +1386,73 @@ def sync_related_links(youtube, drive, queue_folder: str, this_file_name: str, t
         return ""
 
 
+COMBINING_DOT = "\u0307"
+
+def sanitize_public_description(desc: str) -> str:
+    """Izleyiciye giden metin temizligi (30.10 QC — Cloud raporu):
+    1) Iceri kesisim notu ('🔗 ...' ile baslayan satirlar) aciklamadan cikarilir
+    2) Turkce karakter kaymalari (i/i/I/İ + birlesme noktesi U+0307) duzeltilir
+    3) Bolum araligi denetimi — YouTube kurali: her bolum >= 10 sn, yoksa bolum cizgileri acilmaz
+    """
+    if not desc:
+        return desc
+    out = []
+    for ln in str(desc).splitlines():
+        if ln.strip().startswith("🔗"):
+            log.warning(f"Sanitizer: iceri not aciklamadan cikarildi: {ln.strip()[:80]}")
+            continue
+        out.append(ln)
+    text = "\n".join(out)
+    text = text.replace("i" + COMBINING_DOT, "i")
+    text = text.replace("ı" + COMBINING_DOT, "ı")
+    text = text.replace("İ" + COMBINING_DOT, "İ")
+    text = text.replace("I" + COMBINING_DOT, "İ")
+    import re as _re
+    ts = _re.findall(r"^\s*(\d{1,2}):(\d{2})\s+\S", text, _re.M)
+    if len(ts) >= 3:
+        secs = [int(a) * 60 + int(b) for a, b in ts]
+        bad = [(secs[i], secs[i + 1]) for i in range(len(secs) - 1) if secs[i + 1] - secs[i] < 10]
+        if bad:
+            log.warning(f"Sanitizer: <10 sn bolum araligi var {bad} — YouTube bolumleri acilmayabilir!")
+    return text
+
+
+def repair_video() -> None:
+    """Yayinda olan videoyu tek seferlik onar (30.10): repo'da repair_video.json varsa
+    aciklama ve/veya kapak gunceller, dosyayi siler.
+    Format: {"video_id": "...", "description": "secenekli", "thumbnail_drive_id": "secenekli Drive ID"}
+    """
+    rp = BASE_DIR / "repair_video.json"
+    if not rp.exists():
+        log.info("Onarım dosyasi yok — yapilacak bir sey yok.")
+        return
+    spec = json.loads(rp.read_text(encoding="utf-8"))
+    vid = str(spec.get("video_id", "")).strip()
+    if not vid:
+        raise SystemExit("repair_video.json: video_id eksik")
+    youtube, drive = get_google_clients()
+
+    if spec.get("description") is not None:
+        new_desc = sanitize_public_description(str(spec["description"]))[:4900]
+        youtube.videos().update(
+            part="snippet",
+            body={"id": vid, "snippet": {"description": new_desc}},
+        ).execute()
+        log.info(f"Onarım: aciklama guncellendi ({len(new_desc)} kr) -> {vid}")
+
+    if spec.get("thumbnail_drive_id"):
+        tmp = Path(tempfile.mktemp(suffix=".png"))
+        download_drive_file(drive, str(spec["thumbnail_drive_id"]), tmp)
+        with open(tmp, "rb") as fh:
+            media = MediaFileUpload(fh, mimetype="image/png", resumable=False)
+        youtube.thumbnails().set(videoId=vid, media_body=media).execute()
+        tmp.unlink(missing_ok=True)
+        log.info(f"Onarım: kapak guncellendi -> {vid} (Drive {spec['thumbnail_drive_id']})")
+
+    rp.unlink(missing_ok=True)
+    log.info("Onarım tamamlandi; repair_video.json silindi.")
+
+
 def upload_job(
     channel_config: dict = None,
     publish_at=None,
@@ -1454,6 +1521,8 @@ def upload_job(
         "pinned_comment": scheduled.get("pinned_comment", ""),
         "privacyStatus": config.get("privacy_status", "public") or "public",
     }
+
+    meta["description"] = sanitize_public_description(meta["description"])
 
     log.info(f"Sıradaki Video : {file_name} (Satır {scheduled.get('row')} · Tür: {scheduled.get('video_type')})")
     log.info(f"Başlık         : {meta['title']}")
@@ -1772,5 +1841,7 @@ if __name__ == "__main__":
             except Exception:
                 pass
             raise
+    elif "--repair" in sys.argv:
+        repair_video()
     else:
         main()

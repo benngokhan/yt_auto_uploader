@@ -88,6 +88,16 @@ jobs:
           Path("config.json").write_text(json.dumps(cfg, indent=2, ensure_ascii=False), encoding="utf-8")
           PY
 
+      - name: Video onarımı (repair_video.json — push ile tetiklenen tek seferlik düzeltme)
+        if: github.event_name == 'push'
+        run: |
+          python uploader.py --repair
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- repair_video.json
+          git diff --cached --quiet || git commit -m "chore: video onarımı tamamlandı [skip ci]"
+          git push
+
       - name: Validate configuration (manual dry run — ZERO YouTube API quota!)
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
         run: |
