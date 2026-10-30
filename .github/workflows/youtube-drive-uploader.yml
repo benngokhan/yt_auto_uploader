@@ -43,6 +43,9 @@ jobs:
   upload:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -72,12 +75,10 @@ jobs:
 
       - name: Configure Google credentials
         env:
-          GOOGLE_CLIENT_SECRETS_JSON: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON || vars.GOOGLE_CLIENT_SECRETS_JSON }}
-          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON || vars.GOOGLE_TOKEN_JSON }}
+          GOOGLE_CLIENT_SECRETS_JSON: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
           DRIVE_QUEUE_FOLDER_ID: '1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_'
           SHEETS_ID: ''
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || vars.GEMINI_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || vars.GROQ_API_KEY || vars.AGROQ_API_KEY }}
         run: |
           python - <<'PY'
           import json, os
@@ -95,8 +96,6 @@ jobs:
           cfg["drive_queue_folder_id"] = raw_folder
           cfg["sheets_id"] = ""
           cfg["privacy_status"] = "public"
-          if os.getenv("GEMINI_API_KEY"): cfg["gemini_api_key"] = os.environ["GEMINI_API_KEY"]
-          if os.getenv("GROQ_API_KEY"): cfg["groq_api_key"] = os.environ["GROQ_API_KEY"]
           Path("config.json").write_text(json.dumps(cfg, indent=2, ensure_ascii=False), encoding="utf-8")
           PY
 
@@ -234,8 +233,8 @@ jobs:
       - name: Telegram VIP Bildirimi
         if: ${{ always() }}
         env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || vars.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || vars.TELEGRAM_CHAT_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           JOB_STATUS: ${{ job.status }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |

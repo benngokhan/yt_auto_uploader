@@ -98,6 +98,19 @@ class SlotGuardTests(unittest.TestCase):
             self.assertFalse(g.reserve_slot(claims,log,key))
             self.assertFalse(claims.exists())
 
+    def test_credential_files_are_ignored_and_keys_remain_environment_only(self):
+        root=Path(__file__).resolve().parent.parent
+        self.assertIn('token.json', (root/'.gitignore').read_text().splitlines())
+        workflow=(root/'.github/workflows/youtube-drive-uploader.yml').read_text()
+        self.assertNotIn('cfg["gemini_api_key"] = os.environ',workflow)
+        self.assertNotIn('cfg["groq_api_key"] = os.environ',workflow)
+        for name in ('GOOGLE_TOKEN_JSON','GOOGLE_CLIENT_SECRETS_JSON','GEMINI_API_KEY','GROQ_API_KEY','TELEGRAM_BOT_TOKEN'):
+            self.assertNotIn(f'vars.{name}',workflow)
+        with patch.dict(os.environ,{'GEMINI_API_KEY':'test-gemini','GROQ_API_KEY':'test-groq'}):
+            cfg=uploader.load_config()
+            self.assertEqual(cfg['gemini_api_key'],'test-gemini')
+            self.assertEqual(cfg['groq_api_key'],'test-groq')
+
     def test_configuration_validation_never_writes_or_moves_drive_files(self):
         drive=MagicMock()
         drive.files.return_value.get.return_value.execute.return_value={'name':'Queue'}

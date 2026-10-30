@@ -134,8 +134,8 @@ jobs:
       - name: Telegram alarmi
         if: steps.c.outputs.alert == 'true'
         env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || vars.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || vars.TELEGRAM_CHAT_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           SLOT: ${{ steps.c.outputs.slot }}
           KIND: ${{ steps.c.outputs.kind }}
           LATE: ${{ steps.c.outputs.late }}

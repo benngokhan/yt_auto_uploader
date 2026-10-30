@@ -1,6 +1,7 @@
 # Secrets — never commit these
 .env
 client_secrets.json
+token.json
 credentials/
 
 # Personal data
