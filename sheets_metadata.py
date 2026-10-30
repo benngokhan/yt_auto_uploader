@@ -8,7 +8,6 @@ Bilgi Dozu (@bilgidozuofficial) — Google Drive & Excel (DRIVE Sekmesi) Metadat
 import io
 import logging
 import os
-import random
 import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -26,8 +25,11 @@ log = logging.getLogger(__name__)
 
 DEFAULT_DRIVE_FOLDER_ID = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"  # KartaL Stok (27.10 karar: TEK kuyruk klasörü — eski YENI_SERI_ONAYLI_STOK buraya taşındı)
 DEFAULT_SHEETS_ID = ""
-MIN_SHORTS_NUMBER = 51   # CEO kararı 29.10: havuz 51+ (47-50 arşive); 1..50 ESKİ_STOK_ASKIDA; 48 zaten yayınlanmış
-MIN_LONG_NUMBER = 14     # 29.10 REİS karari: stok uzun 14-16 + yeni seri 17+ yayina onayli; eski 1..13 kilitli (Drive'da 14 ust uzun dosyasi yok, dogrulandi)
+# Only our current series is eligible; earlier stock is never selected.
+MIN_SHORTS_NUMBER = 150
+MIN_LONG_NUMBER = 18
+# Already-public videos must not be published again even if the table is stale.
+KNOWN_PUBLISHED_NAMES = frozenset({"video_157.mp4", "uzun_video_17.mp4"})
 
 CATEGORY_MAP = {
     "uzay ve astronomi": "28",
@@ -62,6 +64,8 @@ def natural_sort_key(filename: str) -> tuple:
 
 def is_skipped_by_floor(filename: str) -> bool:
     name = os.path.basename(filename).lower()
+    if name in KNOWN_PUBLISHED_NAMES:
+        return True
     if name.startswith("video_") and extract_video_number(name) < MIN_SHORTS_NUMBER:
         return True
     if name.startswith("uzun_") and extract_video_number(name) < MIN_LONG_NUMBER:
@@ -121,21 +125,11 @@ def decide_daily_column(now_tr: Optional[datetime] = None) -> str:
 
 
 def decide_prime_time_video_type(now_tr: Optional[datetime] = None) -> str:
-    """SABİT slot tipi (30.10 REİS kararı — yayın saatleri 12:30 + 19:30 TR):
-    - Cuma 12:30 slotu (TR 12-13) -> 'long' (haftalık UZUN = sabit Cuma 12:30)
-    - Cuma 19:30 slotu (TR 19-20) -> 'long' telafi: bugün UZUN henüz çıkmadıysa uzun buradan
-      çıkar; bugün çıktıysa -> 'short' (akşam Shorts saati)
-    - Diğer tüm günlerin her iki slotu -> 'short'
+    """The two daily automatic slots are always Shorts.
+
+    The separate weekly long-video slot calls the uploader explicitly with
+    ``video_type=long``; it never replaces either daily Shorts slot.
     """
-    tr_tz = timezone(timedelta(hours=3))
-    dt = now_tr.astimezone(tr_tz) if now_tr else datetime.now(tr_tz)
-    if dt.weekday() == 4:  # Cuma
-        if dt.hour in (12, 13):
-            return "long"
-        if dt.hour in (19, 20):
-            if any(is_long_filename(fn) for fn in _todays_uploaded_filenames()):
-                return "short"
-            return "long"
     return "short"
 
 
@@ -358,8 +352,7 @@ def load_table_from_drive_or_local(
 
 
 def list_drive_videos_with_stats(drive, folder_id: str) -> tuple[list[dict], int]:
-    """KartaL Stok klasöründeki .mp4 dosyalarını tarar, mükerrer dosya sayısını hesaplar ve
-    aynı dosya adından birden fazla varsa yalnızca EN ESKİ (orijinal) kopyayı tutar."""
+    """List unique video names; ambiguous duplicate names are rejected, not guessed."""
     raw_videos = []
     if not drive or not folder_id:
         return [], 0
@@ -385,17 +378,18 @@ def list_drive_videos_with_stats(drive, folder_id: str) -> tuple[list[dict], int
 
     by_name: dict[str, list[dict]] = {}
     for f in raw_videos:
-        key = f.get("name", "").strip()
+        key = f.get("name", "").strip().casefold()
         if key:
             by_name.setdefault(key, []).append(f)
 
     unique_videos = []
     duplicate_count = 0
     for key, items in by_name.items():
-        items.sort(key=lambda x: x.get("createdTime", ""))
-        unique_videos.append(items[0])  # en eski (orijinal) kopya
         if len(items) > 1:
             duplicate_count += len(items) - 1
+            log.error("Aynı ada sahip %s kuyrukta %d kez var; yanlış sürüm yayınlanmasın diye atlandı.", key, len(items))
+            continue
+        unique_videos.append(items[0])
 
     unique_videos.sort(key=lambda x: natural_sort_key(x.get("name", "")))
     return unique_videos, duplicate_count
@@ -636,19 +630,6 @@ def get_next_scheduled_video(
         if rec.get("has_youtube_link") or rec.get("youtube_url") or not rec.get("is_ready")
     }
 
-    daily_col = decide_daily_column()  # 'beden_beyin' (5 gün) | 'uzun' (Cuma) | 'doz_disi' (Pazar)
-    todays_uploads = _todays_uploaded_filenames()
-
-    # Cuma kuralı (REİS 30.10 revizyon): haftada 1 Uzun video; ama 2 slot SABİT —
-    # Cuma uzun video zaten çıktıysa akşam slotu SHORT'A döner (eski "aynı gün farklı kategori açılmaz" kuralı kaldırıldı).
-    cuma_short_flip = False
-    if video_type == "auto" and daily_col == "uzun":
-        if any(is_long_filename(fn) for fn in todays_uploads):
-            log.info("CUMA: Haftalık Uzun Video bugün zaten yayınlandı; akşam slotu SHORT'a dönüyor (REİS 30.10: 2 slot sabit).")
-            daily_col = "beden_beyin"
-            video_type = "short"
-            cuma_short_flip = True
-
     def collect_ready(want_long: Optional[bool], want_col: Optional[str] = None, subcat_lock: Optional[str] = None) -> list[dict]:
         ready: list[dict] = []
         for v in videos:
@@ -684,67 +665,47 @@ def get_next_scheduled_video(
                 "row": meta["row"],
                 "video_type": "long" if is_long_filename(vname) else "short",
             })
-        # Strateji Masası tablo sırasını birebir uygula (row sırası)
-        ready.sort(key=lambda item: (item["row"], natural_sort_key(item["name"])))
+        # Filename number, not spreadsheet row/category/randomness, is authoritative.
+        ready.sort(key=lambda item: natural_sort_key(item["name"]))
         return ready
 
-    # Aynı gün 2 slot varsa İKİSİ DE AYNI SÜTUNDAN olacak (19:00 ne açtıysa 20:15 aynı sütundan devam eder)
-    locked_col = daily_col
-    locked_subcat = None
-    if todays_uploads and video_type == "auto":
-        first_today = todays_uploads[0]
-        first_meta = table.get(first_today) or {}
-        locked_col = first_meta.get("column_group") or classify_strategy_column(first_today, first_meta.get("category_name", ""))
-        if locked_col == "doz_disi":
-            locked_subcat = classify_doz_disi_subcat(first_meta.get("category_name", ""), first_meta.get("title", ""))
+    if video_type not in {"auto", "short", "long"}:
+        raise ValueError(f"Geçersiz video türü: {video_type}")
 
-    if video_type == "long" or (video_type == "auto" and locked_col == "uzun"):
-        cands = collect_ready(want_long=True, want_col="uzun")
-        return cands[0] if cands else None
+    if video_type == "long":
+        candidates = [
+            c for c in collect_ready(want_long=True)
+            if re.fullmatch(r"uzun_video_\d+\.mp4", c["name"], flags=re.IGNORECASE)
+        ]
+        # Explicit force cannot jump over an earlier ready video.
+        if force_file and candidates and force_file.casefold() != candidates[0]["name"].casefold():
+            log.warning("Sıra dışı uzun video isteği yok sayıldı: %s", force_file)
+        return candidates[0] if candidates else None
 
-    # FORCE (29.10): REİS'in özel videosu — bu dosya sabitlendi, havuzda hazırsa O çıkar; değilse normal akış
-    # 30.10: UZUN slotunda (Cuma 12:30) short FORCE uygulanmaz — tür uyumsuz dosya sonraki short slot'a kalır
-    if force_file:
-        if video_type == "long" and not is_long_filename(force_file):
-            log.info(f"FORCE: {force_file} short video — UZUN slotuna uygulanmaz (sonraki short slot'ta bekletilir)")
-        else:
-            fc = [c for c in collect_ready(want_long=None, want_col=None) if c["name"] == force_file]
-            if fc:
-                log.info(f"FORCE: {force_file} bu slot için sabitlendi (satır {fc[0]['row']})")
-                return fc[0]
-            log.info(f"FORCE: {force_file} havuzda hazır değil -> normal akışa dönülüyor")
+    # Shorts are strict consecutive numbers from 150. A missing/not-ready entry
+    # stops the queue instead of silently jumping ahead. Only evidence of a
+    # previous publication (log or YouTube link) advances the expected number.
+    completed_names = {str(x).strip().casefold() for x in skip_ids}
+    completed_names.update(KNOWN_PUBLISHED_NAMES)
+    expected = MIN_SHORTS_NUMBER
+    while True:
+        name = f"video_{expected}.mp4"
+        meta = table.get(name) or {}
+        if name.casefold() in completed_names or meta.get("has_youtube_link") or meta.get("youtube_url"):
+            expected += 1
+            continue
+        break
 
-    if video_type == "short" and locked_col == "uzun":
-        locked_col = "beden_beyin"
-
-    # Önce günün kilitli sütunundan (ve varsa aynı alt kategoriden) seç
-    cands = collect_ready(want_long=False, want_col=locked_col, subcat_lock=locked_subcat)
-    if not cands and locked_subcat:
-        cands = collect_ready(want_long=False, want_col=locked_col, subcat_lock=None)
-    if not cands and (not todays_uploads or cuma_short_flip):
-        # Yalnızca günün ilk slotunda o sütun tamamen bittiyse sıradaki Beden&Beyin -> Doz Dışı yedeklemesi
-        # (+ REİS 30.10: Cuma short flip'inde de havuz boşsa yedek sütuna düş)
-        for fallback_col in ("beden_beyin", "doz_disi"):
-            cands = collect_ready(want_long=False, want_col=fallback_col)
-            if cands:
-                break
-    # CUMA İKİZ KURALI (30.10, CLOUD bildirimi MADDE 5): bugün uzun video yayınlandıysa
-    # 19:30 slotu = o uzunun "İlgili Video" hücresindeki 1'e 1 twin short'u (SERİ ZİNCİRİ trafiği).
-    if cuma_short_flip and cands:
-        try:
-            today_long = next((fn for fn in todays_uploads if is_long_filename(fn)), None)
-            if today_long and today_long in table:
-                twin_names = [t.strip() for t in str(table[today_long].get("related_video") or "").split(",") if t.strip()]
-                for tn in twin_names:
-                    hit = next((c for c in cands if c["name"].casefold() == tn.casefold()), None)
-                    if hit:
-                        log.info(f"CUMA İKİZ: {today_long}'un twin'i {hit['name']} 19:30'a sabitlendi (CLOUD MADDE 5).")
-                        return hit
-        except Exception as e:
-            log.warning(f"Cuma ikiz kuralı atlandı (zararsız): {e}")
-
-    # EMİR 024: shorts — tablo sırası DEĞİL, hazır havuzdan RASTGELE (uzun video path'i sıralı kalır)
-    return random.choice(cands) if cands else None
+    if force_file and force_file.casefold() != name.casefold():
+        log.warning("Sıra dışı Shorts isteği yok sayıldı: %s; beklenen %s", force_file, name)
+    candidates = [c for c in collect_ready(want_long=False) if c["name"].casefold() == name.casefold()]
+    if not candidates:
+        log.warning("Sıradaki %s yok veya hazır değil; sıra atlanmadan bekleniyor.", name)
+        return None
+    if len(candidates) != 1:
+        log.error("Sıradaki %s birden fazla sürümle eşleşti; güvenlik için durduruldu.", name)
+        return None
+    return candidates[0]
 
 
 # ---------------------------------------------------------------------------

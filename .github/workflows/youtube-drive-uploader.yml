@@ -16,20 +16,15 @@ on:
         type: string
         default: "auto"
       force_file:
-        description: "Özel video: tam dosya adı (örn. video_148.mp4). Boş = normal akış."
+        description: "İsteğe bağlı tam dosya adı; sıra dışındaki dosyalar alınmaz."
         required: false
         type: string
         default: ""
   schedule:
-    # Türkiye Saati (UTC+3) SABİT 2 Slot (30.10 REİS kararı — 12:30 + 19:30):
-    # 1) 12:30 TR (09:30 UTC) -> Slot 1
-    - cron: "30 9 * * *"
-    # 2) 19:30 TR (16:30 UTC) -> Slot 2 (akşam Shorts saati)
-    - cron: "30 16 * * *"
-    # Not: Haftalik UZUN video SABİT Cuma 12:30 TR slotunda yayinlanir (REİS karari 30.10);
-    #      Cuma 19:30 telafidir (12:30 kacarsa uzun 19:30'ta cikar). Uzun ciktiginda 19:30 short'a doner.
-    #      Diger gunlerin iki slotu da short.
-    # 10:05 TR telafi slotu KAPATILDI (28.10, kullanicinin 2-slot karari)
+    # Türkiye (UTC+03): her gün iki Shorts; Cuma 16:00 ek uzun video.
+    - cron: "30 9 * * *"   # 12:30 Türkiye — Shorts
+    - cron: "0 13 * * 5"   # Cuma 16:00 Türkiye — ek uzun video
+    - cron: "30 16 * * *"  # 19:30 Türkiye — Shorts
 
 permissions:
   actions: read
@@ -57,6 +52,9 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      - name: Test queue order and duplicate safeguards
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: Configure Google credentials
         env:
@@ -89,7 +87,7 @@ jobs:
           PY
 
       - name: Video onarımı (repair_video.json — push ile tetiklenen tek seferlik düzeltme)
-        if: github.event_name == 'push'
+        if: ${{ github.event_name == 'push' && hashFiles('repair_video.json') != '' }}
         run: |
           python uploader.py --repair
           git config user.name "github-actions[bot]"
@@ -105,16 +103,24 @@ jobs:
           import json
           from pathlib import Path
           from google.oauth2.credentials import Credentials
-          from uploader import get_google_clients, load_config, validate_metadata_workbook
+          from uploader import get_google_clients, load_config, load_uploaded_ids, validate_metadata_workbook
+          from sheets_metadata import get_next_scheduled_video
           cfg = load_config()
           creds = Credentials.from_authorized_user_file("token.json")
           granted_scopes = set(creds.scopes or [])
           if "https://www.googleapis.com/auth/youtube.upload" not in granted_scopes:
               raise SystemExit("OAuth token is missing the youtube.upload scope; re-authorize with uploader.py's configured scopes.")
+          analytics_scope = "https://www.googleapis.com/auth/yt-analytics.readonly"
+          print("ANALYTICS SCOPE:", "YES" if analytics_scope in granted_scopes else "NO")
           # SADECE Drive ve Tablo doğrulanır — YouTube Data API kotasından 0 birim harcanır!
           _youtube, drive = get_google_clients()
           drive.files().list(q=f"'{cfg['drive_queue_folder_id']}' in parents and trashed=false", pageSize=10, fields="files(id,name)").execute()
           print(validate_metadata_workbook(drive, cfg["drive_queue_folder_id"]))
+          done = load_uploaded_ids(Path(cfg.get("uploaded_list", "uploaded.txt")))
+          next_short = get_next_scheduled_video(drive, cfg["drive_queue_folder_id"], skip_ids=done, video_type="short")
+          next_long = get_next_scheduled_video(drive, cfg["drive_queue_folder_id"], skip_ids=done, video_type="long")
+          print(f"SIRADAKI SHORT: {next_short['name'] if next_short else 'BEKLIYOR'}")
+          print(f"SIRADAKI UZUN: {next_long['name'] if next_long else 'BEKLIYOR'}")
           manifest = json.loads(Path("approved_new_series_manifest.json").read_text(encoding="utf-8"))
           print(f"VALIDATION OK (0 YouTube Quota Spent): {len(manifest.get('approved_videos', {}))} approved videos in manifest.")
           PY
@@ -165,16 +171,12 @@ jobs:
       - name: Upload one queued video (Prime Time Schedule)
         if: ${{ (github.event_name == 'schedule' && steps.guard.outputs.should_run != 'false') || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
         env:
-          INPUT_VIDEO_TYPE: ${{ inputs.video_type || 'auto' }}
+          INPUT_VIDEO_TYPE: ${{ github.event_name == 'schedule' && github.event.schedule == '0 13 * * 5' && 'long' || inputs.video_type || 'auto' }}
           INPUT_FORCE_FILE: ${{ inputs.force_file || '' }}
         run: |
           FILE_ARG=""
           if [ -n "$INPUT_FORCE_FILE" ]; then
             FILE_ARG="--file $INPUT_FORCE_FILE"
-          elif [ -f force_next_video.txt ]; then
-            FILE_ARG="--file $(cat force_next_video.txt)"
-            echo "FORCE_USED=$(cat force_next_video.txt)" >> "$GITHUB_ENV"
-            echo "force_next_video.txt bulundu: $FILE_ARG"
           fi
           if [ "$INPUT_VIDEO_TYPE" = "short" ]; then
             python uploader.py --now --short $FILE_ARG
@@ -190,13 +192,7 @@ jobs:
           if [ -f uploaded.txt ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            # FORCE dosyasi bu slot'ta kullanildiyse tuset (sonraki slot tekrar calismasin)
-            if [ -n "${FORCE_USED:-}" ] && [ -f force_next_video.txt ] && [ "$(cat force_next_video.txt)" = "$FORCE_USED" ]; then
-              rm -f force_next_video.txt
-              echo "force_next_video.txt tusetildi (bu slot'ta kullandl: $FORCE_USED)"
-            fi
             git add uploaded.txt status_report.json bilgidozu_yukleme_tablosu.xlsx baslik.xlsx
-            git add -A -- force_next_video.txt 2>/dev/null || true
             [ -f .healed_131_thumb ] && git add -f .healed_131_thumb || true
             git diff --cached --quiet || git commit -m "chore: record uploaded Bilgi Dozu video [skip ci]"
             git push
