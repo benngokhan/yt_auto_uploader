@@ -1,29 +1,38 @@
 name: Slot Watchdog
-# DEAD-MAN-SWITCH: cron sessiz kalmazsa bile Telegram'a alarm.
-# Mevcut bildirim "basilip FAIL oldu"yi yakalar; bu workflow "BASILMADI"yi yakalar.
-# GitHub cron gecikmeleri gorsel olarak 30-50 dk -> ilk kontrol slot+45dk, sonda slot+75dk.
+# DEAD-MAN-SWITCH v2 (30.10 KRIZ): video slotunden GECIKIRSE Telegram alarm + otomatik kurtarma.
+# v1 hatasi (30.10): yalniz "run basladi mi" soruyordu — run 46 dk gecikmeli basladiysa
+# "basladi" diyip susuyordu; video ~40 dk gecikti ve kimse uyarilmadi.
+# v2 mantigi:
+#   13:05 TR (slot+35, erken) : uploaded.txt'de slot-35dk..simdi arasi YAYIN damgasi yoksa ALARM
+#   13:15 TR (slot+45, tescil): hala yoksa ALARM + run hic baslamadiysa OTOMATIK KURTARMA
+#                               (uploader'a workflow_dispatch, video_type=auto)
+#   20:05 / 20:15 TR: ayni kural 19:30 slotu icin.
+# Pencere slot'a sabitlendi: watchdog'un kendisi gecikse bile gecikmeli AMA basarili
+# yuklemede yanlis alarm vermez; gecikmede alarm + kurtarma yapar.
 
 on:
   schedule:
-    - cron: "15 10 * * *"  # 13:15 TR -> 12:30 slotunu izler
-    - cron: "15 17 * * *"  # 20:15 TR -> 19:30 slotunu izler
+    - cron: "05 10 * * *"  # 13:05 TR -> 12:30 slotu (erken)
+    - cron: "15 10 * * *"  # 13:15 TR -> 12:30 slotu (tescil + kurtarma)
+    - cron: "05 17 * * *"  # 20:05 TR -> 19:30 slotu (erken)
+    - cron: "15 17 * * *"  # 20:15 TR -> 19:30 slotu (tescil + kurtarma)
   workflow_dispatch: {}
 
 permissions:
-  actions: read
+  actions: write
   contents: read
 
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 20
     steps:
       - name: Checkout (uploaded.txt icin)
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
-      - name: Slot run baslatildi mi?
+      - name: Video yayina cikti mi?
         id: c
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -34,73 +43,99 @@ jobs:
           from datetime import datetime, timezone, timedelta
 
           schedule = os.environ.get("GITHUB_EVENT_SCHEDULE", "").strip()
-          if schedule.startswith("5 7"):
-              slot_tr, kind = "10:05", "auto"   # telafi guard'a bagli
-          elif schedule.startswith("30 9"):
-              slot_tr, kind = "12:30", "yes"
-          elif schedule.startswith("30 16"):
-              slot_tr, kind = "19:30", "yes"
+          if schedule.startswith("05 10"):
+              slot_h, kind = 9, "erken"
+          elif schedule.startswith("15 10"):
+              slot_h, kind = 9, "tescil"
+          elif schedule.startswith("05 17"):
+              slot_h, kind = 16, "erken"
+          elif schedule.startswith("15 17"):
+              slot_h, kind = 16, "tescil"
           else:
-              slot_tr, kind = "manual", "yes"
+              print("Manuel/dispatch tetikleme -> kontrol yok.")
+              raise SystemExit(0)
 
-          # 10:05: ana workflow'un telafi guard'inin kopyasi — dunun akşam slotlari
-          # tamamsa bu slot yasal olarak ATLANIYOR -> alarm verme.
-          if kind == "auto":
-              stamps = []
-              p = os.path.join(os.getcwd(), "uploaded.txt")
-              if os.path.exists(p):
-                  for line in open(p, encoding="utf-8"):
-                      line = line.strip()
-                      if not line or line.startswith("#"):
-                          continue
-                      parts = [x.strip() for x in line.split("|")]
-                      if len(parts) >= 4:
-                          try:
-                              stamps.append(datetime.strptime(parts[3], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc))
-                          except ValueError:
-                              pass
-              now_tr = datetime.now(timezone.utc) + timedelta(hours=3)
-              yday = (now_tr - timedelta(days=1)).date()
-              done = sum(
-                  1 for ts in stamps
-                  if (ts + timedelta(hours=3)).date() == yday and (ts + timedelta(hours=3)).hour >= 18
-              )
-              exp = 1 if yday.weekday() == 4 else 2
-              if done >= exp:
-                  print(f"10:05 slotu calismasi GEREKMEZ (dun {done}/{exp} aksam slotu tamam) -> alarm yok.")
-                  raise SystemExit(0)
+          slot = datetime.now(timezone.utc).replace(hour=slot_h, minute=30, second=0, microsecond=0)
+          lo = slot - timedelta(minutes=35)
+          now = datetime.now(timezone.utc)
 
-          def run_started(window_min: int) -> bool:
+          # 1) uploaded.txt'de bu pencerede yayin damgasi var mi?
+          stamps = []
+          p = os.path.join(os.getcwd(), "uploaded.txt")
+          if os.path.exists(p):
+              for line in open(p, encoding="utf-8"):
+                  line = line.strip()
+                  if not line or line.startswith("#"):
+                      continue
+                  parts = [x.strip() for x in line.split("|")]
+                  if len(parts) >= 4:
+                      try:
+                          stamps.append(datetime.strptime(parts[3], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc))
+                      except ValueError:
+                          pass
+          published = [s for s in stamps if lo <= s <= now]
+          if published:
+              print(f"OK: slotun videosu {max(published).strftime('%H:%M')} UTC yayinda -> alarm yok.")
+              raise SystemExit(0)
+
+          # 2) Run durumu (baglam + kurtarma karari icin)
+          def recent_runs():
               url = f"https://api.github.com/repos/{os.environ['REPO']}/actions/runs?per_page=20"
               req = urllib.request.Request(url, headers={
                   "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
                   "Accept": "application/vnd.github+json",
               })
               d = json.load(urllib.request.urlopen(req, timeout=30))
-              cutoff = datetime.now(timezone.utc) - timedelta(minutes=window_min)
+              out = []
               for r in d.get("workflow_runs", []):
-                  if r.get("name") != "YouTube Drive Uploader" or r.get("event") != "schedule":
+                  if r.get("name") != "YouTube Drive Uploader":
                       continue
                   try:
                       created = datetime.fromisoformat(r["created_at"].replace("Z", "+00:00"))
                   except Exception:
                       continue
-                  if created >= cutoff:
-                      return True
-              return False
+                  if created >= slot - timedelta(minutes=60):
+                      out.append((created, r.get("event"), r.get("status")))
+              return sorted(out)
 
-          if run_started(55):
-              print(f"{slot_tr} slotunun run'i basladi ✓")
-              raise SystemExit(0)
-          print(f"{slot_tr} sonrasi 55 dkda run yok -> 20 dk bekleniyor (cron gecikmesi payi)...")
-          import time
-          time.sleep(1200)
-          if run_started(80):
-              print(f"{slot_tr} slotunun run'i gecikmeli de olsa basladi ✓")
-              raise SystemExit(0)
-          print(f"ALARM: {slot_tr} slotunun run'i 75 dkda baslatilamadi!")
+          rlist = recent_runs()
+          late_min = int((now - slot).total_seconds() // 60)
+          slot_tr = f"{(slot_h + 3) % 24:02d}:30"
+
+          if rlist:
+              c, ev, st = rlist[-1]
+              run_info = f"Run {c.strftime('%H:%M')} UTC ({ev}, {st}) — video yine de yayinda degil."
+          else:
+              run_info = "Run BASLAMADI (cron gecikmesi)."
+
+          rescue = ""
+          if kind == "tescil" and not rlist:
+              # Otomatik kurtarma: uploader'i dispatch et (upload adimi dispatch'te calisir;
+              # gecikmeli cron run'u daha sonra gelirse cooldown + duplicate lock engeller.)
+              try:
+                  durl = f"https://api.github.com/repos/{os.environ['REPO']}/actions/workflows/youtube-drive-uploader.yml/dispatches"
+                  req = urllib.request.Request(
+                      durl,
+                      data=json.dumps({"ref": "main", "inputs": {"dry_run": False, "video_type": "auto"}}).encode(),
+                      headers={"Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+                               "Accept": "application/vnd.github+json",
+                               "Content-Type": "application/json"},
+                      method="POST",
+                  )
+                  resp = urllib.request.urlopen(req, timeout=30)
+                  print(f"KURTARMA dispatch gonderildi (HTTP {resp.status}).")
+                  rescue = "Otomatik kurtarma tetiklendi — video ~2 dk icinde yayina girer."
+              except Exception as e:
+                  rescue = f"Otomatik kurtarma BASARISIZ ({e}) — manuel mudahale gerekli."
+
+          print(f"ALARM ({kind}): {slot_tr} TR slotu {late_min} dk gecikti. {run_info} {rescue}")
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
               f.write("alert=true\n")
+              f.write(f"slot={slot_tr}\n")
+              f.write(f"kind={kind}\n")
+              f.write(f"late={late_min}\n")
+              f.write(f"run_info={run_info}\n")
+              f.write(f"rescue={rescue}\n")
           PY
 
       - name: Telegram alarmi
@@ -108,8 +143,11 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || vars.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || vars.TELEGRAM_CHAT_ID }}
-          SCHEDULE: ${{ github.event.schedule || 'manual' }}
-          REPO_URL: ${{ github.server_url }}/${{ github.repository }}/actions
+          SLOT: ${{ steps.c.outputs.slot }}
+          KIND: ${{ steps.c.outputs.kind }}
+          LATE: ${{ steps.c.outputs.late }}
+          RUN_INFO: ${{ steps.c.outputs.run_info }}
+          RESCUE: ${{ steps.c.outputs.rescue }}
         run: |
           python - <<'PY'
           import json, os, urllib.request
@@ -117,18 +155,18 @@ jobs:
           chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
           if not token or not chat_id:
               raise SystemExit(0)
-          sched = os.environ.get("SCHEDULE", "?").strip()
-          slot = {"5 7": "10:05", "30 9": "12:30", "30 15": "18:30", "30 17": "20:30"}.get(sched[:5], "slot")
-          text = (
-              "🚨 <b>SLOT ATEŞLENMEDİ</b>\n\n"
-              f"<code>{slot} TR</code> slotunun run'ı 75 dakika içinde başlatılamadı.\n"
-              "Cron takmış olabilir veya workflow devre dışı kalmış olabilir.\n\n"
-              f"Kontrol: <a href=\"{os.environ.get('REPO_URL', '')}\">Actions</a>"
-          )
-          payload = {"chat_id": chat_id, "text": text, "parse_mode": "HTML", "disable_web_page_preview": True}
+          lines = [
+              f"🚨 <b>SLOT GECIKTI ({os.environ.get('KIND', '?')})</b>",
+              f"<code>{os.environ.get('SLOT', '?')} TR</code> slotunun videosu {os.environ.get('LATE', '?')} dakika sonrasi hâlâ yayinda degil.",
+          ]
+          if os.environ.get("RUN_INFO"):
+              lines.append(os.environ["RUN_INFO"])
+          if os.environ.get("RESCUE"):
+              lines.append(os.environ["RESCUE"])
+          payload = {"chat_id": chat_id, "text": "\n".join(lines), "parse_mode": "HTML", "disable_web_page_preview": True}
           req = urllib.request.Request(
               f"https://api.telegram.org/bot{token}/sendMessage",
-              data=json.dumps(payload).encode("utf-8"),
+              data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
               headers={"Content-Type": "application/json; charset=utf-8"},
               method="POST",
           )
