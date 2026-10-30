@@ -153,7 +153,7 @@ jobs:
           PY
 
       - name: Upload one queued video (Prime Time Schedule)
-        if: ${{ (github.event_name == 'schedule' && steps.guard.outputs.should_run != 'false') || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
+        if: ${{ (github.event_name == 'schedule' && steps.guard.outputs.should_run != 'false') || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) || github.event_name == 'push' }}
         env:
           INPUT_VIDEO_TYPE: ${{ inputs.video_type || 'auto' }}
           INPUT_FORCE_FILE: ${{ inputs.force_file || '' }}
@@ -175,7 +175,7 @@ jobs:
           fi
 
       - name: Persist duplicate-prevention log
-        if: ${{ success() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)) }}
+        if: ${{ success() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) || github.event_name == 'push') }}
         run: |
           if [ -f uploaded.txt ]; then
             git config user.name "github-actions[bot]"
