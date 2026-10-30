@@ -1434,9 +1434,14 @@ def repair_video() -> None:
 
     if spec.get("description") is not None:
         new_desc = sanitize_public_description(str(spec["description"]))[:4900]
+        # videos.update(part=snippet) basligi da istiyor -> mevcut basligi al, birlikte gonder
+        cur = youtube.videos().list(part="snippet", id=vid).execute().get("items", [{}])[0].get("snippet", {})
+        cur_title = (cur.get("title") or "").strip()
+        if not cur_title:
+            raise SystemExit(f"Onarım: {vid} basligi alinamadi — aciklama guncellenmedi (güvenli dur)")
         youtube.videos().update(
             part="snippet",
-            body={"id": vid, "snippet": {"description": new_desc}},
+            body={"id": vid, "snippet": {"title": cur_title, "description": new_desc}},
         ).execute()
         log.info(f"Onarım: aciklama guncellendi ({len(new_desc)} kr) -> {vid}")
 
