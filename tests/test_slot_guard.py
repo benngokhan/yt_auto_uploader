@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import slot_guard as g
 import uploader
@@ -97,6 +97,21 @@ class SlotGuardTests(unittest.TestCase):
             log.write_text(f'f | video_150.mp4 | https://youtu.be/abc | 2026-10-30 09:31 | title | SLOT={key}\n')
             self.assertFalse(g.reserve_slot(claims,log,key))
             self.assertFalse(claims.exists())
+
+    def test_configuration_validation_never_writes_or_moves_drive_files(self):
+        drive=MagicMock()
+        drive.files.return_value.get.return_value.execute.return_value={'name':'Queue'}
+        drive.files.return_value.list.return_value.execute.return_value={'files':[]}
+        recs={'video_150.mp4':{'is_ready':True,'is_long':False}}
+        stats={'unique_videos':1,'duplicate_videos':0,'published_videos':0,'ready_videos':1}
+        with patch.object(uploader,'sync_cloud_deliveries_to_drive') as sync, \
+             patch.object(uploader,'drain_lobi_to_queue') as move, \
+             patch.object(uploader,'load_table_from_drive_or_local',return_value=recs), \
+             patch('sheets_metadata.list_drive_videos',return_value=[]), \
+             patch('sheets_metadata.compute_queue_stats',return_value=stats):
+            uploader.validate_metadata_workbook(drive,'queue')
+            sync.assert_not_called();move.assert_not_called()
+            drive.files.return_value.update.assert_not_called()
 
     def test_log_persisted_even_if_later_upload_step_fails(self):
         workflow=(Path(__file__).resolve().parent.parent/'.github/workflows/youtube-drive-uploader.yml').read_text()

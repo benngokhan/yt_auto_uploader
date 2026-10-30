@@ -283,13 +283,12 @@ def sync_cloud_deliveries_to_drive(drive, queue_folder: str) -> None:
 
 
 def validate_metadata_workbook(drive, queue_folder: str) -> str:
-    sync_cloud_deliveries_to_drive(drive, queue_folder or DEFAULT_DRIVE_FOLDER_ID)
+    # A dry-run or push validation must never rewrite the live Drive workbook.
     records = load_table_from_drive_or_local(drive, queue_folder or DEFAULT_DRIVE_FOLDER_ID)
     if not records:
         raise RuntimeError("DRIVE sekmesi okunamadı veya hiç satır bulunamadı.")
     ready_shorts = sum(1 for r in records.values() if r.get("is_ready") and not r.get("is_long"))
     ready_longs = sum(1 for r in records.values() if r.get("is_ready") and r.get("is_long"))
-    drain_lobi_to_queue(drive, queue_folder or DEFAULT_DRIVE_FOLDER_ID)
 
     # AKILLI RÖNTGEN: Tabloda hazır görünen uzunlar, Drive klasöründe fiziksel var mı?
     try:
