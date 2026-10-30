@@ -20,6 +20,11 @@ on:
         required: false
         type: string
         default: ""
+      recovery_slot:
+        description: "Yalnız bekçi telafisi için UTC slot kimliği (YYYY-MM-DDTHH:MMZ)."
+        required: false
+        type: string
+        default: ""
   schedule:
     # Türkiye (UTC+03): her gün iki Shorts; Cuma 16:00 ek uzun video.
     - cron: "30 9 * * *"   # 12:30 Türkiye — Shorts
@@ -42,6 +47,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: main
           persist-credentials: true
 
       - name: Set up Python
@@ -55,6 +61,14 @@ jobs:
 
       - name: Test queue order and duplicate safeguards
         run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Resolve publication slot
+        id: slot
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_SCHEDULE: ${{ github.event.schedule || '' }}
+          RECOVERY_SLOT: ${{ inputs.recovery_slot || '' }}
+        run: python slot_guard.py
 
       - name: Configure Google credentials
         env:
@@ -168,10 +182,28 @@ jobs:
               f.write(f"should_run={should}\n")
           PY
 
-      - name: Upload one queued video (Prime Time Schedule)
+      - name: Reserve the publication slot before contacting YouTube
+        id: reserve
         if: ${{ (github.event_name == 'schedule' && steps.guard.outputs.should_run != 'false') || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
         env:
-          INPUT_VIDEO_TYPE: ${{ github.event_name == 'schedule' && github.event.schedule == '0 13 * * 5' && 'long' || inputs.video_type || 'auto' }}
+          SLOT_KEY: ${{ steps.slot.outputs.key }}
+        run: |
+          python slot_guard.py reserve
+          if ! git diff --quiet -- slot_claims.txt; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add slot_claims.txt
+            git commit -m "chore: reserve publication slot [skip ci]"
+            git pull --rebase --autostash origin main
+            git push origin HEAD:main
+          fi
+
+      - name: Upload one queued video (Prime Time Schedule)
+        id: publish
+        if: ${{ steps.reserve.outputs.allow == 'true' }}
+        env:
+          INPUT_VIDEO_TYPE: ${{ steps.slot.outputs.kind || inputs.video_type || 'auto' }}
+          BILGI_SLOT_KEY: ${{ steps.slot.outputs.key }}
           INPUT_FORCE_FILE: ${{ inputs.force_file || '' }}
         run: |
           FILE_ARG=""
@@ -187,7 +219,7 @@ jobs:
           fi
 
       - name: Persist duplicate-prevention log
-        if: ${{ success() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)) }}
+        if: ${{ always() && steps.publish.outcome != 'skipped' && steps.publish.outcome != '' }}
         run: |
           if [ -f uploaded.txt ]; then
             git config user.name "github-actions[bot]"
@@ -195,7 +227,8 @@ jobs:
             git add uploaded.txt status_report.json bilgidozu_yukleme_tablosu.xlsx baslik.xlsx
             [ -f .healed_131_thumb ] && git add -f .healed_131_thumb || true
             git diff --cached --quiet || git commit -m "chore: record uploaded Bilgi Dozu video [skip ci]"
-            git push
+            git pull --rebase --autostash origin main
+            git push origin HEAD:main
           fi
 
       - name: Telegram VIP Bildirimi

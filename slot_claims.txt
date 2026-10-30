@@ -1,0 +1,1 @@
+# Publication slot claims (UTC). A claim is durable and is not automatically retried.

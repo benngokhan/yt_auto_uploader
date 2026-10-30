@@ -5,8 +5,9 @@ name: Slot Watchdog
 # v2 mantigi:
 #   13:05 TR (slot+35, erken) : uploaded.txt'de slot-35dk..simdi arasi YAYIN damgasi yoksa ALARM
 #   13:15 TR (slot+45, tescil): hala yoksa ALARM + run hic baslamadiysa OTOMATIK KURTARMA
-#                               (uploader'a workflow_dispatch, video_type=auto)
-#   20:05 / 20:15 TR: ayni kural 19:30 slotu icin.
+#                               (uploader'a aynı slot kimliği ve uygun türle workflow_dispatch)
+#   16:35 / 16:45 TR: Cuma uzun video; 20:05 / 20:15 TR: 19:30 Shorts.
+# Ayrılmış ama sonucu belirsiz slot, çift yayını önlemek için tekrar denenmez.
 # Pencere slot'a sabitlendi: watchdog'un kendisi gecikse bile gecikmeli AMA basarili
 # yuklemede yanlis alarm vermez; gecikmede alarm + kurtarma yapar.
 
@@ -14,6 +15,8 @@ on:
   schedule:
     - cron: "05 10 * * *"  # 13:05 TR -> 12:30 slotu (erken)
     - cron: "15 10 * * *"  # 13:15 TR -> 12:30 slotu (tescil + kurtarma)
+    - cron: "35 13 * * 5"  # Cuma 16:35 TR -> 16:00 ek uzun video (erken)
+    - cron: "45 13 * * 5"  # Cuma 16:45 TR -> 16:00 ek uzun video (kurtarma)
     - cron: "05 17 * * *"  # 20:05 TR -> 19:30 slotu (erken)
     - cron: "15 17 * * *"  # 20:15 TR -> 19:30 slotu (tescil + kurtarma)
   workflow_dispatch: {}
@@ -30,6 +33,7 @@ jobs:
       - name: Checkout (uploaded.txt icin)
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 1
 
       - name: Video yayina cikti mi?
@@ -37,45 +41,23 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
+          GITHUB_EVENT_SCHEDULE: ${{ github.event.schedule || '' }}
         run: |
           python - <<'PY'
           import json, os, urllib.request
           from datetime import datetime, timezone, timedelta
+          from slot_guard import watchdog_slot, parse_slot, slot_completed, slot_claimed
 
           schedule = os.environ.get("GITHUB_EVENT_SCHEDULE", "").strip()
-          if schedule.startswith("05 10"):
-              slot_h, kind = 9, "erken"
-          elif schedule.startswith("15 10"):
-              slot_h, kind = 9, "tescil"
-          elif schedule.startswith("05 17"):
-              slot_h, kind = 16, "erken"
-          elif schedule.startswith("15 17"):
-              slot_h, kind = 16, "tescil"
-          else:
+          info = watchdog_slot(schedule)
+          if info is None:
               print("Manuel/dispatch tetikleme -> kontrol yok.")
               raise SystemExit(0)
-
-          slot = datetime.now(timezone.utc).replace(hour=slot_h, minute=30, second=0, microsecond=0)
-          lo = slot - timedelta(minutes=35)
+          key, expected_type, kind = info
+          slot, _ = parse_slot(key)
           now = datetime.now(timezone.utc)
-
-          # 1) uploaded.txt'de bu pencerede yayin damgasi var mi?
-          stamps = []
-          p = os.path.join(os.getcwd(), "uploaded.txt")
-          if os.path.exists(p):
-              for line in open(p, encoding="utf-8"):
-                  line = line.strip()
-                  if not line or line.startswith("#"):
-                      continue
-                  parts = [x.strip() for x in line.split("|")]
-                  if len(parts) >= 4:
-                      try:
-                          stamps.append(datetime.strptime(parts[3], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc))
-                      except ValueError:
-                          pass
-          published = [s for s in stamps if lo <= s <= now]
-          if published:
-              print(f"OK: slotun videosu {max(published).strftime('%H:%M')} UTC yayinda -> alarm yok.")
+          if slot_completed(os.path.join(os.getcwd(), "uploaded.txt"), key, now=now):
+              print(f"OK: {key} slotu zaten yayınlandı; alarm yok.")
               raise SystemExit(0)
 
           # 2) Run durumu (baglam + kurtarma karari icin)
@@ -88,35 +70,46 @@ jobs:
               d = json.load(urllib.request.urlopen(req, timeout=30))
               out = []
               for r in d.get("workflow_runs", []):
-                  if r.get("name") != "YouTube Drive Uploader":
+                  if r.get("name") != "YouTube Drive Uploader" or r.get("event") not in ("schedule", "workflow_dispatch"):
                       continue
                   try:
                       created = datetime.fromisoformat(r["created_at"].replace("Z", "+00:00"))
                   except Exception:
                       continue
-                  if created >= slot - timedelta(minutes=60):
+                  if slot - timedelta(minutes=5) <= created <= now:
                       out.append((created, r.get("event"), r.get("status")))
               return sorted(out)
 
-          rlist = recent_runs()
+          api_error = None
+          try:
+              rlist = recent_runs()
+          except Exception as e:
+              rlist = []
+              api_error = type(e).__name__
           late_min = int((now - slot).total_seconds() // 60)
-          slot_tr = f"{(slot_h + 3) % 24:02d}:30"
+          slot_tr = slot.astimezone(timezone(timedelta(hours=3))).strftime("%H:%M")
 
-          if rlist:
+          if api_error:
+              run_info = f"GitHub işçi durumu doğrulanamadı ({api_error})."
+          elif rlist:
               c, ev, st = rlist[-1]
               run_info = f"Run {c.strftime('%H:%M')} UTC ({ev}, {st}) — video yine de yayinda degil."
           else:
               run_info = "Run BASLAMADI (cron gecikmesi)."
 
           rescue = ""
-          if kind == "tescil" and not rlist:
-              # Otomatik kurtarma: uploader'i dispatch et (upload adimi dispatch'te calisir;
-              # gecikmeli cron run'u daha sonra gelirse cooldown + duplicate lock engeller.)
+          claimed = slot_claimed("slot_claims.txt", key)
+          if api_error:
+              rescue = "Durum belirsiz; çift yayını önlemek için otomatik telafi durduruldu."
+          elif claimed:
+              rescue = "Slot ayrılmış fakat yayın kaydı yok; çift yayını önlemek için otomatik tekrar durduruldu."
+          elif kind == "tescil" and not rlist:
+              # Gecikmeli cron ve telafi, upload öncesi aynı kalıcı slotu ayırır.
               try:
                   durl = f"https://api.github.com/repos/{os.environ['REPO']}/actions/workflows/youtube-drive-uploader.yml/dispatches"
                   req = urllib.request.Request(
                       durl,
-                      data=json.dumps({"ref": "main", "inputs": {"dry_run": False, "video_type": "auto"}}).encode(),
+                      data=json.dumps({"ref": "main", "inputs": {"dry_run": False, "video_type": expected_type, "recovery_slot": key}}).encode(),
                       headers={"Authorization": f"Bearer {os.environ['GH_TOKEN']}",
                                "Accept": "application/vnd.github+json",
                                "Content-Type": "application/json"},
@@ -124,7 +117,7 @@ jobs:
                   )
                   resp = urllib.request.urlopen(req, timeout=30)
                   print(f"KURTARMA dispatch gonderildi (HTTP {resp.status}).")
-                  rescue = "Otomatik kurtarma tetiklendi — video ~2 dk icinde yayina girer."
+                  rescue = "Otomatik kurtarma tetiklendi; sonuç yayın işçisinden doğrulanacak."
               except Exception as e:
                   rescue = f"Otomatik kurtarma BASARISIZ ({e}) — manuel mudahale gerekli."
 

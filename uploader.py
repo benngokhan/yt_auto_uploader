@@ -38,6 +38,8 @@ try:
 except ImportError:
     Request = Credentials = InstalledAppFlow = build = HttpError = MediaFileUpload = MediaIoBaseDownload = None
 
+from slot_guard import parse_slot, slot_completed
+
 from sheets_metadata import (
     DEFAULT_DRIVE_FOLDER_ID,
     DEFAULT_SHEETS_ID,
@@ -372,15 +374,18 @@ def load_uploaded_ids(list_path: Path) -> set:
     return ids
 
 
-def mark_as_uploaded(list_path: Path, file_id: str, file_name: str, yt_url: str, title: str = "") -> None:
+def mark_as_uploaded(list_path: Path, file_id: str, file_name: str, yt_url: str, title: str = "", slot_key: str = "") -> None:
     list_path.parent.mkdir(parents=True, exist_ok=True)
-    ts = datetime.now().strftime("%Y-%m-%d %H:%M")
+    if slot_key:
+        parse_slot(slot_key)
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
+    marker = f" | SLOT={slot_key}" if slot_key else ""
     write_header = not list_path.exists() or list_path.stat().st_size == 0
     with open(list_path, "a", encoding="utf-8") as f:
         if write_header:
             f.write("# Bilgi Dozu — Yüklenen Videolar Kaydı\n")
-            f.write("# Format: drive_file_id | filename | youtube_url | uploaded_at | title\n\n")
-        f.write(f"{file_id} | {file_name} | {yt_url} | {ts} | {title}\n")
+            f.write("# Format: drive_file_id | filename | youtube_url | uploaded_at UTC | title | optional slot\n\n")
+        f.write(f"{file_id} | {file_name} | {yt_url} | {ts} | {title}{marker}\n")
 
 
 def get_next_drive_video(drive, folder_id: str, skip_ids: set = None, video_type: str = "auto") -> dict | None:
@@ -1473,6 +1478,14 @@ def upload_job(
     token_file = Path(config["token_file"]) if config.get("token_file") else None
     queue_folder = config.get("drive_queue_folder_id", DEFAULT_DRIVE_FOLDER_ID).strip() or DEFAULT_DRIVE_FOLDER_ID
     list_path = Path(config.get("uploaded_list", str(BASE_DIR / "uploaded.txt")))
+    slot_key = os.getenv("BILGI_SLOT_KEY", "").strip()
+    if slot_key:
+        _, expected_type = parse_slot(slot_key)
+        if resolved_type != expected_type:
+            raise RuntimeError(f"Slot ile video türü uyuşmuyor: {slot_key} / {resolved_type}")
+        if not dry_run and slot_completed(list_path, slot_key):
+            log.info(f"{slot_key} slotu zaten yayınlandı; gecikmeli tekrar güvenle atlandı.")
+            return None
 
     youtube, drive = get_google_clients(token_file=token_file)
     drain_lobi_to_queue(drive, queue_folder)
@@ -1600,6 +1613,9 @@ def upload_job(
         vid_id = response["id"]
         yt_url = f"https://youtu.be/{vid_id}"
         log.info(f"YouTube yüklemesi tamamlandı: {yt_url}")
+        # Record publication before optional thumbnail/comment work can fail.
+        mark_as_uploaded(list_path, file_id, file_name, yt_url, title=meta["title"], slot_key=slot_key)
+        update_excel_status_in_drive(drive, queue_folder, file_name, new_status="YÜKLENDİ", youtube_url=yt_url)
 
         upload_thumbnail_if_exists(youtube, drive, queue_folder, file_name, vid_id)
         # 26.10.2026: video_131.mp4 (MOxaXPkS0zw) kota sınırına denk geldiği için tek seferlik kapak telafisi
@@ -1611,8 +1627,6 @@ def upload_job(
             except Exception:
                 pass
         comment_ok, _ = post_pinned_comment(youtube, vid_id, meta.get("pinned_comment", ""))
-        mark_as_uploaded(list_path, file_id, file_name, yt_url, title=meta["title"])
-        update_excel_status_in_drive(drive, queue_folder, file_name, new_status="YÜKLENDİ", youtube_url=yt_url)
         backlink_info = backlink_previous_episode(
             youtube, drive, queue_folder, list_path, file_name, vid_id, meta["title"]
         )

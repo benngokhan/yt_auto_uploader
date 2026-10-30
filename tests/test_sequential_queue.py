@@ -97,6 +97,12 @@ class SequentialQueueTests(unittest.TestCase):
     def test_invalid_mode_is_rejected(self):
         with self.assertRaises(ValueError): self.select({},[],kind='invalid')
 
+    def test_watchdog_receives_schedule_context(self):
+        from pathlib import Path
+        text = (Path(__file__).resolve().parent.parent / '.github/workflows/slot-watchdog.yml').read_text(encoding='utf-8')
+        self.assertIn("GITHUB_EVENT_SCHEDULE: ${{ github.event.schedule || '' }}", text)
+        self.assertIn('os.environ.get("GITHUB_EVENT_SCHEDULE", "")', text)
+
 
 if __name__ == '__main__':
     unittest.main()
