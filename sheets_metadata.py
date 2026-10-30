@@ -638,11 +638,15 @@ def get_next_scheduled_video(
     daily_col = decide_daily_column()  # 'beden_beyin' (5 gün) | 'uzun' (Cuma) | 'doz_disi' (Pazar)
     todays_uploads = _todays_uploaded_filenames()
 
-    # Cuma kuralı: haftada 1 Uzun video. Cuma günü uzun video zaten çıktıysa 2. slotta Shorts karıştırma!
+    # Cuma kuralı (REİS 30.10 revizyon): haftada 1 Uzun video; ama 2 slot SABİT —
+    # Cuma uzun video zaten çıktıysa akşam slotu SHORT'A döner (eski "aynı gün farklı kategori açılmaz" kuralı kaldırıldı).
+    cuma_short_flip = False
     if video_type == "auto" and daily_col == "uzun":
         if any(is_long_filename(fn) for fn in todays_uploads):
-            log.info("CUMA KURALI: Haftalık Uzun Video bugün zaten yayınlandı; aynı gün farklı kategori açılmaz.")
-            return None
+            log.info("CUMA: Haftalık Uzun Video bugün zaten yayınlandı; akşam slotu SHORT'a dönüyor (REİS 30.10: 2 slot sabit).")
+            daily_col = "beden_beyin"
+            video_type = "short"
+            cuma_short_flip = True
 
     def collect_ready(want_long: Optional[bool], want_col: Optional[str] = None, subcat_lock: Optional[str] = None) -> list[dict]:
         ready: list[dict] = []
@@ -716,8 +720,9 @@ def get_next_scheduled_video(
     cands = collect_ready(want_long=False, want_col=locked_col, subcat_lock=locked_subcat)
     if not cands and locked_subcat:
         cands = collect_ready(want_long=False, want_col=locked_col, subcat_lock=None)
-    if not cands and not todays_uploads:
+    if not cands and (not todays_uploads or cuma_short_flip):
         # Yalnızca günün ilk slotunda o sütun tamamen bittiyse sıradaki Beden&Beyin -> Doz Dışı yedeklemesi
+        # (+ REİS 30.10: Cuma short flip'inde de havuz boşsa yedek sütuna düş)
         for fallback_col in ("beden_beyin", "doz_disi"):
             cands = collect_ready(want_long=False, want_col=fallback_col)
             if cands:
