@@ -1449,8 +1449,7 @@ def repair_video() -> None:
     if spec.get("thumbnail_drive_id"):
         tmp = Path(tempfile.mktemp(suffix=".png"))
         download_drive_file(drive, str(spec["thumbnail_drive_id"]), tmp)
-        with open(tmp, "rb") as fh:
-            media = MediaFileUpload(fh, mimetype="image/png", resumable=False)
+        media = MediaFileUpload(str(tmp), mimetype="image/png", resumable=False)
         youtube.thumbnails().set(videoId=vid, media_body=media).execute()
         tmp.unlink(missing_ok=True)
         log.info(f"Onarım: kapak guncellendi -> {vid} (Drive {spec['thumbnail_drive_id']})")
