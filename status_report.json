@@ -1,17 +1,17 @@
 {
-  "updated_at": "2026-10-30 13:10",
-  "updated_at_iso": "2026-10-30T13:10:43.847512+03:00",
+  "updated_at": "2026-10-30 20:09",
+  "updated_at_iso": "2026-10-30T20:09:45.101159+03:00",
   "overall_status": "ok",
   "overall_label": "Her şey çalışıyor",
   "summary": {
-    "total_views": 40100,
+    "total_views": 40262,
     "subscribers": 51,
-    "total_videos_published": 76,
-    "weekly_uploaded": 25,
+    "total_videos_published": 77,
+    "weekly_uploaded": 23,
     "total_comments": 34,
     "total_likes": 162,
     "failed_jobs": 0,
-    "stock_shorts": 59,
+    "stock_shorts": 58,
     "stock_long": 9
   },
   "workers": [
@@ -20,9 +20,9 @@
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-30 13:10",
-      "jobs_done": 76,
-      "last_action": "uzun_video_17.mp4 yayınlandı (https://youtu.be/QhqHWaVWLJY)",
+      "updated_at": "2026-10-30 20:09",
+      "jobs_done": 77,
+      "last_action": "video_150.mp4 yayınlandı (https://youtu.be/GA6Etnh6OEs)",
       "error_message": ""
     },
     {
@@ -30,8 +30,8 @@
       "name": "Yorumcu ve kapak işçisi",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-30 13:10",
-      "jobs_done": 76,
+      "updated_at": "2026-10-30 20:09",
+      "jobs_done": 77,
       "last_action": "OAuth (youtube.force-ssl) aktif · İlk yorum otomatik yazılır",
       "error_message": ""
     },
@@ -40,7 +40,7 @@
       "name": "Analitik çekici (YouTube API)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-30 13:10",
+      "updated_at": "2026-10-30 20:09",
       "jobs_done": 30,
       "last_action": "30 videonun gerçek görüntülenme ve yorum verisi güncellendi",
       "error_message": ""
@@ -50,8 +50,8 @@
       "name": "Telegram bildirim işçisi",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-30 13:10",
-      "jobs_done": 76,
+      "updated_at": "2026-10-30 20:09",
+      "jobs_done": 77,
       "last_action": "Yayın kartı ve sabit yorum metni gönderildi",
       "error_message": ""
     }
@@ -62,7 +62,7 @@
       "title": "YouTube API günlük kotası",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-30 13:10",
+      "updated_at": "2026-10-30 20:09",
       "detail": "Günlük 10.000 birim kotası aktif ve yeterli."
     },
     {
@@ -70,15 +70,15 @@
       "title": "Google Drive ve Sheets bağlantısı",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-30 13:10",
-      "detail": "Drive klasörü ve 3 sekmeli yükleme tablosu canlı bağlı (Stok: 59 Shorts, 9 Uzun)."
+      "updated_at": "2026-10-30 20:09",
+      "detail": "Drive klasörü ve 3 sekmeli yükleme tablosu canlı bağlı (Stok: 58 Shorts, 9 Uzun)."
     },
     {
       "id": "comment_worker",
       "title": "Yorum ve kapak işçisi yetkisi",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-30 13:10",
+      "updated_at": "2026-10-30 20:09",
       "detail": "youtube.force-ssl yetkisi aktif."
     }
   ],
@@ -87,8 +87,8 @@
       "id": "QhqHWaVWLJY",
       "url": "https://youtu.be/QhqHWaVWLJY",
       "title": "Karanlıkta Gözümüz Gece Görüşünü Nasıl Açar? Korsan Bandı ve Rodopsin Sırrı 👁️ #bilgidozu",
-      "publishedAt": "2026-10-30T10:10:32Z",
-      "views": 0,
+      "publishedAt": "2026-10-30T10:10:51Z",
+      "views": 2,
       "likes": 0,
       "comments": 1
     },
@@ -97,7 +97,7 @@
       "url": "https://youtu.be/aat1STZfbps",
       "title": "Kendi Sesini Kayıtta Dinleyince Neden Tuhaf Gelir? 🎙️ #bilgidozu #shorts",
       "publishedAt": "2026-10-29T18:11:21Z",
-      "views": 53,
+      "views": 106,
       "likes": 2,
       "comments": 1
     },
@@ -106,7 +106,7 @@
       "url": "https://youtu.be/t2lphcITKXs",
       "title": "Üçgen ve Açı Kelimelerini Atatürk'ün Bizzat Türettiğini Biliyor muydun? 🇹🇷 #bilgidozu #shorts",
       "publishedAt": "2026-10-29T16:30:30Z",
-      "views": 38,
+      "views": 41,
       "likes": 1,
       "comments": 1
     },
@@ -115,7 +115,7 @@
       "url": "https://youtu.be/Bn5vzNjsnWo",
       "title": "Vücudundaki Hücrelerin Yarısından Fazlası Aslında Bakteri! 🦠 #bilgidozu #shorts",
       "publishedAt": "2026-10-28T18:10:28Z",
-      "views": 172,
+      "views": 181,
       "likes": 3,
       "comments": 1
     },
@@ -124,7 +124,7 @@
       "url": "https://youtu.be/j8J7rqtyyFg",
       "title": "Utandığında Neden Sadece Yüzün ve Kulakların Kızarır? 😳 #bilgidozu #shorts",
       "publishedAt": "2026-10-28T16:37:53Z",
-      "views": 499,
+      "views": 505,
       "likes": 1,
       "comments": 1
     },
@@ -241,7 +241,7 @@
       "url": "https://youtu.be/07gRpcD8Hp0",
       "title": "Bu Minik Karides Avını Kıskacıyla Değil, Patlayan Kabarcıkla Vuruyor! 🦐💥 #bilgidozu #shorts",
       "publishedAt": "2026-10-24T20:23:49Z",
-      "views": 149,
+      "views": 150,
       "likes": 2,
       "comments": 1
     },
