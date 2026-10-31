@@ -1,17 +1,17 @@
 {
-  "updated_at": "2026-10-30 20:09",
-  "updated_at_iso": "2026-10-30T20:09:45.101159+03:00",
+  "updated_at": "2026-10-31 13:26",
+  "updated_at_iso": "2026-10-31T13:26:02.341730+03:00",
   "overall_status": "ok",
   "overall_label": "Her şey çalışıyor",
   "summary": {
-    "total_views": 40262,
+    "total_views": 40696,
     "subscribers": 51,
-    "total_videos_published": 77,
+    "total_videos_published": 78,
     "weekly_uploaded": 23,
     "total_comments": 34,
-    "total_likes": 162,
+    "total_likes": 146,
     "failed_jobs": 0,
-    "stock_shorts": 58,
+    "stock_shorts": 57,
     "stock_long": 9
   },
   "workers": [
@@ -20,9 +20,9 @@
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-30 20:09",
-      "jobs_done": 77,
-      "last_action": "video_150.mp4 yayınlandı (https://youtu.be/GA6Etnh6OEs)",
+      "updated_at": "2026-10-31 13:26",
+      "jobs_done": 78,
+      "last_action": "video_151.mp4 yayınlandı (https://youtu.be/8UCQK5YKWxM)",
       "error_message": ""
     },
     {
@@ -30,8 +30,8 @@
       "name": "Yorumcu ve kapak işçisi",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-30 20:09",
-      "jobs_done": 77,
+      "updated_at": "2026-10-31 13:26",
+      "jobs_done": 78,
       "last_action": "OAuth (youtube.force-ssl) aktif · İlk yorum otomatik yazılır",
       "error_message": ""
     },
@@ -40,7 +40,7 @@
       "name": "Analitik çekici (YouTube API)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-30 20:09",
+      "updated_at": "2026-10-31 13:26",
       "jobs_done": 30,
       "last_action": "30 videonun gerçek görüntülenme ve yorum verisi güncellendi",
       "error_message": ""
@@ -50,8 +50,8 @@
       "name": "Telegram bildirim işçisi",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-10-30 20:09",
-      "jobs_done": 77,
+      "updated_at": "2026-10-31 13:26",
+      "jobs_done": 78,
       "last_action": "Yayın kartı ve sabit yorum metni gönderildi",
       "error_message": ""
     }
@@ -62,7 +62,7 @@
       "title": "YouTube API günlük kotası",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-30 20:09",
+      "updated_at": "2026-10-31 13:26",
       "detail": "Günlük 10.000 birim kotası aktif ve yeterli."
     },
     {
@@ -70,25 +70,34 @@
       "title": "Google Drive ve Sheets bağlantısı",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-30 20:09",
-      "detail": "Drive klasörü ve 3 sekmeli yükleme tablosu canlı bağlı (Stok: 58 Shorts, 9 Uzun)."
+      "updated_at": "2026-10-31 13:26",
+      "detail": "Drive klasörü ve 3 sekmeli yükleme tablosu canlı bağlı (Stok: 57 Shorts, 9 Uzun)."
     },
     {
       "id": "comment_worker",
       "title": "Yorum ve kapak işçisi yetkisi",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-10-30 20:09",
+      "updated_at": "2026-10-31 13:26",
       "detail": "youtube.force-ssl yetkisi aktif."
     }
   ],
   "videos": [
     {
+      "id": "GA6Etnh6OEs",
+      "url": "https://youtu.be/GA6Etnh6OEs",
+      "title": "Sabah Uyandığında Boyun Geceye Göre Neden 2 Santim Daha Uzun Çıkar? 📏 #bilgidozu #shorts",
+      "publishedAt": "2026-10-30T17:09:59Z",
+      "views": 207,
+      "likes": 2,
+      "comments": 1
+    },
+    {
       "id": "QhqHWaVWLJY",
       "url": "https://youtu.be/QhqHWaVWLJY",
       "title": "Karanlıkta Gözümüz Gece Görüşünü Nasıl Açar? Korsan Bandı ve Rodopsin Sırrı 👁️ #bilgidozu",
       "publishedAt": "2026-10-30T10:10:51Z",
-      "views": 2,
+      "views": 4,
       "likes": 0,
       "comments": 1
     },
@@ -97,7 +106,7 @@
       "url": "https://youtu.be/aat1STZfbps",
       "title": "Kendi Sesini Kayıtta Dinleyince Neden Tuhaf Gelir? 🎙️ #bilgidozu #shorts",
       "publishedAt": "2026-10-29T18:11:21Z",
-      "views": 106,
+      "views": 169,
       "likes": 2,
       "comments": 1
     },
@@ -106,7 +115,7 @@
       "url": "https://youtu.be/t2lphcITKXs",
       "title": "Üçgen ve Açı Kelimelerini Atatürk'ün Bizzat Türettiğini Biliyor muydun? 🇹🇷 #bilgidozu #shorts",
       "publishedAt": "2026-10-29T16:30:30Z",
-      "views": 41,
+      "views": 60,
       "likes": 1,
       "comments": 1
     },
@@ -115,7 +124,7 @@
       "url": "https://youtu.be/Bn5vzNjsnWo",
       "title": "Vücudundaki Hücrelerin Yarısından Fazlası Aslında Bakteri! 🦠 #bilgidozu #shorts",
       "publishedAt": "2026-10-28T18:10:28Z",
-      "views": 181,
+      "views": 218,
       "likes": 3,
       "comments": 1
     },
@@ -124,7 +133,7 @@
       "url": "https://youtu.be/j8J7rqtyyFg",
       "title": "Utandığında Neden Sadece Yüzün ve Kulakların Kızarır? 😳 #bilgidozu #shorts",
       "publishedAt": "2026-10-28T16:37:53Z",
-      "views": 505,
+      "views": 514,
       "likes": 1,
       "comments": 1
     },
@@ -133,7 +142,7 @@
       "url": "https://youtu.be/0vGKrBpJh0Q",
       "title": "Sevdiğin Birine Bakınca Göz Bebeğin Neden Otomatik Büyür? 👀 #bilgidozu #shorts",
       "publishedAt": "2026-10-28T11:07:39Z",
-      "views": 132,
+      "views": 135,
       "likes": 2,
       "comments": 1
     },
@@ -187,7 +196,7 @@
       "url": "https://youtu.be/MOxaXPkS0zw",
       "title": "Küçücük Kâğıt Kesiği Neden Bu Kadar Çok Acıtır? 🩹⚡ #bilgidozu #shorts",
       "publishedAt": "2026-10-26T16:37:10Z",
-      "views": 728,
+      "views": 729,
       "likes": 9,
       "comments": 1
     },
@@ -196,7 +205,7 @@
       "url": "https://youtu.be/jrySNivbPcQ",
       "title": "Kışın Kalbi Durup Buz Tutan, Baharda Çözülüp Canlanan Kurbağa! 🐸❄️ #bilgidozu #shorts",
       "publishedAt": "2026-10-26T11:39:23Z",
-      "views": 653,
+      "views": 654,
       "likes": 7,
       "comments": 1
     },
@@ -214,7 +223,7 @@
       "url": "https://youtu.be/q6YFVt6JV4c",
       "title": "Mısır Piramitleri Yapılırken Dünya'da Hâlâ Tüylü Mamutlar Yaşıyordu! 🦣⏳ #bilgidozu #shorts",
       "publishedAt": "2026-10-25T15:29:36Z",
-      "views": 42,
+      "views": 43,
       "likes": 0,
       "comments": 1
     },
@@ -286,7 +295,7 @@
       "url": "https://youtu.be/sh9zYFybcHY",
       "title": "Kendini Neden Gıdıklayamazsın? Beynin Hamleni Önceden Biliyor! 🧠🤭 #bilgidozu #shorts",
       "publishedAt": "2026-10-23T18:25:00Z",
-      "views": 80,
+      "views": 81,
       "likes": 0,
       "comments": 1
     },
@@ -295,7 +304,7 @@
       "url": "https://youtu.be/mANNR6Tf21o",
       "title": "Burnun Nöbetleşe Çalışıyor: İki Delik Aynı Anda Eşit Nefes Almaz! 👃🔄 #bilgidozu #shorts",
       "publishedAt": "2026-10-23T15:29:55Z",
-      "views": 962,
+      "views": 965,
       "likes": 9,
       "comments": 1
     },
@@ -313,7 +322,7 @@
       "url": "https://youtu.be/JO2Vxbd5gLM",
       "title": "Gözlerinize İnanmayın: Yıldırımlar Aslında Aşağıdan Yukarıya Çakar! ⚡🌩️ #bilgidozu #shorts",
       "publishedAt": "2026-10-22T17:30:15Z",
-      "views": 1042,
+      "views": 1044,
       "likes": 13,
       "comments": 1
     },
@@ -322,7 +331,7 @@
       "url": "https://youtu.be/CPITUvh_5rs",
       "title": "Birinin Sizden Hoşlandığını Anlamanın En Kesin Yolu! 👁️✨ #bilgidozu #shorts",
       "publishedAt": "2026-10-22T15:30:03Z",
-      "views": 1085,
+      "views": 1086,
       "likes": 18,
       "comments": 1
     },
@@ -331,7 +340,7 @@
       "url": "https://youtu.be/IrutrnRqyWM",
       "title": "Bu Canlı Uzay Boşluğunda ve Radyasyonda Bile Ölmüyor! 🐻🔬 #bilgidozu #shorts",
       "publishedAt": "2026-10-22T09:30:13Z",
-      "views": 1333,
+      "views": 1334,
       "likes": 24,
       "comments": 1
     },
@@ -340,18 +349,9 @@
       "url": "https://youtu.be/DEhC0RBlZvM",
       "title": "Jüpiter'de Dünya'dan Büyük Bir Fırtına 350 Yıldır DÖNÜYOR! 🌪️🪐 #bilgidozu #shorts",
       "publishedAt": "2026-10-21T08:47:47Z",
-      "views": 1006,
+      "views": 1007,
       "likes": 23,
       "comments": 3
-    },
-    {
-      "id": "qYzG9jVSLDw",
-      "url": "https://youtu.be/qYzG9jVSLDw",
-      "title": "Dünyanın En Yaşlı Canlısı Bir Hayvan Değil, 80.000 Yaşındaki Bu Orman! 🌲⚡ #bilgidozu #shorts",
-      "publishedAt": "2026-10-21T08:47:12Z",
-      "views": 1170,
-      "likes": 18,
-      "comments": 1
     }
   ]
 }
