@@ -1,0 +1,107 @@
+name: BD Jarvis temporary build and emulator checks
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: bd-jarvis-temp-20261031
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Build signed release and local tests
+        working-directory: android_jarvis_temp
+        env:
+          BD_KEYSTORE: ${{ runner.temp }}/bd-jarvis-release.p12
+          BD_KEYSTORE_B64: ${{ secrets.BD_JARVIS_SIGNING_KEYSTORE }}
+          BD_KEYSTORE_PASS: ${{ secrets.BD_JARVIS_SIGNING_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$BD_KEYSTORE_B64"; test -n "$BD_KEYSTORE_PASS"
+          printf '%s' "$BD_KEYSTORE_B64" | base64 --decode > "$BD_KEYSTORE"
+          chmod 600 "$BD_KEYSTORE"
+          trap 'rm -f "$BD_KEYSTORE"' EXIT
+          chmod +x gradlew
+          ./gradlew --no-daemon --max-workers=2 :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest :app:assembleRelease
+      - name: Verify package, signature, permissions and artifacts
+        working-directory: android_jarvis_temp
+        run: |
+          set -euo pipefail
+          mkdir -p output
+          cp app/build/outputs/apk/release/app-release.apk output/Bilgi_Dozu_Jarvis.apk
+          cp app/build/outputs/apk/debug/app-debug.apk output/debug.apk
+          cp app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk output/androidTest.apk
+          cp app/build/test-results/testDebugUnitTest/*.xml output/
+          BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          "$BT/apksigner" verify --verbose --print-certs output/Bilgi_Dozu_Jarvis.apk | tee output/signature.txt
+          "$BT/aapt" dump badging output/Bilgi_Dozu_Jarvis.apk | tee output/badging.txt
+          "$BT/aapt" dump permissions output/Bilgi_Dozu_Jarvis.apk | tee output/permissions.txt
+          "$BT/aapt" dump xmltree output/Bilgi_Dozu_Jarvis.apk AndroidManifest.xml > output/manifest.txt
+          grep -q "package: name='com.bilgidozu.jarvis'" output/badging.txt
+          if grep -q 'android.permission.INTERNET' output/permissions.txt; then echo 'Unexpected INTERNET permission'; exit 1; fi
+          if grep -q 'FixtureActivity' output/manifest.txt; then echo 'Debug fixture leaked into release'; exit 1; fi
+          if grep -Eq 'android:debuggable.*0xffffffff' output/manifest.txt; then echo 'Release is debuggable'; exit 1; fi
+          sha256sum output/Bilgi_Dozu_Jarvis.apk | tee output/sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bd-jarvis-build
+          path: android_jarvis_temp/output/
+          retention-days: 1
+  accessibility-tests:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [30, 34]
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: bd-jarvis-build
+          path: output
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Enable KVM access
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls -l /dev/kvm
+      - name: Android accessibility fixture tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: |
+            set -o pipefail
+            adb shell input keyevent 82 || true
+            adb shell wm dismiss-keyguard || true
+            adb install -r output/debug.apk
+            adb install -r output/androidTest.apk
+            adb shell settings put secure enabled_accessibility_services com.bilgidozu.jarvis/com.bilgidozu.jarvis.JarvisAccessibilityService
+            adb shell settings put secure accessibility_enabled 1
+            adb shell am start -n com.bilgidozu.jarvis/.MainActivity
+            adb shell am instrument -w -r com.bilgidozu.jarvis.test/androidx.test.runner.AndroidJUnitRunner | tr -d '\r' | tee "$RUNNER_TEMP/fixture-${{ matrix.api }}.txt"
+            grep -q 'OK (12 tests)'  "$RUNNER_TEMP/fixture-${{ matrix.api }}.txt"
+            ! grep -E 'FAILURES!!!|INSTRUMENTATION_FAILED|Process crashed|shortMsg=' "$RUNNER_TEMP/fixture-${{ matrix.api }}.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bd-jarvis-fixture-${{ matrix.api }}
+          path: ${{ runner.temp }}/fixture-${{ matrix.api }}.txt
+          if-no-files-found: ignore
+          retention-days: 1
