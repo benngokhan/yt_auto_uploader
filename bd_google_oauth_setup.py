@@ -27,8 +27,8 @@ SCOPES = (
     'https://www.googleapis.com/auth/youtube.force-ssl',
     'https://www.googleapis.com/auth/drive',
     'https://www.googleapis.com/auth/spreadsheets',
-    'https://www.googleapis.com/auth/yt-analytics.readonly',
 )
+ANALYTICS_SCOPE = 'https://www.googleapis.com/auth/yt-analytics.readonly'
 SAFE_OAUTH_ERRORS = {'invalid_grant', 'invalid_client', 'invalid_request', 'unauthorized_client', 'access_denied', 'invalid_scope'}
 
 
@@ -164,11 +164,13 @@ def exchange(client: dict, request: dict) -> dict:
     end = datetime.now(timezone.utc).date() - timedelta(days=1)
     start = end - timedelta(days=6)
     query = urllib.parse.urlencode({'ids':'channel==MINE', 'startDate':start.isoformat(), 'endDate':end.isoformat(), 'metrics':'views', 'dimensions':'day'})
-    analytics = 'OK'
-    try:
-        request_json('https://youtubeanalytics.googleapis.com/v2/reports?' + query, access_token=access)
-    except SetupError as exc:
-        analytics = str(exc) if str(exc).startswith('GOOGLE_HTTP_') else 'UNAVAILABLE'
+    analytics = 'SCOPE_NOT_GRANTED'
+    if ANALYTICS_SCOPE in granted:
+        analytics = 'OK'
+        try:
+            request_json('https://youtubeanalytics.googleapis.com/v2/reports?' + query, access_token=access)
+        except SetupError as exc:
+            analytics = str(exc) if str(exc).startswith('GOOGLE_HTTP_') else 'UNAVAILABLE'
     expiry = (datetime.now(timezone.utc) + timedelta(seconds=expires - 30)).isoformat().replace('+00:00', 'Z')
     credentials = {
         'token': access,
