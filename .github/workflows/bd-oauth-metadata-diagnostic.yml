@@ -1,0 +1,54 @@
+name: Bilgi Dozu Google OAuth Metadata Diagnostic
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Inspect credential metadata without printing credentials
+        shell: python
+        env:
+          C: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}
+          T: ${{ secrets.GOOGLE_TOKEN_JSON }}
+        run: |
+          import json, os
+          from urllib.parse import urlparse
+          def flag(name, value):
+              print(name + '=' + ('YES' if value else 'NO'))
+          try:
+              conf = json.loads(os.getenv('C', '{}') or '{}')
+              token = json.loads(os.getenv('T', '{}') or '{}')
+              if not isinstance(conf, dict) or not isinstance(token, dict):
+                  raise ValueError('bad shape')
+              kind = 'web' if isinstance(conf.get('web'), dict) else 'installed' if isinstance(conf.get('installed'), dict) else 'unknown'
+              cfg = conf.get(kind, {})
+              redirects = cfg.get('redirect_uris', []) or []
+              scopes = token.get('scopes', []) or []
+              if isinstance(scopes, str):
+                  scopes = scopes.split()
+              print('CLIENT_TYPE=' + kind)
+              flag('CLIENT_ID_PRESENT', bool(cfg.get('client_id')))
+              flag('CLIENT_SECRET_PRESENT', bool(cfg.get('client_secret')))
+              flag('TOKEN_CLIENT_MATCH', bool(cfg.get('client_id')) and cfg.get('client_id') == token.get('client_id'))
+              flag('REFRESH_TOKEN_PRESENT', bool(token.get('refresh_token')))
+              flag('LOOPBACK_REDIRECT', any(urlparse(str(x)).hostname in {'127.0.0.1', 'localhost', '::1'} for x in redirects))
+              flag('RAILWAY_CALLBACK_REGISTERED', 'https://qkn0.up.railway.app/analytics/oauth/callback' in redirects)
+              for label, scope in (
+                  ('YT_UPLOAD_SCOPE', 'https://www.googleapis.com/auth/youtube.upload'),
+                  ('YT_FORCE_SSL_SCOPE', 'https://www.googleapis.com/auth/youtube.force-ssl'),
+                  ('YT_FULL_SCOPE', 'https://www.googleapis.com/auth/youtube'),
+                  ('ANALYTICS_SCOPE', 'https://www.googleapis.com/auth/yt-analytics.readonly'),
+                  ('DRIVE_FULL_SCOPE', 'https://www.googleapis.com/auth/drive'),
+                  ('SHEETS_SCOPE', 'https://www.googleapis.com/auth/spreadsheets'),
+              ):
+                  flag(label, scope in scopes)
+              print('SAFE_METADATA_DIAGNOSTIC_COMPLETE')
+          except Exception:
+              print('SAFE_METADATA_DIAGNOSTIC_FAILED')
+              raise SystemExit(1)
