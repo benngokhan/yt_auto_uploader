@@ -82,14 +82,15 @@ def main() -> None:
             continue
         old = ws.cell(r, VIEWS_COL).value
         try:
-            old = int(old) if old not in (None, "") else 0
+            # Boş/bozuk değer ilk ölçümdür; sıfır varsayıp artışa ekleme.
+            old = int(old) if old not in (None, "") else None
         except (TypeError, ValueError):
-            old = 0
+            old = None
         rows.append((r, str(ws.cell(r, FILE_COL).value or ""), str(ws.cell(r, TITLE_COL).value or "")[:60], old, vid))
 
     if not rows:
-        print("LINKLI SATIR YOK — rapor boş.")
-        return
+        wb.close()
+        raise RuntimeError("Linkli video yok — eski özet rapor olarak gönderilemez.")
 
     # 1) flat tarama (2 istek: shorts + videos)
     views: dict[str, int] = {}
@@ -99,11 +100,13 @@ def main() -> None:
     print(f"flat: {len(views)} video, {len(rows) - len(missing)}/{len(rows)} linkli satır eşleşti, eksik: {len(missing)}")
 
     # 2) eksikler için video bazlı fallback
-    for i, (r, f, t, old, vid) in enumerate(rows):
+    fallback_attempts = 0
+    for r, f, t, old, vid in rows:
         if vid in views:
             continue
-        if i > 40:  # emniyet: en fazla ~40 tekil istek
+        if fallback_attempts >= 40:  # en fazla 40 gerçek tekil istek
             break
+        fallback_attempts += 1
         vc = fetch_one(f"https://www.youtube.com/watch?v={vid}")
         if vc is not None:
             views[vid] = vc
@@ -112,24 +115,36 @@ def main() -> None:
     total = 0
     deltas: list[tuple[int, str, str]] = []
     written = 0
+    baselines = 0
+    unavailable = 0
     for r, f, t, old, vid in rows:
         vc = views.get(vid)
         if vc is None:
             print(f"  UYARI: {f} ({vid}) view alınamadı — eski değer duruyor ({old})")
-            total += old
+            total += old if old is not None else 0
+            unavailable += 1
             continue
         total += vc
-        deltas.append((vc - old, t or f, f))
+        if old is None:
+            # İlk görülen toplamı kaydet ama son rapor artışı diye sunma.
+            baselines += 1
+        else:
+            deltas.append((vc - old, t or f, f))
         if vc != old and not dry:
             ws.cell(r, VIEWS_COL).value = vc
             written += 1
 
+    if unavailable == len(rows):
+        wb.close()
+        raise RuntimeError("Hiçbir video verisi alınamadı — eski değerler başarı raporu olarak sunulamaz.")
     if not dry and written:
         wb.save(TABLE)
+    wb.close()
 
     deltas.sort(reverse=True)
     top = [d for d in deltas if d[0] > 0][:5]
-    day_gain = sum(d[0] for d in deltas if d[0] > 0)
+    # Net değişim, varsa azalan sayıları da içerir; kapsam yalnız kıyaslanabilenlerdir.
+    day_gain = sum(d[0] for d in deltas)
     print(f"TOPLAM_GORUNTULEME={total}")
     print(f"BUGUN_KAZANC={day_gain}")
     print(f"GUNCELLENEN_SATIR={written if not dry else 0} (dry_run={dry})")
@@ -138,6 +153,8 @@ def main() -> None:
     with open("stats_summary.json", "w", encoding="utf-8") as fh:
         json.dump({
             "total": total, "day_gain": day_gain, "updated": written if not dry else 0,
+            "baseline_count": baselines, "compared_count": len(deltas),
+            "unavailable_count": unavailable, "dry_run": dry,
             "top": [{"delta": d, "title": t, "file": f} for d, t, f in top],
         }, fh, ensure_ascii=False, indent=1)
 

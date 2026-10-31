@@ -61,7 +61,7 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           python - <<'PY'
-          import json, os, urllib.request
+          import html, json, os, urllib.request
           from pathlib import Path
 
           token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
@@ -80,15 +80,23 @@ jobs:
           else:
               s = json.loads(sfile.read_text(encoding="utf-8"))
               top = "\n".join(
-                  f"• <b>+{t['delta']:,}</b> {t['title'][:55]}" for t in s.get("top", [])[:3]
+                  f"• <b>+{t['delta']:,}</b> {html.escape(str(t['title'])[:55])}" for t in s.get("top", [])[:3]
               ) or "—"
+              baselines = s.get("baseline_count", 0)
+              unavailable = s.get("unavailable_count", 0)
+              coverage = f"İlk ölçüm (artışa dahil değil): {baselines} video\n" if baselines else ""
+              if unavailable:
+                  coverage += f"Veri alınamayan: {unavailable} video\n"
+              table_note = "Test: tabloya yazılmadı" if s.get("dry_run") else f"GitHub tablosu: {s.get('updated', 0)} satır güncellendi"
               text = (
                   "📊 <b>Bilgi Dozu — Görüntülenme Raporu</b>\n\n"
                   f"Toplam: <b>{s['total']:,}</b>\n"
-                  f"Son rapordan beri: <b>+{s['day_gain']:,}</b>\n\n"
-                  "En çok yükselen:\n"
+                  f"Kıyaslanabilenlerde net değişim: <b>{s['day_gain']:+,}</b>\n"
+                  f"{coverage}\n"
+                  "En çok yükselen (kıyaslanabilen):\n"
                   f"{top}\n\n"
-                  "Tablo güncellendi ✓ · Kota: 0"
+                  f"{table_note} · Kota: 0\n"
+                  "Drive eşitlemesi bu raporla doğrulanmaz."
               )
               payload = {"chat_id": chat_id, "text": text, "parse_mode": "HTML", "disable_web_page_preview": True}
 
