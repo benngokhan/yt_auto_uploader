@@ -431,62 +431,153 @@ def upload_to_youtube(youtube, video_path: Path, meta: dict) -> dict:
     return response
 
 
-def upload_thumbnail_if_exists(youtube, drive, folder_id: str, video_file_name: str, video_id: str) -> bool:
-    """Eğer Drive klasöründe kapak_XX.png (veya uzun_kapak_XX.png) varsa videoya otomatik kapak olarak giydirir."""
-    import re
-    m_short = re.match(r"^video_(\d+)\.mp4$", video_file_name, re.I)
-    m_long = re.match(r"^uzun_video_(\d+)\.mp4$", video_file_name, re.I)
-    if m_short:
-        # Shorts'ta platform API kapağını sergilemiyor (Data API sınırlaması) -> 50 unit kota boşa gitmesin
-        log.info("  Kapak adımı atlandı: Shorts'ta YouTube API kapağını sergilemiyor (görsel = video karesi)")
-        return False
-    candidates = []
-    if m_long:
-        num = m_long.group(1)
-        candidates = [f"uzun_kapak_{num}.png", f"kapak_uzun_{num}.png", f"kapak_{num}.png"]
-    if not candidates:
-        return False
-    try:
-        search_folders = ["1muy62IFhN8RQc4LpWdGB2hSFtum6BplD", DEFAULT_DRIVE_FOLDER_ID, "1XKZJ12HyAvZkjgiG38ys3HOMhZ42d_jJ", "1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br"]
-        if folder_id and folder_id not in search_folders:
-            search_folders.append(folder_id)
-        # Ana klasör içindeki KAPAKLAR alt klasörünü de ara
-        q_sub = f"'{DEFAULT_DRIVE_FOLDER_ID}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
-        sub_res = drive.files().list(q=q_sub, pageSize=50, fields="files(id,name)").execute()
-        for sf in sub_res.get("files", []):
-            if "kapak" in sf.get("name", "").lower():
-                search_folders.insert(0, sf["id"])
+from dataclasses import dataclass
 
-        files = {}
-        for sf_id in search_folders:
-            q = f"'{sf_id}' in parents and trashed=false"
-            res = drive.files().list(q=q, pageSize=200, fields="files(id,name)").execute()
-            for f in res.get("files", []):
-                files.setdefault(f["name"].lower(), f["id"])
-        target_id = None
-        target_name = None
-        for c in candidates:
-            if c.lower() in files:
-                target_id = files[c.lower()]
-                target_name = c
-                break
-        if not target_id:
-            return False
-        suffix = Path(target_name).suffix or ".png"
-        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tf:
-            tpath = Path(tf.name)
+
+@dataclass(frozen=True)
+class ThumbnailResult:
+    api_accepted: bool = False
+    drive_saved: bool = False
+
+    def __bool__(self):
+        return self.api_accepted
+
+
+def thumbnail_candidates(video_file_name: str) -> tuple[bool, list[str], str]:
+    """Exact names only: prevent a different video's cover from being selected."""
+    import re
+    m_short = re.fullmatch(r"video_(\d+)\.mp4", video_file_name, re.I)
+    m_long = re.fullmatch(r"uzun_video_(\d+)\.mp4", video_file_name, re.I)
+    if m_short:
+        n = m_short.group(1)
+        names = [f"{stem}.{ext}" for stem in (f"kapak_{n}", f"short_kapak_{n}") for ext in ("jpg", "png", "jpeg")]
+        return True, names, f"kapak_{n}.jpg"
+    if m_long:
+        n = m_long.group(1)
+        # A bare kapak_N might belong to a different Shorts video. Do not guess.
+        names = [f"{stem}.{ext}" for stem in (f"uzun_kapak_{n}", f"kapak_uzun_{n}") for ext in ("png", "jpg", "jpeg")]
+        return False, names, f"uzun_kapak_{n}.jpg"
+    return False, [], ""
+
+
+def upload_thumbnail_if_exists(
+    youtube, drive, folder_id: str, video_file_name: str, video_id: str,
+    video_path: Path = None, video_title: str = "",
+) -> ThumbnailResult:
+    """Use a matching Drive cover or make one from this new video's own artwork.
+
+    This is optional and only called after the new video is recorded as uploaded.
+    Shorts' actual appearance is platform-dependent even after an API success.
+    Every failure is logged; the result separately records API and Drive status.
+    """
+    is_short, candidates, generated_name = thumbnail_candidates(video_file_name)
+    if not candidates:
+        return ThumbnailResult()
+    drive_saved = False
+    try:
+        from PIL import Image
+        from thumbnail_design import make_video_cover
+        queue = folder_id or DEFAULT_DRIVE_FOLDER_ID
+        cover_folder = None
+        folder_lookup_ok = False
         try:
-            download_drive_file(drive, target_id, tpath)
-            media = MediaFileUpload(str(tpath), mimetype="image/png" if suffix == ".png" else "image/jpeg")
-            youtube.thumbnails().set(videoId=video_id, media_body=media).execute()
-            log.info(f"  Özel kapak başarıyla giydirildi: {target_name} (uzun video)")
-            return True
-        finally:
-            if tpath.exists():
-                tpath.unlink()
+            q = f"'{queue}' in parents and mimeType='application/vnd.google-apps.folder' and name='KAPAKLAR' and trashed=false"
+            result = drive.files().list(q=q, pageSize=50, fields="files(id,name)").execute()
+            folder_lookup_ok = True
+            folders = result.get('files', [])
+            if folders:
+                # Prefer the existing stock folder when there are duplicate names.
+                preferred = next((x for x in folders if x.get('id') == '1XKZJ12HyAvZkjgiG38ys3HOMhZ42d_jJ'), folders[0])
+                cover_folder = preferred['id']
+        except Exception as e:
+            log.warning(f"  KAPAKLAR klasörü aranamadı: {e}")
+
+        folder_ids = [cover_folder, queue, '1muy62IFhN8RQc4LpWdGB2hSFtum6BplD',
+                      '1XKZJ12HyAvZkjgiG38ys3HOMhZ42d_jJ', '1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br']
+        folder_ids = list(dict.fromkeys(f for f in folder_ids if f))
+        found = {}
+        clauses = ' or '.join("name='" + name + "'" for name in candidates)
+        for fid in folder_ids:
+            try:
+                page = None
+                seen_in_folder = {}
+                while True:
+                    q = f"'{fid}' in parents and trashed=false and ({clauses})"
+                    result = drive.files().list(q=q, pageSize=100, pageToken=page,
+                        orderBy='modifiedTime desc', fields='nextPageToken,files(id,name,mimeType,size,modifiedTime)').execute()
+                    for item in result.get('files', []):
+                        if item.get('mimeType') in ('image/jpeg','image/png'):
+                            name = item.get('name','').lower()
+                            if name in seen_in_folder and seen_in_folder[name] != item.get('id'):
+                                log.warning(f"  Aynı adda birden çok kapak var ({name}); yanlış eşleşmemesi için atlandı.")
+                                return ThumbnailResult()
+                            seen_in_folder[name] = item.get('id')
+                            found.setdefault(name, item)
+                    page = result.get('nextPageToken')
+                    if not page:
+                        break
+            except Exception as e:
+                # A stale legacy folder must not prevent looking in the other folders.
+                log.info(f"  Kapak klasörü erişilemedi, diğerleri deneniyor: {e}")
+        target = next((found.get(name.lower()) for name in candidates if found.get(name.lower())), None)
+        suffix = Path(target['name']).suffix.lower() if target else '.jpg'
+        with tempfile.TemporaryDirectory(prefix='bd-cover-') as temp:
+            path = Path(temp)/('cover'+suffix)
+            if target:
+                drive_saved = True
+                if int(target.get('size') or 0) > 50_000_000:
+                    raise ValueError('Hazır kapak çok büyük')
+                download_drive_file(drive, target['id'], path)
+                log.info(f"  Hazır kapak bulundu: {target['name']}")
+            else:
+                if not video_path or not video_title:
+                    log.warning('  Eşleşen kapak yok; yedek için video veya başlık eksik.')
+                    return ThumbnailResult()
+                # No paid image provider: use the video's own approved artwork.
+                make_video_cover(Path(video_path),path,video_title,is_short)
+                if not cover_folder and folder_lookup_ok:
+                    try:
+                        obj=drive.files().create(body={'name':'KAPAKLAR','mimeType':'application/vnd.google-apps.folder','parents':[queue]},fields='id').execute()
+                        cover_folder=obj['id']
+                    except Exception as e:
+                        log.warning(f"  Kapaklar klasörü oluşturulamadı: {e}")
+                if cover_folder:
+                    try:
+                        media=MediaFileUpload(str(path),mimetype='image/jpeg',resumable=False)
+                        obj=drive.files().create(body={'name':generated_name,'parents':[cover_folder],
+                            'description':f'{video_file_name} için video sahnesinden hazırlanmış kapak'},
+                            media_body=media,fields='id,name').execute()
+                        drive_saved = True
+                        log.info(f"  Yeni video kapağı Drive'a kaydedildi: {obj.get('name',generated_name)}")
+                    except Exception as e:
+                        # YouTube may still accept the local cover even if Drive write failed.
+                        log.warning(f"  Kapak Drive'a kaydedilemedi: {e}")
+            if path.stat().st_size > 50_000_000:
+                raise ValueError('Kapak dosyası YouTube sınırından büyük')
+            with Image.open(path) as im:
+                image_format=im.format
+                width, height = im.size
+                if not width or not height:
+                    raise ValueError('Kapak boyutu geçersiz')
+                ratio = width / height
+                if is_short and not .53 <= ratio <= .60:
+                    raise ValueError('Shorts kapağı dikey 9:16 değil')
+                if not is_short and not 1.65 <= ratio <= 1.90:
+                    raise ValueError('Uzun video kapağı yatay 16:9 değil')
+                im.verify()
+            if image_format not in ('JPEG','PNG'):
+                raise ValueError('Kapak JPEG veya PNG değil')
+            mime='image/jpeg' if image_format=='JPEG' else 'image/png'
+            media=MediaFileUpload(str(path),mimetype=mime,resumable=False)
+            youtube.thumbnails().set(videoId=video_id,media_body=media).execute()
+            if is_short:
+                log.info('  Shorts kapak isteği YouTube API tarafından kabul edildi; Shorts görünümü Studio üzerinde doğrulanmalı.')
+            else:
+                log.info('  Uzun video kapak isteği YouTube API tarafından kabul edildi.')
+            return ThumbnailResult(api_accepted=True, drive_saved=drive_saved)
     except Exception as e:
-        log.warning(f"  Kapak giydirme uyarısı: {e}")
-        return False
+        log.warning(f"  Kapak hazırlanamadı veya YouTube reddetti (yayın korunuyor): {e}")
+        return ThumbnailResult(api_accepted=False, drive_saved=drive_saved)
 
 
 def post_pinned_comment(youtube, video_id: str, comment_text: str) -> tuple[bool, str]:
@@ -692,6 +783,8 @@ def build_telegram_report(
     meta: dict,
     comment_ok: bool,
     backlink_info: dict | None = None,
+    thumbnail_ok: bool | None = None,
+    thumbnail_saved: bool | None = None,
 ) -> str:
     import html as _html
     raw_title = meta.get("title", "")
@@ -742,12 +835,23 @@ def build_telegram_report(
         f"{yt_url}"
     )
 
+    thumbnail_line = ""
+    if thumbnail_ok is True:
+        extra = " Shorts görünümünü Studio'da kontrol et." if not file_name.lower().startswith("uzun_") else ""
+        save_note = " Drive'a kaydedilemedi." if thumbnail_saved is False else ""
+        thumbnail_line = f"🖼️ <b>Kapak:</b> YouTube isteği kabul etti.{save_note}{extra}\n\n"
+    elif thumbnail_ok is False and thumbnail_saved is True:
+        thumbnail_line = "⚠️ <b>Kapak:</b> Drive'da var; otomatik uygulama tamamlanmadı. Kapağı ve Studio'yu kontrol et.\n\n"
+    elif thumbnail_ok is False:
+        thumbnail_line = "⚠️ <b>Kapak:</b> Hazırlanamadı veya Drive'a kaydedilemedi; yayın korundu.\n\n"
+
     msg_html = (
         f"🟢 <b>BİLGİ DOZU · YENİ VİDEO YAYINDA!</b>\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
         f"🎬 <b>{_html.escape(clean_title)}</b>\n"
         f"📂 <code>{_html.escape(file_name)}</code> · <b>{vtype_label}</b>\n"
         f"{stock_line}"
+        f"{thumbnail_line}"
         f"{chain_line}"
         f"{comment_header}\n"
         f"<pre>{_html.escape(pinned)}</pre>\n\n"
@@ -1616,15 +1720,14 @@ def upload_job(
         mark_as_uploaded(list_path, file_id, file_name, yt_url, title=meta["title"], slot_key=slot_key)
         update_excel_status_in_drive(drive, queue_folder, file_name, new_status="YÜKLENDİ", youtube_url=yt_url)
 
-        upload_thumbnail_if_exists(youtube, drive, queue_folder, file_name, vid_id)
-        # 26.10.2026: video_131.mp4 (MOxaXPkS0zw) kota sınırına denk geldiği için tek seferlik kapak telafisi
-        heal_flag = BASE_DIR / ".healed_131_thumb"
-        if not heal_flag.exists() and file_name != "video_131.mp4":
-            try:
-                upload_thumbnail_if_exists(youtube, drive, queue_folder, "video_131.mp4", "MOxaXPkS0zw")
-                heal_flag.write_text("ok\n", encoding="utf-8")
-            except Exception:
-                pass
+        # Optional, after the publication is recorded; never modify an older video here.
+        try:
+            thumbnail_result = upload_thumbnail_if_exists(
+                youtube, drive, queue_folder, file_name, vid_id,
+                video_path=tmp_path, video_title=meta['title'])
+        except Exception as thumb_err:
+            log.warning(f"  Kapak adımı atlandı (yayın korunuyor): {thumb_err}")
+            thumbnail_result = ThumbnailResult()
         comment_ok, _ = post_pinned_comment(youtube, vid_id, meta.get("pinned_comment", ""))
         backlink_info = backlink_previous_episode(
             youtube, drive, queue_folder, list_path, file_name, vid_id, meta["title"]
@@ -1646,7 +1749,10 @@ def upload_job(
             log.warning(f"İlgili video zinciri atlandı (zararsız): {re_err}")
         # retro_enrich_published RETIRED: kullanıcı eski videoları elle düzenliyor; token ekstra yüklenmiyor (25 Ekim kararı)
 
-        report_txt = build_telegram_report(file_name, vid_id, yt_url, meta, comment_ok, backlink_info=backlink_info)
+        report_txt = build_telegram_report(file_name, vid_id, yt_url, meta, comment_ok,
+                                           backlink_info=backlink_info,
+                                           thumbnail_ok=thumbnail_result.api_accepted,
+                                           thumbnail_saved=thumbnail_result.drive_saved)
         REPORT_FILE.write_text(report_txt, encoding="utf-8")
         sync_kartal_status_report(youtube, file_name, yt_url)
 
