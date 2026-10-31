@@ -1,0 +1,40 @@
+name: Bilgi Dozu Google OAuth Secure Setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: Safe inspect or single-use OAuth exchange
+        required: true
+        type: choice
+        options: [inspect, exchange]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bilgi-dozu-google-oauth-setup
+  cancel-in-progress: false
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout reviewed setup code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install sealed-box cryptography
+        run: pip install --quiet 'PyNaCl>=1.5,<2'
+      - name: Run restricted Google OAuth setup
+        env:
+          SETUP_PHASE: ${{ inputs.phase }}
+          CLIENT_JSON: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}
+          SETUP_JSON: ${{ secrets.BD_GOOGLE_OAUTH_TEMP_20261031 }}
+        run: python bd_google_oauth_setup.py
