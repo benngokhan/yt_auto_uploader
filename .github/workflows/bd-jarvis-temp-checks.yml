@@ -95,16 +95,32 @@ jobs:
             adb shell wm dismiss-keyguard || true
             adb install -r output/debug.apk
             adb install -r output/androidTest.apk
-            adb shell settings put secure enabled_accessibility_services com.bilgidozu.jarvis/com.bilgidozu.jarvis.JarvisAccessibilityService
-            adb shell settings put secure accessibility_enabled 1
+            adb shell settings delete secure enabled_accessibility_services || true
+            adb shell settings put secure accessibility_enabled 0
             adb shell am start -n com.bilgidozu.jarvis/.MainActivity
             adb shell am instrument -w -r com.bilgidozu.jarvis.test/androidx.test.runner.AndroidJUnitRunner | tr -d '\r' | tee "$RUNNER_TEMP/fixture-${{ matrix.api }}.txt"
             grep -q 'OK (12 tests)'  "$RUNNER_TEMP/fixture-${{ matrix.api }}.txt"
             ! grep -E 'FAILURES!!!|INSTRUMENTATION_FAILED|Process crashed|shortMsg=' "$RUNNER_TEMP/fixture-${{ matrix.api }}.txt"
+            adb uninstall com.bilgidozu.jarvis.test
+            adb uninstall com.bilgidozu.jarvis
+            adb logcat -c
+            adb install output/Bilgi_Dozu_Jarvis.apk
+            adb shell am start -W -n com.bilgidozu.jarvis/.MainActivity | tr -d '\r' | tee "$RUNNER_TEMP/release-smoke-${{ matrix.api }}.txt"
+            grep -q 'Status: ok' "$RUNNER_TEMP/release-smoke-${{ matrix.api }}.txt"
+            adb shell settings put secure enabled_accessibility_services com.bilgidozu.jarvis/com.bilgidozu.jarvis.JarvisAccessibilityService
+            adb shell settings put secure accessibility_enabled 1
+            sleep 2
+            adb shell dumpsys accessibility | grep -F 'com.bilgidozu.jarvis' | head -10 >> "$RUNNER_TEMP/release-smoke-${{ matrix.api }}.txt"
+            adb shell pidof com.bilgidozu.jarvis
+            adb exec-out screencap -p > "$RUNNER_TEMP/release-${{ matrix.api }}.png"
+            ! adb shell logcat -d -s AndroidRuntime:E | grep -q 'FATAL EXCEPTION'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: bd-jarvis-fixture-${{ matrix.api }}
-          path: ${{ runner.temp }}/fixture-${{ matrix.api }}.txt
+          path: |
+            ${{ runner.temp }}/fixture-${{ matrix.api }}.txt
+            ${{ runner.temp }}/release-smoke-${{ matrix.api }}.txt
+            ${{ runner.temp }}/release-${{ matrix.api }}.png
           if-no-files-found: ignore
           retention-days: 1
