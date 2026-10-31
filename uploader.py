@@ -785,6 +785,7 @@ def build_telegram_report(
     backlink_info: dict | None = None,
     thumbnail_ok: bool | None = None,
     thumbnail_saved: bool | None = None,
+    related_info: dict | None = None,
 ) -> str:
     import html as _html
     raw_title = meta.get("title", "")
@@ -814,13 +815,28 @@ def build_telegram_report(
     extra_buttons = []
     if backlink_info and backlink_info.get("prev_vid_id"):
         pf = backlink_info.get("prev_file", "önceki bölüm")
+        desc_state = "adım tamamlandı" if backlink_info.get("desc_updated") else "doğrulanmadı"
+        comment_state = "adım tamamlandı" if backlink_info.get("comment_updated") else "doğrulanmadı"
         chain_line = (
-            f"🔗 <b>Zincir Geri-Bağlantı ({_html.escape(pf)}):</b> Açıklama + Yorum otomatik bağlandı ✅\n"
-            f"<i>(Shorts alt 'İlgili Video' hapı YouTube API'de kapalıdır; aşağıdaki butonla 2 sn'de seçebilirsin)</i>\n\n"
+            f"🔗 <b>Zincir Geri-Bağlantı ({_html.escape(pf)}):</b> "
+            f"açıklama {desc_state}, yorum {comment_state}.\n"
+            f"<i>Shorts 'İlgili Video' bağlantısı ayrıca Studio işlemi gerektirir.</i>\n\n"
         )
         extra_buttons.append(
             [{"text": f"🔗 {pf} -> 'İlgili Video' Seç (Studio)", "url": backlink_info["studio_edit_url"]}]
         )
+
+    related_line = ""
+    if isinstance(related_info, dict) and related_info.get("status") in {
+        "studio_pending", "waiting_target", "ambiguous", "no_mapping", "no_table", "unknown", "invalid_short", "invalid_target"
+    }:
+        msg = _html.escape(str(related_info.get("message", "İlgili video doğrulanmadı.")))
+        target = related_info.get("target_name")
+        target_line = f" Hedef: <code>{_html.escape(str(target))}</code>." if target else ""
+        related_line = f"🔗 <b>İlgili Video:</b> {msg}{target_line}\n\n"
+        studio_url = str(related_info.get("studio_url") or "")
+        if related_info.get("status") == "studio_pending" and studio_url.startswith("https://studio.youtube.com/video/"):
+            extra_buttons.append([{"text": "🔗 İlgili Video'yu Studio'da Aç", "url": studio_url}])
 
     if comment_ok:
         comment_header = "✅ <b>SABİT YORUM (Otomatik Atıldı · Sabitle):</b>"
@@ -853,6 +869,7 @@ def build_telegram_report(
         f"{stock_line}"
         f"{thumbnail_line}"
         f"{chain_line}"
+        f"{related_line}"
         f"{comment_header}\n"
         f"<pre>{_html.escape(pinned)}</pre>\n\n"
         f"📢 <b>YOUTUBE GÖNDERİLER METNİ (1 Kez Dokun Tamamı Kopyalanır):</b>\n"
@@ -1410,88 +1427,27 @@ def _ilgili_tablo_oku(drive, queue_folder: str) -> tuple | None:
     return headers, data
 
 
-def sync_related_links(youtube, drive, queue_folder: str, this_file_name: str, this_vid_id: str) -> str:
-    """SERİ ZİNCİRİ — YouTube Studio 'İlgili Video' otomatik bağlantısı (API: relatedVideos).
-    - UZUN yayınlandığında -> tablonun 'İlgili Video' sütunundaki 3 shorttan yayınlanmış olanların
-      relatedVideos alanına uzun videosu bağlanır; uzun videonun kendi ilgili alanı ilk short'a.
-    - SHORT yayınlandığında -> onu kapsayan uzun video yayınlanmışsa short.relatedVideos = uzun video
-      (uzun videonun ilgili alanı boşsa, ilk yayınlanan short'a bağlanır).
-    Best-effort: hata yükleme akışını durdurmaz. Özet metin Telegram raporu için döner.
+def sync_related_links(youtube, drive, queue_folder: str, this_file_name: str, this_vid_id: str) -> dict:
+    """İlgili Short eşleşmesini PLANLA; YouTube'da kesinlikle değişiklik yapma.
+
+    YouTube Data API `relatedVideos` alanını desteklemez. Bu nedenle burada
+    gerçekte çalışmayan API çağrıları yerine yalnız doğrulanmamış bir Studio iş
+    emri hazırlanır. Hedefin kanalı/gizlilik durumu Studio işleminden önce
+    ayrıca doğrulanmalıdır. Eski videolar otomatik değiştirilmez.
     """
-    import re as _re
     try:
-        okunan = _ilgili_tablo_oku(drive, queue_folder)
-        if not okunan:
-            return ""
-        headers, data = okunan
-        def col(name: str):
-            return next((i for i, h in enumerate(headers) if h.strip().casefold() == name.casefold()), None)
-        c_ad, c_link, c_rel = col("Dosya Adı"), col("YouTube Link"), col("İlgili Video")
-        if c_ad is None or c_link is None or c_rel is None:
-            return ""
-
-        def _link_of(row):
-            return _extract_yt_vid_id(str(row[c_link] or "")) if row else ""
-
-        def _bos_ilgili_mi(youtube, vid: str) -> bool:
-            r = youtube.videos().list(part="relatedVideos", id=vid).execute()
-            items = r.get("items", [])
-            if not items:
-                return True
-            return not (items[0].get("relatedVideos") or {}).get("videoId")
-
-        def _bagla(short_vid: str, hedef_vid: str) -> bool:
-            youtube.videos().update(part="relatedVideos", id=short_vid,
-                                    body={"relatedVideos": {"videoId": hedef_vid}}).execute()
-            return True
-
-        baglanan = []
-        is_long = this_file_name.startswith("uzun_")
-        if is_long:
-            row = data.get(this_file_name.casefold())
-            if not row:
-                return ""
-            hedefler = [t.strip() for t in str(row[c_rel] or "").split(",") if t.strip()]
-            for h in hedefler:
-                kvid = _link_of(data.get(h.casefold()))
-                if not kvid:
-                    continue  # short henüz yayınlanmadı
-                try:
-                    _bagla(kvid, this_vid_id)
-                    baglanan.append(h)
-                except Exception as e:
-                    log.warning(f"İLGİLİ VİDEO: {h} -> {this_file_name} bağlanamadı: {e}")
-            if baglanan and _bos_ilgili_mi(youtube, this_vid_id):
-                ilk = _link_of(data.get(baglanan[0].casefold()))
-                if ilk:
-                    try:
-                        _bagla(this_vid_id, ilk)
-                        log.info(f"İLGİLİ VİDEO: {this_file_name} -> {baglanan[0]} (uzun kendi bağlantısı)")
-                    except Exception as e:
-                        log.warning(f"İLGİLİ VİDEO: uzun videosunun kendi bağlantısı kurulamadı: {e}")
-        else:
-            # Short: onu kapsayan uzun video satırını bul
-            for ad, row in data.items():
-                if ad.startswith("uzun_") and this_file_name.casefold() in [t.strip().casefold() for t in str(row[c_rel] or "").split(",") if t.strip()]:
-                    lvid = _link_of(row)
-                    if not lvid:
-                        return ""  # uzun video henüz yayınlanmadı
-                    try:
-                        _bagla(this_vid_id, lvid)
-                        baglanan.append(ad)
-                        if _bos_ilgili_mi(youtube, lvid):
-                            _bagla(lvid, this_vid_id)
-                            log.info(f"İLGİLİ VİDEO: {ad} -> {this_file_name} (uzun kendi bağlantısı)")
-                    except Exception as e:
-                        log.warning(f"İLGİLİ VİDEO: {this_file_name} -> {ad} bağlanamadı: {e}")
-                    break
-        if baglanan:
-            log.info(f"İLGİLİ VİDEO: {len(baglanan) if is_long else len(baglanan)} bağlantı kuruldu: {', '.join(baglanan)}")
-            return f"🔗 İlgili video: {len(baglanan)} bağlantı ({', '.join(baglanan)[:80]})"
-        return ""
-    except Exception as e:
-        log.warning(f"İLGİLİ VİDEO zinciri atlandı (zararsız): {e}")
-        return ""
+        from related_plan import plan, uploaded_file_ids
+        table = _ilgili_tablo_oku(drive, queue_folder)
+        if not table:
+            return {"status": "no_table", "message": "İlgili video tablosu okunamadı; otomatik bağlantı yapılmadı."}
+        headers, rows = table
+        result = plan(headers, rows, this_file_name, this_vid_id,
+                      uploaded_file_ids(BASE_DIR / "uploaded.txt"))
+        log.info("İlgili video planı: %s — otomatik Studio değişikliği yapılmadı.", result["status"])
+        return result
+    except Exception as exc:
+        log.warning("İlgili video planı hazırlanamadı: %s", type(exc).__name__)
+        return {"status": "unknown", "message": "İlgili video doğrulanamadı; otomatik bağlantı yapılmadı."}
 
 
 COMBINING_DOT = "\u0307"
@@ -1740,17 +1696,18 @@ def upload_job(
             if konu_listesi:
                 pkid = ensure_named_playlist(youtube, konu_listesi)
                 add_video_to_series(youtube, vid_id, pkid)
-        # SERİ ZİNCİRİ: 'İlgili Video' (relatedVideos) otomatik bağlantı — short ve uzun için de
+        # YouTube API ilgili-video alanı sunmaz: yalnız doğrulanmamış iş emri hazırla.
+        # Bu isteğe bağlı adım hiçbir koşulda gerçekleşmiş yayını/haber kartını engellemesin.
         try:
-            rel_ozet = sync_related_links(youtube, drive, queue_folder, file_name, vid_id)
-            if rel_ozet:
-                backlink_info = (backlink_info or "") + f" | {rel_ozet}"
+            related_info = sync_related_links(youtube, drive, queue_folder, file_name, vid_id)
         except Exception as re_err:
-            log.warning(f"İlgili video zinciri atlandı (zararsız): {re_err}")
+            log.warning("İlgili video planı atlandı: %s", type(re_err).__name__)
+            related_info = {"status": "unknown", "message": "İlgili video doğrulanamadı; otomatik bağlantı yapılmadı."}
         # retro_enrich_published RETIRED: kullanıcı eski videoları elle düzenliyor; token ekstra yüklenmiyor (25 Ekim kararı)
 
         report_txt = build_telegram_report(file_name, vid_id, yt_url, meta, comment_ok,
                                            backlink_info=backlink_info,
+                                           related_info=related_info,
                                            thumbnail_ok=thumbnail_result.api_accepted,
                                            thumbnail_saved=thumbnail_result.drive_saved)
         REPORT_FILE.write_text(report_txt, encoding="utf-8")
@@ -1766,7 +1723,16 @@ def upload_job(
             crosspost_result = run_crosspost(tmp_path, file_name, xcap, drive=drive, folder_id="1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_")
             log.info(f"Çapraz paylaşım sonucu: {crosspost_result}")
         except Exception as xe:
-            log.warning(f"Çapraz paylaşım atlandı (YouTube akışı etkilenmedi): {xe}")
+            # Kimlik bilgileri/çerezler exception metninde bulunabileceğinden metni yazdırma.
+            log.warning("Çapraz paylaşım atlandı (YouTube akışı etkilenmedi): %s", type(xe).__name__)
+
+        # Ana yükleme kartı, çapraz denemeden önce oluşturulmuştur. Bu nedenle
+        # kartı ancak eldeki sonucu dürüstçe etiketleyerek sonradan tamamlarız.
+        try:
+            from delivery_diagnostics import append_to_payload
+            append_to_payload(BASE_DIR / "last_upload_payload.json", file_name, crosspost_result)
+        except Exception as de:
+            log.warning("Çapraz sonuç karta eklenemedi: %s", type(de).__name__)
 
         return {
             "video_id": vid_id,

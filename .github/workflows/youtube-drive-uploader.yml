@@ -245,6 +245,7 @@ jobs:
           token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
           chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
           if not token or not chat_id:
+              print("::warning::Telegram bildirimi gönderilmedi: bot veya sohbet ayarı eksik.")
               raise SystemExit(0)
 
           status = os.getenv("JOB_STATUS", "")
@@ -265,6 +266,7 @@ jobs:
                   },
               }
           else:
+              print("::notice::Yayın kartı yok: gönderilecek Telegram bildirimi bulunmadı.")
               raise SystemExit(0)
 
           req = urllib.request.Request(
@@ -273,5 +275,14 @@ jobs:
               headers={"Content-Type": "application/json; charset=utf-8"},
               method="POST",
           )
-          urllib.request.urlopen(req, timeout=15).read()
+          try:
+              with urllib.request.urlopen(req, timeout=15) as response:
+                  result = json.loads(response.read().decode("utf-8"))
+              if not result.get("ok") or not result.get("result", {}).get("message_id"):
+                  raise RuntimeError("Telegram API kabul sonucu dönmedi")
+              print("Telegram API mesajı kabul etti; okunduğu anlamına gelmez.")
+          except Exception as exc:
+              # URL veya hata gövdesi oturum bilgisi içerebilir; yazdırma.
+              print(f"::warning::Telegram gönderimi doğrulanamadı ({type(exc).__name__}).")
+              raise SystemExit(1) from None
           PY

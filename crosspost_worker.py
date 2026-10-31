@@ -56,7 +56,7 @@ def _load_drive_keys(drive=None, folder_id: str = "") -> dict:
         log.info(f"{KEYS_FILE_NAME} Drive'dan okundu (anahtarlar: {[k for k, v in keys.items() if v]})")
         return keys
     except Exception as e:
-        log.warning(f"Drive anahtar dosyası okunamadı: {e}")
+        log.warning("Drive anahtar dosyası okunamadı: %s", type(e).__name__)
         return {}
 
 
@@ -113,8 +113,8 @@ def _send_telegram_note(lines: list[str]) -> None:
             headers={"Content-Type": "application/json"},
         )
         urllib.request.urlopen(req, timeout=20)
-    except Exception as e:  # Telegram hatası bile akışı bozmasın
-        log.warning(f"Telegram çapraz paylaşım notu gönderilemedi: {e}")
+    except Exception as e:  # URL/yanıtlar gizli bilgi içerebilir; ayrıntıyı yazdırma.
+        log.warning("Telegram çapraz paylaşım notu gönderilemedi: %s", type(e).__name__)
 
 
 def post_instagram(video_path: Path, caption: str) -> str | None:
@@ -149,11 +149,11 @@ def post_instagram(video_path: Path, caption: str) -> str | None:
         media = cl.clip_upload(str(video_path), _trim_caption(caption, IG_MAX_CAPTION))
         code = getattr(media, "code", "") or ""
         url = f"https://www.instagram.com/reel/{code}/" if code else "https://www.instagram.com/bilgidozuofficial/"
-        log.info(f"Instagram Reels yüklendi: {url}")
+        log.info("Instagram yükleme yanıtı alındı; herkese açık görünürlük doğrulanmadı.")
         return url
     except Exception as e:
-        log.warning(f"Instagram yüklemesi başarısız: {e}")
-        return f"HATA: {e}"
+        log.warning("Instagram yüklemesi başarısız: %s", type(e).__name__)
+        return f"HATA: {type(e).__name__}"
 
 
 def _ensure_playwright_browser() -> None:
@@ -187,15 +187,15 @@ def post_tiktok(video_path: Path, caption: str) -> str | None:
             headless=True,
         )
         if failed:
-            msg = f"HATA: tiktok-uploader başarısız liste döndü: {failed}"
+            msg = "HATA: TikTok yükleme kütüphanesi başarısız sonucu döndürdü"
             log.warning(msg)
             return msg
         url = "https://www.tiktok.com/@bilgidozuofficial"
-        log.info(f"TikTok yüklendi: {url}")
+        log.info("TikTok gönderim denemesi tamamlandı; herkese açık gönderi henüz doğrulanmadı.")
         return url
     except Exception as e:
-        log.warning(f"TikTok yüklemesi başarısız: {e}")
-        return f"HATA: {e}"
+        log.warning("TikTok yüklemesi başarısız: %s", type(e).__name__)
+        return f"HATA: {type(e).__name__}"
 
 
 def run_crosspost(video_path: Path, file_name: str, caption: str, drive=None, folder_id: str = "") -> dict:
@@ -219,15 +219,13 @@ def run_crosspost(video_path: Path, file_name: str, caption: str, drive=None, fo
     results["instagram"] = post_instagram(video_path, caption)
     results["tiktok"] = post_tiktok(video_path, caption)
 
-    note_lines = []
-    tt = results["tiktok"]
-    ig = results["instagram"]
-    if tt:
-        ok = isinstance(tt, str) and not tt.startswith("HATA")
-        note_lines.append(f"{'✅' if ok else '⚠️'} <b>TikTok:</b> {tt}")
-    if ig:
-        ok = isinstance(ig, str) and not ig.startswith("HATA")
-        note_lines.append(f"{'✅' if ok else '⚠️'} <b>Instagram:</b> {ig}")
+    # Yalnız API yanıtı veya genel profil adresi herkese açık yayının kanıtı değildir.
+    # Telegram notuna hata gövdesi veya kimlik bilgisi içerebilecek ham değer ekleme.
+    from delivery_diagnostics import classify
+    note_lines = [
+        f"ℹ️ <b>TikTok:</b> {classify('tiktok', results['tiktok'])}",
+        f"ℹ️ <b>Instagram:</b> {classify('instagram', results['instagram'])}",
+    ]
     _send_telegram_note(note_lines)
 
     log.info(f"Çapraz paylaşım bitti: {results}")
