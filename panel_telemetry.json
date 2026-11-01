@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-02 02:37:31",
-  "generated_at_iso": "2026-11-02T02:37:31.280070+03:00",
+  "generated_at": "2026-11-02 02:39:10",
+  "generated_at_iso": "2026-11-02T02:39:10.968695+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -53,95 +53,88 @@
   "drive_inventory": {
     "shorts_videos": [
       {
-        "id": "19MqklocEBCqO_pEeNz7z29EPt7cU019c",
-        "name": "xvideo_136.mp4",
-        "mimeType": "video/mp4",
-        "modifiedTime": "2026-11-01T18:38:51.095Z",
-        "size": 18156883
-      },
-      {
         "id": "1gy9oKoKOwQDxUC-rYMNN64KYf80ZS_t-",
         "name": "video_155.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:24.015Z",
-        "size": 11500831
+        "size": 11500831,
+        "modifiedTime": "2026-10-30T06:42:24.015Z"
       },
       {
         "id": "1YCY-8cvOXZhAehJ8rSlcAw0TgfemJ0Xm",
         "name": "video_156.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:29.773Z",
-        "size": 10103932
+        "size": 10103932,
+        "modifiedTime": "2026-10-30T06:42:29.773Z"
       },
       {
         "id": "1PzclvBCMlkt9DaQR49Bd3XTOjNsIXaa7",
         "name": "video_157.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-29T16:29:06.652Z",
-        "size": 14063238
+        "size": 14063238,
+        "modifiedTime": "2026-10-29T16:29:06.652Z"
       },
       {
         "id": "18tFRo-unZ-U1Xv7DEGLnyPMvc5oxZuYX",
         "name": "video_158.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:32.321Z",
-        "size": 10058523
+        "size": 10058523,
+        "modifiedTime": "2026-10-30T06:42:32.321Z"
       },
       {
         "id": "1t3f4eXm0QhpENLjyEcCQM4UrpTtsFDCu",
         "name": "video_159.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:32.963Z",
-        "size": 13003616
+        "size": 13003616,
+        "modifiedTime": "2026-10-30T06:42:32.963Z"
       },
       {
         "id": "1ZPU6JT8nHmZCohP7wx17a-FfoW9BCKPL",
         "name": "video_160.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:33.617Z",
-        "size": 11357378
+        "size": 11357378,
+        "modifiedTime": "2026-10-30T06:42:33.617Z"
       },
       {
         "id": "18-b_M7qo2NsaaLT6T8EetVcq7-uJrhLK",
         "name": "video_161.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:34.257Z",
-        "size": 15117638
+        "size": 15117638,
+        "modifiedTime": "2026-10-30T06:42:34.257Z"
       },
       {
         "id": "1xwogYEA49ym92lGPbbW8RARcAlnMlVqM",
         "name": "video_162.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:40.336Z",
-        "size": 9983214
+        "size": 9983214,
+        "modifiedTime": "2026-10-30T06:42:40.336Z"
       },
       {
         "id": "16w8ahoKJZzkErIQhCgR9x---DvuY2-Fm",
         "name": "video_163.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:41.003Z",
-        "size": 11540103
+        "size": 11540103,
+        "modifiedTime": "2026-10-30T06:42:41.003Z"
       },
       {
         "id": "1n00O3UrSxsMQgsQVj7PhYXeFlgBVQEvT",
         "name": "video_164.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:41.724Z",
-        "size": 16909491
+        "size": 16909491,
+        "modifiedTime": "2026-10-30T06:42:41.724Z"
       },
       {
         "id": "1EmBE1qjegAjSfGsgaz-OpunusCnke5pq",
         "name": "video_165.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:42.377Z",
-        "size": 17188306
+        "size": 17188306,
+        "modifiedTime": "2026-10-30T06:42:42.377Z"
       },
       {
         "id": "1dnW2wofoZ12-ncwQKJ3LYrn715elgrov",
         "name": "video_166.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:43.112Z",
-        "size": 16172312
+        "size": 16172312,
+        "modifiedTime": "2026-10-30T06:42:43.112Z"
       }
     ],
     "shorts_covers": [
@@ -149,292 +142,299 @@
         "id": "1jiScwcmRqXEC5xt8mUJj7ODoE_mZ1y-z",
         "name": "kapak_155.jpg",
         "mimeType": "image/jpeg",
-        "modifiedTime": "2026-11-01T18:33:51.700Z",
-        "size": 543290
+        "size": 543290,
+        "modifiedTime": "2026-11-01T18:33:51.700Z"
       },
       {
         "id": "1Q1i0AbU6XgEppUzRn-pr_McKGWb1J1i4",
         "name": "kapak_155_yeni.jpg",
         "mimeType": "image/jpeg",
-        "modifiedTime": "2026-11-01T23:10:03.708Z",
-        "size": 452285
+        "size": 452285,
+        "modifiedTime": "2026-11-01T23:10:03.708Z"
       },
       {
         "id": "1miH9dD9DoyzBKHKQkS2hWwvNdEd507Bc",
         "name": "kapak_156.jpg",
         "mimeType": "image/jpeg",
-        "modifiedTime": "2026-11-01T18:33:51.732Z",
-        "size": 481105
+        "size": 481105,
+        "modifiedTime": "2026-11-01T18:33:51.732Z"
       },
       {
         "id": "1Pn4FrVtlVWNVwR83adi4EdF2wsk6VwX6",
         "name": "kapak_157.jpg",
         "mimeType": "image/jpeg",
-        "modifiedTime": "2026-11-01T18:33:52.006Z",
-        "size": 476230
+        "size": 476230,
+        "modifiedTime": "2026-11-01T18:33:52.006Z"
       },
       {
         "id": "1q9spYyS39ZR3rPY3vr_zBHKzyRJNYgeq",
         "name": "kapak_158.jpg",
         "mimeType": "image/jpeg",
-        "modifiedTime": "2026-11-01T18:33:51.720Z",
-        "size": 340678
+        "size": 340678,
+        "modifiedTime": "2026-11-01T18:33:51.720Z"
       },
       {
         "id": "1sTjhRkAYL432ogtAhARNGxkV1OIbSa0Q",
         "name": "kapak_159.jpg",
         "mimeType": "image/jpeg",
-        "modifiedTime": "2026-11-01T18:33:51.693Z",
-        "size": 529860
+        "size": 529860,
+        "modifiedTime": "2026-11-01T18:33:51.693Z"
       },
       {
         "id": "1dtuV1FbFxpSS9vomzVxlKxSyn3COonxq",
         "name": "kapak_160.jpg",
         "mimeType": "image/jpeg",
-        "modifiedTime": "2026-11-01T18:33:51.709Z",
-        "size": 347565
+        "size": 347565,
+        "modifiedTime": "2026-11-01T18:33:51.709Z"
       },
       {
         "id": "1U90eAyu_McOxlJPy41_gDfeZOEpJLI3V",
         "name": "kapak_161.jpg",
         "mimeType": "image/jpeg",
-        "modifiedTime": "2026-11-01T18:33:51.693Z",
-        "size": 590136
+        "size": 590136,
+        "modifiedTime": "2026-11-01T18:33:51.693Z"
       },
       {
         "id": "157LBXRQKnOwbZbXm5REt5D3W8PKlprbx",
         "name": "kapak_162.jpg",
         "mimeType": "image/jpeg",
-        "modifiedTime": "2026-11-01T18:33:51.737Z",
-        "size": 376246
+        "size": 376246,
+        "modifiedTime": "2026-11-01T18:33:51.737Z"
       },
       {
         "id": "1Arx0rFAUsdjoHtN29-wJUVryZy_yqijH",
         "name": "kapak_163.jpg",
         "mimeType": "image/jpeg",
-        "modifiedTime": "2026-11-01T18:33:51.728Z",
-        "size": 365794
+        "size": 365794,
+        "modifiedTime": "2026-11-01T18:33:51.728Z"
+      },
+      {
+        "id": "1CKa1MeUAlu_vVjpLyoJvg1SgPguQx0NC",
+        "name": "kapak_164.jpeg",
+        "mimeType": "image/jpeg",
+        "size": 410354,
+        "modifiedTime": "2026-11-01T23:37:01.992Z"
       }
     ],
     "long_videos": [
       {
-        "id": "1-qWhR9bbqqWdGvVZsA9225xzOWnexMew",
-        "name": "uzun_video_8.mp4",
-        "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-20T21:29:27.994Z",
-        "size": 83722104
-      },
-      {
-        "id": "1weJEy_9zjDGeqfLFHapdZ3Tt8UXMqYzn",
-        "name": "uzun_video_9.mp4",
-        "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-20T21:36:09.141Z",
-        "size": 85769016
-      },
-      {
         "id": "1lltDL8ype5n64_YiVIT05ueS9h7bYoDy",
         "name": "uzun_video_10.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-21T06:48:07.760Z",
-        "size": 95768604
+        "size": 95768604,
+        "modifiedTime": "2026-10-21T06:48:07.760Z"
       },
       {
         "id": "1higVkpVZsQqZmlV8gCQwFUB6atImqIrq",
         "name": "uzun_video_11.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-22T11:09:34.894Z",
-        "size": 73557803
+        "size": 73557803,
+        "modifiedTime": "2026-10-22T11:09:34.894Z"
       },
       {
         "id": "1UtmDpdqS7H-FP18vtYqDVFRVlfUX2A2o",
         "name": "uzun_video_12.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-23T18:19:03.558Z",
-        "size": 91996704
+        "size": 91996704,
+        "modifiedTime": "2026-10-23T18:19:03.558Z"
       },
       {
         "id": "1SXwmT40zgpwql-9iqz9tHG11PoM-y_jW",
         "name": "uzun_video_13.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-24T14:26:28.563Z",
-        "size": 56755064
+        "size": 56755064,
+        "modifiedTime": "2026-10-24T14:26:28.563Z"
       },
       {
         "id": "10_8u3UfhVCTkpCoETJ2T5ynRewlHUnaQ",
         "name": "uzun_video_14.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-28T22:30:02.179Z",
-        "size": 54733836
+        "size": 54733836,
+        "modifiedTime": "2026-10-28T22:30:02.179Z"
       },
       {
         "id": "1hJwUNT7cJX8ZoDuDpV6C8qRtQwf1IKVW",
         "name": "uzun_video_15.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-28T22:30:05.902Z",
-        "size": 42042562
+        "size": 42042562,
+        "modifiedTime": "2026-10-28T22:30:05.902Z"
       },
       {
         "id": "1DkQB1eWOX4PZf4cB_T85JI_bwptr1qMJ",
         "name": "uzun_video_16.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-28T22:30:09.504Z",
-        "size": 53969733
+        "size": 53969733,
+        "modifiedTime": "2026-10-28T22:30:09.504Z"
       },
       {
         "id": "1xPl6QRzHp6UZZ_ZMWSZ-oa0eFxfl6iax",
         "name": "uzun_video_17.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:30.407Z",
-        "size": 21311864
+        "size": 21311864,
+        "modifiedTime": "2026-10-30T06:42:30.407Z"
       },
       {
         "id": "1sL_Td-hlSk7Vq9kTqPV8eBqJUuo2Fbaa",
         "name": "uzun_video_18.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:31.061Z",
-        "size": 17537408
+        "size": 17537408,
+        "modifiedTime": "2026-10-30T06:42:31.061Z"
       },
       {
         "id": "1eUkviF0XGskcYAlvwJhFflbSemU44aBd",
         "name": "uzun_video_19.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:31.719Z",
-        "size": 17336587
+        "size": 17336587,
+        "modifiedTime": "2026-10-30T06:42:31.719Z"
       },
       {
         "id": "1fao6xZA2G594tEDPzocoILsOuHjYlM7U",
         "name": "uzun_video_20.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:43.795Z",
-        "size": 20158481
+        "size": 20158481,
+        "modifiedTime": "2026-10-30T06:42:43.795Z"
       },
       {
         "id": "1kxn3E7Un55nTdvH-SY30-8_7bpUXyg5e",
         "name": "uzun_video_21.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:44.485Z",
-        "size": 26434399
+        "size": 26434399,
+        "modifiedTime": "2026-10-30T06:42:44.485Z"
       },
       {
         "id": "1v7NJbO692Lp55qjSqycja_CJooyBvUXm",
         "name": "uzun_video_22.mp4",
         "mimeType": "video/mp4",
-        "modifiedTime": "2026-10-30T06:42:45.208Z",
-        "size": 26890531
+        "size": 26890531,
+        "modifiedTime": "2026-10-30T06:42:45.208Z"
+      },
+      {
+        "id": "1-qWhR9bbqqWdGvVZsA9225xzOWnexMew",
+        "name": "uzun_video_8.mp4",
+        "mimeType": "video/mp4",
+        "size": 83722104,
+        "modifiedTime": "2026-10-20T21:29:27.994Z"
+      },
+      {
+        "id": "1weJEy_9zjDGeqfLFHapdZ3Tt8UXMqYzn",
+        "name": "uzun_video_9.mp4",
+        "mimeType": "video/mp4",
+        "size": 85769016,
+        "modifiedTime": "2026-10-20T21:36:09.141Z"
       }
     ],
     "long_covers": [
       {
-        "id": "1R-VZZHpHlX_la0-hu4xD1TmZBA0pUGam",
-        "name": "uzun_kapak_8.png",
-        "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:14.383Z",
-        "size": 763637
-      },
-      {
-        "id": "1KqEPvriafHU7YZP4cCnppWOG_lN1z_mb",
-        "name": "uzun_kapak_8_yeni.png",
-        "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T23:24:33.467Z",
-        "size": 1657459
-      },
-      {
-        "id": "16Q3MQNjnNEX3RwVTvzrGZ0_5bQ5cjxkV",
-        "name": "uzun_kapak_9.png",
-        "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:14.892Z",
-        "size": 495622
-      },
-      {
         "id": "1JzSRGJ8lSELmi54BmwTE2zWgSPs82pPi",
         "name": "uzun_kapak_10.png",
         "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:15.380Z",
-        "size": 744262
+        "size": 744262,
+        "modifiedTime": "2026-11-01T19:46:15.380Z"
       },
       {
         "id": "16xg3eaXZoCsS6dCYwy5KRusp9kCE0kYt",
         "name": "uzun_kapak_11.png",
         "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:14.536Z",
-        "size": 712215
+        "size": 712215,
+        "modifiedTime": "2026-11-01T19:46:14.536Z"
       },
       {
         "id": "1R3B2Le8L3wRtzzllWH8NAzr7P4U6WrRp",
         "name": "uzun_kapak_12.png",
         "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:15.445Z",
-        "size": 680842
+        "size": 680842,
+        "modifiedTime": "2026-11-01T19:46:15.445Z"
       },
       {
         "id": "1hDtci56LoU5Y0JJiedhFpDXxH-MGQOGR",
         "name": "uzun_kapak_13.png",
         "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:15.206Z",
-        "size": 678234
+        "size": 678234,
+        "modifiedTime": "2026-11-01T19:46:15.206Z"
       },
       {
         "id": "1RCI3SwogtXxuq7kWH9zG8fWFt53SkLwd",
         "name": "uzun_kapak_14.png",
         "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:14.139Z",
-        "size": 862676
+        "size": 862676,
+        "modifiedTime": "2026-11-01T19:46:14.139Z"
       },
       {
         "id": "1i7QZRj8yFXoeAXEByyqfcwvbTRIj2lZE",
         "name": "uzun_kapak_15.png",
         "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:15.271Z",
-        "size": 807835
+        "size": 807835,
+        "modifiedTime": "2026-11-01T19:46:15.271Z"
       },
       {
         "id": "1x0Kj2EiteNr_OIxpYy5lotB6at3PhT8_",
         "name": "uzun_kapak_16.png",
         "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:14.961Z",
-        "size": 795808
+        "size": 795808,
+        "modifiedTime": "2026-11-01T19:46:14.961Z"
       },
       {
         "id": "1nC-MBMGOzZ0uS0Hk_JRbLsslRlopZX2L",
         "name": "uzun_kapak_17.png",
         "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:14.237Z",
-        "size": 743185
+        "size": 743185,
+        "modifiedTime": "2026-11-01T19:46:14.237Z"
       },
       {
         "id": "1moe-G5kCYGkeRtNneD9IkDzoWAXv4qlg",
         "name": "uzun_kapak_18.png",
         "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:15.319Z",
-        "size": 677189
+        "size": 677189,
+        "modifiedTime": "2026-11-01T19:46:15.319Z"
       },
       {
         "id": "11js2fd0G_MuATtp9LJ20eYSIjnnabe7W",
         "name": "uzun_kapak_19.png",
         "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:14.639Z",
-        "size": 806517
+        "size": 806517,
+        "modifiedTime": "2026-11-01T19:46:14.639Z"
       },
       {
         "id": "10UXm1WwxxYrZ53kDVIHVLxcPwkXg5Aii",
         "name": "uzun_kapak_20.png",
         "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:14.769Z",
-        "size": 672902
+        "size": 672902,
+        "modifiedTime": "2026-11-01T19:46:14.769Z"
       },
       {
         "id": "1tsG3BOvEOxe8Pz-LCxxZqYKgsNDyJIru",
         "name": "uzun_kapak_21.png",
         "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:14.331Z",
-        "size": 671023
+        "size": 671023,
+        "modifiedTime": "2026-11-01T19:46:14.331Z"
       },
       {
         "id": "1KXvb5VKixPf8gDyQYDCxM-xdy0dS2glr",
         "name": "uzun_kapak_22.png",
         "mimeType": "image/png",
-        "modifiedTime": "2026-11-01T19:46:14.289Z",
-        "size": 670717
+        "size": 670717,
+        "modifiedTime": "2026-11-01T19:46:14.289Z"
+      },
+      {
+        "id": "1R-VZZHpHlX_la0-hu4xD1TmZBA0pUGam",
+        "name": "uzun_kapak_8.png",
+        "mimeType": "image/png",
+        "size": 763637,
+        "modifiedTime": "2026-11-01T19:46:14.383Z"
+      },
+      {
+        "id": "1KqEPvriafHU7YZP4cCnppWOG_lN1z_mb",
+        "name": "uzun_kapak_8_yeni.png",
+        "mimeType": "image/png",
+        "size": 1657459,
+        "modifiedTime": "2026-11-01T23:24:33.467Z"
+      },
+      {
+        "id": "16Q3MQNjnNEX3RwVTvzrGZ0_5bQ5cjxkV",
+        "name": "uzun_kapak_9.png",
+        "mimeType": "image/png",
+        "size": 495622,
+        "modifiedTime": "2026-11-01T19:46:14.892Z"
       }
     ],
     "ceo_files": [
@@ -442,36 +442,36 @@
         "id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "modifiedTime": "2026-11-01T23:14:11.000Z",
-        "size": 92974
+        "size": 88179,
+        "modifiedTime": "2026-11-01T22:23:27.400Z"
       },
       {
         "id": "1LyZBIc52OzaGZBaq8yXODcseZ0wilsrs",
         "name": "RETANSIYON_OZEL_RAPORLAR",
         "mimeType": "application/vnd.google-apps.folder",
-        "modifiedTime": "2026-11-01T22:59:58.786Z",
-        "size": 0
+        "size": 0,
+        "modifiedTime": "2026-11-01T22:59:58.786Z"
       },
       {
         "id": "1bRhgFGax34FGsySde71FqTiMIUpZkw02",
         "name": "Shorts Kapak Şablon",
         "mimeType": "application/vnd.google-apps.folder",
-        "modifiedTime": "2026-11-01T21:25:45.740Z",
-        "size": 0
+        "size": 0,
+        "modifiedTime": "2026-11-01T21:25:45.740Z"
       },
       {
         "id": "1Zr7qxRszk73BvC0DZTmBhJ6Gs6qwR026",
         "name": "Uzun Kapak Şablon",
         "mimeType": "application/vnd.google-apps.folder",
-        "modifiedTime": "2026-11-01T21:25:15.086Z",
-        "size": 0
+        "size": 0,
+        "modifiedTime": "2026-11-01T21:25:15.086Z"
       },
       {
         "id": "1bdRiCGleq7jNHJXzODiKRIjDIrd7iGYM",
         "name": "Video Üretimi - Gerekli Kaynaklar",
         "mimeType": "application/vnd.google-apps.folder",
-        "modifiedTime": "2026-11-01T20:46:15.622Z",
-        "size": 0
+        "size": 0,
+        "modifiedTime": "2026-11-01T20:46:15.622Z"
       }
     ]
   },
