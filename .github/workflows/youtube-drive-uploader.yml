@@ -136,13 +136,13 @@ jobs:
           try:
               import io, openpyxl
               from googleapiclient.http import MediaFileUpload
-              from sheets_metadata import PRIMARY_TABLE_FILE_ID, _download_workbook_bytes_from_drive
+              from sheets_metadata import DEFAULT_SHEETS_ID, _download_workbook_bytes_from_drive
               raw_wb = _download_workbook_bytes_from_drive(drive, cfg["drive_queue_folder_id"])
               if raw_wb and Path("bilgidozu_yukleme_tablosu.xlsx").exists():
                   wb_d = openpyxl.load_workbook(io.BytesIO(raw_wb), data_only=True)
                   if "DRIVE" in wb_d.sheetnames and str(wb_d["DRIVE"].cell(148, 8).value or "").strip() == "BEKLEMEDE":
                       media = MediaFileUpload("bilgidozu_yukleme_tablosu.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", resumable=False)
-                      drive.files().update(fileId=PRIMARY_TABLE_FILE_ID, media_body=media).execute()
+                      drive.files().update(fileId=DEFAULT_SHEETS_ID, media_body=media).execute()
                       print("DRIVE TABLO SENKRONIZE EDILDI: uzun_video_17.mp4 -> YÜKLENDİ & İŞÇİLER güncellendi.")
           except Exception as sync_err:
               print("Drive tablo senkron uyarısı:", sync_err)
@@ -252,9 +252,10 @@ jobs:
         if: ${{ always() && steps.publish.outcome != 'skipped' && steps.publish.outcome != '' }}
         run: |
           if [ -f uploaded.txt ]; then
+            python sync_panel_telemetry.py || true
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add uploaded.txt status_report.json bilgidozu_yukleme_tablosu.xlsx baslik.xlsx
+            git add uploaded.txt status_report.json panel_telemetry.json bilgidozu_yukleme_tablosu.xlsx baslik.xlsx
             [ -f .healed_131_thumb ] && git add -f .healed_131_thumb || true
             git diff --cached --quiet || git commit -m "chore: record uploaded Bilgi Dozu video [skip ci]"
             git pull --rebase --autostash origin main

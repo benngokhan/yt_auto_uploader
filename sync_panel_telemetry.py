@@ -1,0 +1,401 @@
+#!/usr/bin/env python3
+"""Bilgi Dozu Admin Paneli — Canlı Telemetri, Drive Stok Envanteri ve Retansiyon Senkronizasyonu.
+
+0 YouTube Data API kotası harcar. Google Drive'daki YOUTUBE_OTOMASYON alt klasörlerini
+(CEO, Kısa Video/Video, Kısa Video/Kapak, Uzun Video/Video, Uzun Video/Kapak) ve
+Bilgi_Dozu_Retansiyon_Raporu.xlsx dosyasını okuyarak panel_telemetry.json üretir.
+"""
+from __future__ import annotations
+
+import io
+import json
+import os
+import re
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+import openpyxl
+
+from sheets_metadata import (
+    CEO_FOLDER_ID,
+    DEFAULT_SHEETS_ID,
+    KNOWN_PUBLISHED_NAMES,
+    LONG_COVER_FOLDER_ID,
+    LONG_VIDEO_FOLDER_ID,
+    MIN_LONG_NUMBER,
+    MIN_SHORTS_NUMBER,
+    SHORTS_COVER_FOLDER_ID,
+    SHORTS_VIDEO_FOLDER_ID,
+    YOUTUBE_OTOMASYON_FOLDER_ID,
+    _download_workbook_bytes_from_drive,
+    get_next_scheduled_video,
+    is_skipped_by_floor,
+    load_table_from_drive_or_local,
+)
+from uploader import get_google_clients, load_uploaded_ids
+
+BASE_DIR = Path(__file__).resolve().parent
+RETENTION_FOLDER_ID = "1LyZBIc52OzaGZBaq8yXODcseZ0wilsrs"
+RETENTION_REPORT_ID = "1-04hX_5htkheIkCe-W-56bu4zBkfXOvT"
+TELEMETRY_FILE = BASE_DIR / "panel_telemetry.json"
+
+
+def _list_folder_files(drive, folder_id: str) -> list[dict]:
+    if drive is None:
+        return []
+    out = []
+    page_token = None
+    while True:
+        res = drive.files().list(
+            q=f"'{folder_id}' in parents and trashed=false",
+            pageSize=100,
+            pageToken=page_token,
+            orderBy="name",
+            fields="nextPageToken,files(id,name,mimeType,size,modifiedTime)",
+        ).execute()
+        for f in res.get("files", []):
+            out.append({
+                "id": f.get("id", ""),
+                "name": f.get("name", ""),
+                "mimeType": f.get("mimeType", ""),
+                "size": int(f.get("size") or 0),
+                "modifiedTime": f.get("modifiedTime", ""),
+            })
+        page_token = res.get("nextPageToken")
+        if not page_token:
+            break
+    return out
+
+
+def _parse_retention_workbook(raw_bytes: bytes) -> dict:
+    wb = openpyxl.load_workbook(io.BytesIO(raw_bytes), data_only=True)
+    info = {}
+    if "Rapor Bilgisi" in wb.sheetnames:
+        ws = wb["Rapor Bilgisi"]
+        for r in range(2, ws.max_row + 1):
+            k = str(ws.cell(r, 1).value or "").strip()
+            v = ws.cell(r, 2).value
+            if k:
+                info[k] = v
+
+    metrics = []
+    if "Video Metrikleri" in wb.sheetnames:
+        ws = wb["Video Metrikleri"]
+        for r in range(2, ws.max_row + 1):
+            title = str(ws.cell(r, 1).value or "").strip()
+            if not title:
+                continue
+            url = str(ws.cell(r, 10).value or "").strip()
+            m_id = re.search(r"(?:youtu\.be/|v=|shorts/)([A-Za-z0-9_-]{11})", url)
+            vid_id = m_id.group(1) if m_id else ""
+            metrics.append({
+                "title": title,
+                "published_date": str(ws.cell(r, 2).value or ""),
+                "duration_sec": float(ws.cell(r, 3).value or 0),
+                "views": int(ws.cell(r, 4).value or 0),
+                "avg_view_sec": float(ws.cell(r, 5).value or 0),
+                "avg_view_pct": float(ws.cell(r, 6).value or 0),
+                "watch_time_min": float(ws.cell(r, 7).value or 0),
+                "hook_3s_pct": float(ws.cell(r, 8).value) if ws.cell(r, 8).value is not None else None,
+                "curve_status": str(ws.cell(r, 9).value or ""),
+                "url": url,
+                "video_id": vid_id,
+            })
+
+    curves: dict[str, dict] = {}
+    if "Eğri Verileri" in wb.sheetnames:
+        ws = wb["Eğri Verileri"]
+        for r in range(2, ws.max_row + 1):
+            vtitle = str(ws.cell(r, 1).value or "").strip()
+            vid = str(ws.cell(r, 2).value or "").strip()
+            ratio = ws.cell(r, 3).value
+            sec = ws.cell(r, 4).value
+            pct = ws.cell(r, 5).value
+            if not vid or ratio is None or pct is None:
+                continue
+            if vid not in curves:
+                curves[vid] = {"video_id": vid, "title": vtitle, "points": []}
+            curves[vid]["points"].append({
+                "ratio": round(float(ratio) * 100, 1),
+                "sec": round(float(sec or 0), 2),
+                "pct": round(float(pct), 2),
+            })
+
+    # Attach hook_3s_pct from curves if missing in metrics
+    for m in metrics:
+        vid = m["video_id"]
+        if m["hook_3s_pct"] is None and vid in curves and curves[vid]["points"]:
+            pts = curves[vid]["points"]
+            closest = min(pts, key=lambda p: abs(p["sec"] - 3.0))
+            m["hook_3s_pct"] = closest["pct"]
+
+    return {
+        "info": info,
+        "video_count": len(metrics),
+        "curve_count": len(curves),
+        "metrics": metrics,
+        "curves": list(curves.values()),
+    }
+
+
+def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_table_to_drive: bool = False) -> dict:
+    tr_now = datetime.now(timezone(timedelta(hours=3)))
+    now_str = tr_now.strftime("%Y-%m-%d %H:%M:%S")
+
+    # Sync workbook between GitHub and Drive
+    if drive is not None:
+        try:
+            wb_local_path = BASE_DIR / "bilgidozu_yukleme_tablosu.xlsx"
+            if push_table_to_drive and wb_local_path.exists():
+                from googleapiclient.http import MediaFileUpload
+                media = MediaFileUpload(
+                    str(wb_local_path),
+                    mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    resumable=False,
+                )
+                drive.files().update(fileId=DEFAULT_SHEETS_ID, media_body=media).execute()
+                print("[telemetry] GitHub tablosu Google Drive CEO klasörüne yazıldı.")
+            else:
+                raw_wb = _download_workbook_bytes_from_drive(drive, CEO_FOLDER_ID)
+                if raw_wb:
+                    wb_local_path.write_bytes(raw_wb)
+        except Exception as e:
+            print(f"[telemetry] Drive tablo senkron uyarısı: {e}")
+
+    shorts_videos = _list_folder_files(drive, SHORTS_VIDEO_FOLDER_ID) if drive else []
+    shorts_covers = _list_folder_files(drive, SHORTS_COVER_FOLDER_ID) if drive else []
+    long_videos = _list_folder_files(drive, LONG_VIDEO_FOLDER_ID) if drive else []
+    long_covers = _list_folder_files(drive, LONG_COVER_FOLDER_ID) if drive else []
+    ceo_files = _list_folder_files(drive, CEO_FOLDER_ID) if drive else []
+
+    # Fallback to existing telemetry drive inventory if running offline
+    if not shorts_videos and TELEMETRY_FILE.exists():
+        try:
+            prev = json.loads(TELEMETRY_FILE.read_text(encoding="utf-8"))
+            inv = prev.get("drive_inventory", {})
+            shorts_videos = inv.get("shorts_videos", [])
+            shorts_covers = inv.get("shorts_covers", [])
+            long_videos = inv.get("long_videos", [])
+            long_covers = inv.get("long_covers", [])
+            ceo_files = inv.get("ceo_files", [])
+        except Exception:
+            pass
+
+    shorts_video_map = {f["name"].lower(): f for f in shorts_videos}
+    shorts_cover_map = {f["name"].lower(): f for f in shorts_covers}
+    long_video_map = {f["name"].lower(): f for f in long_videos}
+    long_cover_map = {f["name"].lower(): f for f in long_covers}
+
+    records = load_table_from_drive_or_local(None, CEO_FOLDER_ID)
+    done_ids = load_uploaded_ids(BASE_DIR / "uploaded.txt")
+
+    next_short = None
+    next_long = None
+    if drive is not None:
+        try:
+            next_short = get_next_scheduled_video(drive, CEO_FOLDER_ID, skip_ids=done_ids, video_type="short")
+            next_long = get_next_scheduled_video(drive, CEO_FOLDER_ID, skip_ids=done_ids, video_type="long")
+        except Exception:
+            pass
+
+    # Build enriched active queue items (Shorts >= 155, Long >= 8)
+    queue_items = []
+    for fname, rec in records.items():
+        if is_skipped_by_floor(fname) and fname not in KNOWN_PUBLISHED_NAMES:
+            continue
+        is_long = bool(rec.get("is_long"))
+        m_num = re.match(r"^(?:uzun_)?video_(\d+)\.mp4$", fname, re.IGNORECASE)
+        num = int(m_num.group(1)) if m_num else 0
+        if is_long and num < MIN_LONG_NUMBER:
+            continue
+        if not is_long and num < MIN_SHORTS_NUMBER:
+            continue
+
+        expected_cover = f"uzun_kapak_{num}.png" if is_long else f"kapak_{num}.jpg"
+        v_file = long_video_map.get(fname.lower()) if is_long else shorts_video_map.get(fname.lower())
+        c_file = long_cover_map.get(expected_cover.lower()) if is_long else shorts_cover_map.get(expected_cover.lower())
+        is_published = (
+            rec.get("has_youtube_link")
+            or fname in done_ids
+            or fname in KNOWN_PUBLISHED_NAMES
+            or str(rec.get("status", "")).upper() in ("YÜKLENDİ", "YUKLENDI", "PUBLISHED")
+        )
+        queue_items.append({
+            "row": rec.get("row"),
+            "file_name": fname,
+            "number": num,
+            "type": "long" if is_long else "short",
+            "status": "YÜKLENDİ" if is_published else rec.get("status", "BEKLEMEDE"),
+            "is_ready": bool(rec.get("is_ready")) and not is_published,
+            "is_published": bool(is_published),
+            "title": rec.get("title", ""),
+            "description": rec.get("description", ""),
+            "tags": rec.get("tags", []),
+            "category_name": rec.get("category_name", ""),
+            "pinned_comment": rec.get("pinned_comment", ""),
+            "youtube_url": rec.get("youtube_url", ""),
+            "has_drive_video": v_file is not None,
+            "drive_video_id": v_file["id"] if v_file else "",
+            "drive_video_size_mb": round(v_file["size"] / (1024 * 1024), 2) if v_file and v_file.get("size") else 0,
+            "expected_cover": expected_cover,
+            "has_drive_cover": c_file is not None,
+            "drive_cover_id": c_file["id"] if c_file else "",
+        })
+
+    queue_items.sort(key=lambda x: (0 if x["type"] == "short" else 1, x["number"]))
+
+    ready_shorts_queue = [x for x in queue_items if x["type"] == "short" and x["is_ready"] and x["has_drive_video"]]
+    ready_long_queue = [x for x in queue_items if x["type"] == "long" and x["is_ready"] and x["has_drive_video"]]
+    if next_short is None and ready_shorts_queue:
+        next_short = {"name": ready_shorts_queue[0]["file_name"], "title": ready_shorts_queue[0]["title"], "row": ready_shorts_queue[0]["row"]}
+    if next_long is None and ready_long_queue:
+        next_long = {"name": ready_long_queue[0]["file_name"], "title": ready_long_queue[0]["title"], "row": ready_long_queue[0]["row"]}
+
+    # Read ISCILER & UYARILAR from workbook
+    isciler_rows = []
+    uyarilar_rows = []
+    wb_path = BASE_DIR / "bilgidozu_yukleme_tablosu.xlsx"
+    if wb_path.exists():
+        wb = openpyxl.load_workbook(wb_path, data_only=True)
+        for sname in ("ISCILER", "İŞÇİLER"):
+            if sname in wb.sheetnames:
+                ws = wb[sname]
+                for r in range(2, ws.max_row + 1):
+                    wname = str(ws.cell(r, 1).value or "").strip()
+                    if wname:
+                        isciler_rows.append({
+                            "row": r,
+                            "name": wname,
+                            "status": str(ws.cell(r, 2).value or ""),
+                            "updated_at": str(ws.cell(r, 3).value or ""),
+                            "error_message": str(ws.cell(r, 4).value or ""),
+                            "jobs_done": ws.cell(r, 5).value,
+                            "last_action": str(ws.cell(r, 6).value or ""),
+                        })
+                break
+        if "UYARILAR" in wb.sheetnames:
+            ws = wb["UYARILAR"]
+            for r in range(2, ws.max_row + 1):
+                u_title = str(ws.cell(r, 1).value or "").strip()
+                if u_title:
+                    uyarilar_rows.append({
+                        "row": r,
+                        "title": u_title,
+                        "status": str(ws.cell(r, 2).value or ""),
+                        "updated_at": str(ws.cell(r, 3).value or ""),
+                        "detail": str(ws.cell(r, 4).value or ""),
+                    })
+
+    # Retention report
+    retention_data = {}
+    ret_bytes = None
+    if local_retention_xlsx and local_retention_xlsx.exists():
+        ret_bytes = local_retention_xlsx.read_bytes()
+    elif drive is not None:
+        try:
+            from googleapiclient.http import MediaIoBaseDownload
+            buf = io.BytesIO()
+            req = drive.files().get_media(fileId=RETENTION_REPORT_ID)
+            dl = MediaIoBaseDownload(buf, req)
+            done = False
+            while not done:
+                _, done = dl.next_chunk()
+            ret_bytes = buf.getvalue()
+        except Exception as e:
+            print(f"[telemetry] Retansiyon raporu indirme uyarısı: {e}")
+
+    if ret_bytes:
+        try:
+            retention_data = _parse_retention_workbook(ret_bytes)
+        except Exception as e:
+            print(f"[telemetry] Retansiyon parse uyarısı: {e}")
+    elif TELEMETRY_FILE.exists():
+        try:
+            retention_data = json.loads(TELEMETRY_FILE.read_text(encoding="utf-8")).get("retention", {})
+        except Exception:
+            pass
+
+    missing_covers = [
+        x["file_name"] for x in queue_items
+        if not x["is_published"] and x["has_drive_video"] and not x["has_drive_cover"]
+    ]
+
+    payload = {
+        "generated_at": now_str,
+        "generated_at_iso": tr_now.isoformat(),
+        "folders": {
+            "youtube_otomasyon": YOUTUBE_OTOMASYON_FOLDER_ID,
+            "ceo": CEO_FOLDER_ID,
+            "table_file_id": DEFAULT_SHEETS_ID,
+            "shorts_video": SHORTS_VIDEO_FOLDER_ID,
+            "shorts_cover": SHORTS_COVER_FOLDER_ID,
+            "long_video": LONG_VIDEO_FOLDER_ID,
+            "long_cover": LONG_COVER_FOLDER_ID,
+            "retention_folder": RETENTION_FOLDER_ID,
+            "retention_report": RETENTION_REPORT_ID,
+        },
+        "schedule_rules": {
+            "daily_slots_tr": ["12:30", "19:30"],
+            "prewarm_tr": ["12:12", "19:12"],
+            "watchdog_tr": ["12:50", "13:00", "19:50", "20:00"],
+            "friday_1230": "long",
+            "friday_1930": "short",
+            "other_days": "short",
+            "min_shorts_number": MIN_SHORTS_NUMBER,
+            "min_long_number": MIN_LONG_NUMBER,
+            "cover_fallback_generation": False,
+            "crosspost_enabled": False,
+        },
+        "queue_summary": {
+            "ready_shorts": len(ready_shorts_queue),
+            "ready_longs": len(ready_long_queue),
+            "total_ready": len(ready_shorts_queue) + len(ready_long_queue),
+            "days_of_stock": round((len(ready_shorts_queue) + len(ready_long_queue)) / 2.0, 1),
+            "next_short": next_short["name"] if next_short else None,
+            "next_short_title": next_short.get("title", "") if next_short else "",
+            "next_long": next_long["name"] if next_long else None,
+            "next_long_title": next_long.get("title", "") if next_long else "",
+            "missing_covers": missing_covers,
+        },
+        "drive_inventory": {
+            "shorts_videos": shorts_videos,
+            "shorts_covers": shorts_covers,
+            "long_videos": long_videos,
+            "long_covers": long_covers,
+            "ceo_files": ceo_files,
+        },
+        "active_queue": queue_items,
+        "isciler": isciler_rows,
+        "uyarilar": uyarilar_rows,
+        "retention": retention_data,
+    }
+    TELEMETRY_FILE.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    return payload
+
+
+def main() -> None:
+    import sys
+    push_table = "--push-table-to-drive" in sys.argv
+    drive = None
+    if (BASE_DIR / "token.json").exists():
+        try:
+            _, drive = get_google_clients()
+        except Exception as e:
+            print(f"[telemetry] Drive istemcisi açılamadı, yerel mod kullanılıyor: {e}")
+    local_ret = Path("/home/user/google_drive/Bilgi_Dozu_Retansiyon_Raporu.xlsx")
+    data = build_telemetry(
+        drive=drive,
+        local_retention_xlsx=local_ret if local_ret.exists() else None,
+        push_table_to_drive=push_table,
+    )
+    qs = data["queue_summary"]
+    print(
+        f"[telemetry] panel_telemetry.json güncellendi: "
+        f"Hazır={qs['total_ready']} ({qs['ready_shorts']} Shorts, {qs['ready_longs']} Uzun) · "
+        f"Sıradaki Short={qs['next_short']} · Sıradaki Uzun={qs['next_long']} · "
+        f"Eksik Kapak={qs['missing_covers']} · Retansiyon Video={data.get('retention', {}).get('video_count', 0)}"
+    )
+
+
+if __name__ == "__main__":
+    main()
