@@ -41,13 +41,20 @@ except ImportError:
 from slot_guard import parse_slot, slot_completed
 
 from sheets_metadata import (
+    CEO_FOLDER_ID,
     DEFAULT_DRIVE_FOLDER_ID,
     DEFAULT_SHEETS_ID,
+    LONG_COVER_FOLDER_ID,
+    LONG_VIDEO_FOLDER_ID,
+    SHORTS_COVER_FOLDER_ID,
+    SHORTS_VIDEO_FOLDER_ID,
+    YOUTUBE_OTOMASYON_FOLDER_ID,
     decide_prime_time_video_type,
     get_next_scheduled_video,
     iscilers_heartbeat,
     load_table_from_drive_or_local,
     log_uyari_drive,
+    record_worker_outcome_in_drive,
     sanitize_title,
     update_excel_status_in_drive,
 )
@@ -81,7 +88,7 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 DEFAULT_CONFIG = {
-    "upload_time": "14:00,18:00,21:00",
+    "upload_time": "12:30,19:30",
     "privacy_status": "public",
     "default_category": "27",
     "drive_queue_folder_id": DEFAULT_DRIVE_FOLDER_ID,
@@ -98,7 +105,7 @@ def load_config() -> dict:
             cfg.update(json.loads(CONFIG_FILE.read_text(encoding="utf-8")))
         except Exception as e:
             log.warning(f"config.json okuma uyarısı: {e}")
-    # Ana klasör her zaman 1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br olarak kilitlidir
+    # Ana klasör her zaman YOUTUBE_OTOMASYON / CEO olarak kilitlidir
     cfg["drive_queue_folder_id"] = DEFAULT_DRIVE_FOLDER_ID
     if os.getenv("SHEETS_ID"):
         cfg["sheets_id"] = os.environ["SHEETS_ID"].strip()
@@ -287,48 +294,41 @@ def validate_metadata_workbook(drive, queue_folder: str) -> str:
     records = load_table_from_drive_or_local(drive, queue_folder or DEFAULT_DRIVE_FOLDER_ID)
     if not records:
         raise RuntimeError("DRIVE sekmesi okunamadı veya hiç satır bulunamadı.")
-    ready_shorts = sum(1 for r in records.values() if r.get("is_ready") and not r.get("is_long"))
-    ready_longs = sum(1 for r in records.values() if r.get("is_ready") and r.get("is_long"))
+    from sheets_metadata import is_skipped_by_floor, list_drive_videos, is_long_filename, compute_queue_stats
+    ready_shorts = sum(
+        1 for k, r in records.items()
+        if r.get("is_ready") and not r.get("is_long") and not is_skipped_by_floor(k)
+    )
+    ready_longs = sum(
+        1 for k, r in records.items()
+        if r.get("is_ready") and r.get("is_long") and not is_skipped_by_floor(k)
+    )
 
-    # AKILLI RÖNTGEN: Tabloda hazır görünen uzunlar, Drive klasöründe fiziksel var mı?
     try:
-        from sheets_metadata import list_drive_videos, is_long_filename
         disk_videos = list_drive_videos(drive, queue_folder or DEFAULT_DRIVE_FOLDER_ID)
         disk_long_names = sorted(v["name"] for v in disk_videos if is_long_filename(v["name"]))
-        ready_long_names = sorted(k for k, r in records.items() if r.get("is_ready") and r.get("is_long"))
+        ready_long_names = sorted(
+            k for k, r in records.items()
+            if r.get("is_ready") and r.get("is_long") and not is_skipped_by_floor(k)
+        )
         kayip_longlar = [n for n in ready_long_names if n not in disk_long_names]
         print(f"UZUN-RONTGEN: Diskte {len(disk_long_names)} uzun mp4 -> {disk_long_names}")
         print(f"UZUN-RONTGEN: Tabloda hazır {len(ready_long_names)} satır -> {ready_long_names}")
         print(f"UZUN-RONTGEN: Kayıp uzun: {kayip_longlar if kayip_longlar else 'YOK'}")
-        # Yeni seri kilidi: eski klasörlerdeki uzun_video_* dosyaları ASLA YENI_SERI_ONAYLI_STOK içine taşınmaz!
         qname = drive.files().get(fileId=queue_folder, fields="name").execute().get("name", "?")
-        print(f"YENI-SERI-KLASOR: Aktif kuyruk klasörü = '{qname}' (id {queue_folder[:8]}...) — eski stok taşıma kapalı.")
-        # Varsa aynı isimli yedek klasörleri de listele (bilgi amaçlı)
-        try:
-            fold = drive.files().list(q="mimeType='application/vnd.google-apps.folder' and name contains 'Stok' and trashed=false", fields="files(id,name)").execute()
-            print(f"UZUN-ONARIM: 'Stok' adlı klasörler: {[(f2['name'], f2['id'][:8]) for f2 in fold.get('files', [])]}")
-        except Exception as fe:
-            print(f"UZUN-ONARIM klasör listesi hata (zararsız): {fe}")
+        print(f"YOUTUBE-OTOMASYON: Aktif CEO klasörü = '{qname}' (id {queue_folder[:8]}...) — Kısa/Uzun Video alt klasörleri bağlı.")
     except Exception as xe:
         print(f"UZUN-RONTGEN hata (zararsız): {xe}")
-    # Çapraz paylaşım anahtar probu (Stok klasöründe crosspost_keys.json var mı?)
-    try:
-        from crosspost_worker import STOCK_FOLDER_ID, KEYS_FILE_NAME
-        q = f"'{STOCK_FOLDER_ID}' in parents and name='{KEYS_FILE_NAME}' and trashed=false"
-        kres = drive.files().list(q=q, fields="files(id,name,modifiedTime)", pageSize=1).execute()
-        if kres.get("files"):
-            f0 = kres["files"][0]
-            print(f"CROSSPOST-KEYS: BULUNDU ✓ ({f0['name']} · {f0.get('modifiedTime','?')})")
-        else:
-            print("CROSSPOST-KEYS: HENÜZ YOK ✗ (KartaL Stok klasöründe crosspost_keys.json bulunamadı)")
-    except Exception as ke:
-        print(f"CROSSPOST-KEYS probe hatası (zararsız): {ke}")
-    # 3 sayılı kuyruk raporu: benzersiz video / mükerrer / yayınlanmış
-    from sheets_metadata import compute_queue_stats
-    qstats = compute_queue_stats(drive, queue_folder or DEFAULT_DRIVE_FOLDER_ID, table=records, skip_ids=load_uploaded_ids(BASE_DIR / "uploaded.txt"))
+    print("CROSSPOST: Instagram ve TikTok paylaşımı kullanıcı kararıyla PASİF.")
+    qstats = compute_queue_stats(
+        drive,
+        queue_folder or DEFAULT_DRIVE_FOLDER_ID,
+        table=records,
+        skip_ids=load_uploaded_ids(BASE_DIR / "uploaded.txt"),
+    )
     print(f"KUYRUK_RAPORU: benzersiz {qstats['unique_videos']} / mükerrer {qstats['duplicate_videos']} / yayınlanmış {qstats['published_videos']} (hazır: {qstats['ready_videos']})")
     return (
-        f"bilgidozu_yukleme_tablosu.xlsx: DRIVE sekmesi doğrulandı (YouTube Link filtresi + video_31+ kilidi aktif); "
+        f"bilgidozu_yukleme_tablosu.xlsx: DRIVE sekmesi doğrulandı (video_155+ & uzun_video_8+ kilidi aktif); "
         f"Kuyruk: benzersiz {qstats['unique_videos']} / mükerrer {qstats['duplicate_videos']} / yayınlanmış {qstats['published_videos']} "
         f"({ready_shorts} hazır Shorts, {ready_longs} hazır Uzun Video)."
     )
@@ -464,11 +464,11 @@ def upload_thumbnail_if_exists(
     youtube, drive, folder_id: str, video_file_name: str, video_id: str,
     video_path: Path = None, video_title: str = "",
 ) -> ThumbnailResult:
-    """Use a matching Drive cover or make one from this new video's own artwork.
+    """Use ONLY a matching ready cover from Drive (YOUTUBE_OTOMASYON / Kısa Video / Kapak or Uzun Video / Kapak).
 
-    This is optional and only called after the new video is recorded as uploaded.
-    Shorts' actual appearance is platform-dependent even after an API success.
-    Every failure is logged; the result separately records API and Drive status.
+    Worker MUST NEVER auto-generate a cover from video frames. If no ready cover
+    is found in Drive, the video remains published without a custom cover so the
+    owner can add it manually.
     """
     is_short, candidates, generated_name = thumbnail_candidates(video_file_name)
     if not candidates:
@@ -476,105 +476,89 @@ def upload_thumbnail_if_exists(
     drive_saved = False
     try:
         from PIL import Image
-        from thumbnail_design import make_video_cover
         queue = folder_id or DEFAULT_DRIVE_FOLDER_ID
-        cover_folder = None
-        folder_lookup_ok = False
-        try:
-            q = f"'{queue}' in parents and mimeType='application/vnd.google-apps.folder' and name='KAPAKLAR' and trashed=false"
-            result = drive.files().list(q=q, pageSize=50, fields="files(id,name)").execute()
-            folder_lookup_ok = True
-            folders = result.get('files', [])
-            if folders:
-                # Prefer the existing stock folder when there are duplicate names.
-                preferred = next((x for x in folders if x.get('id') == '1XKZJ12HyAvZkjgiG38ys3HOMhZ42d_jJ'), folders[0])
-                cover_folder = preferred['id']
-        except Exception as e:
-            log.warning(f"  KAPAKLAR klasörü aranamadı: {e}")
+        primary_cover_folder = SHORTS_COVER_FOLDER_ID if is_short else LONG_COVER_FOLDER_ID
 
-        folder_ids = [cover_folder, queue, '1muy62IFhN8RQc4LpWdGB2hSFtum6BplD',
-                      '1XKZJ12HyAvZkjgiG38ys3HOMhZ42d_jJ', '1MBjwKp1DXoxLiCAkds84MowZAFMOK7Br']
+        folder_ids = [primary_cover_folder]
+        # Support custom/mocked folder_id in unit tests
+        if queue not in {CEO_FOLDER_ID, YOUTUBE_OTOMASYON_FOLDER_ID, SHORTS_VIDEO_FOLDER_ID, LONG_VIDEO_FOLDER_ID, primary_cover_folder}:
+            try:
+                q = f"'{queue}' in parents and mimeType='application/vnd.google-apps.folder' and (name='Kapak' or name='KAPAKLAR') and trashed=false"
+                result = drive.files().list(q=q, pageSize=20, fields="files(id,name)").execute()
+                for fobj in result.get("files", []):
+                    if fobj.get("id"):
+                        folder_ids.insert(0, fobj["id"])
+            except Exception:
+                pass
+            folder_ids.append(queue)
+
         folder_ids = list(dict.fromkeys(f for f in folder_ids if f))
         found = {}
-        clauses = ' or '.join("name='" + name + "'" for name in candidates)
+        clauses = " or ".join("name='" + name + "'" for name in candidates)
         for fid in folder_ids:
             try:
                 page = None
                 seen_in_folder = {}
                 while True:
                     q = f"'{fid}' in parents and trashed=false and ({clauses})"
-                    result = drive.files().list(q=q, pageSize=100, pageToken=page,
-                        orderBy='modifiedTime desc', fields='nextPageToken,files(id,name,mimeType,size,modifiedTime)').execute()
-                    for item in result.get('files', []):
-                        if item.get('mimeType') in ('image/jpeg','image/png'):
-                            name = item.get('name','').lower()
-                            if name in seen_in_folder and seen_in_folder[name] != item.get('id'):
+                    result = drive.files().list(
+                        q=q, pageSize=100, pageToken=page,
+                        orderBy="modifiedTime desc",
+                        fields="nextPageToken,files(id,name,mimeType,size,modifiedTime)",
+                    ).execute()
+                    for item in result.get("files", []):
+                        if item.get("mimeType") in ("image/jpeg", "image/png"):
+                            name = item.get("name", "").lower()
+                            if name in seen_in_folder and seen_in_folder[name] != item.get("id"):
                                 log.warning(f"  Aynı adda birden çok kapak var ({name}); yanlış eşleşmemesi için atlandı.")
                                 return ThumbnailResult()
-                            seen_in_folder[name] = item.get('id')
+                            seen_in_folder[name] = item.get("id")
                             found.setdefault(name, item)
-                    page = result.get('nextPageToken')
+                    page = result.get("nextPageToken")
                     if not page:
                         break
             except Exception as e:
-                # A stale legacy folder must not prevent looking in the other folders.
                 log.info(f"  Kapak klasörü erişilemedi, diğerleri deneniyor: {e}")
+
         target = next((found.get(name.lower()) for name in candidates if found.get(name.lower())), None)
-        suffix = Path(target['name']).suffix.lower() if target else '.jpg'
-        with tempfile.TemporaryDirectory(prefix='bd-cover-') as temp:
-            path = Path(temp)/('cover'+suffix)
-            if target:
-                drive_saved = True
-                if int(target.get('size') or 0) > 50_000_000:
-                    raise ValueError('Hazır kapak çok büyük')
-                download_drive_file(drive, target['id'], path)
-                log.info(f"  Hazır kapak bulundu: {target['name']}")
-            else:
-                if not video_path or not video_title:
-                    log.warning('  Eşleşen kapak yok; yedek için video veya başlık eksik.')
-                    return ThumbnailResult()
-                # No paid image provider: use the video's own approved artwork.
-                make_video_cover(Path(video_path),path,video_title,is_short)
-                if not cover_folder and folder_lookup_ok:
-                    try:
-                        obj=drive.files().create(body={'name':'KAPAKLAR','mimeType':'application/vnd.google-apps.folder','parents':[queue]},fields='id').execute()
-                        cover_folder=obj['id']
-                    except Exception as e:
-                        log.warning(f"  Kapaklar klasörü oluşturulamadı: {e}")
-                if cover_folder:
-                    try:
-                        media=MediaFileUpload(str(path),mimetype='image/jpeg',resumable=False)
-                        obj=drive.files().create(body={'name':generated_name,'parents':[cover_folder],
-                            'description':f'{video_file_name} için video sahnesinden hazırlanmış kapak'},
-                            media_body=media,fields='id,name').execute()
-                        drive_saved = True
-                        log.info(f"  Yeni video kapağı Drive'a kaydedildi: {obj.get('name',generated_name)}")
-                    except Exception as e:
-                        # YouTube may still accept the local cover even if Drive write failed.
-                        log.warning(f"  Kapak Drive'a kaydedilemedi: {e}")
+        if not target:
+            log.warning(
+                f"  Hazır kapak bulunamadı ({generated_name}); kural gereği otomatik kapak üretilmedi, "
+                "video kapaksız yayınlandı (elle tamamlanacak)."
+            )
+            return ThumbnailResult(api_accepted=False, drive_saved=False)
+
+        drive_saved = True
+        suffix = Path(target["name"]).suffix.lower() or ".jpg"
+        with tempfile.TemporaryDirectory(prefix="bd-cover-") as temp:
+            path = Path(temp) / ("cover" + suffix)
+            if int(target.get("size") or 0) > 50_000_000:
+                raise ValueError("Hazır kapak çok büyük")
+            download_drive_file(drive, target["id"], path)
+            log.info(f"  Hazır kapak bulundu: {target['name']}")
             if path.stat().st_size > 50_000_000:
-                raise ValueError('Kapak dosyası YouTube sınırından büyük')
+                raise ValueError("Kapak dosyası YouTube sınırından büyük")
             with Image.open(path) as im:
-                image_format=im.format
+                image_format = im.format
                 width, height = im.size
                 if not width or not height:
-                    raise ValueError('Kapak boyutu geçersiz')
+                    raise ValueError("Kapak boyutu geçersiz")
                 ratio = width / height
                 if is_short and not .53 <= ratio <= .60:
-                    raise ValueError('Shorts kapağı dikey 9:16 değil')
+                    raise ValueError("Shorts kapağı dikey 9:16 değil")
                 if not is_short and not 1.65 <= ratio <= 1.90:
-                    raise ValueError('Uzun video kapağı yatay 16:9 değil')
+                    raise ValueError("Uzun video kapağı yatay 16:9 değil")
                 im.verify()
-            if image_format not in ('JPEG','PNG'):
-                raise ValueError('Kapak JPEG veya PNG değil')
-            mime='image/jpeg' if image_format=='JPEG' else 'image/png'
-            media=MediaFileUpload(str(path),mimetype=mime,resumable=False)
-            youtube.thumbnails().set(videoId=video_id,media_body=media).execute()
+            if image_format not in ("JPEG", "PNG"):
+                raise ValueError("Kapak JPEG veya PNG değil")
+            mime = "image/jpeg" if image_format == "JPEG" else "image/png"
+            media = MediaFileUpload(str(path), mimetype=mime, resumable=False)
+            youtube.thumbnails().set(videoId=video_id, media_body=media).execute()
             if is_short:
-                log.info('  Shorts kapak isteği YouTube API tarafından kabul edildi; Shorts görünümü Studio üzerinde doğrulanmalı.')
+                log.info("  Shorts kapak isteği YouTube API tarafından kabul edildi; Shorts görünümü Studio üzerinde doğrulanmalı.")
             else:
-                log.info('  Uzun video kapak isteği YouTube API tarafından kabul edildi.')
-            return ThumbnailResult(api_accepted=True, drive_saved=drive_saved)
+                log.info("  Uzun video kapak isteği YouTube API tarafından kabul edildi.")
+            return ThumbnailResult(api_accepted=True, drive_saved=True)
     except Exception as e:
         log.warning(f"  Kapak hazırlanamadı veya YouTube reddetti (yayın korunuyor): {e}")
         return ThumbnailResult(api_accepted=False, drive_saved=drive_saved)
@@ -722,7 +706,7 @@ def build_telegram_report(
     elif thumbnail_ok is False and thumbnail_saved is True:
         thumbnail_line = "⚠️ <b>Kapak:</b> Drive'da var; otomatik uygulama tamamlanmadı. Kapağı ve Studio'yu kontrol et.\n\n"
     elif thumbnail_ok is False:
-        thumbnail_line = "⚠️ <b>Kapak:</b> Hazırlanamadı veya Drive'a kaydedilemedi; yayın korundu.\n\n"
+        thumbnail_line = "⚠️ <b>Kapak:</b> Drive'da hazır kapak bulunamadı; kural gereği otomatik kapak üretilmedi, kapaksız yayınlandı (elle tamamlanacak).\n\n"
 
     msg_html = (
         f"🟢 <b>BİLGİ DOZU · YENİ VİDEO YAYINDA!</b>\n"
@@ -1574,7 +1558,16 @@ def upload_job(
                                            thumbnail_ok=thumbnail_result.api_accepted,
                                            thumbnail_saved=thumbnail_result.drive_saved)
         REPORT_FILE.write_text(report_txt, encoding="utf-8")
-        sync_kartal_status_report(youtube, file_name, yt_url)
+        sync_kartal_status_report(
+            youtube,
+            file_name,
+            yt_url,
+            thumbnail_ok=thumbnail_result.api_accepted,
+            thumbnail_saved=thumbnail_result.drive_saved,
+            comment_ok=comment_ok,
+            drive=drive,
+            queue_folder=queue_folder,
+        )
 
         # --- Çapraz paylaşım (TikTok + Instagram Reels): dosya silinmeden önce ---
         crosspost_result = None
@@ -1613,8 +1606,18 @@ def upload_job(
 
 
 
-def sync_kartal_status_report(youtube, last_uploaded_file: str = "", last_uploaded_url: str = "", error_msg: str = "") -> None:
-    """Her çalışmada YouTube API'den gerçek görüntülenme/yorum sayılarını çekip status_report.json dosyasını günceller."""
+def sync_kartal_status_report(
+    youtube,
+    last_uploaded_file: str = "",
+    last_uploaded_url: str = "",
+    error_msg: str = "",
+    thumbnail_ok: bool | None = None,
+    thumbnail_saved: bool | None = None,
+    comment_ok: bool | None = None,
+    drive=None,
+    queue_folder: str = DEFAULT_DRIVE_FOLDER_ID,
+) -> None:
+    """Her çalışmada YouTube API'den gerçek görüntülenme/yorum sayılarını çekip status_report.json ve İŞÇİLER sekmesini bağımsız günceller."""
     try:
         tr_now = datetime.now(timezone(timedelta(hours=3)))
         ch_res = youtube.channels().list(part="snippet,statistics,contentDetails", mine=True).execute()
@@ -1659,20 +1662,124 @@ def sync_kartal_status_report(youtube, last_uploaded_file: str = "", last_upload
 
         now_str = tr_now.strftime("%Y-%m-%d %H:%M")
         report_path = Path(__file__).resolve().parent / "status_report.json"
-        prev_shorts, prev_long = 58, 10
-        if report_path.exists():
-            try:
-                old_r = json.loads(report_path.read_text(encoding="utf-8"))
-                prev_shorts = max(0, int(old_r.get("summary", {}).get("stock_shorts", 58)) - (0 if last_uploaded_file.startswith("uzun_") else (1 if last_uploaded_file else 0)))
-                prev_long = max(0, int(old_r.get("summary", {}).get("stock_long", 10)) - (1 if last_uploaded_file.startswith("uzun_") else 0))
-            except Exception:
-                pass
+        prev_shorts, prev_long = 11, 14
+        try:
+            from sheets_metadata import is_skipped_by_floor
+            all_recs = load_table_from_drive_or_local(drive, queue_folder)
+            done_ids = load_uploaded_ids(BASE_DIR / "uploaded.txt")
+            prev_shorts = sum(
+                1 for k, r in all_recs.items()
+                if r.get("is_ready") and not r.get("is_long") and not is_skipped_by_floor(k) and k not in done_ids
+            )
+            prev_long = sum(
+                1 for k, r in all_recs.items()
+                if r.get("is_ready") and r.get("is_long") and not is_skipped_by_floor(k) and k not in done_ids
+            )
+        except Exception:
+            if report_path.exists():
+                try:
+                    old_r = json.loads(report_path.read_text(encoding="utf-8"))
+                    prev_shorts = max(0, int(old_r.get("summary", {}).get("stock_shorts", 11)) - (0 if last_uploaded_file.startswith("uzun_") else (1 if last_uploaded_file else 0)))
+                    prev_long = max(0, int(old_r.get("summary", {}).get("stock_long", 14)) - (1 if last_uploaded_file.startswith("uzun_") else 0))
+                except Exception:
+                    pass
 
+        if thumbnail_ok is True:
+            thumb_status = "ok"
+            thumb_status_text = "Çalışıyor"
+            thumb_action = f"{last_uploaded_file} için hazır Drive kapağı uygulandı"
+            thumb_err = ""
+        elif thumbnail_ok is False and thumbnail_saved is False:
+            thumb_status = "warn"
+            thumb_status_text = "Eksik Kapak (Elle Tamamlanacak)"
+            thumb_action = f"{last_uploaded_file} için Drive'da hazır kapak yok; kapaksız yayınlandı"
+            thumb_err = "Hazır kapak Drive'da bulunamadı"
+        elif thumbnail_ok is False:
+            thumb_status = "warn"
+            thumb_status_text = "Kapak Uygulanamadı"
+            thumb_action = f"{last_uploaded_file} kapağı YouTube API tarafından uygulanamadı"
+            thumb_err = "Kapak API reddi veya doğrulama hatası"
+        else:
+            thumb_status = "idle"
+            thumb_status_text = "Beklemede"
+            thumb_action = "Bu çalışmada kapak işlemi tetiklenmedi"
+            thumb_err = ""
+
+        if comment_ok is True:
+            comm_status = "ok"
+            comm_status_text = "Çalışıyor"
+            comm_action = f"{last_uploaded_file} altına ilk sabit yorum yazıldı"
+            comm_err = ""
+        elif comment_ok is False:
+            comm_status = "warn"
+            comm_status_text = "Yorum Yazılamadı"
+            comm_action = f"{last_uploaded_file} sabit yorumu API ile eklenemedi (Telegram kartına eklendi)"
+            comm_err = "Yorum API uyarısı veya boş yorum"
+        else:
+            comm_status = "idle"
+            comm_status_text = "Beklemede"
+            comm_action = "Bu çalışmada yorum işlemi tetiklenmedi"
+            comm_err = ""
+
+        workers_list = [
+            {
+                "id": "uploader",
+                "name": "Yükleyici (Drive -> YouTube)",
+                "status": "err" if error_msg else "ok",
+                "status_text": "Hata" if error_msg else "Çalışıyor",
+                "updated_at": now_str,
+                "jobs_done": int(ch_stats.get("videoCount", len(yt_videos))),
+                "last_action": f"{last_uploaded_file} yayınlandı ({last_uploaded_url})" if last_uploaded_file else "Son zamanlanmış kontrol tamamlandı",
+                "error_message": error_msg,
+            },
+            {
+                "id": "cover_worker",
+                "name": "Kapak İşçisi (Drive Hazır Kapak -> YouTube)",
+                "status": thumb_status,
+                "status_text": thumb_status_text,
+                "updated_at": now_str if thumbnail_ok is not None else "-",
+                "jobs_done": int(ch_stats.get("videoCount", len(yt_videos))),
+                "last_action": thumb_action,
+                "error_message": thumb_err,
+            },
+            {
+                "id": "comment_worker",
+                "name": "Yorumcu (Sabit Yorum İşçisi)",
+                "status": comm_status,
+                "status_text": comm_status_text,
+                "updated_at": now_str if comment_ok is not None else "-",
+                "jobs_done": int(ch_stats.get("videoCount", len(yt_videos))),
+                "last_action": comm_action,
+                "error_message": comm_err,
+            },
+            {
+                "id": "analytics",
+                "name": "Analitik çekici (YouTube API)",
+                "status": "ok" if yt_videos else "warn",
+                "status_text": "Çalışıyor" if yt_videos else "Veri Yok",
+                "updated_at": now_str,
+                "jobs_done": len(yt_videos),
+                "last_action": f"{len(yt_videos)} videonun gerçek görüntülenme ve yorum verisi güncellendi",
+                "error_message": "",
+            },
+            {
+                "id": "crosspost",
+                "name": "Çapraz Paylaşım (Instagram / TikTok)",
+                "status": "disabled",
+                "status_text": "Pasif (Devre Dışı)",
+                "updated_at": "-",
+                "jobs_done": 0,
+                "last_action": "Paylaşım yapılmadığı için pasif duruma getirildi",
+                "error_message": "",
+            },
+        ]
+
+        has_warn = any(w["status"] in ("warn", "err") for w in workers_list)
         report = {
             "updated_at": now_str,
             "updated_at_iso": tr_now.isoformat(),
-            "overall_status": "err" if error_msg else "ok",
-            "overall_label": "Hata var" if error_msg else "Her şey çalışıyor",
+            "overall_status": "err" if error_msg else ("warn" if has_warn else "ok"),
+            "overall_label": "Hata var" if error_msg else ("Uyarı var (Kontrol et)" if has_warn else "Her şey çalışıyor"),
             "summary": {
                 "total_views": int(ch_stats.get("viewCount", 0)),
                 "subscribers": int(ch_stats.get("subscriberCount", 0)),
@@ -1684,48 +1791,7 @@ def sync_kartal_status_report(youtube, last_uploaded_file: str = "", last_upload
                 "stock_shorts": prev_shorts,
                 "stock_long": prev_long,
             },
-            "workers": [
-                {
-                    "id": "uploader",
-                    "name": "Yükleyici (Drive -> YouTube)",
-                    "status": "err" if error_msg else "ok",
-                    "status_text": "Hata" if error_msg else "Çalışıyor",
-                    "updated_at": now_str,
-                    "jobs_done": int(ch_stats.get("videoCount", len(yt_videos))),
-                    "last_action": f"{last_uploaded_file} yayınlandı ({last_uploaded_url})" if last_uploaded_file else "Son zamanlanmış kontrol tamamlandı",
-                    "error_message": error_msg,
-                },
-                {
-                    "id": "comment_thumb",
-                    "name": "Yorumcu ve kapak işçisi",
-                    "status": "ok",
-                    "status_text": "Çalışıyor",
-                    "updated_at": now_str,
-                    "jobs_done": int(ch_stats.get("videoCount", len(yt_videos))),
-                    "last_action": "OAuth (youtube.force-ssl) aktif · İlk yorum otomatik yazılır",
-                    "error_message": "",
-                },
-                {
-                    "id": "analytics",
-                    "name": "Analitik çekici (YouTube API)",
-                    "status": "ok",
-                    "status_text": "Çalışıyor",
-                    "updated_at": now_str,
-                    "jobs_done": len(yt_videos),
-                    "last_action": f"{len(yt_videos)} videonun gerçek görüntülenme ve yorum verisi güncellendi",
-                    "error_message": "",
-                },
-                {
-                    "id": "telegram",
-                    "name": "Telegram bildirim işçisi",
-                    "status": "ok",
-                    "status_text": "Çalışıyor",
-                    "updated_at": now_str,
-                    "jobs_done": int(ch_stats.get("videoCount", len(yt_videos))),
-                    "last_action": "Yayın kartı ve sabit yorum metni gönderildi",
-                    "error_message": "",
-                },
-            ],
+            "workers": workers_list,
             "alerts": [
                 {
                     "id": "quota",
@@ -1741,21 +1807,27 @@ def sync_kartal_status_report(youtube, last_uploaded_file: str = "", last_upload
                     "status": "ok",
                     "status_text": "Sorunsuz",
                     "updated_at": now_str,
-                    "detail": f"Drive klasörü ve 3 sekmeli yükleme tablosu canlı bağlı (Stok: {prev_shorts} Shorts, {prev_long} Uzun).",
+                    "detail": f"YOUTUBE_OTOMASYON klasörü ve CEO yükleme tablosu canlı bağlı (Stok: {prev_shorts} Shorts, {prev_long} Uzun).",
                 },
                 {
                     "id": "comment_worker",
-                    "title": "Yorum ve kapak işçisi yetkisi",
-                    "status": "ok",
-                    "status_text": "Sorunsuz",
+                    "title": "Yorum ve kapak işçisi durumu",
+                    "status": "warn" if (thumb_status != "ok" or comm_status != "ok") else "ok",
+                    "status_text": "Kontrol Gerekli" if (thumb_status != "ok" or comm_status != "ok") else "Sorunsuz",
                     "updated_at": now_str,
-                    "detail": "youtube.force-ssl yetkisi aktif.",
+                    "detail": f"Kapak: {thumb_status_text} · Yorum: {comm_status_text}",
                 },
             ],
             "videos": yt_videos,
         }
         report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
         log.info("Kartal AI status_report.json gerçek YouTube API verileriyle güncellendi.")
+        if drive is not None:
+            try:
+                active_updates = [w for w in workers_list if w["updated_at"] != "-"]
+                record_worker_outcome_in_drive(drive, queue_folder, active_updates)
+            except Exception as we:
+                log.warning(f"İŞÇİLER sekmesi güncellenemedi: {we}")
     except Exception as e:
         log.warning(f"status_report.json güncellenemedi: {e}")
 
@@ -1763,9 +1835,9 @@ def sync_kartal_status_report(youtube, last_uploaded_file: str = "", last_upload
 def main() -> None:
     get_google_clients()
     scheduler = BlockingScheduler()
-    scheduler.add_job(upload_job, "cron", hour=19, minute=0, kwargs={"video_type": "auto"})
-    scheduler.add_job(upload_job, "cron", hour=20, minute=15, kwargs={"video_type": "auto"})
-    log.info("Prime Time Zamanlayıcı aktif — 19:00 TR & 20:15 TR (aynı gün tek sütun kilidi; Cuma Uzun Video).")
+    scheduler.add_job(upload_job, "cron", hour=12, minute=30, kwargs={"video_type": "auto"})
+    scheduler.add_job(upload_job, "cron", hour=19, minute=30, kwargs={"video_type": "auto"})
+    log.info("Prime Time Zamanlayıcı aktif — 12:30 TR & 19:30 TR (Cuma 12:30 Uzun Video, diğer tüm slotlar Shorts).")
     scheduler.start()
 
 

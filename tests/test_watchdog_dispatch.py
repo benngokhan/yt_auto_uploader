@@ -53,7 +53,7 @@ class WatchdogDispatchTests(unittest.TestCase):
         return calls,output
 
     def test_long_rescue_has_exact_slot_and_type(self):
-        key='2026-10-30T13:00Z'
+        key='2026-10-30T09:30Z'
         calls,output=self.run_script(info=(key,'long','tescil'))
         self.assertEqual(len(calls),1)
         self.assertEqual(calls[0]['inputs']['video_type'],'long')
@@ -61,35 +61,35 @@ class WatchdogDispatchTests(unittest.TestCase):
         self.assertIn('alert=true',output)
 
     def test_completed_slot_prevents_dispatch(self):
-        key='2026-10-30T13:00Z'
-        row=f'f | uzun_video_18.mp4 | https://youtu.be/abc | 2026-10-30 13:05 | title | SLOT={key}\n'
+        key='2026-10-30T09:30Z'
+        row=f'f | uzun_video_8.mp4 | https://youtu.be/abc | 2026-10-30 09:35 | title | SLOT={key}\n'
         calls,output=self.run_script(info=(key,'long','tescil'),existing_log=row)
         self.assertEqual(calls,[])
         self.assertEqual(output,'')
 
     def test_claim_without_completion_alerts_without_another_upload(self):
-        key='2026-10-30T13:00Z'
+        key='2026-10-30T09:30Z'
         calls,output=self.run_script(info=(key,'long','tescil'),claims=key+'\n')
         self.assertEqual(calls,[])
         self.assertIn('alert=true',output)
         self.assertIn('otomatik tekrar durduruldu',output)
 
     def test_push_validation_run_does_not_mask_missing_schedule(self):
-        key='2026-10-30T13:00Z'
-        run={'name':'YouTube Drive Uploader','event':'push','status':'completed','created_at':'2026-10-30T13:02:00Z'}
+        key='2026-10-30T09:30Z'
+        run={'name':'YouTube Drive Uploader','event':'push','status':'completed','created_at':'2026-10-30T09:32:00Z'}
         calls,_=self.run_script(info=(key,'long','tescil'),runs=[run])
         self.assertEqual(len(calls),1)
 
     def test_unavailable_github_api_alerts_but_never_blindly_dispatches(self):
-        key='2026-10-30T13:00Z'
+        key='2026-10-30T09:30Z'
         calls,output=self.run_script(info=(key,'long','tescil'),fail_get=True)
         self.assertEqual(calls,[])
         self.assertIn('alert=true',output)
         self.assertIn('doğrulanamadı',output)
 
     def test_started_scheduled_run_blocks_rescue(self):
-        key='2026-10-30T13:00Z'
-        run={'name':'YouTube Drive Uploader','event':'schedule','status':'in_progress','created_at':'2026-10-30T13:01:00Z'}
+        key='2026-10-30T09:30Z'
+        run={'name':'YouTube Drive Uploader','event':'schedule','status':'in_progress','created_at':'2026-10-30T09:31:00Z'}
         calls,output=self.run_script(info=(key,'long','tescil'),runs=[run])
         self.assertEqual(calls,[])
         self.assertIn('alert=true',output)

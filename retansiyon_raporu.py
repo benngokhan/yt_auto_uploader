@@ -27,7 +27,7 @@ from openpyxl.utils import get_column_letter
 CHANNEL_ID = 'UC3bjZMPZ5FW2JQGfU41iaUg'
 REPOSITORY = 'benngokhan/yt_auto_uploader'
 FOLDER_ID = '1LyZBIc52OzaGZBaq8yXODcseZ0wilsrs'
-PARENT_ID = '1kXqmi6Ll6SLbnYjp9oR_JoDe4dK-0XYM'
+PARENT_ID = '190zQiUYkp8fsQFleva77TKqc9MeGxZiI'
 REPORT_ID = '1-04hX_5htkheIkCe-W-56bu4zBkfXOvT'
 EXPECTED_PERMISSIONS = {'06006357664194807857': 'owner', '16570037873922638546': 'writer'}
 XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'

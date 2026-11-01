@@ -11,8 +11,8 @@
     "total_comments": 32,
     "total_likes": 98,
     "failed_jobs": 0,
-    "stock_shorts": 54,
-    "stock_long": 9
+    "stock_shorts": 11,
+    "stock_long": 14
   },
   "workers": [
     {
@@ -22,12 +22,22 @@
       "status_text": "Çalışıyor",
       "updated_at": "2026-11-01 20:00",
       "jobs_done": 78,
-      "last_action": "video_154.mp4 yayınlandı (https://youtu.be/DDdoh5PRoQQ)",
+      "last_action": "video_154.mp4 yayınlandı · Sıradaki: video_155.mp4 / uzun_video_8.mp4",
       "error_message": ""
     },
     {
-      "id": "comment_thumb",
-      "name": "Yorumcu ve kapak işçisi",
+      "id": "cover_worker",
+      "name": "Kapak İşçisi (Drive Hazır Kapak -> YouTube)",
+      "status": "ok",
+      "status_text": "Çalışıyor",
+      "updated_at": "2026-11-01 20:00",
+      "jobs_done": 78,
+      "last_action": "Yalnız Drive'daki hazır kapaklar kullanılır (otomatik üretim kapalı)",
+      "error_message": ""
+    },
+    {
+      "id": "comment_worker",
+      "name": "Yorumcu (Sabit Yorum İşçisi)",
       "status": "ok",
       "status_text": "Çalışıyor",
       "updated_at": "2026-11-01 20:00",
@@ -46,13 +56,13 @@
       "error_message": ""
     },
     {
-      "id": "telegram",
-      "name": "Telegram bildirim işçisi",
-      "status": "ok",
-      "status_text": "Çalışıyor",
-      "updated_at": "2026-11-01 20:00",
-      "jobs_done": 78,
-      "last_action": "Yayın kartı ve sabit yorum metni gönderildi",
+      "id": "crosspost",
+      "name": "Çapraz Paylaşım (Instagram / TikTok)",
+      "status": "disabled",
+      "status_text": "Pasif (Devre Dışı)",
+      "updated_at": "-",
+      "jobs_done": 0,
+      "last_action": "Paylaşım yapılmadığı için pasif duruma getirildi",
       "error_message": ""
     }
   ],
@@ -71,15 +81,15 @@
       "status": "ok",
       "status_text": "Sorunsuz",
       "updated_at": "2026-11-01 20:00",
-      "detail": "Drive klasörü ve 3 sekmeli yükleme tablosu canlı bağlı (Stok: 54 Shorts, 9 Uzun)."
+      "detail": "YOUTUBE_OTOMASYON klasörü ve CEO yükleme tablosu canlı bağlı (Stok: 11 Shorts, 14 Uzun)."
     },
     {
       "id": "comment_worker",
-      "title": "Yorum ve kapak işçisi yetkisi",
+      "title": "Yorum ve kapak işçisi durumu",
       "status": "ok",
       "status_text": "Sorunsuz",
       "updated_at": "2026-11-01 20:00",
-      "detail": "youtube.force-ssl yetkisi aktif."
+      "detail": "Kapak: Hazır Drive kapağı modu · Yorum: youtube.force-ssl yetkisi aktif."
     }
   ],
   "videos": [

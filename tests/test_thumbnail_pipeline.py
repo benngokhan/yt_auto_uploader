@@ -108,33 +108,35 @@ class CoverUploadTests(unittest.TestCase):
         with patch.object(uploader,'download_drive_file',side_effect=self.copy_fake_cover), \
              patch.object(uploader,'MediaFileUpload',side_effect=self.media):
             self.assertTrue(uploader.upload_thumbnail_if_exists(self.youtube,self.drive,'queue','uzun_video_19.mp4','longid'))
-    def test_missing_cover_uses_only_new_video_and_is_saved_in_drive(self):
+    def test_missing_cover_never_auto_generates_or_writes_to_drive(self):
         files=self.set_files()
         with patch.object(uploader,'MediaFileUpload',side_effect=self.media), \
              patch('thumbnail_design.make_video_cover',side_effect=self.fake_frame_cover) as renderer:
-            ok=uploader.upload_thumbnail_if_exists(self.youtube,self.drive,'queue','video_152.mp4','newvid',self.image,'Susuzluk')
-        self.assertTrue(ok);renderer.assert_called_once()
-        self.assertEqual(renderer.call_args.args[0],self.image)
-        self.assertEqual(files.created[0]['body']['name'],'kapak_152.jpg')
-        self.assertEqual(files.created[0]['body']['parents'],['covers'])
-        self.assertEqual(self.youtube.thumbnails.return_value.set.call_args.kwargs['videoId'],'newvid')
-    def test_youtube_rejection_does_not_raise_or_erase_drive_cover(self):
-        files=self.set_files()
+            ok=uploader.upload_thumbnail_if_exists(self.youtube,self.drive,'queue','video_155.mp4','newvid',self.image,'Susuzluk')
+        self.assertFalse(ok)
+        self.assertFalse(ok.drive_saved)
+        renderer.assert_not_called()
+        self.assertEqual(files.created,[])
+        self.youtube.thumbnails.return_value.set.assert_not_called()
+    def test_youtube_rejection_on_existing_cover_keeps_drive_saved_true(self):
+        files=self.set_files([{'id':'asset','name':'kapak_155.jpg','mimeType':'image/jpeg','size':'300'}])
         self.youtube.thumbnails.return_value.set.return_value.execute.side_effect=RuntimeError('Shorts unsupported')
-        with patch.object(uploader,'MediaFileUpload',side_effect=self.media), \
-             patch('thumbnail_design.make_video_cover',side_effect=self.fake_frame_cover):
-            result=uploader.upload_thumbnail_if_exists(self.youtube,self.drive,'queue','video_152.mp4','newvid',self.image,'Su')
+        with patch.object(uploader,'download_drive_file',side_effect=self.copy_fake_cover), \
+             patch.object(uploader,'MediaFileUpload',side_effect=self.media), \
+             patch('thumbnail_design.make_video_cover') as renderer:
+            result=uploader.upload_thumbnail_if_exists(self.youtube,self.drive,'queue','video_155.mp4','newvid',self.image,'Su')
             self.assertFalse(result)
             self.assertTrue(result.drive_saved)
-        self.assertEqual(len(files.created),1)
-    def test_drive_write_failure_does_not_prevent_youtube_attempt(self):
+            renderer.assert_not_called()
+        self.assertEqual(files.created,[])
+    def test_missing_cover_reports_manual_completion_without_generation(self):
         self.set_files(fail_create=True)
-        with patch.object(uploader,'MediaFileUpload',side_effect=self.media), \
-             patch('thumbnail_design.make_video_cover',side_effect=self.fake_frame_cover):
-            result=uploader.upload_thumbnail_if_exists(self.youtube,self.drive,'queue','video_152.mp4','newvid',self.image,'Su')
-            self.assertTrue(result)
+        with patch('thumbnail_design.make_video_cover') as renderer:
+            result=uploader.upload_thumbnail_if_exists(self.youtube,self.drive,'queue','video_155.mp4','newvid',self.image,'Su')
+            self.assertFalse(result)
             self.assertFalse(result.drive_saved)
-        self.youtube.thumbnails.return_value.set.assert_called_once()
+            renderer.assert_not_called()
+        self.youtube.thumbnails.return_value.set.assert_not_called()
     def test_wrong_aspect_is_not_sent_to_youtube(self):
         self.image=Path(self.tmp.name)/'horizontal.jpg';Image.new('RGB',(160,90)).save(self.image)
         self.set_files([{'id':'asset','name':'kapak_152.jpg','mimeType':'image/jpeg','size':'300'}])

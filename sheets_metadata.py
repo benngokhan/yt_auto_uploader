@@ -23,11 +23,18 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
-DEFAULT_DRIVE_FOLDER_ID = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"  # KartaL Stok (27.10 karar: TEK kuyruk klasörü — eski YENI_SERI_ONAYLI_STOK buraya taşındı)
+YOUTUBE_OTOMASYON_FOLDER_ID = "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj"
+CEO_FOLDER_ID = "190zQiUYkp8fsQFleva77TKqc9MeGxZiI"
+SHORTS_VIDEO_FOLDER_ID = "1LfW4adjq0x4ZjBuphjebAbKLVsgY8TXY"
+SHORTS_COVER_FOLDER_ID = "1INXnZpMGBGOZ03o4cqm5MuC5MporWSkD"
+LONG_VIDEO_FOLDER_ID = "16jMIabV8mdJIRlc_e55Gmlwu5asfcBGN"
+LONG_COVER_FOLDER_ID = "1g3QluGyaLByQgXmoXO0i1PPtr3ORjRQR"
+
+DEFAULT_DRIVE_FOLDER_ID = CEO_FOLDER_ID  # Ana tablo (bilgidozu_yukleme_tablosu.xlsx) YOUTUBE_OTOMASYON / CEO klasöründe
 DEFAULT_SHEETS_ID = ""
-# Only our current series is eligible; earlier stock is never selected.
-MIN_SHORTS_NUMBER = 150
-MIN_LONG_NUMBER = 18
+# Kısa videolar video_155.mp4, uzun videolar uzun_video_8.mp4 ile başlar.
+MIN_SHORTS_NUMBER = 155
+MIN_LONG_NUMBER = 8
 # Already-public videos must not be published again even if the table is stale.
 KNOWN_PUBLISHED_NAMES = frozenset({"video_157.mp4", "uzun_video_17.mp4"})
 
@@ -63,8 +70,10 @@ def natural_sort_key(filename: str) -> tuple:
 
 
 def is_skipped_by_floor(filename: str) -> bool:
-    name = os.path.basename(filename).lower()
+    name = os.path.basename(filename).strip().lower()
     if name in KNOWN_PUBLISHED_NAMES:
+        return True
+    if name.startswith("xvideo_"):
         return True
     if name.startswith("video_") and extract_video_number(name) < MIN_SHORTS_NUMBER:
         return True
@@ -125,11 +134,14 @@ def decide_daily_column(now_tr: Optional[datetime] = None) -> str:
 
 
 def decide_prime_time_video_type(now_tr: Optional[datetime] = None) -> str:
-    """The two daily automatic slots are always Shorts.
-
-    The separate weekly long-video slot calls the uploader explicitly with
-    ``video_type=long``; it never replaces either daily Shorts slot.
+    """Her gün 12:30 ve 19:30'da yayın yapılır:
+    - Cuma (weekday==4) 12:30 slotu (saat < 16) -> 'long' (Uzun Video)
+    - Cuma 19:30 ve diğer tüm günler 12:30 / 19:30 -> 'short' (Kısa Video)
     """
+    tr_tz = timezone(timedelta(hours=3))
+    dt = now_tr.astimezone(tr_tz) if now_tr else datetime.now(tr_tz)
+    if dt.weekday() == 4 and dt.hour < 16:
+        return "long"
     return "short"
 
 
@@ -357,10 +369,15 @@ def list_drive_videos_with_stats(drive, folder_id: str) -> tuple[list[dict], int
     if not drive or not folder_id:
         return [], 0
 
+    if folder_id in {CEO_FOLDER_ID, YOUTUBE_OTOMASYON_FOLDER_ID, DEFAULT_DRIVE_FOLDER_ID}:
+        parent_clause = f"('{SHORTS_VIDEO_FOLDER_ID}' in parents or '{LONG_VIDEO_FOLDER_ID}' in parents)"
+    else:
+        parent_clause = f"'{folder_id}' in parents"
+
     page_token = None
     while True:
         res = drive.files().list(
-            q=f"'{folder_id}' in parents and trashed = false",
+            q=f"{parent_clause} and trashed = false",
             pageSize=200,
             fields="nextPageToken, files(id, name, mimeType, size, createdTime)",
             **({"pageToken": page_token} if page_token else {}),
@@ -369,7 +386,9 @@ def list_drive_videos_with_stats(drive, folder_id: str) -> tuple[list[dict], int
             mime = f.get("mimeType", "")
             name = f.get("name", "")
             if mime == "application/vnd.google-apps.folder":
-                continue  # KAPAKLAR veya karantina alt klasörlerine inme
+                continue
+            if name.strip().lower().startswith("xvideo_"):
+                continue  # xvideo_136.mp4 vb. devre dışı dosyalar yok sayılır
             if name.lower().endswith(".mp4") or "video/" in mime:
                 raw_videos.append(f)
         page_token = res.get("nextPageToken")
@@ -777,7 +796,14 @@ def log_uyari_drive(drive, folder_id: str, kategori: str, mesaj: str) -> bool:
 
 
 def iscilers_heartbeat(drive, folder_id: str) -> bool:
-    """EMİR 024: her cron çalışmasında İŞÇİLER sekmesindeki tüm işçilerin 'Son Güncelleme Zamanı' canlanır."""
+    """Toplu kalp atışı devre dışı: her işçi yalnız kendi görevi tamamlandığında güncellenir."""
+    return False
+
+
+def record_worker_outcome_in_drive(drive, folder_id: str, worker_updates: list[dict]) -> bool:
+    """Yalnız gerçekten çalışan işçilerin durumunu ve son işlem özetini kendi satırına yazar."""
+    if not worker_updates:
+        return False
     fid = _find_primary_table(drive, folder_id)
     if not fid:
         return False
@@ -790,17 +816,37 @@ def iscilers_heartbeat(drive, folder_id: str) -> bool:
                 ws = wb[name]
                 break
         if ws is None:
-            ws = wb.create_sheet("İŞÇİLER")
+            ws = wb.create_sheet("ISCILER")
         if not ws.cell(1, 1).value:
             ws.append(["İşçi Adı", "Durum", "Son Güncelleme Zamanı", "Son Hata Mesajı", "Kaç İş Yaptı", "Son İşlem Özeti"])
-        rows = [r for r in range(2, ws.max_row + 1) if ws.cell(r, 1).value]
-        if not rows:
-            ws.append(["Yükleyici (Drive -> YouTube)", "Çalışıyor", now_str, "", "", "EMİR 024: otomatik tick aktif"])
-            rows = [ws.max_row]
-        for r in rows:
-            if not ws.cell(r, 2).value:
-                ws.cell(r, 2).value = "Çalışıyor"
-            ws.cell(r, 3).value = now_str
+        existing_rows = {}
+        for r in range(2, ws.max_row + 1):
+            wname = str(ws.cell(r, 1).value or "").strip()
+            if wname:
+                existing_rows[wname] = r
+        for upd in worker_updates:
+            wname = upd.get("name", "").strip()
+            if not wname:
+                continue
+            r = existing_rows.get(wname)
+            if r is None:
+                ws.append([
+                    wname,
+                    upd.get("status_text", "Çalışıyor"),
+                    upd.get("updated_at", now_str),
+                    upd.get("error_message", ""),
+                    upd.get("jobs_done", ""),
+                    upd.get("last_action", ""),
+                ])
+                existing_rows[wname] = ws.max_row
+            else:
+                ws.cell(r, 2).value = upd.get("status_text", ws.cell(r, 2).value)
+                ws.cell(r, 3).value = upd.get("updated_at", now_str)
+                ws.cell(r, 4).value = upd.get("error_message", "")
+                if upd.get("jobs_done") is not None:
+                    ws.cell(r, 5).value = upd.get("jobs_done")
+                if upd.get("last_action") is not None:
+                    ws.cell(r, 6).value = upd.get("last_action")
 
     return _drive_table_write(drive, fid, writer)
 

@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Identify publication slots so a delayed cron and its rescue cannot both publish."""
+"""Identify publication slots so a delayed cron and its rescue cannot both publish.
+
+Schedule (Turkey Time, UTC+03):
+- Monday, Tuesday, Wednesday, Thursday, Saturday, Sunday:
+  - 12:30 TR (09:30 UTC) -> Shorts (short)
+  - 19:30 TR (16:30 UTC) -> Shorts (short)
+- Friday (weekday == 4):
+  - 12:30 TR (09:30 UTC) -> Long Video (long)
+  - 19:30 TR (16:30 UTC) -> Shorts (short)
+"""
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import os
@@ -8,15 +17,19 @@ import sys
 
 UTC = timezone.utc
 SCHEDULES = {
-    "30 9 * * *": (9, 30, None, "short"),
-    "0 13 * * 5": (13, 0, 4, "long"),
+    "12 9 * * *": (9, 30, None, "auto_noon"),
+    "30 9 * * *": (9, 30, None, "auto_noon"),
+    "12 16 * * *": (16, 30, None, "short"),
     "30 16 * * *": (16, 30, None, "short"),
 }
 WATCHDOGS = {
+    "50 9 * * *": ("30 9 * * *", "erken"),
+    "0 10 * * *": ("30 9 * * *", "tescil"),
+    "50 16 * * *": ("30 16 * * *", "erken"),
+    "0 17 * * *": ("30 16 * * *", "tescil"),
+    # Legacy aliases kept for compatibility
     "05 10 * * *": ("30 9 * * *", "erken"),
     "15 10 * * *": ("30 9 * * *", "tescil"),
-    "35 13 * * 5": ("0 13 * * 5", "erken"),
-    "45 13 * * 5": ("0 13 * * 5", "tescil"),
     "05 17 * * *": ("30 16 * * *", "erken"),
     "15 17 * * *": ("30 16 * * *", "tescil"),
 }
@@ -31,17 +44,26 @@ def _utc(now):
     return now.astimezone(UTC)
 
 
+def _slot_kind_for_stamp(stamp: datetime) -> str:
+    if (stamp.hour, stamp.minute) == (9, 30):
+        return "long" if stamp.weekday() == 4 else "short"
+    if (stamp.hour, stamp.minute) == (16, 30):
+        return "short"
+    raise ValueError("Not a configured publication slot")
+
+
 def scheduled_slot(schedule, now=None):
-    """Most recent intended occurrence, even when a cron arrives after UTC midnight."""
+    """Most recent (or upcoming within 25 min) intended occurrence, even when a cron arrives after UTC midnight."""
     if schedule not in SCHEDULES:
         raise ValueError("Unknown scheduled slot")
     current = _utc(now)
-    hour, minute, weekday, kind = SCHEDULES[schedule]
+    hour, minute, weekday, raw_kind = SCHEDULES[schedule]
     candidate = current.replace(hour=hour, minute=minute, second=0, microsecond=0)
     if weekday is not None:
         candidate -= timedelta(days=(candidate.weekday() - weekday) % 7)
-    if candidate > current + timedelta(minutes=2):
+    if candidate > current + timedelta(minutes=25):
         candidate -= timedelta(days=7 if weekday is not None else 1)
+    kind = _slot_kind_for_stamp(candidate) if raw_kind == "auto_noon" else raw_kind
     return candidate.strftime("%Y-%m-%dT%H:%MZ"), kind
 
 
@@ -52,15 +74,10 @@ def parse_slot(key, now=None, recovery=False):
         stamp = datetime.strptime(key, "%Y-%m-%dT%H:%MZ").replace(tzinfo=UTC)
     except ValueError:
         raise ValueError("Invalid slot date") from None
-    if (stamp.hour, stamp.minute) in {(9, 30), (16, 30)}:
-        kind = "short"
-    elif (stamp.hour, stamp.minute) == (13, 0) and stamp.weekday() == 4:
-        kind = "long"
-    else:
-        raise ValueError("Not a configured publication slot")
+    kind = _slot_kind_for_stamp(stamp)
     if recovery:
         age = _utc(now) - stamp
-        if age < -timedelta(minutes=2) or age > timedelta(hours=6):
+        if age < -timedelta(minutes=25) or age > timedelta(hours=6):
             raise ValueError("Rescue slot is in the future or too old")
     return stamp, kind
 
