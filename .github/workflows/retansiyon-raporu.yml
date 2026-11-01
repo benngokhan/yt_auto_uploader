@@ -1,42 +1,42 @@
-name: Retansiyon Raporu (Analytics API)
-# Her gün 11:30 TR (08:30 UTC): son 30 günün ortalama izlenme süresi + % izlenen'i tabloya.
-# 09:00 TR view raporu (yt-dlp) sonrasında çalışır; commit + push ile tablo,
-# ana uploader'ın push run'ında Drive'a sync'lenir (mevcut ikili senkron kuralı).
-# YouTube API kotası: 0 (Analytics API ayrı havuz, sadece readonly okuma).
-
+name: Retansiyon Raporu (Ozel Analytics)
+# 11:30 Türkiye: özel Drive raporu. Eski yayın tablosu, YouTube yayını ve git push yok.
 on:
   schedule:
-    - cron: "30 8 * * *"   # 11:30 TR
+    - cron: "30 8 * * *"
   workflow_dispatch:
-
+    inputs:
+      save_report:
+        description: 'Gercek raporu yalniz ozel Drive dosyasina kaydet'
+        type: boolean
+        required: false
+        default: false
 permissions:
-  contents: write
-
+  contents: read
+concurrency:
+  group: ozel-retansiyon-raporu
+  cancel-in-progress: false
 jobs:
-  rapor:
+  report:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
+      - name: Kodlari indir
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Python kur
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-
-      - name: Kurulum
-        run: pip install -q openpyxl
-
-      - name: Retansiyon verisini tabloya yaz
+          python-version: '3.11'
+      - name: Rapor kitapligi
+        run: python -m pip install --disable-pip-version-check -q openpyxl==3.1.5
+      - name: Guvenlik ve olcum testleri
+        run: python -m unittest discover -s tests_retention -p 'test_*.py' -v
+      - name: Ozel retansiyon raporu
         env:
-          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
-          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
-          YT_ANALYTICS_REFRESH_TOKEN: ${{ secrets.YT_ANALYTICS_REFRESH_TOKEN }}
-        run: python3 retansiyon_raporu.py
-
-      - name: Tabloyu commit + push (Drive sync sonraki ana run'da)
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add bilgidozu_yukleme_tablosu.xlsx stats_retansiyon.json
-          git diff --cached --quiet || git commit -m "chore: retansiyon raporu (Analytics API)"
-          git push
+          BD_ANALYTICS_CLIENT_CONFIG: ${{ secrets.BD_ANALYTICS_CLIENT_CONFIG }}
+          BD_ANALYTICS_REFRESH_TOKEN: ${{ secrets.BD_ANALYTICS_REFRESH_TOKEN }}
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          GH_READ_TOKEN: ${{ github.token }}
+          RETENTION_MODE: ${{ (github.event_name == 'schedule' || inputs.save_report == true) && 'save' || 'test' }}
+        run: python retansiyon_raporu.py
