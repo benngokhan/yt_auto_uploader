@@ -622,158 +622,21 @@ def backlink_previous_episode(
     new_vid_id: str,
     new_title: str,
 ) -> dict:
+    """Previous uploads are immutable: never rewrite their descriptions or comments.
+
+    Keep the return shape for existing callers and report formatting. A new upload
+    can still produce a separate Studio-pending related-video plan, but no previous
+    video is read or changed here. A future re-enable requires explicit authorization.
     """
-    Zincirli Shorts serisinde (video_131 -> 132 -> 133 ...) yeni bölüm yayınlandığı anda
-    bir önceki bölümün (video_{N-1}) YouTube açıklamasını ve kanalın ilk/sabit yorumunu
-    otomatik güncelleyerek sıradaki bölüme doğrudan yönlendirme ekler.
-    (Not: Shorts oynatıcısındaki yerleşik 'İlgili Video' hapı YouTube Data API v3'te
-    açık olmadığı için Telegram kartına ayrıca 1-tık Studio düzenleme butonu eklenir.)
-    """
-    import re as _re
-    info = {
+    log.info("  Önceki videolara geri-bağlantı yazma: güvenlik gereği kapalı.")
+    return {
+        "status": "disabled_by_policy",
         "prev_file": "",
         "prev_vid_id": "",
         "desc_updated": False,
         "comment_updated": False,
         "studio_edit_url": "",
     }
-    m = _re.match(r"^video_(\d+)\.mp4$", (current_file or "").strip(), _re.I)
-    if not m:
-        return info
-    cur_num = int(m.group(1))
-
-    # EMIR 026: RASTGELE SEÇİM DÖNEMİ — zincir hedefi "numara-1" değil:
-    # aynı konunun (kategori) en son YAYINLANMIŞ videosu. Eşleşme yoksa: genel en son yayın.
-    all_recs = {}
-    try:
-        all_recs = load_table_from_drive_or_local(drive, queue_folder)
-    except Exception:
-        all_recs = {}
-    cur_cat = (all_recs.get((current_file or "").strip(), {}).get("category_name") or "").strip().lower()
-    cur_key = (current_file or "").strip().lower()
-    pub_pool = [
-        (fn, rec) for fn, rec in all_recs.items()
-        if rec.get("has_youtube_link") and rec.get("youtube_url")
-        and not rec.get("is_long") and fn.lower() != cur_key
-    ]
-    if not pub_pool:
-        log.info("  Zincir geri-bağlantı: yayında başka video yok, zincir atlandı.")
-        return info
-    same_topic = [
-        (fn, rec) for fn, rec in pub_pool
-        if cur_cat and (rec.get("category_name") or "").strip().lower() == cur_cat
-    ]
-    target = same_topic or pub_pool
-    target.sort(key=lambda x: (str(x[1].get("uploaded_at") or ""), x[1].get("row") or 0), reverse=True)
-    prev_file = target[0][0]
-    info["prev_file"] = prev_file
-    info["chain_mode"] = "konu" if same_topic else "genel"
-    prev_vid_id = ""
-
-    # 1) uploaded.txt üzerinden önceki bölümün video ID'sini ara
-    if list_path and list_path.exists():
-        for line in reversed(list_path.read_text(encoding="utf-8", errors="ignore").splitlines()):
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            parts = [p.strip() for p in line.split("|")]
-            if len(parts) >= 3 and parts[1].lower() == prev_file.lower():
-                prev_vid_id = _extract_yt_vid_id(parts[2])
-                if prev_vid_id:
-                    break
-
-    # 2) Drive / yerel tablo üzerinden yedek arama
-    if not prev_vid_id and prev_file in all_recs:
-        prev_vid_id = _extract_yt_vid_id(all_recs[prev_file].get("youtube_url", ""))
-
-    # 3) Kanalın son yüklemeleri üzerinden başlık eşleşmesiyle yedek arama
-    if not prev_vid_id and prev_file in all_recs:
-        prev_expected_title = (all_recs[prev_file].get("title") or "").split("#")[0].strip().lower()
-        if prev_expected_title:
-            try:
-                ch_res = youtube.channels().list(part="contentDetails", mine=True).execute()
-                upl = ch_res["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
-                pl_res = youtube.playlistItems().list(part="snippet,contentDetails", playlistId=upl, maxResults=15).execute()
-                for it in pl_res.get("items", []):
-                    cand_id = it["contentDetails"]["videoId"]
-                    cand_title = (it.get("snippet", {}).get("title") or "").lower()
-                    if cand_id != new_vid_id and prev_expected_title[:24] in cand_title:
-                        prev_vid_id = cand_id
-                        break
-            except Exception:
-                pass
-
-    if not prev_vid_id:
-        log.info(f"  Zincir geri-bağlantı: {prev_file} için henüz yayında YouTube ID bulunamadı.")
-        return info
-
-    info["prev_vid_id"] = prev_vid_id
-    info["studio_edit_url"] = f"https://studio.youtube.com/video/{prev_vid_id}/edit"
-    clean_next = new_title.replace("#bilgidozu", "").replace("#shorts", "").strip()
-    short_link = f"https://youtube.com/shorts/{new_vid_id}"
-    banner_line = f"⏭️ SIRADAKİ BÖLÜM YAYINDA: {clean_next}\n👉 {short_link}"
-
-    # Katman 1: Önceki videonun açıklamasını (videos.update) güncelle
-    try:
-        vr = youtube.videos().list(part="snippet", id=prev_vid_id).execute()
-        vitems = vr.get("items", [])
-        if vitems:
-            snip = vitems[0]["snippet"]
-            cur_desc = (snip.get("description") or "").strip()
-            if new_vid_id not in cur_desc and "SIRADAKİ BÖLÜM YAYINDA" not in cur_desc:
-                updated_desc = f"{banner_line}\n\n{cur_desc}".strip()[:4900]
-                youtube.videos().update(
-                    part="snippet",
-                    body={
-                        "id": prev_vid_id,
-                        "snippet": {
-                            "title": snip.get("title", ""),
-                            "description": updated_desc,
-                            "tags": snip.get("tags", []),
-                            "categoryId": str(snip.get("categoryId", "27")),
-                            "defaultLanguage": snip.get("defaultLanguage", "tr"),
-                            "defaultAudioLanguage": snip.get("defaultAudioLanguage", "tr"),
-                        },
-                    },
-                ).execute()
-                info["desc_updated"] = True
-                log.info(f"  Zincir geri-bağlantı ✓: {prev_file} ({prev_vid_id}) açıklamasına {current_file} linki eklendi.")
-            else:
-                info["desc_updated"] = True
-    except Exception as e:
-        log.warning(f"  Zincir açıklama güncelleme uyarısı ({prev_file}): {e}")
-
-    # Katman 2: Önceki videodaki kanal yorumunu (comments.update) güncelle
-    try:
-        ch_res = youtube.channels().list(part="id", mine=True).execute()
-        my_ch_id = ch_res["items"][0]["id"] if ch_res.get("items") else ""
-        ct_res = youtube.commentThreads().list(part="snippet", videoId=prev_vid_id, maxResults=30).execute()
-        own_cid, own_txt = "", ""
-        for ct in ct_res.get("items", []):
-            top = ct.get("snippet", {}).get("topLevelComment", {})
-            csnip = top.get("snippet", {})
-            if my_ch_id and csnip.get("authorChannelId", {}).get("value", "") == my_ch_id:
-                own_cid = top.get("id", "")
-                own_txt = (csnip.get("textOriginal") or csnip.get("textDisplay") or "").strip()
-                break
-        comment_addon = f"⏭️ Videoda bahsettiğimiz sıradaki bölüm yayında: \"{clean_next}\" 👉 https://youtu.be/{new_vid_id} (@bilgidozuofficial)"
-        if own_cid and new_vid_id not in own_txt and "sıradaki bölüm yayında" not in own_txt.lower():
-            youtube.comments().update(
-                part="snippet",
-                body={"id": own_cid, "snippet": {"textOriginal": f"{own_txt}\n\n{comment_addon}".strip()}},
-            ).execute()
-            info["comment_updated"] = True
-            log.info(f"  Zincir yorum güncellemesi ✓: {prev_file} sabit yorumuna sıradaki bölüm eklendi.")
-        elif not own_cid:
-            youtube.commentThreads().insert(
-                part="snippet",
-                body={"snippet": {"videoId": prev_vid_id, "topLevelComment": {"snippet": {"textOriginal": comment_addon}}}},
-            ).execute()
-            info["comment_updated"] = True
-    except Exception as e:
-        log.warning(f"  Zincir yorum güncelleme uyarısı ({prev_file}): {e}")
-
-    return info
 
 
 def build_telegram_report(
