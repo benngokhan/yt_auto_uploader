@@ -2,9 +2,11 @@
 """
 Bilgi Dozu Çapraz Paylaşım İşçisi (TikTok + Instagram Reels)
 -----------------------------------------------------------
-YouTube'a yüklenen her Shorts'u aynı anda TikTok ve Instagram Reels'e de atar.
+Kullanıcı isteğiyle TikTok ve Instagram paylaşımı pasiftir. Önceki oturumlar
+kullanılmaz, Drive'dan kimlik bilgisi alınmaz ve dış platforma istek gönderilmez.
+Tekrar etkinleştirme ancak açık kullanıcı onayı ve güvenli yeni oturumlarla yapılır.
 
-Gerekli ortam değişkenleri (GitHub Secrets):
+Geçmişte kullanılan ortam değişkenleri (GitHub Secrets):
   IG_SESSIONID    -> Instagram sessionid çerezi (öncelikli)
   IG_USERNAME / IG_PASSWORD -> sessionid yoksa klasik giriş
   TIKTOK_SESSIONID -> TikTok sessionid çerezi
@@ -28,6 +30,10 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(name)s | %(mes
 # KartaL Stok (Bot'un yayın çekim klasörü) — çapraz paylaşım anahtar dosyası burada durur
 STOCK_FOLDER_ID = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"
 KEYS_FILE_NAME = "crosspost_keys.json"
+
+# Kullanıcı her iki platformu pasife aldı. Env/Drive'daki eski oturumlar veya
+# bayraklar bu kilidi kaldıramaz; yeniden açma açık kullanıcı onayı gerektirir.
+CROSSPOST_DISABLED_BY_USER = True
 
 
 def _load_drive_keys(drive=None, folder_id: str = "") -> dict:
@@ -74,8 +80,10 @@ IG_MAX_CAPTION = 2100      # Reels 2200 limiti; güvenli pay bırak
 
 
 def crosspost_enabled() -> bool:
-    """Kilit anahtarı + en az bir platform kimliği var mı?"""
-    flag = os.getenv("CROSSPOST_ENABLED", "true").strip().lower()
+    """Kullanıcı kilidi, ortam bayrağı ve platform kimliklerini birlikte kontrol et."""
+    if CROSSPOST_DISABLED_BY_USER:
+        return False
+    flag = os.getenv("CROSSPOST_ENABLED", "false").strip().lower()
     if flag in ("0", "false", "no", "hayir", "hayır", "kapali", "kapalı"):
         return False
     has_ig = bool(os.getenv("IG_SESSIONID", "").strip()) or (
@@ -119,6 +127,9 @@ def _send_telegram_note(lines: list[str]) -> None:
 
 def post_instagram(video_path: Path, caption: str) -> str | None:
     """Reels (clip) olarak Instagram'a yükler. Başarılıysa reel URL'si döner."""
+    if CROSSPOST_DISABLED_BY_USER:
+        log.info("Instagram paylaşımı kullanıcı isteğiyle pasif.")
+        return None
     sid = os.getenv("IG_SESSIONID", "").strip()
     user = os.getenv("IG_USERNAME", "").strip()
     pw = os.getenv("IG_PASSWORD", "").strip()
@@ -167,6 +178,9 @@ def _ensure_playwright_browser() -> None:
 
 def post_tiktok(video_path: Path, caption: str) -> str | None:
     """sessionid çereziyle TikTok'a yükler. Başarılıysa None değil URL/ID döner."""
+    if CROSSPOST_DISABLED_BY_USER:
+        log.info("TikTok paylaşımı kullanıcı isteğiyle pasif.")
+        return None
     sid = os.getenv("TIKTOK_SESSIONID", "").strip()
     if not sid:
         log.info("TikTok kimliği yok (TIKTOK_SESSIONID) -> atlanıyor.")
@@ -201,6 +215,9 @@ def post_tiktok(video_path: Path, caption: str) -> str | None:
 def run_crosspost(video_path: Path, file_name: str, caption: str, drive=None, folder_id: str = "") -> dict:
     """Ana giriş: uygunsa IG + TikTok'a yükler, sonuçları raporlar."""
     results = {"instagram": None, "tiktok": None}
+    if CROSSPOST_DISABLED_BY_USER:
+        log.info("Instagram ve TikTok kullanıcı isteğiyle pasif; oturumlar okunmadı.")
+        return {**results, "status": "disabled_by_user"}
 
     # Env'de anahtar yoksa Drive'daki crosspost_keys.json'dan hidre et (GitHub workflow YAML'si kilitli)
     if not crosspost_enabled() and drive is not None:

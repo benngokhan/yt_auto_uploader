@@ -44,6 +44,9 @@ def append_to_payload(path: Path, file_name: str, result: object) -> bool:
     """
     if str(file_name).lower().startswith("uzun_") or not path.is_file():
         return False
+    # Kullanıcının bilinçli kapattığı işçileri başarısız iş gibi karta ekleme.
+    if isinstance(result, dict) and result.get("status") == "disabled_by_user":
+        return False
     if not isinstance(result, dict):
         result = {}
     try:

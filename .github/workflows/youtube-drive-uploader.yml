@@ -46,6 +46,8 @@ jobs:
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      # Kullanıcı isteği: Instagram/TikTok devre dışı; eski oturumlar kullanılmaz.
+      CROSSPOST_ENABLED: 'false'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

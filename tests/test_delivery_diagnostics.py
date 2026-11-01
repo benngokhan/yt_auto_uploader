@@ -59,7 +59,7 @@ class DisabledCrosspostTests(unittest.TestCase):
             result = c.run_crosspost(Path("/not/real.mp4"), "video_200.mp4", "", drive=object())
             ig.assert_not_called()
             tt.assert_not_called()
-            self.assertEqual(result, {"instagram": None, "tiktok": None})
+            self.assertEqual(result, {"instagram": None, "tiktok": None, "status": "disabled_by_user"})
 
     def test_drive_flag_off_does_not_post_even_when_sessions_are_present(self):
         keys = {"CROSSPOST_ENABLED": "false", "IG_SESSIONID": "old-ig", "TIKTOK_SESSIONID": "old-tt"}
