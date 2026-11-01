@@ -138,6 +138,29 @@ def _parse_retention_workbook(raw_bytes: bytes) -> dict:
     }
 
 
+def _resolve_table_file_id(drive) -> str:
+    """Ana yukleme tablosunun Drive dosya kimligini bulur (CEO klasoru)."""
+    if DEFAULT_SHEETS_ID:
+        return DEFAULT_SHEETS_ID
+    try:
+        resp = (
+            drive.files()
+            .list(
+                q=f"'{CEO_FOLDER_ID}' in parents and trashed=false",
+                fields="files(id,name,mimeType)",
+                pageSize=100,
+            )
+            .execute()
+        )
+        for f in resp.get("files", []):
+            name = (f.get("name") or "").lower()
+            if name.startswith("bilgidozu") and name.endswith((".xlsx", ".xlsm")):
+                return f["id"]
+    except Exception as e:
+        print(f"[telemetry] Tablo kimligi okunamadi: {e}")
+    return ""
+
+
 def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_table_to_drive: bool = False) -> dict:
     tr_now = datetime.now(timezone(timedelta(hours=3)))
     now_str = tr_now.strftime("%Y-%m-%d %H:%M:%S")
@@ -148,13 +171,16 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
             wb_local_path = BASE_DIR / "bilgidozu_yukleme_tablosu.xlsx"
             if push_table_to_drive and wb_local_path.exists():
                 from googleapiclient.http import MediaFileUpload
+                table_id = _resolve_table_file_id(drive)
+                if not table_id:
+                    raise RuntimeError("Yukleme tablosu Drive'da bulunamadi")
                 media = MediaFileUpload(
                     str(wb_local_path),
                     mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     resumable=False,
                 )
-                drive.files().update(fileId=DEFAULT_SHEETS_ID, media_body=media).execute()
-                print("[telemetry] GitHub tablosu Google Drive CEO klasörüne yazıldı.")
+                drive.files().update(fileId=table_id, media_body=media).execute()
+                print(f"[telemetry] GitHub tablosu Drive'a yazildi (fileId={table_id}).")
             else:
                 raw_wb = _download_workbook_bytes_from_drive(drive, CEO_FOLDER_ID)
                 if raw_wb:
@@ -326,7 +352,7 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
         "folders": {
             "youtube_otomasyon": YOUTUBE_OTOMASYON_FOLDER_ID,
             "ceo": CEO_FOLDER_ID,
-            "table_file_id": DEFAULT_SHEETS_ID,
+            "table_file_id": _resolve_table_file_id(drive) if drive else "",
             "shorts_video": SHORTS_VIDEO_FOLDER_ID,
             "shorts_cover": SHORTS_COVER_FOLDER_ID,
             "long_video": LONG_VIDEO_FOLDER_ID,
