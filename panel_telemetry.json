@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-02 02:39:10",
-  "generated_at_iso": "2026-11-02T02:39:10.968695+03:00",
+  "generated_at": "2026-11-02 02:55:12",
+  "generated_at_iso": "2026-11-02T02:55:12.654674+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -214,6 +214,20 @@
         "mimeType": "image/jpeg",
         "size": 410354,
         "modifiedTime": "2026-11-01T23:37:01.992Z"
+      },
+      {
+        "id": "1oVNpllA-2eIgIr-XhTaeMWrsewWn5ilx",
+        "name": "kapak_165.jpeg",
+        "mimeType": "image/jpeg",
+        "size": 425137,
+        "modifiedTime": "2026-11-01T23:41:19.073Z"
+      },
+      {
+        "id": "1KbAsfC4HRO_bNp3gwU8GAM2QlVn-Yfgg",
+        "name": "kapak_166.jpeg",
+        "mimeType": "image/jpeg",
+        "size": 333759,
+        "modifiedTime": "2026-11-01T23:41:18.571Z"
       }
     ],
     "long_videos": [
