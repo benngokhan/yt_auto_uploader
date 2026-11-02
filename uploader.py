@@ -694,7 +694,6 @@ def build_telegram_report(
     community_post = (
         f"🔥 {clean_title}\n"
         f"💬 {pinned}\n"
-        f"👇 Hemen izle ve fikrini yaz:\n"
         f"{yt_url}"
     )
 
@@ -729,10 +728,6 @@ def build_telegram_report(
         "disable_web_page_preview": True,
         "reply_markup": {
             "inline_keyboard": [
-                [
-                    {"text": "📋 Sabit Yorumu Kopyala", "copy_text": {"text": pinned}},
-                    {"text": "📋 Gönderi Metnini Kopyala", "copy_text": {"text": community_post}},
-                ],
                 [
                     {"text": "▶️ Videoyu İzle", "url": yt_url},
                     {"text": "📌 Yorumu Sabitle", "url": studio_comments_url},
