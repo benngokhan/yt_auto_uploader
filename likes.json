@@ -1,9 +1,9 @@
 {
- "generated_at": "2026-11-02 03:43:38",
- "generated_at_iso": "2026-11-02T03:43:38.802518+03:00",
+ "generated_at": "2026-11-02 03:49:22",
+ "generated_at_iso": "2026-11-02T03:49:22.004994+03:00",
  "source": "yt-dlp (YouTube API kotasi 0)",
- "ok": 75,
- "failed": 3,
+ "ok": 0,
+ "failed": 78,
  "items": {
   "IrutrnRqyWM": {
    "likes": 24,

@@ -1,7 +1,7 @@
 {
  "schema": 2,
- "generated_at": "2026-11-02 03:31:32",
- "generated_at_iso": "2026-11-02T03:31:32.158355+03:00",
+ "generated_at": "2026-11-02 03:48:45",
+ "generated_at_iso": "2026-11-02T03:48:45.168351+03:00",
  "channel_id": "UC3bjZMPZ5FW2JQGfU41iaUg",
  "channel_url": "https://www.youtube.com/@bilgidozuofficial",
  "top_shorts": [
@@ -204,7 +204,7 @@
   "mode": "views+likes",
   "like_weight": 20,
   "likes_source": "likes.json",
-  "likes_generated_at": "2026-11-02 03:43:38"
+  "likes_generated_at": "2026-11-02 03:49:22"
  },
  "totals": {
   "videos": 78,
