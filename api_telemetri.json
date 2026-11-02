@@ -1,11 +1,10 @@
 {
-  "zaman": "2026-11-02T13:38:50+00:00",
+  "zaman": "2026-11-02T13:39:40+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
-      "durum": "yok",
-      "mesaj": "Anahtar tanımlı değil (ELEVENLABS_API_KEY)",
-      "panel_aksiyon": "Ses & Kredi sayfasından anahtar yükle",
+      "durum": "gecersiz",
+      "mesaj": "HTTP 401",
       "yenilenme": "aylık · fatura dönemi başında sıfırlanır (kalan kredi devretmez)"
     },
     {
@@ -43,16 +42,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4995,
+      "kalan": 4990,
       "limit": 5000,
-      "kullanilan": 5,
+      "kullanilan": 10,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 59.3,
+      "actions_dakika": 60.5,
       "actions_kosu": 117,
       "actions_limit": 2000,
-      "actions_kalan": 1940.7
+      "actions_kalan": 1939.5
     },
     {
       "ad": "Google Drive",
@@ -189,8 +188,8 @@
   ],
   "ozet": {
     "ok": 5,
-    "eksik": 1,
-    "gecersiz": 2,
+    "eksik": 0,
+    "gecersiz": 3,
     "hata": 0
   },
   "gecmis": [
@@ -224,6 +223,10 @@
     },
     {
       "zaman": "2026-11-02T13:38:50+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T13:39:40+00:00",
       "elevenlabs_kalan": null
     }
   ]
