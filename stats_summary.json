@@ -1,36 +1,36 @@
 {
- "total": 21682,
- "day_gain": 65,
- "updated": 27,
- "baseline_count": 0,
- "compared_count": 42,
+ "total": 22818,
+ "day_gain": 64,
+ "updated": 32,
+ "baseline_count": 13,
+ "compared_count": 35,
  "unavailable_count": 4,
  "dry_run": false,
  "top": [
   {
-   "delta": 11,
-   "title": "Üçgen ve Açı Kelimelerini Atatürk'ün Bizzat Türettiğini Bili",
-   "file": "video_157.mp4"
+   "delta": 18,
+   "title": "Göz Kapağın Neden Kendi Kendine Seğirir? Anlamı Bu! 👁🧠 #bilg",
+   "file": "video_133.mp4"
   },
   {
    "delta": 9,
-   "title": "Kendi Sesini Kayıtta Dinleyince Neden Tuhaf Gelir? 🎙️ #bilgi",
-   "file": "video_96.mp4"
+   "title": "Baldır Kasların Aslında İkinci Kalbin! Kanı Kalbe Nasıl Taşı",
+   "file": "video_132.mp4"
   },
   {
-   "delta": 5,
+   "delta": 6,
+   "title": "Bir Esnedin, Etraf da Esnedi! Esnemenin Bulaşma Sırrı 😮🧠 #bi",
+   "file": "video_134.mp4"
+  },
+  {
+   "delta": 4,
    "title": "Burnun Nöbetleşe Çalışıyor: İki Delik Aynı Anda Eşit Nefes A",
    "file": "video_32.mp4"
   },
   {
    "delta": 4,
-   "title": "Göz Kapağın Neden Kendi Kendine Seğirir? Anlamı Bu! 👁🧠 #bilg",
-   "file": "video_133.mp4"
-  },
-  {
-   "delta": 3,
-   "title": "Vücudundaki Hücrelerin Yarısından Fazlası Aslında Bakteri! 🦠",
-   "file": "video_86.mp4"
+   "title": "Bu Minik Karides Avını Kıskacıyla Değil, Patlayan Kabarcıkla",
+   "file": "video_38.mp4"
   }
  ]
 }
