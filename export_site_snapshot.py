@@ -68,7 +68,7 @@ def _with_likes(item: dict, likes_map: dict) -> dict:
     item = dict(item)
     item["views"] = views
     item["likes"] = likes
-    item["like_rate"] = round(likes / views * 100, 2) if likes and views else None
+    item["like_rate"] = round(likes / views * 100, 2) if likes is not None and views else None
     item["rank_score"] = views + (LIKE_WEIGHT * likes if likes else 0)
     item["likes_at"] = rec.get("fetched_at") or ""
     return item

@@ -135,7 +135,7 @@
    "published_date": "2026-10-16",
    "url": "https://youtu.be/vh_h0diuFG8",
    "likes": 0,
-   "like_rate": null,
+   "like_rate": 0.0,
    "rank_score": 129,
    "likes_at": "2026-11-02 03:51:37"
   },
@@ -159,7 +159,7 @@
    "published_date": "2026-09-24",
    "url": "https://youtu.be/tQJg3mG2Kvo",
    "likes": 0,
-   "like_rate": null,
+   "like_rate": 0.0,
    "rank_score": 37,
    "likes_at": "2026-11-02 03:51:37"
   },
@@ -171,7 +171,7 @@
    "published_date": "2026-09-24",
    "url": "https://youtu.be/ExNJqJLhHP0",
    "likes": 0,
-   "like_rate": null,
+   "like_rate": 0.0,
    "rank_score": 26,
    "likes_at": "2026-11-02 03:51:37"
   },
@@ -183,7 +183,7 @@
    "published_date": "2026-10-18",
    "url": "https://youtu.be/eAnBBamiD1U",
    "likes": 0,
-   "like_rate": null,
+   "like_rate": 0.0,
    "rank_score": 14,
    "likes_at": "2026-11-02 03:51:37"
   },
@@ -195,7 +195,7 @@
    "published_date": "2026-10-30",
    "url": "https://youtu.be/QhqHWaVWLJY",
    "likes": 0,
-   "like_rate": null,
+   "like_rate": 0.0,
    "rank_score": 5,
    "likes_at": "2026-11-02 03:51:37"
   }
