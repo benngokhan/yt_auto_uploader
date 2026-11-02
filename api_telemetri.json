@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-02T13:39:40+00:00",
+  "zaman": "2026-11-02T13:46:54+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -42,16 +42,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4990,
+      "kalan": 4985,
       "limit": 5000,
-      "kullanilan": 10,
+      "kullanilan": 15,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 60.5,
-      "actions_kosu": 117,
+      "actions_dakika": 62.1,
+      "actions_kosu": 119,
       "actions_limit": 2000,
-      "actions_kalan": 1939.5
+      "actions_kalan": 1937.9
     },
     {
       "ad": "Google Drive",
@@ -64,31 +64,36 @@
         {
           "ad": "Kısa Videolar",
           "boyut": 207711022,
-          "dosya": 12
+          "dosya": 12,
+          "sahip": "gokhanaltundal@gmail.com"
         },
         {
           "ad": "Uzun Videolar",
           "boyut": 767984696,
-          "dosya": 15
+          "dosya": 15,
+          "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
         {
           "ad": "Kısa Kapaklar",
-          "boyut": 5554854,
-          "dosya": 13
+          "boyut": 6155477,
+          "dosya": 14,
+          "sahip": "gokhanaltundal@gmail.com"
         },
         {
           "ad": "Uzun Kapaklar",
           "boyut": 24989715,
-          "dosya": 20
+          "dosya": 20,
+          "sahip": "gokhanaltundal@gmail.com"
         },
         {
           "ad": "CEO / Tablolar",
           "boyut": 77069360,
-          "dosya": 14
+          "dosya": 14,
+          "sahip": "gokhanaltundal@gmail.com"
         },
         {
           "ad": "Diğer (Gmail, Fotoğraflar, arşiv)",
-          "boyut": 4606667933,
+          "boyut": 4606067310,
           "dosya": 0
         }
       ],
@@ -126,8 +131,10 @@
           "boyut": 73557803
         }
       ],
-      "drive_gorunen": 2853992791,
-      "disalan": 2835984789,
+      "drive_gorunen": 2854593414,
+      "kendi_dosyalar": 2245301057,
+      "paylasilan": 609292357,
+      "disalan": 3444676523,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
       "not_": "Google hesabının TOPLAM alanı: Drive + Gmail + Fotoğraflar ortak"
@@ -227,6 +234,10 @@
     },
     {
       "zaman": "2026-11-02T13:39:40+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T13:46:54+00:00",
       "elevenlabs_kalan": null
     }
   ]
