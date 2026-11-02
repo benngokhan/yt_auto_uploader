@@ -1,6 +1,6 @@
 {
-  "zaman": "2026-11-02T12:26:32+00:00",
-  "anahtar_durumu": "gecersiz",
-  "mesaj": "ElevenLabs HTTP 401 — anahtar geçersiz/iptal",
+  "zaman": "2026-11-02T12:27:18+00:00",
+  "anahtar_durumu": "yok",
+  "mesaj": "ELEVENLABS_API_KEY tanımlı değil. Panelden anahtar yükle.",
   "gecmis": []
 }
