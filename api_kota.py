@@ -129,7 +129,8 @@ def _klasor_boyut(drive, fid: str, derinlik: int = 2) -> tuple[int, int]:
                 pageSize=100, pageToken=sayfa,
                 fields="nextPageToken,files(id,size,mimeType)",
             ).execute()
-        except Exception:
+        except Exception as e:
+            print(f"  klasör listelenemedi ({fid}): {e}")
             break
         for f in res.get("files", []):
             if f.get("mimeType") == "application/vnd.google-apps.folder":
@@ -179,8 +180,9 @@ def google():
         try:
             b, n = _klasor_boyut(drive, DRIVE_ARSIV[1], derinlik=3)
             kirilim.append({"ad": DRIVE_ARSIV[0], "boyut": b, "dosya": n})
-        except Exception:
-            pass
+        except Exception as e:
+            print("arşiv klasörü okunamadı:", e)
+            kirilim.append({"ad": DRIVE_ARSIV[0], "boyut": 0, "dosya": 0, "hata": str(e)[:120]})
         kirilim_toplam = sum(k["boyut"] for k in kirilim)
         if used > kirilim_toplam:
             kirilim.append({
