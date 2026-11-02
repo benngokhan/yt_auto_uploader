@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-02 19:47:19",
-  "generated_at_iso": "2026-11-02T19:47:19.275705+03:00",
+  "generated_at": "2026-11-02 20:05:10",
+  "generated_at_iso": "2026-11-02T20:05:10.728582+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -36,12 +36,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 10,
+    "ready_shorts": 9,
     "ready_longs": 14,
-    "total_ready": 24,
-    "days_of_stock": 12.0,
-    "next_short": "video_156.mp4",
-    "next_short_title": "Havuç Gece Görüşünü Güçlendirir Efsanesi Nasıl Gizli Radar Oyunu Çıktı? 🥕 #bilgidozu #shorts",
+    "total_ready": 23,
+    "days_of_stock": 11.5,
+    "next_short": "video_158.mp4",
+    "next_short_title": "Ağlamamak İçin Kendini Tuttuğunda Boğazına Neden Yumru Oturur? 😢 #bilgidozu #shorts",
     "next_long": "uzun_video_8.mp4",
     "next_long_title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
     "missing_covers": []
@@ -487,8 +487,8 @@
         "id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 90465,
-        "modifiedTime": "2026-11-02T10:11:21.220Z"
+        "size": 90530,
+        "modifiedTime": "2026-11-02T17:05:08.994Z"
       },
       {
         "id": "1LathGn2Mn5Zn_1gf4JqqVz1WnaSm7NVN",
@@ -578,9 +578,9 @@
       "file_name": "video_156.mp4",
       "number": 156,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Havuç Gece Görüşünü Güçlendirir Efsanesi Nasıl Gizli Radar Oyunu Çıktı? 🥕 #bilgidozu #shorts",
       "description": "Çok havuç yersen karanlıkta kedi gibi görürsün sözünü hep duyarız; peki bu gerçek mi yoksa askeri bir sır mı? Havuçtaki A vitamini göz sağlığını korur; fakat eksiklik yoksa fazlası sağlıklı göze ekstra gece görüşü vermez.\n\n📍 BÖLÜMLER\n00:00 Bol havuç yemek gece — Görüşünü açar mı?\n00:18 1940 gece gökyüzünde — Gizli radar icadı!\n00:37 80 yıldır süren — En başarılı kampanya!\n\n📊 Kaynaklar:\n• Smithsonian Magazine & Imperial War Museums Archives\n• https://www.smithsonianmag.com/arts-culture/a-wwii-propaganda-campaign-popularized-the-myth-that-carrots-help-you-see-in-the-dark-28812484/\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #tarih #bilim #efsaneler #ilginçbilgiler",
       "tags": [
