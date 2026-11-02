@@ -1,10 +1,11 @@
 {
-  "zaman": "2026-11-02T13:48:11+00:00",
+  "zaman": "2026-11-02T14:02:52+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
-      "durum": "gecersiz",
-      "mesaj": "HTTP 401",
+      "durum": "yok",
+      "mesaj": "Anahtar tanımlı değil (ELEVENLABS_API_KEY)",
+      "panel_aksiyon": "Ses & Kredi sayfasından anahtar yükle",
       "yenilenme": "aylık · fatura dönemi başında sıfırlanır (kalan kredi devretmez)"
     },
     {
@@ -42,16 +43,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4980,
+      "kalan": 4975,
       "limit": 5000,
-      "kullanilan": 20,
+      "kullanilan": 25,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 63.2,
-      "actions_kosu": 121,
+      "actions_dakika": 65.5,
+      "actions_kosu": 123,
       "actions_limit": 2000,
-      "actions_kalan": 1936.8
+      "actions_kalan": 1934.5
     },
     {
       "ad": "Google Drive",
@@ -87,8 +88,8 @@
         },
         {
           "ad": "CEO / Tablolar",
-          "boyut": 77069360,
-          "dosya": 14,
+          "boyut": 234170607,
+          "dosya": 19,
           "sahip": "gokhanaltundal@gmail.com"
         },
         {
@@ -115,6 +116,10 @@
           "boyut": 87818519
         },
         {
+          "ad": "163 - 6 GÖRSEL HAREKET KONTROLÜ.mp4",
+          "boyut": 87042844
+        },
+        {
           "ad": "uzun_video_9.mp4",
           "boyut": 85769016
         },
@@ -125,15 +130,11 @@
         {
           "ad": "uzun_video_8.mp4",
           "boyut": 83722104
-        },
-        {
-          "ad": "uzun_video_11.mp4",
-          "boyut": 73557803
         }
       ],
-      "drive_gorunen": 2854588488,
+      "drive_gorunen": 3011689735,
       "kendi_dosyalar": 2245296131,
-      "paylasilan": 609292357,
+      "paylasilan": 766393604,
       "disalan": 3444681449,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
@@ -195,8 +196,8 @@
   ],
   "ozet": {
     "ok": 5,
-    "eksik": 0,
-    "gecersiz": 3,
+    "eksik": 1,
+    "gecersiz": 2,
     "hata": 0
   },
   "gecmis": [
@@ -242,6 +243,10 @@
     },
     {
       "zaman": "2026-11-02T13:48:11+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T14:02:52+00:00",
       "elevenlabs_kalan": null
     }
   ]
