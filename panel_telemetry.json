@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-02 16:36:04",
-  "generated_at_iso": "2026-11-02T16:36:04.025595+03:00",
+  "generated_at": "2026-11-02 17:44:39",
+  "generated_at_iso": "2026-11-02T17:44:39.680354+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -224,6 +224,13 @@
         "mimeType": "image/jpeg",
         "size": 333759,
         "modifiedTime": "2026-11-01T23:41:18.571Z"
+      },
+      {
+        "id": "1HcuSg6M8A3nLHjQO0JcdNq75eNpwnLLG",
+        "name": "kapak_167.jpg",
+        "mimeType": "image/jpeg",
+        "size": 600623,
+        "modifiedTime": "2026-11-02T13:42:13.019Z"
       }
     ],
     "long_videos": [
@@ -484,6 +491,13 @@
         "modifiedTime": "2026-11-02T10:11:21.220Z"
       },
       {
+        "id": "1LathGn2Mn5Zn_1gf4JqqVz1WnaSm7NVN",
+        "name": "Kontrol",
+        "mimeType": "application/vnd.google-apps.folder",
+        "size": 0,
+        "modifiedTime": "2026-11-02T13:58:08.486Z"
+      },
+      {
         "id": "1LyZBIc52OzaGZBaq8yXODcseZ0wilsrs",
         "name": "RETANSIYON_OZEL_RAPORLAR",
         "mimeType": "application/vnd.google-apps.folder",
@@ -517,6 +531,13 @@
         "mimeType": "application/vnd.google-apps.folder",
         "size": 0,
         "modifiedTime": "2026-11-01T20:46:15.622Z"
+      },
+      {
+        "id": "1lA8QNmVuDvex_gQN680rXx_RFPFw5Pwh",
+        "name": "video_167.mp4",
+        "mimeType": "video/mp4",
+        "size": 28285352,
+        "modifiedTime": "2026-11-02T14:04:13.535Z"
       }
     ]
   },
