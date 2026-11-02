@@ -207,6 +207,32 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
         except Exception:
             pass
 
+
+def cover_candidates(num: int, is_long: bool) -> list[str]:
+    """Hazır kapak adayları — uploader.thumbnail_candidates ile AYNI sıra.
+
+    Kapaklar .jpg / .png / .jpeg uzantılarıyla gelebiliyor (ör. kapak_164.jpeg).
+    Eski kod yalnızca kapak_N.jpg aradığı için panelde yanlış "kapak eksik"
+    uyarısı çıkıyordu.
+    """
+    if is_long:
+        stems = (f"uzun_kapak_{num}", f"kapak_uzun_{num}")
+        exts = ("png", "jpg", "jpeg")
+    else:
+        stems = (f"kapak_{num}", f"short_kapak_{num}")
+        exts = ("jpg", "png", "jpeg")
+    return [f"{stem}.{ext}" for stem in stems for ext in exts]
+
+
+def pick_cover(cover_map: dict, num: int, is_long: bool) -> tuple[str, dict | None]:
+    """(beklenen/mevcut kapak adı, Drive dosyası) — uzantıdan bağımsız eşleşme."""
+    candidates = cover_candidates(num, is_long)
+    for name in candidates:
+        found = cover_map.get(name.lower())
+        if found:
+            return found["name"], found
+    return candidates[0], None
+
     shorts_video_map = {f["name"].lower(): f for f in shorts_videos}
     shorts_cover_map = {f["name"].lower(): f for f in shorts_covers}
     long_video_map = {f["name"].lower(): f for f in long_videos}
@@ -237,9 +263,8 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
         if not is_long and num < MIN_SHORTS_NUMBER:
             continue
 
-        expected_cover = f"uzun_kapak_{num}.png" if is_long else f"kapak_{num}.jpg"
         v_file = long_video_map.get(fname.lower()) if is_long else shorts_video_map.get(fname.lower())
-        c_file = long_cover_map.get(expected_cover.lower()) if is_long else shorts_cover_map.get(expected_cover.lower())
+        expected_cover, c_file = pick_cover(long_cover_map if is_long else shorts_cover_map, num, is_long)
         is_published = (
             rec.get("has_youtube_link")
             or fname in done_ids
