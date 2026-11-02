@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-02T13:37:06+00:00",
+  "zaman": "2026-11-02T13:38:50+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -43,16 +43,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 5000,
+      "kalan": 4995,
       "limit": 5000,
-      "kullanilan": 0,
+      "kullanilan": 5,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 57.9,
-      "actions_kosu": 115,
+      "actions_dakika": 59.3,
+      "actions_kosu": 117,
       "actions_limit": 2000,
-      "actions_kalan": 1942.1
+      "actions_kalan": 1940.7
     },
     {
       "ad": "Google Drive",
@@ -148,7 +148,7 @@
   "secretler": [
     {
       "ad": "ELEVENLABS_API_KEY",
-      "var": false,
+      "var": true,
       "aciklama": "Ses üretimi (ElevenLabs)"
     },
     {
@@ -220,6 +220,10 @@
     },
     {
       "zaman": "2026-11-02T13:37:06+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T13:38:50+00:00",
       "elevenlabs_kalan": null
     }
   ]
