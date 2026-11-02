@@ -217,11 +217,12 @@ def google():
                         for f in res2.get("files", [])]
         except Exception as e:
             print("büyük dosya listesi alınamadı:", e)
-        kirilim_toplam = sum(k["boyut"] for k in kirilim)
-        if used > kirilim_toplam:
+        # Kotayı asıl dolduran kalem: Drive dışı (Gmail + Fotoğraflar) + kendi diğer dosyalar
+        drive_disi = used - kendi
+        if drive_disi > 0:
             kirilim.append({
-                "ad": "Diğer (Gmail, Fotoğraflar, arşiv)",
-                "boyut": used - kirilim_toplam,
+                "ad": "Gmail + Fotoğraflar (Drive dışı)",
+                "boyut": drive_disi,
                 "dosya": 0,
             })
         sonuc.append(ok("Google Drive", kalan=(limit - used) if limit else None, limit=limit,
@@ -230,7 +231,7 @@ def google():
                         disalan=used - kendi,
                         hesap=(q.get("user") or {}).get("emailAddress", ""),
                         yenilenme="yenilenmez · sadece dosya silince/artırınca değişir",
-                        not_="Google hesabının TOPLAM alanı: Drive + Gmail + Fotoğraflar ortak"))
+                        not_="Kota hesap bazlı: klasör başka hesaba aitse yer ONUN kotasından düşer"))
     except Exception as e:
         sonuc.append(hata("Google Drive", e))
 
