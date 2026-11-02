@@ -177,6 +177,21 @@ def google():
                 kirilim.append({"ad": ad, "boyut": b, "dosya": n})
             except Exception:
                 continue
+        # Drive'da görünen tüm dosyaların toplamı (Gmail/Fotoğraflar buraya girmez)
+        gorunen, sayfa2 = 0, None
+        try:
+            for _ in range(10):
+                r3 = drive.files().list(
+                    q="trashed=false and mimeType != 'application/vnd.google-apps.folder'",
+                    pageSize=1000, pageToken=sayfa2, fields="nextPageToken,files(size)",
+                ).execute()
+                gorunen += sum(int(f.get("size") or 0) for f in r3.get("files", []))
+                sayfa2 = r3.get("nextPageToken")
+                if not sayfa2:
+                    break
+        except Exception as e:
+            print("drive toplamı alınamadı:", e)
+
         buyukler = []
         try:
             res2 = drive.files().list(
@@ -197,6 +212,7 @@ def google():
             })
         sonuc.append(ok("Google Drive", kalan=(limit - used) if limit else None, limit=limit,
                         kullanilan=used, birim="bayt", kirilim=kirilim, buyuk_dosyalar=buyukler,
+                        drive_gorunen=gorunen, disalan=used - gorunen,
                         hesap=(q.get("user") or {}).get("emailAddress", ""),
                         yenilenme="yenilenmez · sadece dosya silince/artırınca değişir",
                         not_="Google hesabının TOPLAM alanı: Drive + Gmail + Fotoğraflar ortak"))
