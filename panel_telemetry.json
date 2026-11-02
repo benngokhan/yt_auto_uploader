@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-03 00:43:22",
-  "generated_at_iso": "2026-11-03T00:43:22.022297+03:00",
+  "generated_at": "2026-11-03 01:07:05",
+  "generated_at_iso": "2026-11-03T01:07:05.344220+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -503,6 +503,13 @@
         "mimeType": "application/vnd.google-apps.folder",
         "size": 0,
         "modifiedTime": "2026-11-01T22:59:58.786Z"
+      },
+      {
+        "id": "19EEmVW4U2TH0F07UDWW2Dp5DTp4AZ0t6",
+        "name": "senaryo_kurallari.md",
+        "mimeType": "text/markdown",
+        "size": 3567,
+        "modifiedTime": "2026-11-02T21:58:19.151Z"
       },
       {
         "id": "1wSMluVJ0brXdEm9bnVylTXXD0g3o2RF6",
