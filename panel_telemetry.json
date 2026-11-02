@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-02 11:11:51",
-  "generated_at_iso": "2026-11-02T11:11:51.831852+03:00",
+  "generated_at": "2026-11-02 12:29:20",
+  "generated_at_iso": "2026-11-02T12:29:20.515643+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -44,22 +44,7 @@
     "next_short_title": "Buzun Üzeri Neden Kaygandır: Eksi Derecede Bile Akan Gizli Katman! 🧊 #bilgidozu #shorts",
     "next_long": "uzun_video_8.mp4",
     "next_long_title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
-    "missing_covers": [
-      "uzun_video_8.mp4",
-      "uzun_video_9.mp4",
-      "uzun_video_10.mp4",
-      "uzun_video_11.mp4",
-      "uzun_video_12.mp4",
-      "uzun_video_13.mp4",
-      "uzun_video_14.mp4",
-      "uzun_video_15.mp4",
-      "uzun_video_16.mp4",
-      "uzun_video_18.mp4",
-      "uzun_video_19.mp4",
-      "uzun_video_20.mp4",
-      "uzun_video_21.mp4",
-      "uzun_video_22.mp4"
-    ]
+    "missing_covers": []
   },
   "drive_inventory": {
     "shorts_videos": [
@@ -120,11 +105,11 @@
         "modifiedTime": "2026-10-30T06:42:40.336Z"
       },
       {
-        "id": "16w8ahoKJZzkErIQhCgR9x---DvuY2-Fm",
+        "id": "1-ag1ZRblavOInWCi4qRm-lHSYGy_U47e",
         "name": "video_163.mp4",
         "mimeType": "video/mp4",
-        "size": 11540103,
-        "modifiedTime": "2026-10-30T06:42:41.003Z"
+        "size": 62252543,
+        "modifiedTime": "2026-11-02T04:49:12.546Z"
       },
       {
         "id": "1n00O3UrSxsMQgsQVj7PhYXeFlgBVQEvT",
@@ -357,11 +342,102 @@
         "modifiedTime": "2026-11-02T03:11:16.353Z"
       },
       {
+        "id": "1WuE3DXRU6pC-tM_POwrIdMWZP1e3d2Ak",
+        "name": "uzun_kapak_10.png",
+        "mimeType": "image/png",
+        "size": 789855,
+        "modifiedTime": "2026-11-02T09:10:59.208Z"
+      },
+      {
+        "id": "1JwmEhko71Rypt3ljDpONcSv5SkChzJO6",
+        "name": "uzun_kapak_11.png",
+        "mimeType": "image/png",
+        "size": 842007,
+        "modifiedTime": "2026-11-02T09:10:59.192Z"
+      },
+      {
+        "id": "1PJpoC-ZpFCwBdjcGTIhiIqs46_Z-hXQo",
+        "name": "uzun_kapak_12.png",
+        "mimeType": "image/png",
+        "size": 1464905,
+        "modifiedTime": "2026-11-02T09:11:00.128Z"
+      },
+      {
+        "id": "1mHW8OhMfoOATbtH3DaJj_xSohRWEIYdU",
+        "name": "uzun_kapak_13.png",
+        "mimeType": "image/png",
+        "size": 1770572,
+        "modifiedTime": "2026-11-02T09:10:59.604Z"
+      },
+      {
+        "id": "1blqePOc1OzIy5JgcupC-lmhCz-XSeY-B",
+        "name": "uzun_kapak_14.png",
+        "mimeType": "image/png",
+        "size": 1818663,
+        "modifiedTime": "2026-11-02T09:10:59.465Z"
+      },
+      {
+        "id": "1Eabpdlk-tDG9P9z81DHTrGf9JBHyDzW0",
+        "name": "uzun_kapak_15.png",
+        "mimeType": "image/png",
+        "size": 1666183,
+        "modifiedTime": "2026-11-02T09:10:59.746Z"
+      },
+      {
+        "id": "1QlQRA3iWdD0bpotTmlqPWjeUqzw2Umma",
+        "name": "uzun_kapak_16.png",
+        "mimeType": "image/png",
+        "size": 1725704,
+        "modifiedTime": "2026-11-02T09:11:20.509Z"
+      },
+      {
+        "id": "1E4X5qHX_lxrWMmrTFU9xrzRdwhEITZvH",
+        "name": "uzun_kapak_17.png",
+        "mimeType": "image/png",
+        "size": 1569528,
+        "modifiedTime": "2026-11-02T09:11:20.791Z"
+      },
+      {
+        "id": "1CWhMMxPJKP0zWOdcH_biAa6Lo0UVinYB",
+        "name": "uzun_kapak_18.png",
+        "mimeType": "image/png",
+        "size": 1537069,
+        "modifiedTime": "2026-11-02T09:11:20.679Z"
+      },
+      {
+        "id": "1lG8rubtRPhU90yYqbffbCviiX1Y7LI1h",
+        "name": "uzun_kapak_19.png",
+        "mimeType": "image/png",
+        "size": 850188,
+        "modifiedTime": "2026-11-02T09:11:20.546Z"
+      },
+      {
         "id": "1frRFR8Io5aY-13TWq1uQftwmBahVbO6d",
         "name": "uzun_kapak_2.jpeg",
         "mimeType": "image/jpeg",
         "size": 332099,
         "modifiedTime": "2026-11-02T03:11:16.332Z"
+      },
+      {
+        "id": "1p5n_m1iu8SArGUGK3-N6PxJXW8OUXUPD",
+        "name": "uzun_kapak_20.png",
+        "mimeType": "image/png",
+        "size": 1768498,
+        "modifiedTime": "2026-11-02T09:11:20.701Z"
+      },
+      {
+        "id": "1n6qQ3oyTU60UlV-lg3KSU23EnZQbvzhl",
+        "name": "uzun_kapak_21.png",
+        "mimeType": "image/png",
+        "size": 1911555,
+        "modifiedTime": "2026-11-02T09:11:21.207Z"
+      },
+      {
+        "id": "1e22SUjKLwfd2W9DjGMVS6cBsQjK7O0L6",
+        "name": "uzun_kapak_22.png",
+        "mimeType": "image/png",
+        "size": 1796645,
+        "modifiedTime": "2026-11-02T09:11:21.077Z"
       },
       {
         "id": "1wOWKMFbrxo1d-clfq1LDvPXkgn0emXs0",
@@ -386,10 +462,17 @@
       },
       {
         "id": "1KqEPvriafHU7YZP4cCnppWOG_lN1z_mb",
-        "name": "uzun_kapak_8_yeni.png",
+        "name": "uzun_kapak_8.png",
         "mimeType": "image/png",
         "size": 1657459,
-        "modifiedTime": "2026-11-01T23:24:33.467Z"
+        "modifiedTime": "2026-11-02T08:56:55.392Z"
+      },
+      {
+        "id": "1bwJtSzvnFeN3Fb1zx-VBwCBsmcWWadpz",
+        "name": "uzun_kapak_9.png",
+        "mimeType": "image/png",
+        "size": 1518729,
+        "modifiedTime": "2026-11-02T09:11:00.040Z"
       }
     ],
     "ceo_files": [
@@ -406,6 +489,13 @@
         "mimeType": "application/vnd.google-apps.folder",
         "size": 0,
         "modifiedTime": "2026-11-01T22:59:58.786Z"
+      },
+      {
+        "id": "1wSMluVJ0brXdEm9bnVylTXXD0g3o2RF6",
+        "name": "ses kural.md",
+        "mimeType": "text/markdown",
+        "size": 862,
+        "modifiedTime": "2026-11-02T09:13:22.906Z"
       },
       {
         "id": "1bRhgFGax34FGsySde71FqTiMIUpZkw02",
@@ -702,8 +792,8 @@
       "pinned_comment": "Şimdi burnundan üst üste iki kısa nefes çekip ağzından yavaşça ver; o anlık rahatlamayı hissettin mi? 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "16w8ahoKJZzkErIQhCgR9x---DvuY2-Fm",
-      "drive_video_size_mb": 11.01,
+      "drive_video_id": "1-ag1ZRblavOInWCi4qRm-lHSYGy_U47e",
+      "drive_video_size_mb": 59.37,
       "expected_cover": "kapak_163.jpg",
       "has_drive_cover": true,
       "drive_cover_id": "1Arx0rFAUsdjoHtN29-wJUVryZy_yqijH"
@@ -828,8 +918,8 @@
       "drive_video_id": "1-qWhR9bbqqWdGvVZsA9225xzOWnexMew",
       "drive_video_size_mb": 79.84,
       "expected_cover": "uzun_kapak_8.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1KqEPvriafHU7YZP4cCnppWOG_lN1z_mb"
     },
     {
       "row": 65,
@@ -859,8 +949,8 @@
       "drive_video_id": "1weJEy_9zjDGeqfLFHapdZ3Tt8UXMqYzn",
       "drive_video_size_mb": 81.8,
       "expected_cover": "uzun_kapak_9.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1bwJtSzvnFeN3Fb1zx-VBwCBsmcWWadpz"
     },
     {
       "row": 66,
@@ -891,8 +981,8 @@
       "drive_video_id": "1lltDL8ype5n64_YiVIT05ueS9h7bYoDy",
       "drive_video_size_mb": 91.33,
       "expected_cover": "uzun_kapak_10.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1WuE3DXRU6pC-tM_POwrIdMWZP1e3d2Ak"
     },
     {
       "row": 67,
@@ -922,8 +1012,8 @@
       "drive_video_id": "1higVkpVZsQqZmlV8gCQwFUB6atImqIrq",
       "drive_video_size_mb": 70.15,
       "expected_cover": "uzun_kapak_11.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1JwmEhko71Rypt3ljDpONcSv5SkChzJO6"
     },
     {
       "row": 68,
@@ -954,8 +1044,8 @@
       "drive_video_id": "1UtmDpdqS7H-FP18vtYqDVFRVlfUX2A2o",
       "drive_video_size_mb": 87.73,
       "expected_cover": "uzun_kapak_12.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1PJpoC-ZpFCwBdjcGTIhiIqs46_Z-hXQo"
     },
     {
       "row": 69,
@@ -984,8 +1074,8 @@
       "drive_video_id": "1SXwmT40zgpwql-9iqz9tHG11PoM-y_jW",
       "drive_video_size_mb": 54.13,
       "expected_cover": "uzun_kapak_13.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1mHW8OhMfoOATbtH3DaJj_xSohRWEIYdU"
     },
     {
       "row": 135,
@@ -1016,8 +1106,8 @@
       "drive_video_id": "10_8u3UfhVCTkpCoETJ2T5ynRewlHUnaQ",
       "drive_video_size_mb": 52.2,
       "expected_cover": "uzun_kapak_14.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1blqePOc1OzIy5JgcupC-lmhCz-XSeY-B"
     },
     {
       "row": 139,
@@ -1046,8 +1136,8 @@
       "drive_video_id": "1hJwUNT7cJX8ZoDuDpV6C8qRtQwf1IKVW",
       "drive_video_size_mb": 40.09,
       "expected_cover": "uzun_kapak_15.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1Eabpdlk-tDG9P9z81DHTrGf9JBHyDzW0"
     },
     {
       "row": 143,
@@ -1077,8 +1167,8 @@
       "drive_video_id": "1DkQB1eWOX4PZf4cB_T85JI_bwptr1qMJ",
       "drive_video_size_mb": 51.47,
       "expected_cover": "uzun_kapak_16.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1QlQRA3iWdD0bpotTmlqPWjeUqzw2Umma"
     },
     {
       "row": 148,
@@ -1106,8 +1196,8 @@
       "drive_video_id": "1xPl6QRzHp6UZZ_ZMWSZ-oa0eFxfl6iax",
       "drive_video_size_mb": 20.32,
       "expected_cover": "uzun_kapak_17.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1E4X5qHX_lxrWMmrTFU9xrzRdwhEITZvH"
     },
     {
       "row": 152,
@@ -1136,8 +1226,8 @@
       "drive_video_id": "1sL_Td-hlSk7Vq9kTqPV8eBqJUuo2Fbaa",
       "drive_video_size_mb": 16.72,
       "expected_cover": "uzun_kapak_18.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1CWhMMxPJKP0zWOdcH_biAa6Lo0UVinYB"
     },
     {
       "row": 156,
@@ -1165,8 +1255,8 @@
       "drive_video_id": "1eUkviF0XGskcYAlvwJhFflbSemU44aBd",
       "drive_video_size_mb": 16.53,
       "expected_cover": "uzun_kapak_19.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1lG8rubtRPhU90yYqbffbCviiX1Y7LI1h"
     },
     {
       "row": 160,
@@ -1195,8 +1285,8 @@
       "drive_video_id": "1fao6xZA2G594tEDPzocoILsOuHjYlM7U",
       "drive_video_size_mb": 19.22,
       "expected_cover": "uzun_kapak_20.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1p5n_m1iu8SArGUGK3-N6PxJXW8OUXUPD"
     },
     {
       "row": 164,
@@ -1225,8 +1315,8 @@
       "drive_video_id": "1kxn3E7Un55nTdvH-SY30-8_7bpUXyg5e",
       "drive_video_size_mb": 25.21,
       "expected_cover": "uzun_kapak_21.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1n6qQ3oyTU60UlV-lg3KSU23EnZQbvzhl"
     },
     {
       "row": 168,
@@ -1254,8 +1344,8 @@
       "drive_video_id": "1v7NJbO692Lp55qjSqycja_CJooyBvUXm",
       "drive_video_size_mb": 25.64,
       "expected_cover": "uzun_kapak_22.png",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1e22SUjKLwfd2W9DjGMVS6cBsQjK7O0L6"
     }
   ],
   "isciler": [
