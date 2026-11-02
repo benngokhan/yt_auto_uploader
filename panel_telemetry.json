@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-02 12:30:54",
-  "generated_at_iso": "2026-11-02T12:30:54.343382+03:00",
+  "generated_at": "2026-11-02 13:11:22",
+  "generated_at_iso": "2026-11-02T13:11:22.825923+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -36,12 +36,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 11,
+    "ready_shorts": 10,
     "ready_longs": 14,
-    "total_ready": 25,
-    "days_of_stock": 12.5,
-    "next_short": "video_155.mp4",
-    "next_short_title": "Buzun Üzeri Neden Kaygandır: Eksi Derecede Bile Akan Gizli Katman! 🧊 #bilgidozu #shorts",
+    "total_ready": 24,
+    "days_of_stock": 12.0,
+    "next_short": "video_156.mp4",
+    "next_short_title": "Havuç Gece Görüşünü Güçlendirir Efsanesi Nasıl Gizli Radar Oyunu Çıktı? 🥕 #bilgidozu #shorts",
     "next_long": "uzun_video_8.mp4",
     "next_long_title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
     "missing_covers": []
@@ -480,8 +480,8 @@
         "id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 88179,
-        "modifiedTime": "2026-11-01T22:23:27.400Z"
+        "size": 90465,
+        "modifiedTime": "2026-11-02T10:11:21.220Z"
       },
       {
         "id": "1LyZBIc52OzaGZBaq8yXODcseZ0wilsrs",
@@ -526,9 +526,9 @@
       "file_name": "video_155.mp4",
       "number": 155,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Buzun Üzeri Neden Kaygandır: Eksi Derecede Bile Akan Gizli Katman! 🧊 #bilgidozu #shorts",
       "description": "Düz betonda rahatça yürürken katı buza bastığın saniye ayağının neden sabun gibi kaydığını düşündün mü? Yıllarca ayakkabı basıncının buzu erittiği anlatıldı; oysa insan ağırlığının oluşturduğu basınç buzu eritmeye asla yetmez.\n\n📍 BÖLÜMLER\n00:00 Taş ve cam kuruyken — Buz neden kaygandır?\n00:17 Amsterdam keşfi: — Gevşek yüzey atomları!\n00:36 -7 derece en kaygan an: — Aşırı soğukta azalır!\n\n📊 Kaynaklar:\n• Univ. of Amsterdam (Weber & Bonn, 2018) J. Phys. Chem. Lett.\n• https://iop.uva.nl/content/news/2018/05/why-is-ice-slippery.html\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #fizik #buz #bilim #ilginçbilgiler",
       "tags": [
