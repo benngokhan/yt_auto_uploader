@@ -1,12 +1,12 @@
 {
-  "zaman": "2026-11-02T14:06:07+00:00",
+  "zaman": "2026-11-02T18:58:59+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
       "durum": "ok",
-      "kalan": 9561,
+      "kalan": 7897,
       "limit": 10000,
-      "kullanilan": 439,
+      "kullanilan": 2103,
       "birim": "karakter/kredi",
       "tier": "free",
       "reset_unix": 1794480693,
@@ -50,16 +50,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4970,
+      "kalan": 5000,
       "limit": 5000,
-      "kullanilan": 30,
+      "kullanilan": 0,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 66.5,
-      "actions_kosu": 124,
+      "actions_dakika": 74.7,
+      "actions_kosu": 137,
       "actions_limit": 2000,
-      "actions_kalan": 1933.5
+      "actions_kalan": 1925.3
     },
     {
       "ad": "Google Drive",
@@ -95,7 +95,7 @@
         },
         {
           "ad": "CEO / Tablolar",
-          "boyut": 262455959,
+          "boyut": 262456024,
           "dosya": 20,
           "sahip": "gokhanaltundal@gmail.com"
         },
@@ -139,9 +139,9 @@
           "boyut": 83722104
         }
       ],
-      "drive_gorunen": 3039975087,
+      "drive_gorunen": 3039975152,
       "kendi_dosyalar": 2245296131,
-      "paylasilan": 794678956,
+      "paylasilan": 794679021,
       "disalan": 3444681449,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
@@ -150,11 +150,11 @@
     {
       "ad": "YouTube Data API",
       "durum": "ok",
-      "kalan": 8300,
+      "kalan": 6600,
       "limit": 10000,
-      "kullanilan": 1700,
+      "kullanilan": 3400,
       "birim": "birim (tahmini)",
-      "bugun_yukleme": 1,
+      "bugun_yukleme": 2,
       "yenilenme": "günlük · gece 00:00 Pasifik (TR 10:00) sıfırlanır",
       "not_": "gerçek kota API'de yok; yükleme ≈ 1700 birim sayıldı"
     }
@@ -259,6 +259,10 @@
     {
       "zaman": "2026-11-02T14:06:07+00:00",
       "elevenlabs_kalan": 9561
+    },
+    {
+      "zaman": "2026-11-02T18:58:59+00:00",
+      "elevenlabs_kalan": 7897
     }
   ]
 }
