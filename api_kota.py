@@ -118,16 +118,17 @@ def openrouter():
               not_="TTS + LLM aynı bakiye", **extra)
 
 
-def _klasor_boyut(drive, fid: str, derinlik: int = 2) -> tuple[int, int]:
-    """Klasörün (alt klasörler dahil) toplam bayt ve dosya sayısı. Sayfalama sınırlı."""
+def _klasor_boyut(drive, fid: str, derinlik: int = 2) -> tuple[int, int, set]:
+    """Klasörün (alt klasörler dahil) toplam bayt, dosya sayısı ve dosya sahipleri."""
     toplam, adet, sayfa = 0, 0, None
     altlar = []
+    sahipler: set = set()
     for _ in range(8):  # en fazla 800 dosya
         try:
             res = drive.files().list(
                 q=f"'{fid}' in parents and trashed=false",
                 pageSize=100, pageToken=sayfa,
-                fields="nextPageToken,files(id,size,mimeType)",
+                fields="nextPageToken,files(id,size,mimeType,owners(emailAddress))",
             ).execute()
         except Exception as e:
             print(f"  klasör listelenemedi ({fid}): {e}")
@@ -138,15 +139,19 @@ def _klasor_boyut(drive, fid: str, derinlik: int = 2) -> tuple[int, int]:
             else:
                 toplam += int(f.get("size") or 0)
                 adet += 1
+                for o in (f.get("owners") or []):
+                    if o.get("emailAddress"):
+                        sahipler.add(o["emailAddress"])
         sayfa = res.get("nextPageToken")
         if not sayfa:
             break
     if derinlik > 1:
         for a in altlar[:8]:
-            b, n = _klasor_boyut(drive, a, derinlik - 1)
+            b, n, sh = _klasor_boyut(drive, a, derinlik - 1)
             toplam += b
             adet += n
-    return toplam, adet
+            sahipler |= sh
+    return toplam, adet, sahipler
 
 
 # ── Google: Drive depolama + YouTube kota tahmini ───────────────────────────
@@ -173,19 +178,28 @@ def google():
         kirilim = []
         for ad, fid in DRIVE_KLASORLER:
             try:
-                b, n = _klasor_boyut(drive, fid)
-                kirilim.append({"ad": ad, "boyut": b, "dosya": n})
+                b, n, sh = _klasor_boyut(drive, fid)
+                kirilim.append({"ad": ad, "boyut": b, "dosya": n,
+                                "sahip": ", ".join(sorted(sh)) if sh else ""})
             except Exception:
                 continue
-        # Drive'da görünen tüm dosyaların toplamı (Gmail/Fotoğraflar buraya girmez)
-        gorunen, sayfa2 = 0, None
+        # Kendi dosyalarım (kotamı harcar) vs başkasının paylaştıkları (kota onlarda)
+        gorunen, kendi, paylasilan, sayfa2 = 0, 0, 0, None
         try:
             for _ in range(10):
                 r3 = drive.files().list(
                     q="trashed=false and mimeType != 'application/vnd.google-apps.folder'",
-                    pageSize=1000, pageToken=sayfa2, fields="nextPageToken,files(size)",
+                    pageSize=1000, pageToken=sayfa2,
+                    fields="nextPageToken,files(size,owners(emailAddress))",
                 ).execute()
-                gorunen += sum(int(f.get("size") or 0) for f in r3.get("files", []))
+                for f in r3.get("files", []):
+                    b = int(f.get("size") or 0)
+                    gorunen += b
+                    sahip = [o.get("emailAddress", "") for o in (f.get("owners") or [])]
+                    if any(a == (q.get("user") or {}).get("emailAddress") for a in sahip):
+                        kendi += b
+                    else:
+                        paylasilan += b
                 sayfa2 = r3.get("nextPageToken")
                 if not sayfa2:
                     break
@@ -212,7 +226,8 @@ def google():
             })
         sonuc.append(ok("Google Drive", kalan=(limit - used) if limit else None, limit=limit,
                         kullanilan=used, birim="bayt", kirilim=kirilim, buyuk_dosyalar=buyukler,
-                        drive_gorunen=gorunen, disalan=used - gorunen,
+                        drive_gorunen=gorunen, kendi_dosyalar=kendi, paylasilan=paylasilan,
+                        disalan=used - kendi,
                         hesap=(q.get("user") or {}).get("emailAddress", ""),
                         yenilenme="yenilenmez · sadece dosya silince/artırınca değişir",
                         not_="Google hesabının TOPLAM alanı: Drive + Gmail + Fotoğraflar ortak"))
