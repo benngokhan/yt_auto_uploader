@@ -177,12 +177,17 @@ def google():
                 kirilim.append({"ad": ad, "boyut": b, "dosya": n})
             except Exception:
                 continue
+        buyukler = []
         try:
-            b, n = _klasor_boyut(drive, DRIVE_ARSIV[1], derinlik=3)
-            kirilim.append({"ad": DRIVE_ARSIV[0], "boyut": b, "dosya": n})
+            res2 = drive.files().list(
+                q="trashed=false and mimeType != 'application/vnd.google-apps.folder'",
+                orderBy="quotaBytesUsed desc", pageSize=8,
+                fields="files(name,size,mimeType)",
+            ).execute()
+            buyukler = [{"ad": (f.get("name") or "")[:60], "boyut": int(f.get("size") or 0)}
+                        for f in res2.get("files", [])]
         except Exception as e:
-            print("arşiv klasörü okunamadı:", e)
-            kirilim.append({"ad": DRIVE_ARSIV[0], "boyut": 0, "dosya": 0, "hata": str(e)[:120]})
+            print("büyük dosya listesi alınamadı:", e)
         kirilim_toplam = sum(k["boyut"] for k in kirilim)
         if used > kirilim_toplam:
             kirilim.append({
@@ -191,7 +196,7 @@ def google():
                 "dosya": 0,
             })
         sonuc.append(ok("Google Drive", kalan=(limit - used) if limit else None, limit=limit,
-                        kullanilan=used, birim="bayt", kirilim=kirilim,
+                        kullanilan=used, birim="bayt", kirilim=kirilim, buyuk_dosyalar=buyukler,
                         hesap=(q.get("user") or {}).get("emailAddress", ""),
                         yenilenme="yenilenmez · sadece dosya silince/artırınca değişir",
                         not_="Google hesabının TOPLAM alanı: Drive + Gmail + Fotoğraflar ortak"))
