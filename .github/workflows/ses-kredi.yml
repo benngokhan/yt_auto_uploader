@@ -30,7 +30,6 @@ jobs:
     timeout-minutes: 10
     env:
       GH_TOKEN: ${{ secrets.SITE_SYNC_TOKEN }}
-      YENI_ANAHTAR: ${{ github.event.client_payload.anahtar }}
       KILIT_VOICE_ID: ${{ github.event.client_payload.voice_id }}
       KILIT_MODEL: ${{ github.event.client_payload.model }}
       OLAY: ${{ github.event_name }}
@@ -49,7 +48,9 @@ jobs:
 
       # Panelden gelen anahtar: loglarda maskelenir, varsa GitHub secret'ına yazılır
       - name: Anahtarı secret'a işle (panelden geldiyse)
-        if: ${{ github.event_name == 'repository_dispatch' && github.event.action == 'ses_anahtar' && env.YENI_ANAHTAR != '' }}
+        if: ${{ github.event_name == 'repository_dispatch' && github.event.action == 'ses_anahtar' && github.event.client_payload.anahtar != '' }}
+        env:
+          YENI_ANAHTAR: ${{ github.event.client_payload.anahtar }}
         run: |
           echo "::add-mask::$YENI_ANAHTAR"
           python - <<'PY'
