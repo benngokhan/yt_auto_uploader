@@ -52,7 +52,8 @@ def cagri(url: str, body: dict, method: str = "POST"):
         with urllib.request.urlopen(req, timeout=180) as r:
             return json.loads(r.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
-        detay = e.read().decode("utf-8", "ignore")[:300]
+        detay = e.read().decode("utf-8", "ignore")[:400]
+        yaz_sonuc({"ok": False, "asama": "api", "kod": e.code, "hata": detay})
         raise SystemExit(f"ElevenLabs HTTP {e.code}: {detay}")
 
 
