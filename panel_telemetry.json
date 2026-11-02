@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-02 03:51:29",
-  "generated_at_iso": "2026-11-02T03:51:29.232287+03:00",
+  "generated_at": "2026-11-02 04:01:59",
+  "generated_at_iso": "2026-11-02T04:01:59.340479+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -44,11 +44,7 @@
     "next_short_title": "Buzun Üzeri Neden Kaygandır: Eksi Derecede Bile Akan Gizli Katman! 🧊 #bilgidozu #shorts",
     "next_long": "uzun_video_8.mp4",
     "next_long_title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
-    "missing_covers": [
-      "video_164.mp4",
-      "video_165.mp4",
-      "video_166.mp4"
-    ]
+    "missing_covers": []
   },
   "drive_inventory": {
     "shorts_videos": [
@@ -793,9 +789,9 @@
       "has_drive_video": true,
       "drive_video_id": "1n00O3UrSxsMQgsQVj7PhYXeFlgBVQEvT",
       "drive_video_size_mb": 16.13,
-      "expected_cover": "kapak_164.jpg",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "expected_cover": "kapak_164.jpeg",
+      "has_drive_cover": true,
+      "drive_cover_id": "1CKa1MeUAlu_vVjpLyoJvg1SgPguQx0NC"
     },
     {
       "row": 166,
@@ -824,9 +820,9 @@
       "has_drive_video": true,
       "drive_video_id": "1EmBE1qjegAjSfGsgaz-OpunusCnke5pq",
       "drive_video_size_mb": 16.39,
-      "expected_cover": "kapak_165.jpg",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "expected_cover": "kapak_165.jpeg",
+      "has_drive_cover": true,
+      "drive_cover_id": "1oVNpllA-2eIgIr-XhTaeMWrsewWn5ilx"
     },
     {
       "row": 167,
@@ -855,9 +851,9 @@
       "has_drive_video": true,
       "drive_video_id": "1dnW2wofoZ12-ncwQKJ3LYrn715elgrov",
       "drive_video_size_mb": 15.42,
-      "expected_cover": "kapak_166.jpg",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "expected_cover": "kapak_166.jpeg",
+      "has_drive_cover": true,
+      "drive_cover_id": "1KbAsfC4HRO_bNp3gwU8GAM2QlVn-Yfgg"
     },
     {
       "row": 64,
