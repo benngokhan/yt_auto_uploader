@@ -40,6 +40,8 @@ DRIVE_KLASORLER = [
     ("Uzun Kapaklar", "1g3QluGyaLByQgXmoXO0i1PPtr3ORjRQR"),
     ("CEO / Tablolar", "190zQiUYkp8fsQFleva77TKqc9MeGxZiI"),
 ]
+# Arşiv klasörü (botun günlük akışı kullanmaz, yer kaplar)
+DRIVE_ARSIV = ("Arşiv / Yedek (GİRMEK YASAK)", "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_")
 
 
 def now():
@@ -174,6 +176,11 @@ def google():
                 kirilim.append({"ad": ad, "boyut": b, "dosya": n})
             except Exception:
                 continue
+        try:
+            b, n = _klasor_boyut(drive, DRIVE_ARSIV[1], derinlik=3)
+            kirilim.append({"ad": DRIVE_ARSIV[0], "boyut": b, "dosya": n})
+        except Exception:
+            pass
         kirilim_toplam = sum(k["boyut"] for k in kirilim)
         if used > kirilim_toplam:
             kirilim.append({
