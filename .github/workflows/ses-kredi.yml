@@ -87,6 +87,7 @@ jobs:
           PY
 
       - name: Krediyi oku
+        continue-on-error: true   # anahtar yok/geçersizse bile telemetri yazılsın
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
         run: |
