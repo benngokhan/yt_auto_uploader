@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-02T13:46:54+00:00",
+  "zaman": "2026-11-02T13:48:11+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -42,16 +42,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4985,
+      "kalan": 4980,
       "limit": 5000,
-      "kullanilan": 15,
+      "kullanilan": 20,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 62.1,
-      "actions_kosu": 119,
+      "actions_dakika": 63.2,
+      "actions_kosu": 121,
       "actions_limit": 2000,
-      "actions_kalan": 1937.9
+      "actions_kalan": 1936.8
     },
     {
       "ad": "Google Drive",
@@ -92,8 +92,8 @@
           "sahip": "gokhanaltundal@gmail.com"
         },
         {
-          "ad": "Diğer (Gmail, Fotoğraflar, arşiv)",
-          "boyut": 4606067310,
+          "ad": "Gmail + Fotoğraflar (Drive dışı)",
+          "boyut": 3444681449,
           "dosya": 0
         }
       ],
@@ -131,13 +131,13 @@
           "boyut": 73557803
         }
       ],
-      "drive_gorunen": 2854593414,
-      "kendi_dosyalar": 2245301057,
+      "drive_gorunen": 2854588488,
+      "kendi_dosyalar": 2245296131,
       "paylasilan": 609292357,
-      "disalan": 3444676523,
+      "disalan": 3444681449,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
-      "not_": "Google hesabının TOPLAM alanı: Drive + Gmail + Fotoğraflar ortak"
+      "not_": "Kota hesap bazlı: klasör başka hesaba aitse yer ONUN kotasından düşer"
     },
     {
       "ad": "YouTube Data API",
@@ -238,6 +238,10 @@
     },
     {
       "zaman": "2026-11-02T13:46:54+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T13:48:11+00:00",
       "elevenlabs_kalan": null
     }
   ]
