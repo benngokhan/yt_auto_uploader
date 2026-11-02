@@ -60,6 +60,14 @@ jobs:
             python sync_panel_telemetry.py
           fi
 
+      - name: Site anlik goruntusu (shorts_top.json) uret
+        run: python export_site_snapshot.py || true
+
+      - name: Herkese acik siteye yayinla (benngokhan.github.io)
+        env:
+          SITE_SYNC_TOKEN: ${{ secrets.SITE_SYNC_TOKEN }}
+        run: python publish_site_snapshot.py || echo "Site yayini basarisiz (kritik degil)."
+
       - name: Commit updated telemetry
         run: |
           git config user.name "github-actions[bot]"
