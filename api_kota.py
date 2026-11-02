@@ -1,0 +1,303 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""api_kota.py — Panel için TÜM servislerin kalan kullanımını tek dosyada toplar.
+
+Hepsi salt-okunur/ucretsiz çağrı, hiçbiri kota harcamaz:
+  * ElevenLabs   → kalan kredi / limit / reset
+  * OpenRouter   → kredi limiti + kullanım (/api/v1/key, /api/v1/credits)
+  * Google Drive → depolama kotası (about.get)
+  * YouTube      → günlük kota TAHMİNİ (yükleme sayısı × ~1.700 birim / 10.000)
+  * Gemini       → anahtar geçerli mi (models.list)
+  * Groq         → anahtar geçerli mi (models.list)
+  * Telegram     → bot kimliği (getMe)
+  * GitHub       → token kotası + Actions dakikası tahmini (bu ay)
+
+Çıktı: api_telemetri.json
+"""
+from __future__ import annotations
+
+import json
+import os
+import re
+import urllib.error
+import urllib.request
+from datetime import datetime, timezone
+from pathlib import Path
+
+BASE = Path(__file__).parent
+OUT = BASE / "api_telemetri.json"
+SECRET_LIST = BASE / "secret_listesi.json"
+
+YT_GUNLUK_KOTA = 10_000        # YouTube Data API varsayılan günlük kota (birim)
+YT_YUKLEME_BIRIM = 1_700       # upload ~1600 + thumbnail 50 (+ yorum/oynatma listesi payı)
+ACTIONS_FREE_DK = 2_000        # private repo ücretsiz Actions dakikası
+
+
+def now():
+    return datetime.now(timezone.utc)
+
+
+def http_json(url: str, headers: dict | None = None, timeout: int = 30):
+    req = urllib.request.Request(url, headers=headers or {})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.loads(r.read().decode("utf-8"))
+
+
+def ok(ad, **kw):
+    d = {"ad": ad, "durum": "ok"}
+    d.update(kw)
+    return d
+
+
+def hata(ad, mesaj, durum="hata", **kw):
+    d = {"ad": ad, "durum": durum, "mesaj": str(mesaj)[:220]}
+    d.update(kw)
+    return d
+
+
+# ── ElevenLabs ──────────────────────────────────────────────────────────────
+def elevenlabs():
+    key = (os.getenv("ELEVENLABS_API_KEY") or "").strip()
+    if not key:
+        return hata("ElevenLabs", "Anahtar tanımlı değil (ELEVENLABS_API_KEY)", "yok",
+                    panel_aksiyon="Ses & Kredi sayfasından anahtar yükle")
+    try:
+        s = http_json("https://api.elevenlabs.io/v1/user/subscription", {"xi-api-key": key})
+    except urllib.error.HTTPError as e:
+        return hata("ElevenLabs", f"HTTP {e.code}", "gecersiz" if e.code in (401, 403) else "hata")
+    except Exception as e:
+        return hata("ElevenLabs", e)
+    limit = int(s.get("character_limit") or 0)
+    used = int(s.get("character_count") or 0)
+    reset = s.get("next_character_count_reset_unix")
+    return ok("ElevenLabs",
+              kalan=max(limit - used, 0), limit=limit, kullanilan=used,
+              birim="karakter/kredi", tier=s.get("tier"),
+              reset_unix=reset,
+              reset_iso=datetime.fromtimestamp(int(reset), tz=timezone.utc).isoformat(timespec="seconds") if reset else "",
+              klonlama=bool(s.get("can_use_instant_voice_cloning")),
+              not_="1 kredi = 1 karakter (v2/v3) · Flash/Turbo yarı fiyat")
+
+
+# ── OpenRouter ──────────────────────────────────────────────────────────────
+def openrouter():
+    key = (os.getenv("OPENROUTER_API_KEY") or "").strip()
+    if not key:
+        return hata("OpenRouter", "Anahtar yok (OPENROUTER_API_KEY)", "yok")
+    h = {"Authorization": "Bearer " + key}
+    try:
+        k = http_json("https://openrouter.ai/api/v1/key", h).get("data", {})
+    except urllib.error.HTTPError as e:
+        return hata("OpenRouter", f"HTTP {e.code}", "gecersiz" if e.code in (401, 403) else "hata")
+    except Exception as e:
+        return hata("OpenRouter", e)
+    limit = k.get("limit")
+    usage = k.get("usage") or 0
+    kalan = None if limit is None else max(float(limit) - float(usage), 0)
+    extra = {}
+    try:
+        c = http_json("https://openrouter.ai/api/v1/credits", h).get("data", {})
+        extra = {"kredi_alimi": c.get("total_credits"), "kredi_kullanimi": c.get("total_usage")}
+    except Exception:
+        pass
+    return ok("OpenRouter", kalan=kalan, limit=limit, kullanilan=usage,
+              birim="USD kredi", ucretsiz=bool(k.get("is_free_tier")),
+              not_="TTS + LLM aynı bakiye", **extra)
+
+
+# ── Google: Drive depolama + YouTube kota tahmini ───────────────────────────
+def google():
+    sonuc = []
+    try:
+        from google.oauth2.credentials import Credentials
+        from google.auth.transport.requests import Request
+        from googleapiclient.discovery import build
+    except Exception as e:
+        return [hata("Google Drive", f"Kütüphane yok: {e}")]
+    token = BASE / "token.json"
+    if not token.exists():
+        return [hata("Google Drive", "token.json yok", "yok"), hata("YouTube", "token.json yok", "yok")]
+    try:
+        creds = Credentials.from_authorized_user_file(str(token))
+        if not creds.valid and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        drive = build("drive", "v3", credentials=creds, cache_discovery=False)
+        q = drive.about().get(fields="storageQuota,user").execute()
+        sq = q.get("storageQuota", {})
+        limit = int(sq.get("limit") or 0)
+        used = int(sq.get("usage") or 0)
+        sonuc.append(ok("Google Drive", kalan=(limit - used) if limit else None, limit=limit,
+                        kullanilan=used, birim="bayt",
+                        hesap=(q.get("user") or {}).get("emailAddress", ""),
+                        not_="15 GB ücretsiz kota (varsa)"))
+    except Exception as e:
+        sonuc.append(hata("Google Drive", e))
+
+    # YouTube: gerçek kota API'den okunamaz; günlük yükleme sayısından tahmin
+    try:
+        bugun = now().date().isoformat()
+        bugun_adet = 0
+        up = BASE / "uploaded.txt"
+        if up.exists():
+            for line in up.read_text(encoding="utf-8", errors="ignore").splitlines():
+                if bugun in line and ".mp4" in line:
+                    bugun_adet += 1
+        tahmin = bugun_adet * YT_YUKLEME_BIRIM
+        sonuc.append(ok("YouTube Data API",
+                        kalan=max(YT_GUNLUK_KOTA - tahmin, 0), limit=YT_GUNLUK_KOTA,
+                        kullanilan=tahmin, birim="birim (tahmini)",
+                        bugun_yukleme=bugun_adet,
+                        not_=f"gerçek kota API'de yok; yükleme ≈ {YT_YUKLEME_BIRIM} birim sayıldı"))
+    except Exception as e:
+        sonuc.append(hata("YouTube Data API", e))
+    return sonuc
+
+
+# ── Basit anahtar doğrulama ────────────────────────────────────────────────
+def gemini():
+    key = (os.getenv("GEMINI_API_KEY") or "").strip()
+    if not key:
+        return hata("Gemini", "Anahtar yok (GEMINI_API_KEY)", "yok")
+    try:
+        d = http_json(f"https://generativelanguage.googleapis.com/v1beta/models?key={key}")
+        return ok("Gemini", limit=None, kalan=None, birim="istek/dk (kota panelde yok)",
+                  model_sayisi=len(d.get("models", [])), not_="LLM + TTS (gemini-2.5-flash-preview-tts)")
+    except urllib.error.HTTPError as e:
+        return hata("Gemini", f"HTTP {e.code}", "gecersiz" if e.code in (400, 401, 403) else "hata")
+    except Exception as e:
+        return hata("Gemini", e)
+
+
+def groq():
+    key = (os.getenv("GROQ_API_KEY") or "").strip()
+    if not key:
+        return hata("Groq", "Anahtar yok (GROQ_API_KEY)", "yok")
+    try:
+        d = http_json("https://api.groq.com/openai/v1/models", {"Authorization": "Bearer " + key})
+        return ok("Groq", limit=None, kalan=None, birim="istek/dk + günlük token",
+                  model_sayisi=len(d.get("data", [])), not_="ücretsiz katman: dakika bazlı limit")
+    except urllib.error.HTTPError as e:
+        return hata("Groq", f"HTTP {e.code}", "gecersiz" if e.code in (401, 403) else "hata")
+    except Exception as e:
+        return hata("Groq", e)
+
+
+def telegram():
+    tok = (os.getenv("TELEGRAM_BOT_TOKEN") or "").strip()
+    if not tok:
+        return hata("Telegram", "Token yok (TELEGRAM_BOT_TOKEN)", "yok")
+    try:
+        d = http_json(f"https://api.telegram.org/bot{tok}/getMe").get("result", {})
+        return ok("Telegram", limit=None, kalan=None, birim="mesaj/gün (limit yok pratikte)",
+                  bot="@" + str(d.get("username", "")), not_="bildirim kanalı")
+    except Exception as e:
+        return hata("Telegram", e)
+
+
+# ── GitHub: token kotası + Actions dakikası ────────────────────────────────
+def github():
+    tok = (os.getenv("GITHUB_TOKEN") or "").strip()
+    repo = os.getenv("GITHUB_REPOSITORY", "benngokhan/yt_auto_uploader")
+    h = {"Authorization": "token " + tok, "Accept": "application/vnd.github+json"}
+    if not tok:
+        return hata("GitHub", "GITHUB_TOKEN yok", "yok")
+    try:
+        rl = http_json("https://api.github.com/rate_limit", h).get("resources", {}).get("core", {})
+        ek = {}
+        # Actions dakikası: bu ayki koşuların süreleri
+        try:
+            ay = now().strftime("%Y-%m")
+            dakika = 0.0
+            kosu = 0
+            sayfa = 1
+            while sayfa <= 5:
+                runs = http_json(
+                    f"https://api.github.com/repos/{repo}/actions/runs?per_page=100&page={sayfa}", h
+                ).get("workflow_runs", [])
+                if not runs:
+                    break
+                for r in runs:
+                    ts = r.get("run_started_at") or r.get("created_at") or ""
+                    if not ts.startswith(ay):
+                        continue
+                    try:
+                        a = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+                        b = datetime.fromisoformat((r.get("updated_at") or ts).replace("Z", "+00:00"))
+                        dakika += max((b - a).total_seconds(), 0) / 60
+                        kosu += 1
+                    except Exception:
+                        continue
+                sayfa += 1
+            ek = {"actions_dakika": round(dakika, 1), "actions_kosu": kosu,
+                  "actions_limit": ACTIONS_FREE_DK,
+                  "actions_kalan": round(max(ACTIONS_FREE_DK - dakika, 0), 1)}
+        except Exception as e:
+            ek = {"actions_uyari": str(e)[:120]}
+        return ok("GitHub", kalan=rl.get("remaining"), limit=rl.get("limit"),
+                  kullanilan=(rl.get("limit", 0) - rl.get("remaining", 0)) if rl else None,
+                  birim="istek/saat", not_="panel API kotası (saatlik pencerede yenilenir)", **ek)
+    except Exception as e:
+        return hata("GitHub", e)
+
+
+def secret_durumu():
+    """Workflow 'gh secret list' çıktısını secret_listesi.json'a yazar; burada okunur."""
+    gerekli = {
+        "ELEVENLABS_API_KEY": "Ses üretimi (ElevenLabs)",
+        "OPENROUTER_API_KEY": "Yedek LLM + TTS (OpenRouter)",
+        "GEMINI_API_KEY": "Başlık/açıklama üretimi, Gemini TTS",
+        "GROQ_API_KEY": "Hızlı LLM (Groq)",
+        "GOOGLE_TOKEN_JSON": "Drive + YouTube OAuth",
+        "GOOGLE_CLIENT_SECRETS_JSON": "Drive + YouTube OAuth",
+        "TELEGRAM_BOT_TOKEN": "Telegram bildirimleri",
+        "SITE_SYNC_TOKEN": "Panele veri yayını + secret yazma",
+    }
+    mevcut = set()
+    if SECRET_LIST.exists():
+        try:
+            for s in json.loads(SECRET_LIST.read_text(encoding="utf-8")):
+                mevcut.add(s if isinstance(s, str) else s.get("name", ""))
+        except Exception:
+            pass
+    out = []
+    for ad, aciklama in gerekli.items():
+        out.append({"ad": ad, "var": ad in mevcut, "aciklama": aciklama})
+    return out
+
+
+def main() -> int:
+    print("API kotası toplanıyor…")
+    servisler = [elevenlabs(), openrouter(), gemini(), groq(), telegram(), github()]
+    servisler += google()
+    veri = {
+        "zaman": now().isoformat(timespec="seconds"),
+        "servisler": servisler,
+        "secretler": secret_durumu(),
+        "ozet": {
+            "ok": sum(1 for s in servisler if s.get("durum") == "ok"),
+            "eksik": sum(1 for s in servisler if s.get("durum") == "yok"),
+            "gecersiz": sum(1 for s in servisler if s.get("durum") == "gecersiz"),
+            "hata": sum(1 for s in servisler if s.get("durum") == "hata"),
+        },
+    }
+    # geçmiş (küçük trend)
+    gecmis = []
+    if OUT.exists():
+        try:
+            gecmis = json.loads(OUT.read_text(encoding="utf-8")).get("gecmis", [])
+        except Exception:
+            gecmis = []
+    gecmis = (gecmis or [])[-59:]
+    el = next((s for s in servisler if s["ad"] == "ElevenLabs"), {})
+    gecmis.append({"zaman": veri["zaman"], "elevenlabs_kalan": el.get("kalan")})
+    veri["gecmis"] = gecmis
+
+    OUT.write_text(json.dumps(veri, ensure_ascii=False, indent=2), encoding="utf-8")
+    print("ozet:", veri["ozet"])
+    for s in servisler:
+        print(f"  {s['ad']:<20} {s['durum']:<9} kalan={s.get('kalan')} / {s.get('limit')}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
