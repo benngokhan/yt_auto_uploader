@@ -1,0 +1,121 @@
+name: Kapak Yükle (Panel)
+
+# Panelden gelen kapağı Drive'daki doğru klasöre KANONİK adla yazar ve istenirse
+# yayınlanmış videoya anında uygular. Yükleme sırasında kapak hazır değilse
+# kullanıcı sonradan buradan tamamlar — YouTube Studio'ya gitmeye gerek kalmaz.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tip:
+        description: "Tür: short (Shorts) | long (Uzun video)"
+        required: true
+        type: choice
+        options: [short, long]
+        default: short
+      no:
+        description: "Video numarası (ör. 155)"
+        required: true
+        type: string
+      dosya:
+        description: "Repo içindeki kapak yolu (ör. kapak_gelen/kapak_155.jpg)"
+        required: true
+        type: string
+      video_id:
+        description: "Yayınlanmış video ID (boş bırakılırsa sadece Drive'a yazılır)"
+        required: false
+        type: string
+        default: ""
+      temizle:
+        description: "Aynı numaralı eski/artık varyantları (kapak_155_yeni.jpg gibi) çöpe at"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: kapak-yukle
+  cancel-in-progress: false
+
+jobs:
+  kapak:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure Google credentials
+        env:
+          GOOGLE_CLIENT_SECRETS_JSON: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          required = ["GOOGLE_CLIENT_SECRETS_JSON", "GOOGLE_TOKEN_JSON"]
+          missing = [k for k in required if not os.getenv(k, "").strip()]
+          if missing:
+              raise SystemExit("Missing GitHub Actions secrets: " + ", ".join(missing))
+          Path("client_secrets.json").write_text(os.environ["GOOGLE_CLIENT_SECRETS_JSON"], encoding="utf-8")
+          Path("token.json").write_text(os.environ["GOOGLE_TOKEN_JSON"], encoding="utf-8")
+          PY
+
+      - name: Kapağı Drive'a yaz (ve istenirse YouTube'a uygula)
+        env:
+          TIP: ${{ inputs.tip }}
+          NO: ${{ inputs.no }}
+          DOSYA: ${{ inputs.dosya }}
+          VIDEO_ID: ${{ inputs.video_id }}
+          TEMIZLE: ${{ inputs.temizle }}
+        run: |
+          ARGS="--tip $TIP --no $NO --dosya $DOSYA"
+          if [ -n "$VIDEO_ID" ]; then ARGS="$ARGS --video-id $VIDEO_ID"; fi
+          if [ "$TEMIZLE" = "true" ]; then ARGS="$ARGS --temizle"; fi
+          echo "kapak_yukle.py $ARGS"
+          python kapak_yukle.py $ARGS
+
+      - name: Telemetriyi tazele (panelde kapak anında görünsün)
+        run: python sync_panel_telemetry.py || echo "Telemetri tazeleme atlandı (kritik değil)."
+
+      - name: Sonucu ve telemetriyi commit et
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- kapak_sonuc.json panel_telemetry.json
+          git diff --cached --quiet || (git commit -m "chore: panelden kapak yüklendi [skip ci]" && git pull --rebase --autostash origin main && git push origin HEAD:main)
+
+      - name: Özet
+        if: ${{ always() }}
+        run: |
+          echo "### Kapak yükleme sonucu" >> $GITHUB_STEP_SUMMARY
+          python - <<'PY' >> $GITHUB_STEP_SUMMARY
+          import json, pathlib
+          p = pathlib.Path("kapak_sonuc.json")
+          if not p.exists():
+              print("kapak_sonuc.json bulunamadı.")
+          else:
+              d = json.loads(p.read_text(encoding="utf-8"))
+              print(f"- Tür: **{d.get('tip')}** · No: **{d.get('no')}**")
+              print(f"- Drive adı: `{d.get('drive_ad','-')}`")
+              print(f"- Boyut: {d.get('boyut','-')}")
+              for a in d.get("adimlar", []):
+                  print(f"- {a}")
+              if d.get("hata"):
+                  print(f"- ❌ Hata: {d['hata']}")
+          PY
