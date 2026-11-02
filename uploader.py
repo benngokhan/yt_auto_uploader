@@ -409,11 +409,11 @@ def video_suresi_sn(path: Path):
 def senaryo_sure_kontrol(path: Path, file_name: str) -> dict:
     """senaryo_kurallari.md kuralı: shorts 38-42 sn hedef, 30-45 sn sınır.
     Yayını ENGELLEMEZ; uyarı + rapordur."""
+    if file_name.startswith("uzun_"):   # uzun videoda kural yok, ölçüm de yapılmaz
+        return {"sure": None, "durum": "uzun-video"}
     sure = video_suresi_sn(path)
     if sure is None:
         return {"sure": None, "durum": "bilinmiyor"}
-    if file_name.startswith("uzun_"):
-        return {"sure": round(sure, 1), "durum": "uzun-video"}
     if sure > SENARYO_SINIR_SN[1]:
         durum = "uzun"
     elif sure < SENARYO_SINIR_SN[0]:
