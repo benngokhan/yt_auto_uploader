@@ -685,10 +685,14 @@ def build_telegram_report(
         if related_info.get("status") == "studio_pending" and studio_url.startswith("https://studio.youtube.com/video/"):
             extra_buttons.append([{"text": "🔗 İlgili Video'yu Studio'da Aç", "url": studio_url}])
 
+    # Yorum otomatik atıldıysa mesajda tekrar metin göstermiyoruz (sadece sabitlemek kalıyor).
+    # Otomatik atılamadıysa elle atabilmen için metni göster.
     if comment_ok:
-        comment_header = "✅ <b>SABİT YORUM (Otomatik Atıldı · Sabitle):</b>"
+        comment_header = ""
+        comment_block = ""
     else:
-        comment_header = "📌 <b>SABİT YORUM (1 Kez Dokun Kopyala):</b>"
+        comment_header = "📌 <b>SABİT YORUM (elle atılacak):</b>"
+        comment_block = f"<pre>{_html.escape(pinned)}</pre>\n\n"
 
     # Single-block community post without double-newline split so 1 tap copies the entire text + link together!
     community_post = (
@@ -717,7 +721,7 @@ def build_telegram_report(
         f"{chain_line}"
         f"{related_line}"
         f"{comment_header}\n"
-        f"<pre>{_html.escape(pinned)}</pre>\n\n"
+        f"{comment_block}"
         f"📢 <b>YOUTUBE GÖNDERİLER METNİ (1 Kez Dokun Tamamı Kopyalanır):</b>\n"
         f"<pre>{_html.escape(community_post)}</pre>"
     )
@@ -730,7 +734,6 @@ def build_telegram_report(
             "inline_keyboard": [
                 [
                     {"text": "▶️ Videoyu İzle", "url": yt_url},
-                    {"text": "📌 Yorumu Sabitle", "url": studio_comments_url},
                 ],
                 *extra_buttons,
                 [

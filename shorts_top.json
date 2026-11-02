@@ -1,57 +1,33 @@
 {
- "schema": 1,
- "generated_at": "2026-11-02 03:01:11",
- "generated_at_iso": "2026-11-02T03:01:11.412932+03:00",
+ "schema": 2,
+ "generated_at": "2026-11-02 03:31:32",
+ "generated_at_iso": "2026-11-02T03:31:32.158355+03:00",
  "channel_id": "UC3bjZMPZ5FW2JQGfU41iaUg",
  "channel_url": "https://www.youtube.com/@bilgidozuofficial",
  "top_shorts": [
-  {
-   "video_id": "IrutrnRqyWM",
-   "title": "Bu Canlı Uzay Boşluğunda ve Radyasyonda Bile Ölmüyor! 🐻🔬 #bilgidozu #shorts",
-   "views": 1334,
-   "duration_sec": 34.0,
-   "published_date": "2026-10-22",
-   "url": "https://youtu.be/IrutrnRqyWM"
-  },
   {
    "video_id": "4TU_VDiQvzA",
    "title": "Sen Uyurken Beynin Yıkanıyor! 🧠 #Shorts",
    "views": 1277,
    "duration_sec": 36.0,
    "published_date": "2026-10-11",
-   "url": "https://youtu.be/4TU_VDiQvzA"
+   "url": "https://youtu.be/4TU_VDiQvzA",
+   "likes": 35,
+   "like_rate": 2.74,
+   "rank_score": 1977,
+   "likes_at": "2026-11-02 03:42:58"
   },
   {
-   "video_id": "gBe0fwts7lU",
-   "title": "Venüs'te Bir Gün Bir Yıldan Daha Uzun! 🪐 #bilgidozu #shorts",
-   "views": 1239,
-   "duration_sec": 39.0,
-   "published_date": "2026-10-18",
-   "url": "https://youtu.be/gBe0fwts7lU"
-  },
-  {
-   "video_id": "SREO3qV8yuc",
-   "title": "Odaya Niçin Girdiğinizi Kapı Siliyor! 🧠 #Shorts",
-   "views": 1203,
-   "duration_sec": 31.0,
-   "published_date": "2026-10-11",
-   "url": "https://youtu.be/SREO3qV8yuc"
-  },
-  {
-   "video_id": "qYzG9jVSLDw",
-   "title": "Dünyanın En Yaşlı Canlısı Bir Hayvan Değil, 80.000 Yaşındaki Bu Orman! 🌲⚡ #bilgidozu #shorts",
-   "views": 1170,
-   "duration_sec": 38.0,
-   "published_date": "2026-10-21",
-   "url": "https://youtu.be/qYzG9jVSLDw"
-  },
-  {
-   "video_id": "BOmRddkkZfE",
-   "title": "Deja Vu: Beyninin Zaman Hatası! 🧠 #Shorts",
-   "views": 1155,
-   "duration_sec": 36.0,
-   "published_date": "2026-10-11",
-   "url": "https://youtu.be/BOmRddkkZfE"
+   "video_id": "IrutrnRqyWM",
+   "title": "Bu Canlı Uzay Boşluğunda ve Radyasyonda Bile Ölmüyor! 🐻🔬 #bilgidozu #shorts",
+   "views": 1335,
+   "duration_sec": 34.0,
+   "published_date": "2026-10-22",
+   "url": "https://youtu.be/IrutrnRqyWM",
+   "likes": 24,
+   "like_rate": 1.8,
+   "rank_score": 1815,
+   "likes_at": "2026-11-02 03:42:58"
   },
   {
    "video_id": "ML2-a_smuEY",
@@ -59,23 +35,59 @@
    "views": 1143,
    "duration_sec": 36.0,
    "published_date": "2026-10-17",
-   "url": "https://youtu.be/ML2-a_smuEY"
+   "url": "https://youtu.be/ML2-a_smuEY",
+   "likes": 27,
+   "like_rate": 2.36,
+   "rank_score": 1683,
+   "likes_at": "2026-11-02 03:43:01"
   },
   {
-   "video_id": "lYtn7rjqKD8",
-   "title": "Güneşe En Yakın Gezegende Donuyorsun! 🌡️",
-   "views": 1140,
-   "duration_sec": 36.0,
-   "published_date": "2026-10-15",
-   "url": "https://youtu.be/lYtn7rjqKD8"
+   "video_id": "qYzG9jVSLDw",
+   "title": "Dünyanın En Yaşlı Canlısı Bir Hayvan Değil, 80.000 Yaşındaki Bu Orman! 🌲⚡ #bilgidozu #shorts",
+   "views": 1170,
+   "duration_sec": 38.0,
+   "published_date": "2026-10-21",
+   "url": "https://youtu.be/qYzG9jVSLDw",
+   "likes": 19,
+   "like_rate": 1.62,
+   "rank_score": 1550,
+   "likes_at": "2026-11-02 03:43:00"
   },
   {
-   "video_id": "h3kYyYVeEsY",
-   "title": "Beyniniz Ağrıyı Hissedemez! 🧠 #Shorts",
-   "views": 1135,
+   "video_id": "BOmRddkkZfE",
+   "title": "Deja Vu: Beyninin Zaman Hatası! 🧠 #Shorts",
+   "views": 1155,
    "duration_sec": 36.0,
-   "published_date": "2026-10-10",
-   "url": "https://youtu.be/h3kYyYVeEsY"
+   "published_date": "2026-10-11",
+   "url": "https://youtu.be/BOmRddkkZfE",
+   "likes": 18,
+   "like_rate": 1.56,
+   "rank_score": 1515,
+   "likes_at": "2026-11-02 03:43:00"
+  },
+  {
+   "video_id": "5lREZUglUqU",
+   "title": "Jüpiter'in Bu Uydusunda Dünya'dan 2 Kat Fazla Su Var! 🪐🌊 #bilgidozu #shorts",
+   "views": 1050,
+   "duration_sec": 38.0,
+   "published_date": "2026-10-20",
+   "url": "https://youtu.be/5lREZUglUqU",
+   "likes": 23,
+   "like_rate": 2.19,
+   "rank_score": 1510,
+   "likes_at": "2026-11-02 03:43:05"
+  },
+  {
+   "video_id": "gBe0fwts7lU",
+   "title": "Venüs'te Bir Gün Bir Yıldan Daha Uzun! 🪐 #bilgidozu #shorts",
+   "views": 1239,
+   "duration_sec": 39.0,
+   "published_date": "2026-10-18",
+   "url": "https://youtu.be/gBe0fwts7lU",
+   "likes": 12,
+   "like_rate": 0.97,
+   "rank_score": 1479,
+   "likes_at": "2026-11-02 03:42:58"
   },
   {
    "video_id": "znBAuA2MY3Y",
@@ -83,7 +95,35 @@
    "views": 1113,
    "duration_sec": 35.0,
    "published_date": "2026-10-20",
-   "url": "https://youtu.be/znBAuA2MY3Y"
+   "url": "https://youtu.be/znBAuA2MY3Y",
+   "likes": 18,
+   "like_rate": 1.62,
+   "rank_score": 1473,
+   "likes_at": "2026-11-02 03:43:03"
+  },
+  {
+   "video_id": "DEhC0RBlZvM",
+   "title": "Jüpiter'de Dünya'dan Büyük Bir Fırtına 350 Yıldır DÖNÜYOR! 🌪️🪐 #bilgidozu #shorts",
+   "views": 1007,
+   "duration_sec": 40.0,
+   "published_date": "2026-10-21",
+   "url": "https://youtu.be/DEhC0RBlZvM",
+   "likes": 23,
+   "like_rate": 2.28,
+   "rank_score": 1467,
+   "likes_at": "2026-11-02 03:43:07"
+  },
+  {
+   "video_id": "CPITUvh_5rs",
+   "title": "Birinin Sizden Hoşlandığını Anlamanın En Kesin Yolu! 👁️✨ #bilgidozu #shorts",
+   "views": 1086,
+   "duration_sec": 34.0,
+   "published_date": "2026-10-22",
+   "url": "https://youtu.be/CPITUvh_5rs",
+   "likes": 18,
+   "like_rate": 1.66,
+   "rank_score": 1446,
+   "likes_at": "2026-11-02 03:43:03"
   }
  ],
  "top_longs": [
@@ -93,7 +133,11 @@
    "views": 129,
    "duration_sec": 114.0,
    "published_date": "2026-10-16",
-   "url": "https://youtu.be/vh_h0diuFG8"
+   "url": "https://youtu.be/vh_h0diuFG8",
+   "likes": null,
+   "like_rate": null,
+   "rank_score": 129,
+   "likes_at": "2026-11-02 03:43:26"
   },
   {
    "video_id": "AoaTRIpChhw",
@@ -101,15 +145,35 @@
    "views": 97,
    "duration_sec": 100.0,
    "published_date": "2026-10-25",
-   "url": "https://youtu.be/AoaTRIpChhw"
+   "url": "https://youtu.be/AoaTRIpChhw",
+   "likes": 1,
+   "like_rate": 1.03,
+   "rank_score": 117,
+   "likes_at": "2026-11-02 03:43:28"
   },
   {
    "video_id": "tQJg3mG2Kvo",
    "title": "Şehrin İhtiyacı Olan 8 Şey (Hepsi Gerçek) bu",
-   "views": 20,
+   "views": 37,
    "duration_sec": 181.0,
    "published_date": "2026-09-24",
-   "url": "https://youtu.be/tQJg3mG2Kvo"
+   "url": "https://youtu.be/tQJg3mG2Kvo",
+   "likes": null,
+   "like_rate": null,
+   "rank_score": 37,
+   "likes_at": "2026-11-02 03:43:34"
+  },
+  {
+   "video_id": "ExNJqJLhHP0",
+   "title": "İstikrarlı Olmak Neden Bu Kadar Zor? (Ve Nasıl Zahmetsiz Hale Gelir?)",
+   "views": 26,
+   "duration_sec": 572.0,
+   "published_date": "2026-09-24",
+   "url": "https://youtu.be/ExNJqJLhHP0",
+   "likes": null,
+   "like_rate": null,
+   "rank_score": 26,
+   "likes_at": "2026-11-02 03:43:37"
   },
   {
    "video_id": "eAnBBamiD1U",
@@ -117,28 +181,36 @@
    "views": 14,
    "duration_sec": 106.0,
    "published_date": "2026-10-18",
-   "url": "https://youtu.be/eAnBBamiD1U"
-  },
-  {
-   "video_id": "ExNJqJLhHP0",
-   "title": "İstikrarlı Olmak Neden Bu Kadar Zor? (Ve Nasıl Zahmetsiz Hale Gelir?)",
-   "views": 13,
-   "duration_sec": 572.0,
-   "published_date": "2026-09-24",
-   "url": "https://youtu.be/ExNJqJLhHP0"
+   "url": "https://youtu.be/eAnBBamiD1U",
+   "likes": null,
+   "like_rate": null,
+   "rank_score": 14,
+   "likes_at": "2026-11-02 03:43:36"
   },
   {
    "video_id": "QhqHWaVWLJY",
    "title": "Karanlıkta Gözümüz Gece Görüşünü Nasıl Açar? Korsan Bandı ve Rodopsin Sırrı 👁️ #bilgidozu",
-   "views": 3,
+   "views": 5,
    "duration_sec": 119.0,
    "published_date": "2026-10-30",
-   "url": "https://youtu.be/QhqHWaVWLJY"
+   "url": "https://youtu.be/QhqHWaVWLJY",
+   "likes": null,
+   "like_rate": null,
+   "rank_score": 5,
+   "likes_at": "2026-11-02 03:43:38"
   }
  ],
+ "ranking": {
+  "mode": "views+likes",
+  "like_weight": 20,
+  "likes_source": "likes.json",
+  "likes_generated_at": "2026-11-02 03:43:38"
+ },
  "totals": {
   "videos": 78,
-  "views": 35322,
+  "views": 39478,
+  "likes": 563,
+  "likes_known": 70,
   "shorts": 72,
   "longs": 6
  }
