@@ -1,0 +1,126 @@
+{
+  "zaman": "2026-11-02T12:36:38+00:00",
+  "servisler": [
+    {
+      "ad": "ElevenLabs",
+      "durum": "yok",
+      "mesaj": "Anahtar tanımlı değil (ELEVENLABS_API_KEY)",
+      "panel_aksiyon": "Ses & Kredi sayfasından anahtar yükle"
+    },
+    {
+      "ad": "OpenRouter",
+      "durum": "gecersiz",
+      "mesaj": "HTTP 401"
+    },
+    {
+      "ad": "Gemini",
+      "durum": "ok",
+      "limit": null,
+      "kalan": null,
+      "birim": "istek/dk (kota panelde yok)",
+      "model_sayisi": 50,
+      "not_": "LLM + TTS (gemini-2.5-flash-preview-tts)"
+    },
+    {
+      "ad": "Groq",
+      "durum": "gecersiz",
+      "mesaj": "HTTP 403"
+    },
+    {
+      "ad": "Telegram",
+      "durum": "ok",
+      "limit": null,
+      "kalan": null,
+      "birim": "mesaj/gün (limit yok pratikte)",
+      "bot": "@Bilgindozlu_bot",
+      "not_": "bildirim kanalı"
+    },
+    {
+      "ad": "GitHub",
+      "durum": "ok",
+      "kalan": 5000,
+      "limit": 5000,
+      "kullanilan": 0,
+      "birim": "istek/saat",
+      "not_": "panel API kotası (saatlik pencerede yenilenir)",
+      "actions_dakika": 48.3,
+      "actions_kosu": 102,
+      "actions_limit": 2000,
+      "actions_kalan": 1951.7
+    },
+    {
+      "ad": "Google Drive",
+      "durum": "ok",
+      "kalan": 10416149780,
+      "limit": 16106127360,
+      "kullanilan": 5689977580,
+      "birim": "bayt",
+      "hesap": "galtundal81@gmail.com",
+      "not_": "15 GB ücretsiz kota (varsa)"
+    },
+    {
+      "ad": "YouTube Data API",
+      "durum": "ok",
+      "kalan": 8300,
+      "limit": 10000,
+      "kullanilan": 1700,
+      "birim": "birim (tahmini)",
+      "bugun_yukleme": 1,
+      "not_": "gerçek kota API'de yok; yükleme ≈ 1700 birim sayıldı"
+    }
+  ],
+  "secretler": [
+    {
+      "ad": "ELEVENLABS_API_KEY",
+      "var": false,
+      "aciklama": "Ses üretimi (ElevenLabs)"
+    },
+    {
+      "ad": "OPENROUTER_API_KEY",
+      "var": true,
+      "aciklama": "Yedek LLM + TTS (OpenRouter)"
+    },
+    {
+      "ad": "GEMINI_API_KEY",
+      "var": true,
+      "aciklama": "Başlık/açıklama üretimi, Gemini TTS"
+    },
+    {
+      "ad": "GROQ_API_KEY",
+      "var": true,
+      "aciklama": "Hızlı LLM (Groq)"
+    },
+    {
+      "ad": "GOOGLE_TOKEN_JSON",
+      "var": true,
+      "aciklama": "Drive + YouTube OAuth"
+    },
+    {
+      "ad": "GOOGLE_CLIENT_SECRETS_JSON",
+      "var": true,
+      "aciklama": "Drive + YouTube OAuth"
+    },
+    {
+      "ad": "TELEGRAM_BOT_TOKEN",
+      "var": true,
+      "aciklama": "Telegram bildirimleri"
+    },
+    {
+      "ad": "SITE_SYNC_TOKEN",
+      "var": true,
+      "aciklama": "Panele veri yayını + secret yazma"
+    }
+  ],
+  "ozet": {
+    "ok": 5,
+    "eksik": 1,
+    "gecersiz": 2,
+    "hata": 0
+  },
+  "gecmis": [
+    {
+      "zaman": "2026-11-02T12:36:38+00:00",
+      "elevenlabs_kalan": null
+    }
+  ]
+}
