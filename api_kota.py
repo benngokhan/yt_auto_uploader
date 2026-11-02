@@ -32,6 +32,15 @@ YT_GUNLUK_KOTA = 10_000        # YouTube Data API varsayılan günlük kota (bir
 YT_YUKLEME_BIRIM = 1_700       # upload ~1600 + thumbnail 50 (+ yorum/oynatma listesi payı)
 ACTIONS_FREE_DK = 2_000        # private repo ücretsiz Actions dakikası
 
+# Drive kırılımı (hangi klasör ne kadar yer tutuyor)
+DRIVE_KLASORLER = [
+    ("Kısa Videolar", "1LfW4adjq0x4ZjBuphjebAbKLVsgY8TXY"),
+    ("Uzun Videolar", "16jMIabV8mdJIRlc_e55Gmlwu5asfcBGN"),
+    ("Kısa Kapaklar", "1INXnZpMGBGOZ03o4cqm5MuC5MporWSkD"),
+    ("Uzun Kapaklar", "1g3QluGyaLByQgXmoXO0i1PPtr3ORjRQR"),
+    ("CEO / Tablolar", "190zQiUYkp8fsQFleva77TKqc9MeGxZiI"),
+]
+
 
 def now():
     return datetime.now(timezone.utc)
@@ -76,6 +85,7 @@ def elevenlabs():
               reset_unix=reset,
               reset_iso=datetime.fromtimestamp(int(reset), tz=timezone.utc).isoformat(timespec="seconds") if reset else "",
               klonlama=bool(s.get("can_use_instant_voice_cloning")),
+              yenilenme="aylık · fatura dönemi başında sıfırlanır (kredi devretmez)",
               not_="1 kredi = 1 karakter (v2/v3) · Flash/Turbo yarı fiyat")
 
 
@@ -102,7 +112,38 @@ def openrouter():
         pass
     return ok("OpenRouter", kalan=kalan, limit=limit, kullanilan=usage,
               birim="USD kredi", ucretsiz=bool(k.get("is_free_tier")),
+              yenilenme="aylık sıfırlanmaz · kredi yükledikçe artar",
               not_="TTS + LLM aynı bakiye", **extra)
+
+
+def _klasor_boyut(drive, fid: str, derinlik: int = 2) -> tuple[int, int]:
+    """Klasörün (alt klasörler dahil) toplam bayt ve dosya sayısı. Sayfalama sınırlı."""
+    toplam, adet, sayfa = 0, 0, None
+    altlar = []
+    for _ in range(8):  # en fazla 800 dosya
+        try:
+            res = drive.files().list(
+                q=f"'{fid}' in parents and trashed=false",
+                pageSize=100, pageToken=sayfa,
+                fields="nextPageToken,files(id,size,mimeType)",
+            ).execute()
+        except Exception:
+            break
+        for f in res.get("files", []):
+            if f.get("mimeType") == "application/vnd.google-apps.folder":
+                altlar.append(f["id"])
+            else:
+                toplam += int(f.get("size") or 0)
+                adet += 1
+        sayfa = res.get("nextPageToken")
+        if not sayfa:
+            break
+    if derinlik > 1:
+        for a in altlar[:8]:
+            b, n = _klasor_boyut(drive, a, derinlik - 1)
+            toplam += b
+            adet += n
+    return toplam, adet
 
 
 # ── Google: Drive depolama + YouTube kota tahmini ───────────────────────────
@@ -126,10 +167,18 @@ def google():
         sq = q.get("storageQuota", {})
         limit = int(sq.get("limit") or 0)
         used = int(sq.get("usage") or 0)
+        kirilim = []
+        for ad, fid in DRIVE_KLASORLER:
+            try:
+                b, n = _klasor_boyut(drive, fid)
+                kirilim.append({"ad": ad, "boyut": b, "dosya": n})
+            except Exception:
+                continue
         sonuc.append(ok("Google Drive", kalan=(limit - used) if limit else None, limit=limit,
-                        kullanilan=used, birim="bayt",
+                        kullanilan=used, birim="bayt", kirilim=kirilim,
                         hesap=(q.get("user") or {}).get("emailAddress", ""),
-                        not_="15 GB ücretsiz kota (varsa)"))
+                        yenilenme="yenilenmez · sadece dosya silince/artırınca değişir",
+                        not_="Google hesabının TOPLAM alanı: Drive + Gmail + Fotoğraflar ortak"))
     except Exception as e:
         sonuc.append(hata("Google Drive", e))
 
@@ -147,6 +196,7 @@ def google():
                         kalan=max(YT_GUNLUK_KOTA - tahmin, 0), limit=YT_GUNLUK_KOTA,
                         kullanilan=tahmin, birim="birim (tahmini)",
                         bugun_yukleme=bugun_adet,
+                        yenilenme="günlük · gece 00:00 Pasifik (TR 10:00) sıfırlanır",
                         not_=f"gerçek kota API'de yok; yükleme ≈ {YT_YUKLEME_BIRIM} birim sayıldı"))
     except Exception as e:
         sonuc.append(hata("YouTube Data API", e))
@@ -161,7 +211,9 @@ def gemini():
     try:
         d = http_json(f"https://generativelanguage.googleapis.com/v1beta/models?key={key}")
         return ok("Gemini", limit=None, kalan=None, birim="istek/dk (kota panelde yok)",
-                  model_sayisi=len(d.get("models", [])), not_="LLM + TTS (gemini-2.5-flash-preview-tts)")
+                  model_sayisi=len(d.get("models", [])),
+                  yenilenme="günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
+                  not_="LLM + TTS (gemini-2.5-flash-preview-tts)")
     except urllib.error.HTTPError as e:
         return hata("Gemini", f"HTTP {e.code}", "gecersiz" if e.code in (400, 401, 403) else "hata")
     except Exception as e:
@@ -175,7 +227,9 @@ def groq():
     try:
         d = http_json("https://api.groq.com/openai/v1/models", {"Authorization": "Bearer " + key})
         return ok("Groq", limit=None, kalan=None, birim="istek/dk + günlük token",
-                  model_sayisi=len(d.get("data", [])), not_="ücretsiz katman: dakika bazlı limit")
+                  model_sayisi=len(d.get("data", [])),
+                  yenilenme="dakika + günlük token · günlük kısım gece 00:00 UTC",
+                  not_="ücretsiz katman: dakika bazlı limit")
     except urllib.error.HTTPError as e:
         return hata("Groq", f"HTTP {e.code}", "gecersiz" if e.code in (401, 403) else "hata")
     except Exception as e:
@@ -189,7 +243,9 @@ def telegram():
     try:
         d = http_json(f"https://api.telegram.org/bot{tok}/getMe").get("result", {})
         return ok("Telegram", limit=None, kalan=None, birim="mesaj/gün (limit yok pratikte)",
-                  bot="@" + str(d.get("username", "")), not_="bildirim kanalı")
+                  bot="@" + str(d.get("username", "")),
+                  yenilenme="saniye başına limit · günlük kota yok",
+                  not_="bildirim kanalı")
     except Exception as e:
         return hata("Telegram", e)
 
@@ -235,7 +291,9 @@ def github():
             ek = {"actions_uyari": str(e)[:120]}
         return ok("GitHub", kalan=rl.get("remaining"), limit=rl.get("limit"),
                   kullanilan=(rl.get("limit", 0) - rl.get("remaining", 0)) if rl else None,
-                  birim="istek/saat", not_="panel API kotası (saatlik pencerede yenilenir)", **ek)
+                  birim="istek/saat",
+                  yenilenme="istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
+                  not_="panel API kotası (saatlik pencerede yenilenir)", **ek)
     except Exception as e:
         return hata("GitHub", e)
 
