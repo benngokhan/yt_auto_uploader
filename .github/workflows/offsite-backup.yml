@@ -1,0 +1,105 @@
+name: Offsite Yedek (FTP/FTPS)
+
+# Amaç: Drive + GitHub'a ek ÜÇÜNCÜ kopya (3-2-1 yedeği) — sadece FTP/FTPS ile çalışır.
+# Secret'lar tanımlı değilse hiçbir şey yapmaz, hata da vermez (yeşil biter).
+#
+# Gereken repository secret'ları (Settings > Secrets and variables > Actions):
+#   BACKUP_HOST  -> örn. ftp.ornekdomain.com
+#   BACKUP_USER  -> örn. yedek@ornekdomain.com
+#   BACKUP_PASS  -> şifre
+#   BACKUP_DIR   -> örn. /public_html/yedek/bilgidozu   (boş bırakılırsa /bilgidozu kullanılır)
+#   BACKUP_PROTO -> ftps (varsayılan) veya ftp
+#   BACKUP_PORT  -> isteğe bağlı, varsayılan 21
+
+on:
+  schedule:
+    - cron: "15 0 * * *" # 03:15 TR — günlük
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: offsite-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Secret kontrolü
+        id: check
+        env:
+          BACKUP_HOST: ${{ secrets.BACKUP_HOST }}
+          BACKUP_USER: ${{ secrets.BACKUP_USER }}
+          BACKUP_PASS: ${{ secrets.BACKUP_PASS }}
+        run: |
+          if [ -z "$BACKUP_HOST" ] || [ -z "$BACKUP_USER" ] || [ -z "$BACKUP_PASS" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Yedek pasif::FTP bilgileri (BACKUP_HOST/BACKUP_USER/BACKUP_PASS) tanımlı değil. Yedek atlanıyor."
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Kodu indir
+        if: steps.check.outputs.ready == 'true'
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Yedek paketi oluştur
+        if: steps.check.outputs.ready == 'true'
+        run: |
+          set -e
+          STAMP=$(TZ=Europe/Istanbul date +%Y%m%d-%H%M)
+          mkdir -p out
+          for f in bilgidozu_yukleme_tablosu.xlsx panel_telemetry.json uploaded.txt status_report.json slot_claims.txt force_next_video.txt baslik.xlsx; do
+            [ -f "$f" ] && cp "$f" out/ || true
+          done
+          # Kod + testler (sırlar hariç)
+          tar --exclude='.git' --exclude='out' --exclude='__pycache__' --exclude='*.pyc' \
+              -czf "out/kod-yedek-${STAMP}.tar.gz" .
+          cp out/bilgidozu_yukleme_tablosu.xlsx out/tablo-latest.xlsx 2>/dev/null || true
+          cp out/panel_telemetry.json out/telemetry-latest.json 2>/dev/null || true
+          ls -lh out
+          echo "STAMP=${STAMP}" >> "$GITHUB_ENV"
+
+      - name: FTP/FTPS ile yükle
+        if: steps.check.outputs.ready == 'true'
+        env:
+          BACKUP_HOST: ${{ secrets.BACKUP_HOST }}
+          BACKUP_USER: ${{ secrets.BACKUP_USER }}
+          BACKUP_PASS: ${{ secrets.BACKUP_PASS }}
+          BACKUP_DIR: ${{ secrets.BACKUP_DIR }}
+          BACKUP_PROTO: ${{ secrets.BACKUP_PROTO }}
+          BACKUP_PORT: ${{ secrets.BACKUP_PORT }}
+        run: |
+          set -e
+          PROTO="${BACKUP_PROTO:-ftps}"
+          PORT="${BACKUP_PORT:-21}"
+          DIR="${BACKUP_DIR:-/bilgidozu}"
+          DIR="${DIR%/}"
+          BASE="ftp://${BACKUP_HOST}:${PORT}${DIR}"
+          echo "Hedef: ${PROTO} ${BACKUP_HOST}:${PORT}${DIR}"
+          SSL_FLAG="--ssl-reqd"
+          [ "$PROTO" = "ftp" ] && SSL_FLAG=""
+
+          for f in out/*; do
+            name=$(basename "$f")
+            echo "-> $name"
+            curl -sS --fail --ftp-create-dirs $SSL_FLAG --user "${BACKUP_USER}:${BACKUP_PASS}" \
+                 --upload-file "$f" "${BASE}/$name"
+          done
+          echo "::notice title=Yedek tamam::${STAMP} paketi offsite sunucuya yüklendi."
+
+      - name: Özet
+        if: steps.check.outputs.ready == 'true'
+        run: |
+          {
+            echo "### Offsite yedek"
+            echo "- Zaman: $(TZ=Europe/Istanbul date '+%d.%m.%Y %H:%M') (TR)"
+            echo "- Paket: \`kod-yedek-${STAMP}.tar.gz\`"
+            echo "- Tablo: \`tablo-latest.xlsx\`"
+            echo "- Telemetri: \`telemetry-latest.json\`"
+          } >> "$GITHUB_STEP_SUMMARY"
