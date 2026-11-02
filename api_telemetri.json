@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-02T12:36:38+00:00",
+  "zaman": "2026-11-02T12:50:22+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -19,6 +19,7 @@
       "kalan": null,
       "birim": "istek/dk (kota panelde yok)",
       "model_sayisi": 50,
+      "yenilenme": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
       "not_": "LLM + TTS (gemini-2.5-flash-preview-tts)"
     },
     {
@@ -33,20 +34,22 @@
       "kalan": null,
       "birim": "mesaj/gün (limit yok pratikte)",
       "bot": "@Bilgindozlu_bot",
+      "yenilenme": "saniye başına limit · günlük kota yok",
       "not_": "bildirim kanalı"
     },
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 5000,
+      "kalan": 4995,
       "limit": 5000,
-      "kullanilan": 0,
+      "kullanilan": 5,
       "birim": "istek/saat",
+      "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 48.3,
-      "actions_kosu": 102,
+      "actions_dakika": 49.2,
+      "actions_kosu": 104,
       "actions_limit": 2000,
-      "actions_kalan": 1951.7
+      "actions_kalan": 1950.8
     },
     {
       "ad": "Google Drive",
@@ -55,8 +58,36 @@
       "limit": 16106127360,
       "kullanilan": 5689977580,
       "birim": "bayt",
+      "kirilim": [
+        {
+          "ad": "Kısa Videolar",
+          "boyut": 207711022,
+          "dosya": 12
+        },
+        {
+          "ad": "Uzun Videolar",
+          "boyut": 767984696,
+          "dosya": 15
+        },
+        {
+          "ad": "Kısa Kapaklar",
+          "boyut": 5554854,
+          "dosya": 13
+        },
+        {
+          "ad": "Uzun Kapaklar",
+          "boyut": 24989715,
+          "dosya": 20
+        },
+        {
+          "ad": "CEO / Tablolar",
+          "boyut": 77069360,
+          "dosya": 14
+        }
+      ],
       "hesap": "galtundal81@gmail.com",
-      "not_": "15 GB ücretsiz kota (varsa)"
+      "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
+      "not_": "Google hesabının TOPLAM alanı: Drive + Gmail + Fotoğraflar ortak"
     },
     {
       "ad": "YouTube Data API",
@@ -66,6 +97,7 @@
       "kullanilan": 1700,
       "birim": "birim (tahmini)",
       "bugun_yukleme": 1,
+      "yenilenme": "günlük · gece 00:00 Pasifik (TR 10:00) sıfırlanır",
       "not_": "gerçek kota API'de yok; yükleme ≈ 1700 birim sayıldı"
     }
   ],
@@ -120,6 +152,10 @@
   "gecmis": [
     {
       "zaman": "2026-11-02T12:36:38+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T12:50:22+00:00",
       "elevenlabs_kalan": null
     }
   ]
