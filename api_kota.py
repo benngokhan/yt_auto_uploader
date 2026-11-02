@@ -174,6 +174,13 @@ def google():
                 kirilim.append({"ad": ad, "boyut": b, "dosya": n})
             except Exception:
                 continue
+        kirilim_toplam = sum(k["boyut"] for k in kirilim)
+        if used > kirilim_toplam:
+            kirilim.append({
+                "ad": "Diğer (Gmail, Fotoğraflar, arşiv)",
+                "boyut": used - kirilim_toplam,
+                "dosya": 0,
+            })
         sonuc.append(ok("Google Drive", kalan=(limit - used) if limit else None, limit=limit,
                         kullanilan=used, birim="bayt", kirilim=kirilim,
                         hesap=(q.get("user") or {}).get("emailAddress", ""),
@@ -323,10 +330,25 @@ def secret_durumu():
     return out
 
 
+YENILENME = {
+    "ElevenLabs": "aylık · fatura dönemi başında sıfırlanır (kalan kredi devretmez)",
+    "OpenRouter": "aylık sıfırlanmaz · kredi yükledikçe artar",
+    "Gemini": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
+    "Groq": "dakika + günlük token · günlük kısım 00:00 UTC",
+    "Telegram": "saniye başına limit · günlük kota yok",
+    "GitHub": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
+    "Google Drive": "yenilenmez · sadece dosya silince/artırınca değişir",
+    "YouTube Data API": "günlük · gece 00:00 Pasifik (TR 10:00) sıfırlanır",
+}
+
+
 def main() -> int:
     print("API kotası toplanıyor…")
     servisler = [elevenlabs(), openrouter(), gemini(), groq(), telegram(), github()]
     servisler += google()
+    for s in servisler:
+        if not s.get("yenilenme"):
+            s["yenilenme"] = YENILENME.get(s["ad"], "")
     veri = {
         "zaman": now().isoformat(timespec="seconds"),
         "servisler": servisler,
