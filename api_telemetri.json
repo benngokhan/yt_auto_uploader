@@ -1,16 +1,18 @@
 {
-  "zaman": "2026-11-02T12:50:22+00:00",
+  "zaman": "2026-11-02T12:51:31+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
       "durum": "yok",
       "mesaj": "Anahtar tanımlı değil (ELEVENLABS_API_KEY)",
-      "panel_aksiyon": "Ses & Kredi sayfasından anahtar yükle"
+      "panel_aksiyon": "Ses & Kredi sayfasından anahtar yükle",
+      "yenilenme": "aylık · fatura dönemi başında sıfırlanır (kalan kredi devretmez)"
     },
     {
       "ad": "OpenRouter",
       "durum": "gecersiz",
-      "mesaj": "HTTP 401"
+      "mesaj": "HTTP 401",
+      "yenilenme": "aylık sıfırlanmaz · kredi yükledikçe artar"
     },
     {
       "ad": "Gemini",
@@ -25,7 +27,8 @@
     {
       "ad": "Groq",
       "durum": "gecersiz",
-      "mesaj": "HTTP 403"
+      "mesaj": "HTTP 403",
+      "yenilenme": "dakika + günlük token · günlük kısım 00:00 UTC"
     },
     {
       "ad": "Telegram",
@@ -40,16 +43,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4995,
+      "kalan": 4990,
       "limit": 5000,
-      "kullanilan": 5,
+      "kullanilan": 10,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 49.2,
-      "actions_kosu": 104,
+      "actions_dakika": 50.6,
+      "actions_kosu": 106,
       "actions_limit": 2000,
-      "actions_kalan": 1950.8
+      "actions_kalan": 1949.4
     },
     {
       "ad": "Google Drive",
@@ -83,6 +86,11 @@
           "ad": "CEO / Tablolar",
           "boyut": 77069360,
           "dosya": 14
+        },
+        {
+          "ad": "Diğer (Gmail, Fotoğraflar, arşiv)",
+          "boyut": 4606667933,
+          "dosya": 0
         }
       ],
       "hesap": "galtundal81@gmail.com",
@@ -156,6 +164,10 @@
     },
     {
       "zaman": "2026-11-02T12:50:22+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T12:51:31+00:00",
       "elevenlabs_kalan": null
     }
   ]
