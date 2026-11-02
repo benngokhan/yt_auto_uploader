@@ -1520,7 +1520,7 @@ def upload_job(
             if sure_bilgi["durum"] in ("uzun", "kisa"):
                 log.warning(
                     f"  SENARYO SÜRE UYARISI: {file_name} {sure_bilgi['sure']} sn "
-                    f"(hedef {SENARYO_HEDEF_SN[0]}-{SENARYO_HEDEF_SN[1]}, sınır {SENARYO_SINIR_SN[0]}-{SENARYO_SINIR_SN[1]}) "
+                    f"(ideal {SENARYO_HEDEF_SN[0]}-{SENARYO_HEDEF_SN[1]} sn, sınır {SENARYO_SINIR_SN[0]}-{SENARYO_SINIR_SN[1]}) "
                     "— yayın engellenmedi."
                 )
             else:
@@ -1603,9 +1603,9 @@ def upload_job(
         if sure_bilgi.get("sure"):
             _sure_satir = f"\n\n⏱️ <b>Süre:</b> {sure_bilgi['sure']} sn"
             if sure_bilgi["durum"] == "uzun":
-                _sure_satir += f" ⚠️ hedef {SENARYO_HEDEF_SN[0]}–{SENARYO_HEDEF_SN[1]} sn (uzun: kapanışa gelmeden düşüş riski)"
+                _sure_satir += f" ⚠️ ideal {SENARYO_HEDEF_SN[0]}–{SENARYO_HEDEF_SN[1]} sn (uzun: kapanışa gelmeden düşüş riski)"
             elif sure_bilgi["durum"] == "kisa":
-                _sure_satir += f" ⚠️ çok kısa (hedef {SENARYO_HEDEF_SN[0]}–{SENARYO_HEDEF_SN[1]} sn)"
+                _sure_satir += f" ⚠️ çok kısa (ideal {SENARYO_HEDEF_SN[0]}–{SENARYO_HEDEF_SN[1]} sn)"
             report_txt += _sure_satir
         REPORT_FILE.write_text(report_txt, encoding="utf-8")
         sync_kartal_status_report(
