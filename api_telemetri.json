@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-02T13:34:30+00:00",
+  "zaman": "2026-11-02T13:35:58+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -43,16 +43,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4980,
+      "kalan": 4975,
       "limit": 5000,
-      "kullanilan": 20,
+      "kullanilan": 25,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 54.2,
-      "actions_kosu": 110,
+      "actions_dakika": 55.8,
+      "actions_kosu": 113,
       "actions_limit": 2000,
-      "actions_kalan": 1945.8
+      "actions_kalan": 1944.2
     },
     {
       "ad": "Google Drive",
@@ -88,14 +88,43 @@
           "dosya": 14
         },
         {
-          "ad": "Arşiv / Yedek (GİRMEK YASAK)",
-          "boyut": 0,
-          "dosya": 0
-        },
-        {
           "ad": "Diğer (Gmail, Fotoğraflar, arşiv)",
           "boyut": 4606667933,
           "dosya": 0
+        }
+      ],
+      "buyuk_dosyalar": [
+        {
+          "ad": "uzun_video_10.mp4",
+          "boyut": 95768604
+        },
+        {
+          "ad": "uzun_video_12.mp4",
+          "boyut": 91996704
+        },
+        {
+          "ad": "uzun_video_4.mp4",
+          "boyut": 88715905
+        },
+        {
+          "ad": "uzun_video_5.mp4",
+          "boyut": 87818519
+        },
+        {
+          "ad": "uzun_video_9.mp4",
+          "boyut": 85769016
+        },
+        {
+          "ad": "uzun_video_6.mp4",
+          "boyut": 83807712
+        },
+        {
+          "ad": "uzun_video_8.mp4",
+          "boyut": 83722104
+        },
+        {
+          "ad": "uzun_video_11.mp4",
+          "boyut": 73557803
         }
       ],
       "hesap": "galtundal81@gmail.com",
@@ -181,6 +210,10 @@
     },
     {
       "zaman": "2026-11-02T13:34:30+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T13:35:58+00:00",
       "elevenlabs_kalan": null
     }
   ]
