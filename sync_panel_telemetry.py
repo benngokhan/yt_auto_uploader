@@ -161,6 +161,32 @@ def _resolve_table_file_id(drive) -> str:
     return ""
 
 
+def cover_candidates(num: int, is_long: bool) -> list[str]:
+    """Hazır kapak adayları — uploader.thumbnail_candidates ile AYNI sıra.
+
+    Kapaklar .jpg / .png / .jpeg uzantılarıyla gelebiliyor (ör. kapak_164.jpeg).
+    Eski kod yalnızca kapak_N.jpg aradığı için panelde yanlış "kapak eksik"
+    uyarısı çıkıyordu.
+    """
+    if is_long:
+        stems = (f"uzun_kapak_{num}", f"kapak_uzun_{num}")
+        exts = ("png", "jpg", "jpeg")
+    else:
+        stems = (f"kapak_{num}", f"short_kapak_{num}")
+        exts = ("jpg", "png", "jpeg")
+    return [f"{stem}.{ext}" for stem in stems for ext in exts]
+
+
+def pick_cover(cover_map: dict, num: int, is_long: bool) -> tuple[str, dict | None]:
+    """(beklenen/mevcut kapak adı, Drive dosyası) — uzantıdan bağımsız eşleşme."""
+    candidates = cover_candidates(num, is_long)
+    for name in candidates:
+        found = cover_map.get(name.lower())
+        if found:
+            return found["name"], found
+    return candidates[0], None
+
+
 def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_table_to_drive: bool = False) -> dict:
     tr_now = datetime.now(timezone(timedelta(hours=3)))
     now_str = tr_now.strftime("%Y-%m-%d %H:%M:%S")
@@ -206,32 +232,6 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
             ceo_files = inv.get("ceo_files", [])
         except Exception:
             pass
-
-
-def cover_candidates(num: int, is_long: bool) -> list[str]:
-    """Hazır kapak adayları — uploader.thumbnail_candidates ile AYNI sıra.
-
-    Kapaklar .jpg / .png / .jpeg uzantılarıyla gelebiliyor (ör. kapak_164.jpeg).
-    Eski kod yalnızca kapak_N.jpg aradığı için panelde yanlış "kapak eksik"
-    uyarısı çıkıyordu.
-    """
-    if is_long:
-        stems = (f"uzun_kapak_{num}", f"kapak_uzun_{num}")
-        exts = ("png", "jpg", "jpeg")
-    else:
-        stems = (f"kapak_{num}", f"short_kapak_{num}")
-        exts = ("jpg", "png", "jpeg")
-    return [f"{stem}.{ext}" for stem in stems for ext in exts]
-
-
-def pick_cover(cover_map: dict, num: int, is_long: bool) -> tuple[str, dict | None]:
-    """(beklenen/mevcut kapak adı, Drive dosyası) — uzantıdan bağımsız eşleşme."""
-    candidates = cover_candidates(num, is_long)
-    for name in candidates:
-        found = cover_map.get(name.lower())
-        if found:
-            return found["name"], found
-    return candidates[0], None
 
     shorts_video_map = {f["name"].lower(): f for f in shorts_videos}
     shorts_cover_map = {f["name"].lower(): f for f in shorts_covers}
