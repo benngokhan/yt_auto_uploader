@@ -24,8 +24,17 @@ ARAMA_URL = "https://pixabay.com/api/"
 
 
 def _istek(url: str) -> dict:
-    with urllib.request.urlopen(url, timeout=60) as y:
-        return json.loads(y.read().decode())
+    istek = urllib.request.Request(url, headers={"User-Agent": "bilgidozu-motor/1.0 (+github)"})
+    try:
+        with urllib.request.urlopen(istek, timeout=60) as y:
+            return json.loads(y.read().decode())
+    except Exception as hata:  # noqa: BLE001
+        govde = ""
+        try:
+            govde = hata.read().decode()[:300]      # type: ignore[attr-defined]
+        except Exception:  # noqa: BLE001
+            pass
+        raise SystemExit(f"Pixabay isteği başarısız: {hata} | {govde}") from hata
 
 
 def pixabay_ara(sorgu: str, anahtar: str, adet: int = 20) -> list[dict]:

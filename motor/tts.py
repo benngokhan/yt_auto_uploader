@@ -57,7 +57,16 @@ def _speechify(metin: str, cikti: Path, ayar: dict) -> dict:
         raise SesHatasi(f"Speechify hatası: {str(hata)[:160]}") from hata
 
     cikti.write_bytes(base64.b64decode(veri["audio_data"]))
+    _wav_basligini_duzelt(cikti)
     return _hizalama(metin, cikti, veri.get("speech_marks") or {})
+
+
+def _wav_basligini_duzelt(yol: Path) -> None:
+    """Speechify akış (streaming) WAV başlığı yazıyor: kare sayısı 0x7FFFFFFF.
+    Dosyayı yeniden yazıp geçerli başlık üretiyoruz; aksi hâlde ses süresi
+    on binlerce saniye görünüyor."""
+    x, sr = sf.read(str(yol), dtype="float32", always_2d=True)
+    sf.write(str(yol), x, sr, subtype="PCM_16")
 
 
 def _hizalama(metin: str, yol: Path, marks: dict) -> dict:
