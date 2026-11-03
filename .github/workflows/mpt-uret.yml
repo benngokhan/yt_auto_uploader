@@ -18,6 +18,11 @@ on:
         required: false
         type: boolean
         default: false
+      test:
+        description: "TEST modu: Edge ses + kuru (kanonik ses doğrulanmadan hat testi)"
+        required: false
+        type: boolean
+        default: false
 
 #  on:
 #    schedule:
@@ -47,13 +52,14 @@ jobs:
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TEST_MODE: ${{ inputs.test }}
         run: |
           eksik=""
           if [ -z "$PEXELS_API_KEY" ] && [ -z "$PIXABAY_API_KEY" ] && [ -z "$COVERR_API_KEY" ]; then
             eksik="$eksik PIXABAY_API_KEY (veya PEXELS/COVERR)"
           fi
           [ -z "$ELEVENLABS_API_KEY" ] && eksik="$eksik ELEVENLABS_API_KEY"
-          [ -z "$ELEVENLABS_VOICE_ID" ] && eksik="$eksik ELEVENLABS_VOICE_ID"
+          [ -z "$ELEVENLABS_VOICE_ID" ] && [ "$TEST_MODE" != "true" ] && eksik="$eksik ELEVENLABS_VOICE_ID"
           [ -z "$GEMINI_API_KEY" ] && eksik="$eksik GEMINI_API_KEY"
           if [ -n "$eksik" ]; then
             echo "::error::Eksik GitHub secret:$eksik"
@@ -102,9 +108,15 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           KONU: ${{ inputs.konu }}
           KURU: ${{ inputs.kuru }}
+          TEST: ${{ inputs.test }}
         run: |
           ARG=""
-          if [ "$KURU" = "true" ]; then ARG="--kuru"; fi
+          if [ "$TEST" = "true" ]; then
+            ARG="--kuru --ses-edge"
+            echo "TEST modu: Edge ses, Drive'a yükleme yok."
+          elif [ "$KURU" = "true" ]; then
+            ARG="--kuru"
+          fi
           python mpt_uret.py --konu "$KONU" $ARG
 
       - name: Telegram bildirimi
