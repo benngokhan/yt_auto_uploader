@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-02 04:01:59",
-  "generated_at_iso": "2026-11-02T04:01:59.340479+03:00",
+  "generated_at": "2026-11-03 09:42:25",
+  "generated_at_iso": "2026-11-03T09:42:25.133958+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -36,12 +36,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 11,
+    "ready_shorts": 9,
     "ready_longs": 14,
-    "total_ready": 25,
-    "days_of_stock": 12.5,
-    "next_short": "video_155.mp4",
-    "next_short_title": "Buzun Üzeri Neden Kaygandır: Eksi Derecede Bile Akan Gizli Katman! 🧊 #bilgidozu #shorts",
+    "total_ready": 23,
+    "days_of_stock": 11.5,
+    "next_short": "video_158.mp4",
+    "next_short_title": "Ağlamamak İçin Kendini Tuttuğunda Boğazına Neden Yumru Oturur? 😢 #bilgidozu #shorts",
     "next_long": "uzun_video_8.mp4",
     "next_long_title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
     "missing_covers": []
@@ -105,11 +105,11 @@
         "modifiedTime": "2026-10-30T06:42:40.336Z"
       },
       {
-        "id": "16w8ahoKJZzkErIQhCgR9x---DvuY2-Fm",
+        "id": "1-ag1ZRblavOInWCi4qRm-lHSYGy_U47e",
         "name": "video_163.mp4",
         "mimeType": "video/mp4",
-        "size": 11540103,
-        "modifiedTime": "2026-10-30T06:42:41.003Z"
+        "size": 62252543,
+        "modifiedTime": "2026-11-02T04:49:12.546Z"
       },
       {
         "id": "1n00O3UrSxsMQgsQVj7PhYXeFlgBVQEvT",
@@ -138,8 +138,8 @@
         "id": "1jiScwcmRqXEC5xt8mUJj7ODoE_mZ1y-z",
         "name": "kapak_155.jpg",
         "mimeType": "image/jpeg",
-        "size": 543290,
-        "modifiedTime": "2026-11-01T18:33:51.700Z"
+        "size": 425705,
+        "modifiedTime": "2026-11-02T10:51:43.836Z"
       },
       {
         "id": "1Q1i0AbU6XgEppUzRn-pr_McKGWb1J1i4",
@@ -152,8 +152,8 @@
         "id": "1miH9dD9DoyzBKHKQkS2hWwvNdEd507Bc",
         "name": "kapak_156.jpg",
         "mimeType": "image/jpeg",
-        "size": 481105,
-        "modifiedTime": "2026-11-01T18:33:51.732Z"
+        "size": 393762,
+        "modifiedTime": "2026-11-02T21:43:12.352Z"
       },
       {
         "id": "1Pn4FrVtlVWNVwR83adi4EdF2wsk6VwX6",
@@ -224,6 +224,13 @@
         "mimeType": "image/jpeg",
         "size": 333759,
         "modifiedTime": "2026-11-01T23:41:18.571Z"
+      },
+      {
+        "id": "1HcuSg6M8A3nLHjQO0JcdNq75eNpwnLLG",
+        "name": "kapak_167.jpg",
+        "mimeType": "image/jpeg",
+        "size": 600623,
+        "modifiedTime": "2026-11-02T13:42:13.019Z"
       }
     ],
     "long_videos": [
@@ -335,116 +342,144 @@
     ],
     "long_covers": [
       {
-        "id": "1JzSRGJ8lSELmi54BmwTE2zWgSPs82pPi",
+        "id": "1OK0Ut0Nkvt0PEJ3kKh1O1GiAaLjdzWX9",
+        "name": "uzun_kapak_1.jpeg",
+        "mimeType": "image/jpeg",
+        "size": 422594,
+        "modifiedTime": "2026-11-02T03:11:16.353Z"
+      },
+      {
+        "id": "1WuE3DXRU6pC-tM_POwrIdMWZP1e3d2Ak",
         "name": "uzun_kapak_10.png",
         "mimeType": "image/png",
-        "size": 744262,
-        "modifiedTime": "2026-11-01T19:46:15.380Z"
+        "size": 789855,
+        "modifiedTime": "2026-11-02T09:10:59.208Z"
       },
       {
-        "id": "16xg3eaXZoCsS6dCYwy5KRusp9kCE0kYt",
+        "id": "1JwmEhko71Rypt3ljDpONcSv5SkChzJO6",
         "name": "uzun_kapak_11.png",
         "mimeType": "image/png",
-        "size": 712215,
-        "modifiedTime": "2026-11-01T19:46:14.536Z"
+        "size": 842007,
+        "modifiedTime": "2026-11-02T09:10:59.192Z"
       },
       {
-        "id": "1R3B2Le8L3wRtzzllWH8NAzr7P4U6WrRp",
+        "id": "1PJpoC-ZpFCwBdjcGTIhiIqs46_Z-hXQo",
         "name": "uzun_kapak_12.png",
         "mimeType": "image/png",
-        "size": 680842,
-        "modifiedTime": "2026-11-01T19:46:15.445Z"
+        "size": 1464905,
+        "modifiedTime": "2026-11-02T09:11:00.128Z"
       },
       {
-        "id": "1hDtci56LoU5Y0JJiedhFpDXxH-MGQOGR",
+        "id": "1mHW8OhMfoOATbtH3DaJj_xSohRWEIYdU",
         "name": "uzun_kapak_13.png",
         "mimeType": "image/png",
-        "size": 678234,
-        "modifiedTime": "2026-11-01T19:46:15.206Z"
+        "size": 1770572,
+        "modifiedTime": "2026-11-02T09:10:59.604Z"
       },
       {
-        "id": "1RCI3SwogtXxuq7kWH9zG8fWFt53SkLwd",
+        "id": "1blqePOc1OzIy5JgcupC-lmhCz-XSeY-B",
         "name": "uzun_kapak_14.png",
         "mimeType": "image/png",
-        "size": 862676,
-        "modifiedTime": "2026-11-01T19:46:14.139Z"
+        "size": 1818663,
+        "modifiedTime": "2026-11-02T09:10:59.465Z"
       },
       {
-        "id": "1i7QZRj8yFXoeAXEByyqfcwvbTRIj2lZE",
+        "id": "1Eabpdlk-tDG9P9z81DHTrGf9JBHyDzW0",
         "name": "uzun_kapak_15.png",
         "mimeType": "image/png",
-        "size": 807835,
-        "modifiedTime": "2026-11-01T19:46:15.271Z"
+        "size": 1666183,
+        "modifiedTime": "2026-11-02T09:10:59.746Z"
       },
       {
-        "id": "1x0Kj2EiteNr_OIxpYy5lotB6at3PhT8_",
+        "id": "1QlQRA3iWdD0bpotTmlqPWjeUqzw2Umma",
         "name": "uzun_kapak_16.png",
         "mimeType": "image/png",
-        "size": 795808,
-        "modifiedTime": "2026-11-01T19:46:14.961Z"
+        "size": 1725704,
+        "modifiedTime": "2026-11-02T09:11:20.509Z"
       },
       {
-        "id": "1nC-MBMGOzZ0uS0Hk_JRbLsslRlopZX2L",
+        "id": "1E4X5qHX_lxrWMmrTFU9xrzRdwhEITZvH",
         "name": "uzun_kapak_17.png",
         "mimeType": "image/png",
-        "size": 743185,
-        "modifiedTime": "2026-11-01T19:46:14.237Z"
+        "size": 1569528,
+        "modifiedTime": "2026-11-02T09:11:20.791Z"
       },
       {
-        "id": "1moe-G5kCYGkeRtNneD9IkDzoWAXv4qlg",
+        "id": "1CWhMMxPJKP0zWOdcH_biAa6Lo0UVinYB",
         "name": "uzun_kapak_18.png",
         "mimeType": "image/png",
-        "size": 677189,
-        "modifiedTime": "2026-11-01T19:46:15.319Z"
+        "size": 1537069,
+        "modifiedTime": "2026-11-02T09:11:20.679Z"
       },
       {
-        "id": "11js2fd0G_MuATtp9LJ20eYSIjnnabe7W",
+        "id": "1lG8rubtRPhU90yYqbffbCviiX1Y7LI1h",
         "name": "uzun_kapak_19.png",
         "mimeType": "image/png",
-        "size": 806517,
-        "modifiedTime": "2026-11-01T19:46:14.639Z"
+        "size": 850188,
+        "modifiedTime": "2026-11-02T09:11:20.546Z"
       },
       {
-        "id": "10UXm1WwxxYrZ53kDVIHVLxcPwkXg5Aii",
+        "id": "1frRFR8Io5aY-13TWq1uQftwmBahVbO6d",
+        "name": "uzun_kapak_2.jpeg",
+        "mimeType": "image/jpeg",
+        "size": 332099,
+        "modifiedTime": "2026-11-02T03:11:16.332Z"
+      },
+      {
+        "id": "1p5n_m1iu8SArGUGK3-N6PxJXW8OUXUPD",
         "name": "uzun_kapak_20.png",
         "mimeType": "image/png",
-        "size": 672902,
-        "modifiedTime": "2026-11-01T19:46:14.769Z"
+        "size": 1768498,
+        "modifiedTime": "2026-11-02T09:11:20.701Z"
       },
       {
-        "id": "1tsG3BOvEOxe8Pz-LCxxZqYKgsNDyJIru",
+        "id": "1n6qQ3oyTU60UlV-lg3KSU23EnZQbvzhl",
         "name": "uzun_kapak_21.png",
         "mimeType": "image/png",
-        "size": 671023,
-        "modifiedTime": "2026-11-01T19:46:14.331Z"
+        "size": 1911555,
+        "modifiedTime": "2026-11-02T09:11:21.207Z"
       },
       {
-        "id": "1KXvb5VKixPf8gDyQYDCxM-xdy0dS2glr",
+        "id": "1e22SUjKLwfd2W9DjGMVS6cBsQjK7O0L6",
         "name": "uzun_kapak_22.png",
         "mimeType": "image/png",
-        "size": 670717,
-        "modifiedTime": "2026-11-01T19:46:14.289Z"
+        "size": 1796645,
+        "modifiedTime": "2026-11-02T09:11:21.077Z"
       },
       {
-        "id": "1R-VZZHpHlX_la0-hu4xD1TmZBA0pUGam",
-        "name": "uzun_kapak_8.png",
-        "mimeType": "image/png",
-        "size": 763637,
-        "modifiedTime": "2026-11-01T19:46:14.383Z"
+        "id": "1wOWKMFbrxo1d-clfq1LDvPXkgn0emXs0",
+        "name": "uzun_kapak_3.jpeg",
+        "mimeType": "image/jpeg",
+        "size": 571887,
+        "modifiedTime": "2026-11-02T03:11:16.325Z"
+      },
+      {
+        "id": "1sec9pIzmCotB7WGF36ttNza3QMzQuE8m",
+        "name": "uzun_kapak_4.jpeg",
+        "mimeType": "image/jpeg",
+        "size": 533867,
+        "modifiedTime": "2026-11-02T03:11:16.371Z"
+      },
+      {
+        "id": "1rpt3FQImeuRLTk07gvJUTPD25waJtJFy",
+        "name": "uzun_kapak_5.jpeg",
+        "mimeType": "image/jpeg",
+        "size": 441708,
+        "modifiedTime": "2026-11-02T03:11:16.354Z"
       },
       {
         "id": "1KqEPvriafHU7YZP4cCnppWOG_lN1z_mb",
-        "name": "uzun_kapak_8_yeni.png",
+        "name": "uzun_kapak_8.png",
         "mimeType": "image/png",
         "size": 1657459,
-        "modifiedTime": "2026-11-01T23:24:33.467Z"
+        "modifiedTime": "2026-11-02T08:56:55.392Z"
       },
       {
-        "id": "16Q3MQNjnNEX3RwVTvzrGZ0_5bQ5cjxkV",
+        "id": "1bwJtSzvnFeN3Fb1zx-VBwCBsmcWWadpz",
         "name": "uzun_kapak_9.png",
         "mimeType": "image/png",
-        "size": 495622,
-        "modifiedTime": "2026-11-01T19:46:14.892Z"
+        "size": 1518729,
+        "modifiedTime": "2026-11-02T09:11:00.040Z"
       }
     ],
     "ceo_files": [
@@ -452,8 +487,15 @@
         "id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 88179,
-        "modifiedTime": "2026-11-01T22:23:27.400Z"
+        "size": 90530,
+        "modifiedTime": "2026-11-02T17:05:08.994Z"
+      },
+      {
+        "id": "1LathGn2Mn5Zn_1gf4JqqVz1WnaSm7NVN",
+        "name": "Kontrol",
+        "mimeType": "application/vnd.google-apps.folder",
+        "size": 0,
+        "modifiedTime": "2026-11-02T13:58:08.486Z"
       },
       {
         "id": "1LyZBIc52OzaGZBaq8yXODcseZ0wilsrs",
@@ -461,6 +503,20 @@
         "mimeType": "application/vnd.google-apps.folder",
         "size": 0,
         "modifiedTime": "2026-11-01T22:59:58.786Z"
+      },
+      {
+        "id": "19EEmVW4U2TH0F07UDWW2Dp5DTp4AZ0t6",
+        "name": "senaryo_kurallari.md",
+        "mimeType": "text/markdown",
+        "size": 3567,
+        "modifiedTime": "2026-11-02T21:58:19.151Z"
+      },
+      {
+        "id": "1wSMluVJ0brXdEm9bnVylTXXD0g3o2RF6",
+        "name": "ses kural.md",
+        "mimeType": "text/markdown",
+        "size": 862,
+        "modifiedTime": "2026-11-02T09:13:22.906Z"
       },
       {
         "id": "1bRhgFGax34FGsySde71FqTiMIUpZkw02",
@@ -482,6 +538,13 @@
         "mimeType": "application/vnd.google-apps.folder",
         "size": 0,
         "modifiedTime": "2026-11-01T20:46:15.622Z"
+      },
+      {
+        "id": "1lA8QNmVuDvex_gQN680rXx_RFPFw5Pwh",
+        "name": "video_167.mp4",
+        "mimeType": "video/mp4",
+        "size": 28285352,
+        "modifiedTime": "2026-11-02T14:04:13.535Z"
       }
     ]
   },
@@ -491,9 +554,9 @@
       "file_name": "video_155.mp4",
       "number": 155,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Buzun Üzeri Neden Kaygandır: Eksi Derecede Bile Akan Gizli Katman! 🧊 #bilgidozu #shorts",
       "description": "Düz betonda rahatça yürürken katı buza bastığın saniye ayağının neden sabun gibi kaydığını düşündün mü? Yıllarca ayakkabı basıncının buzu erittiği anlatıldı; oysa insan ağırlığının oluşturduğu basınç buzu eritmeye asla yetmez.\n\n📍 BÖLÜMLER\n00:00 Taş ve cam kuruyken — Buz neden kaygandır?\n00:17 Amsterdam keşfi: — Gevşek yüzey atomları!\n00:36 -7 derece en kaygan an: — Aşırı soğukta azalır!\n\n📊 Kaynaklar:\n• Univ. of Amsterdam (Weber & Bonn, 2018) J. Phys. Chem. Lett.\n• https://iop.uva.nl/content/news/2018/05/why-is-ice-slippery.html\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #fizik #buz #bilim #ilginçbilgiler",
       "tags": [
@@ -522,9 +585,9 @@
       "file_name": "video_156.mp4",
       "number": 156,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Havuç Gece Görüşünü Güçlendirir Efsanesi Nasıl Gizli Radar Oyunu Çıktı? 🥕 #bilgidozu #shorts",
       "description": "Çok havuç yersen karanlıkta kedi gibi görürsün sözünü hep duyarız; peki bu gerçek mi yoksa askeri bir sır mı? Havuçtaki A vitamini göz sağlığını korur; fakat eksiklik yoksa fazlası sağlıklı göze ekstra gece görüşü vermez.\n\n📍 BÖLÜMLER\n00:00 Bol havuç yemek gece — Görüşünü açar mı?\n00:18 1940 gece gökyüzünde — Gizli radar icadı!\n00:37 80 yıldır süren — En başarılı kampanya!\n\n📊 Kaynaklar:\n• Smithsonian Magazine & Imperial War Museums Archives\n• https://www.smithsonianmag.com/arts-culture/a-wwii-propaganda-campaign-popularized-the-myth-that-carrots-help-you-see-in-the-dark-28812484/\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #tarih #bilim #efsaneler #ilginçbilgiler",
       "tags": [
@@ -757,8 +820,8 @@
       "pinned_comment": "Şimdi burnundan üst üste iki kısa nefes çekip ağzından yavaşça ver; o anlık rahatlamayı hissettin mi? 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "16w8ahoKJZzkErIQhCgR9x---DvuY2-Fm",
-      "drive_video_size_mb": 11.01,
+      "drive_video_id": "1-ag1ZRblavOInWCi4qRm-lHSYGy_U47e",
+      "drive_video_size_mb": 59.37,
       "expected_cover": "kapak_163.jpg",
       "has_drive_cover": true,
       "drive_cover_id": "1Arx0rFAUsdjoHtN29-wJUVryZy_yqijH"
@@ -884,7 +947,7 @@
       "drive_video_size_mb": 79.84,
       "expected_cover": "uzun_kapak_8.png",
       "has_drive_cover": true,
-      "drive_cover_id": "1R-VZZHpHlX_la0-hu4xD1TmZBA0pUGam"
+      "drive_cover_id": "1KqEPvriafHU7YZP4cCnppWOG_lN1z_mb"
     },
     {
       "row": 65,
@@ -915,7 +978,7 @@
       "drive_video_size_mb": 81.8,
       "expected_cover": "uzun_kapak_9.png",
       "has_drive_cover": true,
-      "drive_cover_id": "16Q3MQNjnNEX3RwVTvzrGZ0_5bQ5cjxkV"
+      "drive_cover_id": "1bwJtSzvnFeN3Fb1zx-VBwCBsmcWWadpz"
     },
     {
       "row": 66,
@@ -947,7 +1010,7 @@
       "drive_video_size_mb": 91.33,
       "expected_cover": "uzun_kapak_10.png",
       "has_drive_cover": true,
-      "drive_cover_id": "1JzSRGJ8lSELmi54BmwTE2zWgSPs82pPi"
+      "drive_cover_id": "1WuE3DXRU6pC-tM_POwrIdMWZP1e3d2Ak"
     },
     {
       "row": 67,
@@ -978,7 +1041,7 @@
       "drive_video_size_mb": 70.15,
       "expected_cover": "uzun_kapak_11.png",
       "has_drive_cover": true,
-      "drive_cover_id": "16xg3eaXZoCsS6dCYwy5KRusp9kCE0kYt"
+      "drive_cover_id": "1JwmEhko71Rypt3ljDpONcSv5SkChzJO6"
     },
     {
       "row": 68,
@@ -1010,7 +1073,7 @@
       "drive_video_size_mb": 87.73,
       "expected_cover": "uzun_kapak_12.png",
       "has_drive_cover": true,
-      "drive_cover_id": "1R3B2Le8L3wRtzzllWH8NAzr7P4U6WrRp"
+      "drive_cover_id": "1PJpoC-ZpFCwBdjcGTIhiIqs46_Z-hXQo"
     },
     {
       "row": 69,
@@ -1040,7 +1103,7 @@
       "drive_video_size_mb": 54.13,
       "expected_cover": "uzun_kapak_13.png",
       "has_drive_cover": true,
-      "drive_cover_id": "1hDtci56LoU5Y0JJiedhFpDXxH-MGQOGR"
+      "drive_cover_id": "1mHW8OhMfoOATbtH3DaJj_xSohRWEIYdU"
     },
     {
       "row": 135,
@@ -1072,7 +1135,7 @@
       "drive_video_size_mb": 52.2,
       "expected_cover": "uzun_kapak_14.png",
       "has_drive_cover": true,
-      "drive_cover_id": "1RCI3SwogtXxuq7kWH9zG8fWFt53SkLwd"
+      "drive_cover_id": "1blqePOc1OzIy5JgcupC-lmhCz-XSeY-B"
     },
     {
       "row": 139,
@@ -1102,7 +1165,7 @@
       "drive_video_size_mb": 40.09,
       "expected_cover": "uzun_kapak_15.png",
       "has_drive_cover": true,
-      "drive_cover_id": "1i7QZRj8yFXoeAXEByyqfcwvbTRIj2lZE"
+      "drive_cover_id": "1Eabpdlk-tDG9P9z81DHTrGf9JBHyDzW0"
     },
     {
       "row": 143,
@@ -1133,7 +1196,7 @@
       "drive_video_size_mb": 51.47,
       "expected_cover": "uzun_kapak_16.png",
       "has_drive_cover": true,
-      "drive_cover_id": "1x0Kj2EiteNr_OIxpYy5lotB6at3PhT8_"
+      "drive_cover_id": "1QlQRA3iWdD0bpotTmlqPWjeUqzw2Umma"
     },
     {
       "row": 148,
@@ -1162,7 +1225,7 @@
       "drive_video_size_mb": 20.32,
       "expected_cover": "uzun_kapak_17.png",
       "has_drive_cover": true,
-      "drive_cover_id": "1nC-MBMGOzZ0uS0Hk_JRbLsslRlopZX2L"
+      "drive_cover_id": "1E4X5qHX_lxrWMmrTFU9xrzRdwhEITZvH"
     },
     {
       "row": 152,
@@ -1192,7 +1255,7 @@
       "drive_video_size_mb": 16.72,
       "expected_cover": "uzun_kapak_18.png",
       "has_drive_cover": true,
-      "drive_cover_id": "1moe-G5kCYGkeRtNneD9IkDzoWAXv4qlg"
+      "drive_cover_id": "1CWhMMxPJKP0zWOdcH_biAa6Lo0UVinYB"
     },
     {
       "row": 156,
@@ -1221,7 +1284,7 @@
       "drive_video_size_mb": 16.53,
       "expected_cover": "uzun_kapak_19.png",
       "has_drive_cover": true,
-      "drive_cover_id": "11js2fd0G_MuATtp9LJ20eYSIjnnabe7W"
+      "drive_cover_id": "1lG8rubtRPhU90yYqbffbCviiX1Y7LI1h"
     },
     {
       "row": 160,
@@ -1251,7 +1314,7 @@
       "drive_video_size_mb": 19.22,
       "expected_cover": "uzun_kapak_20.png",
       "has_drive_cover": true,
-      "drive_cover_id": "10UXm1WwxxYrZ53kDVIHVLxcPwkXg5Aii"
+      "drive_cover_id": "1p5n_m1iu8SArGUGK3-N6PxJXW8OUXUPD"
     },
     {
       "row": 164,
@@ -1281,7 +1344,7 @@
       "drive_video_size_mb": 25.21,
       "expected_cover": "uzun_kapak_21.png",
       "has_drive_cover": true,
-      "drive_cover_id": "1tsG3BOvEOxe8Pz-LCxxZqYKgsNDyJIru"
+      "drive_cover_id": "1n6qQ3oyTU60UlV-lg3KSU23EnZQbvzhl"
     },
     {
       "row": 168,
@@ -1310,7 +1373,7 @@
       "drive_video_size_mb": 25.64,
       "expected_cover": "uzun_kapak_22.png",
       "has_drive_cover": true,
-      "drive_cover_id": "1KXvb5VKixPf8gDyQYDCxM-xdy0dS2glr"
+      "drive_cover_id": "1e22SUjKLwfd2W9DjGMVS6cBsQjK7O0L6"
     }
   ],
   "isciler": [
@@ -1394,8 +1457,8 @@
   ],
   "retention": {
     "info": {
-      "Dönem": "2026-10-02 — 2026-10-31",
-      "Hazırlanma (Türkiye)": "02.11.2026 02:16",
+      "Dönem": "2026-10-03 — 2026-11-01",
+      "Hazırlanma (Türkiye)": "02.11.2026 12:30",
       "Video sayısı": 78,
       "Eğri verisi olan video": 9,
       "Eğri kapsamı": "Son yayınlanan en fazla 10 video; veri varsa.",
@@ -1737,7 +1800,7 @@
         "title": "Kışın Kalbi Durup Buz Tutan, Baharda Çözülüp Canlanan Kurbağa! 🐸❄️ #bilgidozu #shorts",
         "published_date": "2026-10-26",
         "duration_sec": 41.0,
-        "views": 655,
+        "views": 654,
         "avg_view_sec": 11.0,
         "avg_view_pct": 27.43,
         "watch_time_min": 33.0,
@@ -1745,19 +1808,6 @@
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/jrySNivbPcQ",
         "video_id": "jrySNivbPcQ"
-      },
-      {
-        "title": "Utandığında Neden Sadece Yüzün ve Kulakların Kızarır? 😳 #bilgidozu #shorts",
-        "published_date": "2026-10-28",
-        "duration_sec": 49.0,
-        "views": 534,
-        "avg_view_sec": 22.0,
-        "avg_view_pct": 45.28,
-        "watch_time_min": 24.0,
-        "hook_3s_pct": 104.55,
-        "curve_status": "Hazır",
-        "url": "https://youtu.be/j8J7rqtyyFg",
-        "video_id": "j8J7rqtyyFg"
       },
       {
         "title": "Aynaya Baktığında Bir İnsan Değil, Bir Süpernova Görüyorsun! ✨ #bilgidozu #shorts",
@@ -1784,6 +1834,19 @@
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/ah1-d0TQepk",
         "video_id": "ah1-d0TQepk"
+      },
+      {
+        "title": "Utandığında Neden Sadece Yüzün ve Kulakların Kızarır? 😳 #bilgidozu #shorts",
+        "published_date": "2026-10-28",
+        "duration_sec": 49.0,
+        "views": 513,
+        "avg_view_sec": 22.0,
+        "avg_view_pct": 45.28,
+        "watch_time_min": 24.0,
+        "hook_3s_pct": 104.55,
+        "curve_status": "Hazır",
+        "url": "https://youtu.be/j8J7rqtyyFg",
+        "video_id": "j8J7rqtyyFg"
       },
       {
         "title": "Gözünde Bir Kör Nokta Var — Beynin Boşluğu Gizliyor! 👁️🧠 #bilgidozu #shorts",
@@ -1932,7 +1995,7 @@
         "title": "Vücudundaki Hücrelerin Yarısından Fazlası Aslında Bakteri! 🦠 #bilgidozu #shorts",
         "published_date": "2026-10-28",
         "duration_sec": 38.0,
-        "views": 220,
+        "views": 219,
         "avg_view_sec": 19.0,
         "avg_view_pct": 50.39,
         "watch_time_min": 16.0,
@@ -2033,19 +2096,6 @@
         "video_id": "07gRpcD8Hp0"
       },
       {
-        "title": "Güneşe Dönünce Hapşırıyor musun? Bu Bir Refleks: ACHOO! ☀️🤧 #bilgidozu #shorts",
-        "published_date": "2026-10-27",
-        "duration_sec": 53.0,
-        "views": 147,
-        "avg_view_sec": 17.0,
-        "avg_view_pct": 33.5,
-        "watch_time_min": 11.0,
-        "hook_3s_pct": 96.77,
-        "curve_status": "Hazır",
-        "url": "https://youtu.be/LGXmOwTtGOw",
-        "video_id": "LGXmOwTtGOw"
-      },
-      {
         "title": "Gekolar Cam ve Tavanda Yapıştırıcı Olmadan Nasıl Düşmeden Yürüyor? 🦎🧲 #bilgidozu #shorts",
         "published_date": "2026-10-25",
         "duration_sec": 43.0,
@@ -2059,30 +2109,30 @@
         "video_id": "DrqVzn372Hk"
       },
       {
+        "title": "Güneşe Dönünce Hapşırıyor musun? Bu Bir Refleks: ACHOO! ☀️🤧 #bilgidozu #shorts",
+        "published_date": "2026-10-27",
+        "duration_sec": 53.0,
+        "views": 145,
+        "avg_view_sec": 17.0,
+        "avg_view_pct": 33.5,
+        "watch_time_min": 11.0,
+        "hook_3s_pct": 96.77,
+        "curve_status": "Hazır",
+        "url": "https://youtu.be/LGXmOwTtGOw",
+        "video_id": "LGXmOwTtGOw"
+      },
+      {
         "title": "Sevdiğin Birine Bakınca Göz Bebeğin Neden Otomatik Büyür? 👀 #bilgidozu #shorts",
         "published_date": "2026-10-28",
         "duration_sec": 41.0,
-        "views": 139,
+        "views": 132,
         "avg_view_sec": 20.0,
         "avg_view_pct": 51.05,
-        "watch_time_min": 13.0,
+        "watch_time_min": 12.0,
         "hook_3s_pct": 109.68,
         "curve_status": "Hazır",
         "url": "https://youtu.be/0vGKrBpJh0Q",
         "video_id": "0vGKrBpJh0Q"
-      },
-      {
-        "title": "Voynich El Yazması: 600 Yıldır Kimsenin Okuyamadığı Şifreli Kitap! 📜 #bilgidozu #shorts",
-        "published_date": "2026-10-28",
-        "duration_sec": 49.0,
-        "views": 131,
-        "avg_view_sec": 25.0,
-        "avg_view_pct": 52.2,
-        "watch_time_min": 19.0,
-        "hook_3s_pct": 107.32,
-        "curve_status": "Hazır",
-        "url": "https://youtu.be/7DG1etjQlR4",
-        "video_id": "7DG1etjQlR4"
       },
       {
         "title": "Gökten Dev Elmaslar Yağıyor! Fizik Kurallarını Çöpe Atan 3 Gezegen 🪐💎 #bilgidozu",
@@ -2096,6 +2146,19 @@
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/vh_h0diuFG8",
         "video_id": "vh_h0diuFG8"
+      },
+      {
+        "title": "Voynich El Yazması: 600 Yıldır Kimsenin Okuyamadığı Şifreli Kitap! 📜 #bilgidozu #shorts",
+        "published_date": "2026-10-28",
+        "duration_sec": 49.0,
+        "views": 127,
+        "avg_view_sec": 25.0,
+        "avg_view_pct": 52.2,
+        "watch_time_min": 18.0,
+        "hook_3s_pct": 107.32,
+        "curve_status": "Hazır",
+        "url": "https://youtu.be/7DG1etjQlR4",
+        "video_id": "7DG1etjQlR4"
       },
       {
         "title": "Tam Uykuya Dalarken Neden Boşluğa Düşer Gibi Sıçrarsın? 😴⚡ #bilgidozu #shorts",
@@ -2166,7 +2229,7 @@
         "title": "Bir Esnedin, Etraf da Esnedi! Esnemenin Bulaşma Sırrı 😮🧠 #bilgidozu #shorts",
         "published_date": "2026-10-27",
         "duration_sec": 55.0,
-        "views": 78,
+        "views": 77,
         "avg_view_sec": 25.0,
         "avg_view_pct": 45.63,
         "watch_time_min": 11.0,
@@ -2218,9 +2281,9 @@
         "title": "Maratonu bir kraliyet isteği uzattı 👑",
         "published_date": "2026-09-24",
         "duration_sec": 21.0,
-        "views": 39,
+        "views": 36,
         "avg_view_sec": 8.0,
-        "avg_view_pct": 41.75,
+        "avg_view_pct": 41.03,
         "watch_time_min": 3.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
@@ -2231,9 +2294,9 @@
         "title": "Bu Köpekbalığı 400 Yaşında Olabilir! 🦈 #shorts",
         "published_date": "2026-09-24",
         "duration_sec": 11.0,
-        "views": 32,
-        "avg_view_sec": 10.0,
-        "avg_view_pct": 96.69,
+        "views": 30,
+        "avg_view_sec": 11.0,
+        "avg_view_pct": 100.24,
         "watch_time_min": 2.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
@@ -2244,22 +2307,35 @@
         "title": "22 Eylül 2026",
         "published_date": "2026-09-21",
         "duration_sec": 40.0,
-        "views": 31,
-        "avg_view_sec": 12.0,
-        "avg_view_pct": 31.37,
-        "watch_time_min": 4.0,
+        "views": 28,
+        "avg_view_sec": 11.0,
+        "avg_view_pct": 28.56,
+        "watch_time_min": 3.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/XbjukOkKz6M",
         "video_id": "XbjukOkKz6M"
       },
       {
+        "title": "Günde Kaç Saat Kaydırıyorsun? 😳",
+        "published_date": "2026-09-21",
+        "duration_sec": 46.0,
+        "views": 20,
+        "avg_view_sec": 8.0,
+        "avg_view_pct": 17.81,
+        "watch_time_min": 1.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/_agvVDP_Dcg",
+        "video_id": "_agvVDP_Dcg"
+      },
+      {
         "title": "Kleopatra piramitlerden çok bize yakın ⏳ #shorts",
         "published_date": "2026-09-24",
         "duration_sec": 21.0,
-        "views": 22,
-        "avg_view_sec": 8.0,
-        "avg_view_pct": 41.09,
+        "views": 19,
+        "avg_view_sec": 9.0,
+        "avg_view_pct": 47.08,
         "watch_time_min": 1.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
@@ -2267,25 +2343,12 @@
         "video_id": "w0X3T08NOiI"
       },
       {
-        "title": "Günde Kaç Saat Kaydırıyorsun? 😳",
-        "published_date": "2026-09-21",
-        "duration_sec": 46.0,
-        "views": 22,
-        "avg_view_sec": 9.0,
-        "avg_view_pct": 20.22,
-        "watch_time_min": 2.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/_agvVDP_Dcg",
-        "video_id": "_agvVDP_Dcg"
-      },
-      {
         "title": "Doğanın En Tuhaf 3 Gerçeği 🤯 (# Shorts!)",
         "published_date": "2026-09-24",
         "duration_sec": 12.0,
-        "views": 21,
+        "views": 19,
         "avg_view_sec": 8.0,
-        "avg_view_pct": 67.95,
+        "avg_view_pct": 68.66,
         "watch_time_min": 1.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
@@ -2293,12 +2356,12 @@
         "video_id": "uAL5ygdZxr8"
       },
       {
-        "title": "Şehrin İhtiyacı Olan 8 Şey (Hepsi Gerçek) bu",
+        "title": "Şehrin İhtiyacı Olan 8 Şey (Hepsi Gerçek)",
         "published_date": "2026-09-24",
         "duration_sec": 181.0,
-        "views": 20,
+        "views": 16,
         "avg_view_sec": 24.0,
-        "avg_view_pct": 13.44,
+        "avg_view_pct": 13.66,
         "watch_time_min": 5.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
@@ -2309,7 +2372,7 @@
         "title": "Mars'ta Mavi Gün Batımı mı? 3 Şaşırtıcı Gerçek | #Shorts",
         "published_date": "2026-09-24",
         "duration_sec": 11.0,
-        "views": 15,
+        "views": 14,
         "avg_view_sec": 9.0,
         "avg_view_pct": 88.78,
         "watch_time_min": 0.0,
@@ -2317,32 +2380,6 @@
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/c12v1QSDg5E",
         "video_id": "c12v1QSDg5E"
-      },
-      {
-        "title": "Venüs'te Bir Gün, Bir Yıldan Uzun! 🤯 Uzay Hakkında 3 Gerçek #shorts",
-        "published_date": "2026-09-24",
-        "duration_sec": 11.0,
-        "views": 14,
-        "avg_view_sec": 8.0,
-        "avg_view_pct": 78.45,
-        "watch_time_min": 1.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/e0cA_Aji83w",
-        "video_id": "e0cA_Aji83w"
-      },
-      {
-        "title": "Beynin Sana Yalan Söylüyor! 🧠 #shorts",
-        "published_date": "2026-09-22",
-        "duration_sec": 19.0,
-        "views": 14,
-        "avg_view_sec": 13.0,
-        "avg_view_pct": 73.18,
-        "watch_time_min": 1.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/jo5mDrRkROY",
-        "video_id": "jo5mDrRkROY"
       },
       {
         "title": "Doğa İnsandan Daha Zeki! İnsan Aklını Aşan 3 Gizli Deha 🧠🦅 #bilgidozu",
@@ -2358,6 +2395,19 @@
         "video_id": "eAnBBamiD1U"
       },
       {
+        "title": "Venüs'te Bir Gün, Bir Yıldan Uzun! 🤯 Uzay Hakkında 3 Gerçek #shorts",
+        "published_date": "2026-09-24",
+        "duration_sec": 11.0,
+        "views": 13,
+        "avg_view_sec": 9.0,
+        "avg_view_pct": 83.81,
+        "watch_time_min": 0.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/e0cA_Aji83w",
+        "video_id": "e0cA_Aji83w"
+      },
+      {
         "title": "İstikrarlı Olmak Neden Bu Kadar Zor? (Ve Nasıl Zahmetsiz Hale Gelir?)",
         "published_date": "2026-09-24",
         "duration_sec": 572.0,
@@ -2371,10 +2421,23 @@
         "video_id": "ExNJqJLhHP0"
       },
       {
+        "title": "Beynin Sana Yalan Söylüyor! 🧠 #shorts",
+        "published_date": "2026-09-22",
+        "duration_sec": 19.0,
+        "views": 13,
+        "avg_view_sec": 13.0,
+        "avg_view_pct": 73.07,
+        "watch_time_min": 1.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/jo5mDrRkROY",
+        "video_id": "jo5mDrRkROY"
+      },
+      {
         "title": "İlk webcam'in izlediği şeye inanamayacaksın ☕🤯",
         "published_date": "2026-09-24",
         "duration_sec": 21.0,
-        "views": 13,
+        "views": 11,
         "avg_view_sec": 11.0,
         "avg_view_pct": 53.27,
         "watch_time_min": 0.0,
@@ -2387,9 +2450,9 @@
         "title": "Ahtapotların 3 Kalbi Var! 🐙 Hayvanlar Hakkında 3 Şaşırtıcı Gerçek #shorts",
         "published_date": "2026-09-24",
         "duration_sec": 11.0,
-        "views": 12,
-        "avg_view_sec": 8.0,
-        "avg_view_pct": 79.37,
+        "views": 10,
+        "avg_view_sec": 10.0,
+        "avg_view_pct": 92.73,
         "watch_time_min": 0.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
@@ -2400,9 +2463,9 @@
         "title": "10 Saniyede 3 Şaşırtıcı Gerçek — Bölüm 2 | #Shorts",
         "published_date": "2026-09-24",
         "duration_sec": 16.0,
-        "views": 10,
+        "views": 9,
         "avg_view_sec": 9.0,
-        "avg_view_pct": 58.67,
+        "avg_view_pct": 56.41,
         "watch_time_min": 0.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",

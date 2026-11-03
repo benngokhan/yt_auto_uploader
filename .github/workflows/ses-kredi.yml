@@ -1,0 +1,167 @@
+name: Ses & Kredi (ElevenLabs)
+
+# Panel için kalan ElevenLabs kredisini okur (kredi harcamaz), API anahtarını
+# panelden yenilemeye izin verir ve ses listesinden voice_id kilitlemeyi sağlar.
+#
+# Tetikler:
+#   * 6 saatte bir cron  → kredi tazeleme
+#   * Panel "Yenile"      → repository_dispatch: ses_kredi
+#   * Panel "Anahtar yükle" → repository_dispatch: ses_anahtar  (client_payload.anahtar)
+#   * Panel "Bu sesi kilitle" → repository_dispatch: ses_voice    (client_payload.voice_id / model)
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [ses_kredi, ses_anahtar, ses_voice, ses_design, ses_kaydet]
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: ses-kredi
+  cancel-in-progress: true
+
+jobs:
+  kredi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ secrets.SITE_SYNC_TOKEN }}
+      KILIT_VOICE_ID: ${{ github.event.client_payload.voice_id }}
+      KILIT_MODEL: ${{ github.event.client_payload.model }}
+      DESIGN_ACIKLAMA: ${{ github.event.client_payload.aciklama }}
+      DESIGN_ORNEK: ${{ github.event.client_payload.ornek }}
+      DESIGN_MODEL: ${{ github.event.client_payload.ttv_model }}
+      SECILEN_ID: ${{ github.event.client_payload.generated_voice_id }}
+      SES_AD: ${{ github.event.client_payload.ad }}
+      SES_ACIKLAMA: ${{ github.event.client_payload.ses_aciklama }}
+      TTS_MODEL: ${{ github.event.client_payload.tts_model }}
+      OLAY: ${{ github.event_name }}
+      TUR: ${{ github.event.action }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Panelden gelen anahtar: loglarda maskelenir, varsa GitHub secret'ına yazılır
+      - name: Anahtarı secret'a işle (panelden geldiyse)
+        if: ${{ github.event_name == 'repository_dispatch' && github.event.action == 'ses_anahtar' && github.event.client_payload.anahtar != '' }}
+        env:
+          YENI_ANAHTAR: ${{ github.event.client_payload.anahtar }}
+        run: |
+          echo "::add-mask::$YENI_ANAHTAR"
+          python - <<'PY'
+          import os, pathlib
+          pathlib.Path("yeni_anahtar.txt").write_text(os.environ["YENI_ANAHTAR"].strip(), encoding="utf-8")
+          PY
+          if gh secret set ELEVENLABS_API_KEY --repo "$GITHUB_REPOSITORY" --body "$YENI_ANAHTAR"; then
+            echo "✅ ELEVENLABS_API_KEY GitHub secret'ı güncellendi."
+          else
+            echo "⚠️ Secret yazılamadı (SITE_SYNC_TOKEN yetkisi yetersiz). Anahtar yalnızca bu koşuda kullanılacak."
+            echo "   Elle: Settings → Secrets and variables → Actions → ELEVENLABS_API_KEY"
+          fi
+          echo "SES_ANAHTAR_KAYNAK=yeni" >> $GITHUB_ENV
+
+      # Panelden gelen ses kilidi
+      - name: Sesi kilitle (voice.json)
+        if: ${{ github.event_name == 'repository_dispatch' && github.event.action == 'ses_voice' && env.KILIT_VOICE_ID != '' }}
+        run: |
+          python - <<'PY'
+          import json, os, pathlib, datetime
+          p = pathlib.Path("ses/voice.json")
+          d = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+          k = d.get("kilit", {})
+          k["saglayici"] = "elevenlabs"
+          k["voice_id"] = os.environ["KILIT_VOICE_ID"].strip()
+          if os.environ.get("KILIT_MODEL", "").strip():
+              k["model"] = os.environ["KILIT_MODEL"].strip()
+          elif not k.get("model"):
+              k["model"] = "eleven_multilingual_v2"
+          d["kilit"] = k
+          d["kilit_zamani"] = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
+          p.parent.mkdir(parents=True, exist_ok=True)
+          p.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
+          print("voice.json kilitlendi:", k["voice_id"], k.get("model"))
+          PY
+
+      - name: Krediyi oku
+        continue-on-error: true   # anahtar yok/geçersizse bile telemetri yazılsın
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: |
+          if [ -s yeni_anahtar.txt ]; then
+            python ses_kredi.py --anahtar "$(cat yeni_anahtar.txt)"
+          else
+            python ses_kredi.py
+          fi
+
+      - name: Temizlik (geçici anahtar dosyası)
+        if: ${{ always() }}
+        run: rm -f yeni_anahtar.txt
+
+      - name: Yeni ses tasarla (Voice Design)
+        if: ${{ github.event_name == 'repository_dispatch' && github.event.action == 'ses_design' }}
+        continue-on-error: true
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: |
+          python ses_design.py olustur \
+            --aciklama "$DESIGN_ACIKLAMA" \
+            --ornek "$DESIGN_ORNEK" \
+            --model "${DESIGN_MODEL:-eleven_multilingual_ttv_v2}"
+
+      - name: Seçilen sesi kaydet ve kilitle
+        if: ${{ github.event_name == 'repository_dispatch' && github.event.action == 'ses_kaydet' }}
+        continue-on-error: true
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: |
+          python ses_design.py kaydet \
+            --id "$SECILEN_ID" \
+            --ad "${SES_AD:-Bilgi Dozu Anlatıcı}" \
+            --aciklama "$SES_ACIKLAMA" \
+            --tts-model "${TTS_MODEL:-eleven_multilingual_v2}"
+          python ses_kredi.py || true
+
+      - name: Telemetri + ses kilidi commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- ses_telemetri.json 2>/dev/null || true
+          [ -f ses/voice.json ] && git add -A -- ses/voice.json || true
+          git add -A -- ses_onizleme.json ses_uretim_sonuc.json ses/onizleme 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "chore: ses kredisi ve ses kilidi güncellendi [skip ci]" && git pull --rebase --autostash origin main && git push origin HEAD:main)
+
+      - name: Özet
+        if: ${{ always() }}
+        run: |
+          echo "### Ses & Kredi" >> $GITHUB_STEP_SUMMARY
+          python - <<'PY' >> $GITHUB_STEP_SUMMARY
+          import json, pathlib
+          p = pathlib.Path("ses_telemetri.json")
+          if not p.exists():
+              print("ses_telemetri.json yok")
+          else:
+              d = json.loads(p.read_text(encoding="utf-8"))
+              st = d.get("anahtar_durumu")
+              if st != "ok":
+                  print(f"- Anahtar durumu: **{st}** — {d.get('mesaj','')}")
+              else:
+                  t = d.get("tahmin", {})
+                  print(f"- Plan: **{d.get('tier')}** · Kalan: **{d.get('kalan')}** / {d.get('limit')} kredi ({d.get('yuzde_kalan')}%)")
+                  print(f"- Reset: {d.get('reset_iso','-')} ({d.get('reset_gun','-')} gün)")
+                  print(f"- Tahmini: ~{t.get('kac_short')} short (Flash ile ~{t.get('flash_kac_short')})")
+                  k = d.get("klonlama", {})
+                  print(f"- Klonlama: instant={k.get('instant')} profesyonel={k.get('profesyonel')} slot={k.get('ses_slotu')}")
+                  print(f"- Ses sayısı: {len(d.get('sesler', []))}")
+          PY

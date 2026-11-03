@@ -391,6 +391,38 @@ def get_next_drive_video(drive, folder_id: str, skip_ids: set = None, video_type
     return get_next_scheduled_video(drive, folder_id, skip_ids=skip_ids, video_type=video_type)
 
 
+SENARYO_HEDEF_SN = (38, 42)   # senaryo_kurallari.md hedefi
+SENARYO_SINIR_SN = (30, 45)   # bu aralığın dışı uyarı üretir
+
+
+def video_suresi_sn(path: Path):
+    """Videonun süresini saniye cinsinden döndürür (imageio-ffmpeg). Hata olursa None."""
+    try:
+        import imageio_ffmpeg
+        _, secs = imageio_ffmpeg.count_frames_and_secs(str(path))
+        return float(secs)
+    except Exception as e:
+        log.info(f"  Süre ölçülemedi ({type(e).__name__}).")
+        return None
+
+
+def senaryo_sure_kontrol(path: Path, file_name: str) -> dict:
+    """senaryo_kurallari.md kuralı: shorts 38-42 sn hedef, 30-45 sn sınır.
+    Yayını ENGELLEMEZ; uyarı + rapordur."""
+    if file_name.startswith("uzun_"):   # uzun videoda kural yok, ölçüm de yapılmaz
+        return {"sure": None, "durum": "uzun-video"}
+    sure = video_suresi_sn(path)
+    if sure is None:
+        return {"sure": None, "durum": "bilinmiyor"}
+    if sure > SENARYO_SINIR_SN[1]:
+        durum = "uzun"
+    elif sure < SENARYO_SINIR_SN[0]:
+        durum = "kisa"
+    else:
+        durum = "ok"
+    return {"sure": round(sure, 1), "durum": durum}
+
+
 def download_drive_file(drive, file_id: str, dest_path: Path) -> None:
     request = drive.files().get_media(fileId=file_id)
     with io.FileIO(str(dest_path), "wb") as buf:
@@ -1481,6 +1513,19 @@ def upload_job(
         if is_skipped_by_floor(file_name):
             raise RuntimeError(f"GÜVENLİK KİLİDİ: Eski stok videosu yayına alınamaz ({file_name}).")
         download_drive_file(drive, file_id, tmp_path)
+
+        # Senaryo süre kuralı (senaryo_kurallari.md): uyarı üretir, yayını engellemez
+        sure_bilgi = senaryo_sure_kontrol(tmp_path, file_name)
+        if sure_bilgi.get("sure"):
+            if sure_bilgi["durum"] in ("uzun", "kisa"):
+                log.warning(
+                    f"  SENARYO SÜRE UYARISI: {file_name} {sure_bilgi['sure']} sn "
+                    f"(ideal {SENARYO_HEDEF_SN[0]}-{SENARYO_HEDEF_SN[1]} sn, sınır {SENARYO_SINIR_SN[0]}-{SENARYO_SINIR_SN[1]}) "
+                    "— yayın engellenmedi."
+                )
+            else:
+                log.info(f"  Süre: {sure_bilgi['sure']} sn (senaryo kuralına uygun)")
+
         manifest_path = BASE_DIR / "approved_new_series_manifest.json"
         if manifest_path.exists():
             import hashlib as _hashlib
@@ -1555,6 +1600,13 @@ def upload_job(
                                            related_info=related_info,
                                            thumbnail_ok=thumbnail_result.api_accepted,
                                            thumbnail_saved=thumbnail_result.drive_saved)
+        if sure_bilgi.get("sure"):
+            _sure_satir = f"\n\n⏱️ <b>Süre:</b> {sure_bilgi['sure']} sn"
+            if sure_bilgi["durum"] == "uzun":
+                _sure_satir += f" ⚠️ ideal {SENARYO_HEDEF_SN[0]}–{SENARYO_HEDEF_SN[1]} sn (uzun: kapanışa gelmeden düşüş riski)"
+            elif sure_bilgi["durum"] == "kisa":
+                _sure_satir += f" ⚠️ çok kısa (ideal {SENARYO_HEDEF_SN[0]}–{SENARYO_HEDEF_SN[1]} sn)"
+            report_txt += _sure_satir
         REPORT_FILE.write_text(report_txt, encoding="utf-8")
         sync_kartal_status_report(
             youtube,

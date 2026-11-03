@@ -1,0 +1,131 @@
+name: API & Kota
+
+# Tüm servislerin kalan kullanımını okur (hiçbiri kota harcamaz) ve panelden
+# API anahtarı yazmayı sağlar.
+#
+# Tetikler:
+#   * 6 saatte bir cron            → api_kota
+#   * Panel "Yenile"                → repository_dispatch: api_kota
+#   * Panel "Anahtarı kaydet"       → repository_dispatch: api_anahtar
+#                                     client_payload = { "secret_adi": "...", "deger": "..." }
+
+on:
+  schedule:
+    - cron: "15 */6 * * *"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [api_kota, api_anahtar]
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: api-kota
+  cancel-in-progress: true
+
+jobs:
+  kota:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ secrets.SITE_SYNC_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Gizli değeri maskele
+        if: ${{ github.event_name == 'repository_dispatch' && github.event.action == 'api_anahtar' }}
+        env:
+          GELEN_DEGER: ${{ github.event.client_payload.deger }}
+        run: echo "::add-mask::$GELEN_DEGER"
+
+      - name: Anahtarı secret'a yaz (panelden geldiyse)
+        if: ${{ github.event_name == 'repository_dispatch' && github.event.action == 'api_anahtar' }}
+        env:
+          SECRET_ADI: ${{ github.event.client_payload.secret_adi }}
+          GELEN_DEGER: ${{ github.event.client_payload.deger }}
+        run: |
+          case "$SECRET_ADI" in
+            ELEVENLABS_API_KEY|OPENROUTER_API_KEY|GEMINI_API_KEY|GROQ_API_KEY|TELEGRAM_BOT_TOKEN) ;;
+            *) echo "::error::Bu secret panelden yazılamaz: $SECRET_ADI"; exit 1 ;;
+          esac
+          if [ -z "$GELEN_DEGER" ]; then echo "::error::Değer boş"; exit 1; fi
+          if gh secret set "$SECRET_ADI" --repo "$GITHUB_REPOSITORY" --body "$GELEN_DEGER"; then
+            echo "✅ $SECRET_ADI güncellendi."
+          else
+            echo "⚠️ Secret yazılamadı (SITE_SYNC_TOKEN yetkisi). Elle ekle: Settings → Secrets."
+          fi
+          # bu koşuda da kullan
+          echo "YAZILAN_SECRET=$SECRET_ADI" >> $GITHUB_ENV
+
+      - name: Secret listesini çıkar (isimler)
+        if: ${{ always() }}
+        run: gh secret list --repo "$GITHUB_REPOSITORY" --json name > secret_listesi.json || echo "[]" > secret_listesi.json
+
+      - name: Install dependencies
+        run: pip install -q -r requirements.txt
+
+      - name: Configure Google credentials
+        env:
+          GOOGLE_CLIENT_SECRETS_JSON: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          if os.getenv("GOOGLE_CLIENT_SECRETS_JSON", "").strip():
+              Path("client_secrets.json").write_text(os.environ["GOOGLE_CLIENT_SECRETS_JSON"], encoding="utf-8")
+          if os.getenv("GOOGLE_TOKEN_JSON", "").strip():
+              Path("token.json").write_text(os.environ["GOOGLE_TOKEN_JSON"], encoding="utf-8")
+          print("kimlik dosyaları hazır")
+          PY
+
+      - name: Kotayı topla
+        continue-on-error: true
+        run: |
+          # panelden yeni yazılan anahtar bu koşuda da geçerli olsun
+          if [ "$YAZILAN_SECRET" = "ELEVENLABS_API_KEY" ]; then export ELEVENLABS_API_KEY="$GELEN_DEGER"; fi
+          python api_kota.py
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- api_telemetri.json || true
+          git diff --cached --quiet || (git commit -m "chore: api kota telemetrisi [skip ci]" && git pull --rebase --autostash origin main && git push origin HEAD:main)
+
+      - name: Özet
+        if: ${{ always() }}
+        run: |
+          echo "### API & Kota" >> $GITHUB_STEP_SUMMARY
+          python - <<'PY' >> $GITHUB_STEP_SUMMARY
+          import json, pathlib
+          p = pathlib.Path("api_telemetri.json")
+          if not p.exists():
+              print("api_telemetri.json yok"); raise SystemExit
+          d = json.loads(p.read_text(encoding="utf-8"))
+          for s in d.get("servisler", []):
+              kalan = s.get("kalan"); limit = s.get("limit")
+              ek = ""
+              if kalan is not None and limit:
+                  ek = f" — kalan {kalan} / {limit}"
+              print(f"- **{s['ad']}**: {s.get('durum')}{ek}" + (f" · {s.get('mesaj')}" if s.get('mesaj') else ""))
+          eksik = [x["ad"] for x in d.get("secretler", []) if not x["var"]]
+          print(f"\nEksik secret: {', '.join(eksik) if eksik else 'yok ✅'}")
+          PY

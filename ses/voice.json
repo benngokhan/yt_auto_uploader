@@ -1,0 +1,33 @@
+{
+  "kanonik": {
+    "ad": "Bilgi Dozu — ana anlatıcı",
+    "kaynak": "video_163.mp4 (yayınlanmış, doğru ses)",
+    "referans_klip": "ses/ses_referans.wav",
+    "olcum": {
+      "f0_medyan_hz": 160.0,
+      "f0_iqr_hz": 56.9,
+      "seviye_dbfs": -18.0
+    },
+    "onay": "Gökhan onayladı: 163'ün sesi kanonik (2026-11-02)"
+  },
+  "kilit": {
+    "saglayici": "<elevenlabs | openai | harici | test>",
+    "voice_id": "<SABIT_VOICE_ID>",
+    "model": "<model adı>",
+    "ayarlar": {
+      "stability": 0.5,
+      "similarity_boost": 0.85,
+      "speed": 1.0,
+      "seed": 20261102
+    },
+    "harici": {
+      "komut": "<kendi TTS komutun; {metin} ve {cikti} yer tutucuları>"
+    }
+  },
+  "kurallar": {
+    "farkli_sese_fallback": "YASAK — hata olursa aynı voice ile 3 kez retry, olmazsa üretim durur",
+    "onbellek": "sha256(voice_id + model + ayarlar + metin) → wav; aynı cümle ikinci kez üretilmez",
+    "hedef_seviye": "-16 LUFS, tepe -1.0 dBTP",
+    "kapi": "python3 qa/qa_ses.py <cikti> --ref ses/ses_referans.wav  → PASS olmadan yayın yok"
+  }
+}

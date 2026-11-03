@@ -1,0 +1,153 @@
+name: Yedek Üretim (MoneyPrinterTurbo)
+
+# Ana üretim hattı (elle hazırlanan şablonlu videolar) durursa kanal susmasın diye
+# yedek hat: konu -> dikey short -> Drive + tablo satırı -> mevcut yükleyici yayınlar.
+#
+# Şu an SADECE elle çalıştırılır (workflow_dispatch). İlk test başarılı olunca
+# aşağıdaki schedule bloğu açılır (günde 2 video).
+
+on:
+  workflow_dispatch:
+    inputs:
+      konu:
+        description: "Video konusu (tek cümle)"
+        required: true
+        type: string
+      kuru:
+        description: "Kuru çalışma (üret, Drive'a yükleme)"
+        required: false
+        type: boolean
+        default: false
+      test:
+        description: "TEST modu: Edge ses + kuru (kanonik ses doğrulanmadan hat testi)"
+        required: false
+        type: boolean
+        default: false
+
+#  on:
+#    schedule:
+#      - cron: "0 5 * * *"    # 08:00 TR
+#      - cron: "0 14 * * *"   # 17:00 TR
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mpt-uret
+  cancel-in-progress: false
+
+jobs:
+  uret:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Gerekli anahtarlar var mı?
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          COVERR_API_KEY: ${{ secrets.COVERR_API_KEY }}
+          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TEST_MODE: ${{ inputs.test }}
+        run: |
+          eksik=""
+          if [ -z "$PEXELS_API_KEY" ] && [ -z "$PIXABAY_API_KEY" ] && [ -z "$COVERR_API_KEY" ]; then
+            eksik="$eksik PIXABAY_API_KEY (veya PEXELS/COVERR)"
+          fi
+          [ -z "$ELEVENLABS_API_KEY" ] && eksik="$eksik ELEVENLABS_API_KEY"
+          [ -z "$ELEVENLABS_VOICE_ID" ] && [ "$TEST_MODE" != "true" ] && eksik="$eksik ELEVENLABS_VOICE_ID"
+          [ -z "$GEMINI_API_KEY" ] && eksik="$eksik GEMINI_API_KEY"
+          if [ -n "$eksik" ]; then
+            echo "::error::Eksik GitHub secret:$eksik"
+            exit 1
+          fi
+          echo "Anahtarlar tamam."
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: MoneyPrinterTurbo indir
+        run: git clone --depth 1 https://github.com/harry0703/MoneyPrinterTurbo.git MoneyPrinterTurbo
+
+      - name: Bağımlılıkları kur
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ./MoneyPrinterTurbo
+
+      - name: Configure Google credentials
+        env:
+          GOOGLE_CLIENT_SECRETS_JSON: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          for ad in ("GOOGLE_CLIENT_SECRETS_JSON", "GOOGLE_TOKEN_JSON"):
+              if not os.getenv(ad, "").strip():
+                  raise SystemExit(f"Eksik secret: {ad}")
+          Path("client_secrets.json").write_text(os.environ["GOOGLE_CLIENT_SECRETS_JSON"], encoding="utf-8")
+          Path("token.json").write_text(os.environ["GOOGLE_TOKEN_JSON"], encoding="utf-8")
+          PY
+
+      - name: Video üret ve Drive'a teslim et
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          COVERR_API_KEY: ${{ secrets.COVERR_API_KEY }}
+          VIDEO_SOURCE: ${{ vars.VIDEO_SOURCE }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+          ELEVENLABS_VOICE_NAME: ${{ vars.ELEVENLABS_VOICE_NAME || 'bilgi-dozu' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          KONU: ${{ inputs.konu }}
+          KURU: ${{ inputs.kuru }}
+          TEST: ${{ inputs.test }}
+        run: |
+          ARG=""
+          if [ "$TEST" = "true" ]; then
+            ARG="--kuru --ses-edge"
+            echo "TEST modu: Edge ses, Drive'a yükleme yok."
+          elif [ "$KURU" = "true" ]; then
+            ARG="--kuru"
+          fi
+          python mpt_uret.py --konu "$KONU" $ARG
+
+      - name: Telegram bildirimi
+        if: ${{ always() }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          JOB_STATUS: ${{ job.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+          chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+          if not token or not chat_id:
+              print("::warning::Telegram bildirimi gönderilmedi (ayar eksik).")
+              raise SystemExit(0)
+          durum = os.getenv("JOB_STATUS", "")
+          ikon = "✅" if durum == "success" else "❌"
+          metin = (f"{ikon} <b>Yedek Üretim (MPT)</b>\n\n"
+                   f"Durum: <b>{durum}</b>\n"
+                   f"<a href=\"{os.getenv('RUN_URL','')}\">Run ayrıntısı</a>")
+          veri = json.dumps({"chat_id": chat_id, "text": metin, "parse_mode": "HTML"}).encode()
+          istek = urllib.request.Request(
+              f"https://api.telegram.org/bot{token}/sendMessage", data=veri,
+              headers={"Content-Type": "application/json"})
+          try:
+              urllib.request.urlopen(istek, timeout=30)
+              print("Telegram bildirimi gönderildi.")
+          except Exception as hata:
+              print(f"::warning::Telegram hatası: {type(hata).__name__}")
+          PY

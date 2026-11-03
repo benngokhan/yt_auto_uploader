@@ -1,0 +1,272 @@
+{
+  "zaman": "2026-11-03T01:03:31+00:00",
+  "servisler": [
+    {
+      "ad": "ElevenLabs",
+      "durum": "ok",
+      "kalan": 7897,
+      "limit": 10000,
+      "kullanilan": 2103,
+      "birim": "karakter/kredi",
+      "tier": "free",
+      "reset_unix": 1794480693,
+      "reset_iso": "2026-11-12T10:51:33+00:00",
+      "klonlama": false,
+      "yenilenme": "aylık · fatura dönemi başında sıfırlanır (kredi devretmez)",
+      "not_": "1 kredi = 1 karakter (v2/v3) · Flash/Turbo yarı fiyat"
+    },
+    {
+      "ad": "OpenRouter",
+      "durum": "gecersiz",
+      "mesaj": "HTTP 401",
+      "yenilenme": "aylık sıfırlanmaz · kredi yükledikçe artar"
+    },
+    {
+      "ad": "Gemini",
+      "durum": "ok",
+      "limit": null,
+      "kalan": null,
+      "birim": "istek/dk (kota panelde yok)",
+      "model_sayisi": 50,
+      "yenilenme": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
+      "not_": "LLM + TTS (gemini-2.5-flash-preview-tts)"
+    },
+    {
+      "ad": "Groq",
+      "durum": "gecersiz",
+      "mesaj": "HTTP 403",
+      "yenilenme": "dakika + günlük token · günlük kısım 00:00 UTC"
+    },
+    {
+      "ad": "Telegram",
+      "durum": "ok",
+      "limit": null,
+      "kalan": null,
+      "birim": "mesaj/gün (limit yok pratikte)",
+      "bot": "@Bilgindozlu_bot",
+      "yenilenme": "saniye başına limit · günlük kota yok",
+      "not_": "bildirim kanalı"
+    },
+    {
+      "ad": "GitHub",
+      "durum": "ok",
+      "kalan": 5000,
+      "limit": 5000,
+      "kullanilan": 0,
+      "birim": "istek/saat",
+      "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
+      "not_": "panel API kotası (saatlik pencerede yenilenir)",
+      "actions_dakika": 88.7,
+      "actions_kosu": 151,
+      "actions_limit": 2000,
+      "actions_kalan": 1911.3
+    },
+    {
+      "ad": "Google Drive",
+      "durum": "ok",
+      "kalan": 10416149780,
+      "limit": 16106127360,
+      "kullanilan": 5689977580,
+      "birim": "bayt",
+      "kirilim": [
+        {
+          "ad": "Kısa Videolar",
+          "boyut": 207711022,
+          "dosya": 12,
+          "sahip": "gokhanaltundal@gmail.com"
+        },
+        {
+          "ad": "Uzun Videolar",
+          "boyut": 767984696,
+          "dosya": 15,
+          "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
+        },
+        {
+          "ad": "Kısa Kapaklar",
+          "boyut": 6068134,
+          "dosya": 14,
+          "sahip": "gokhanaltundal@gmail.com"
+        },
+        {
+          "ad": "Uzun Kapaklar",
+          "boyut": 24989715,
+          "dosya": 20,
+          "sahip": "gokhanaltundal@gmail.com"
+        },
+        {
+          "ad": "CEO / Tablolar",
+          "boyut": 262459591,
+          "dosya": 21,
+          "sahip": "gokhanaltundal@gmail.com"
+        },
+        {
+          "ad": "Gmail + Fotoğraflar (Drive dışı)",
+          "boyut": 3444681449,
+          "dosya": 0
+        }
+      ],
+      "buyuk_dosyalar": [
+        {
+          "ad": "uzun_video_10.mp4",
+          "boyut": 95768604
+        },
+        {
+          "ad": "uzun_video_12.mp4",
+          "boyut": 91996704
+        },
+        {
+          "ad": "uzun_video_4.mp4",
+          "boyut": 88715905
+        },
+        {
+          "ad": "uzun_video_5.mp4",
+          "boyut": 87818519
+        },
+        {
+          "ad": "163 - 6 GÖRSEL HAREKET KONTROLÜ.mp4",
+          "boyut": 87042844
+        },
+        {
+          "ad": "uzun_video_9.mp4",
+          "boyut": 85769016
+        },
+        {
+          "ad": "uzun_video_6.mp4",
+          "boyut": 83807712
+        },
+        {
+          "ad": "uzun_video_8.mp4",
+          "boyut": 83722104
+        }
+      ],
+      "drive_gorunen": 3039891376,
+      "kendi_dosyalar": 2245296131,
+      "paylasilan": 794595245,
+      "disalan": 3444681449,
+      "hesap": "galtundal81@gmail.com",
+      "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
+      "not_": "Kota hesap bazlı: klasör başka hesaba aitse yer ONUN kotasından düşer"
+    },
+    {
+      "ad": "YouTube Data API",
+      "durum": "ok",
+      "kalan": 10000,
+      "limit": 10000,
+      "kullanilan": 0,
+      "birim": "birim (tahmini)",
+      "bugun_yukleme": 0,
+      "yenilenme": "günlük · gece 00:00 Pasifik (TR 10:00) sıfırlanır",
+      "not_": "gerçek kota API'de yok; yükleme ≈ 1700 birim sayıldı"
+    }
+  ],
+  "secretler": [
+    {
+      "ad": "ELEVENLABS_API_KEY",
+      "var": true,
+      "aciklama": "Ses üretimi (ElevenLabs)"
+    },
+    {
+      "ad": "OPENROUTER_API_KEY",
+      "var": true,
+      "aciklama": "Yedek LLM + TTS (OpenRouter)"
+    },
+    {
+      "ad": "GEMINI_API_KEY",
+      "var": true,
+      "aciklama": "Başlık/açıklama üretimi, Gemini TTS"
+    },
+    {
+      "ad": "GROQ_API_KEY",
+      "var": true,
+      "aciklama": "Hızlı LLM (Groq)"
+    },
+    {
+      "ad": "GOOGLE_TOKEN_JSON",
+      "var": true,
+      "aciklama": "Drive + YouTube OAuth"
+    },
+    {
+      "ad": "GOOGLE_CLIENT_SECRETS_JSON",
+      "var": true,
+      "aciklama": "Drive + YouTube OAuth"
+    },
+    {
+      "ad": "TELEGRAM_BOT_TOKEN",
+      "var": true,
+      "aciklama": "Telegram bildirimleri"
+    },
+    {
+      "ad": "SITE_SYNC_TOKEN",
+      "var": true,
+      "aciklama": "Panele veri yayını + secret yazma"
+    }
+  ],
+  "ozet": {
+    "ok": 6,
+    "eksik": 0,
+    "gecersiz": 2,
+    "hata": 0
+  },
+  "gecmis": [
+    {
+      "zaman": "2026-11-02T12:36:38+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T12:50:22+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T12:51:31+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T13:33:26+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T13:34:30+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T13:35:58+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T13:37:06+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T13:38:50+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T13:39:40+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T13:46:54+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T13:48:11+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T14:02:52+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-02T14:06:07+00:00",
+      "elevenlabs_kalan": 9561
+    },
+    {
+      "zaman": "2026-11-02T18:58:59+00:00",
+      "elevenlabs_kalan": 7897
+    },
+    {
+      "zaman": "2026-11-03T01:03:31+00:00",
+      "elevenlabs_kalan": 7897
+    }
+  ]
+}
