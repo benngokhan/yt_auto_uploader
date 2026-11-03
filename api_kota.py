@@ -111,7 +111,8 @@ def openrouter():
             govde = e.read().decode("utf-8", "replace")[:180]
         except Exception:
             govde = ""
-        return hata("OpenRouter", f"HTTP {e.code} · {govde}".strip(" ·"),
+        ipucu = f"anahtar: {len(key)} karakter, '{key[:8]}…'" if key else "anahtar boş"
+        return hata("OpenRouter", f"HTTP {e.code} · {govde.strip()} · {ipucu}",
                     "gecersiz" if e.code in (401, 403) else "hata")
     except Exception as e:
         return hata("OpenRouter", e)
