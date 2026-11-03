@@ -34,11 +34,11 @@ jobs:
 
           HEDEF_KLASOR = "1Frqd8y7hx625G6uAdP_xKSxvXXZUSRYv"
           SESLER = [
-              ("NNn9dv8zq2kUo7d3JSGG", "Derya - Dynamic and Friendly Narrator"),
-              ("FDs1ZX5J4e4f2c2erxtW", "Fili - Warm Turkish Female"),
-              ("aIdeZYQ86PeVTKIe5may", "Pinar - Direct and Encouraging"),
-              ("Et3hA9mm8aHhswBL5jmC", "Aslihan - Young, High and Clear"),
-              ("xsGHrtxT5AdDzYXTQT0d", "Gonul Filiz - Airy and Soft"),
+              ("XrExE9yKIg1WjnnlVkGX", "Matilda - Knowledgable, Professional"),
+              ("EXAVITQu4vr4xnSDxMaL", "Sarah - Mature, Reassuring"),
+              ("hpp4J3VqNfWAUOO0d1Us", "Bella - Professional, Bright, Warm"),
+              ("cgSgspJ2msm6clMCkdW9", "Jessica - Playful, Bright, Warm"),
+              ("pFZP5JQG7iQjIQuC4Bku", "Lily - Velvety Actress"),
           ]
           metin = (os.environ.get("METIN") or "").strip() or (
               "Hiçbir derdin yokken, otururken, göğsünün neden her beş dakikada bir "
