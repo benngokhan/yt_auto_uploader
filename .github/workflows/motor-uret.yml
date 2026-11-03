@@ -84,7 +84,7 @@ jobs:
           RUN_NO: ${{ github.run_number }}
         run: |
           shopt -s globstar nullglob
-          videolar=(motor/cikti/**/*.mp4)
+          videolar=(motor/cikti/**/*.mp4 motor/cikti/**/kapak.jpg)
           if [ ${#videolar[@]} -eq 0 ]; then
             echo "Video yok (üretim durdu) — Drive'a bir şey konmadı."; exit 0
           fi
@@ -106,8 +106,10 @@ jobs:
           dosyalar = sorted(set(glob.glob("motor/cikti/**/*.mp4", recursive=True))) or \
                      sorted(set(glob.glob("motor/cikti/**/final.mp4", recursive=True)))
           for d in dosyalar:
-              ad = f"ONAY_{os.environ.get('RUN_NO','0')}_{Path(d).name}"
-              medya = MediaFileUpload(d, mimetype="video/mp4", resumable=True)
+              ad = (f"kapak_{os.environ.get('RUN_NO','0')}.jpg" if d.endswith(".jpg")
+                    else f"ONAY_{os.environ.get('RUN_NO','0')}_{Path(d).name}")
+              mime = "image/jpeg" if d.endswith(".jpg") else "video/mp4"
+              medya = MediaFileUpload(d, mimetype=mime, resumable=True)
               sonuc = drive.files().create(
                   body={"name": ad, "parents": [os.environ["ONAY_KLASOR"]]},
                   media_body=medya, fields="id,name,webViewLink").execute()
@@ -121,5 +123,6 @@ jobs:
           name: motor-video
           path: |
             motor/cikti/**/*.mp4
+            motor/cikti/**/kapak.jpg
           if-no-files-found: warn
           retention-days: 7

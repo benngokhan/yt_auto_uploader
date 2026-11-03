@@ -239,6 +239,18 @@ def main() -> int:
     )
     print(f"Video hazır: {cikti}")
 
+    # ---------------------------------------------------- 6) kapak (şablon sabit)
+    import kapak
+    kapak_yolu = cikti.parent / "kapak.jpg"
+    kapak_satirlari = [sahneler[0]["baslik1"], sahneler[0]["baslik2"]]
+    kapak.kapak_uret(
+        parallelar[0], kapak_yolu,
+        satirlar=[k.upper() for k in kapak_satirlari],
+        kategori=ayar.get("kategori", "BİLİM").upper(),
+        alt_aciklama=f"{a.konu} · {ayar.get('kaynak_satiri', '')}".strip(" ·"),
+    )
+    print(f"Kapak hazır: {kapak_yolu}")
+
     if ayar.get("onay", {}).get("mod") == "elle" and not a.onay_verildi:
         onay_dir = calisma / "onay_bekleyen"
         onay_dir.mkdir(parents=True, exist_ok=True)
