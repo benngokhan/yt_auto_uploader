@@ -134,41 +134,6 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
 
 
 # ------------------------------------------------------------------- 2) TTS
-def tts_uret(metin: str, cikti: Path, ayar: dict) -> Path:
-    """voice-02 ile tek cümle sesi. Farklı sese fallback YOK — hata olursa durur."""
-    ses = ayar["ses"]
-    if ses.get("saglayici") != "elevenlabs":
-        raise SystemExit(f"Desteklenmeyen ses sağlayıcısı: {ses.get('saglayici')}")
-    anahtar = os.getenv("ELEVENLABS_API_KEY", "").strip()
-    if not anahtar:
-        raise SystemExit("ELEVENLABS_API_KEY yok — üretim durduruldu (ses kuralı).")
-
-    import urllib.request
-    govde = {
-        "text": metin,
-        "model_id": ses.get("model_id", "eleven_multilingual_v2"),
-        "voice_settings": {
-            "stability": ses.get("stability", 0.35),
-            "similarity_boost": ses.get("similarity_boost", 0.75),
-            "style": ses.get("style", 0.35),
-            "speed": ses.get("speed", 1.0),
-        },
-    }
-    url = f"https://api.elevenlabs.io/v1/text-to-speech/{ses['voice_id']}"
-    for deneme in range(3):
-        try:
-            istek = urllib.request.Request(
-                url, data=json.dumps(govde).encode(), method="POST",
-                headers={"xi-api-key": anahtar, "Content-Type": "application/json",
-                         "Accept": "audio/mpeg"})
-            with urllib.request.urlopen(istek, timeout=180) as y:
-                cikti.write_bytes(y.read())
-            return cikti
-        except Exception as hata:  # noqa: BLE001
-            print(f"TTS denemesi {deneme + 1} başarısız: {str(hata)[:120]}")
-    raise SystemExit("voice-02 üretilemedi — başka sesle devam edilmez, üretim durdu.")
-
-
 # ------------------------------------------------------- 3) hizalama (karaoke)
 def hizala(ses_yolu: Path, metin: str, ayar: dict) -> dict:
     sys.path.insert(0, str(MOTOR))
@@ -196,17 +161,19 @@ def main() -> int:
 
     calisma = KOK / "motor" / "cikti" / "son"
     calisma.mkdir(parents=True, exist_ok=True)
+    import tts
+
     vo_files, hizalamalar = [], []
     for i, s in enumerate(sahneler, start=1):
         wav = calisma / f"vo_{i:02d}.wav"
-        tts_uret(s["ses"], wav, ayar)
-        # kenar düzeltme: uzun sessizlik ve kesme tıkını temizle (metin/hizalama sonrası uygulanır)
-        import ses_kenar
-        kenar = ses_kenar.duzelt(wav)
-        if kenar.get("degisti") and kenar["kirpilan_son_sn"] > 0.4:
-            print(f"  sahne {i}: {kenar['kirpilan_son_sn']} sn boşluk kırpıldı")
+        hiz = tts.uret(s["ses"], wav, ayar)
+        if hiz is None:
+            # sağlayıcı kelime zamanı vermediyse: sessizlik kırp + Whisper ile hizala
+            import ses_kenar
+            ses_kenar.duzelt(wav)
+            hiz = hizala(wav, s["ses"], ayar)
         vo_files.append(str(wav))
-        hizalamalar.append(hizala(wav, s["ses"], ayar))
+        hizalamalar.append(hiz)
         print(f"  sahne {i}: ses {round(re_.wav_duration(str(wav)), 2)} sn")
 
     # ---------------------------------------------------------- 4) görseller

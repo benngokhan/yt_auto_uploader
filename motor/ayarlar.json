@@ -6,13 +6,12 @@
   },
   "fps": 60,
   "ses": {
-    "saglayici": "elevenlabs",
-    "voice_id": "KUTUPHANEDEN_SECILECEK",
-    "model_id": "eleven_multilingual_v2",
-    "stability": 0.35,
-    "similarity_boost": 0.75,
-    "style": 0.35,
-    "speed": 1.0
+    "saglayici": "speechify",
+    "voice_id": "ayse",
+    "model": "simba-3.5",
+    "dil": "tr",
+    "yedek_saglayici": "elevenlabs",
+    "yedek_voice_id": "KUTUPHANEDEN_SECILECEK"
   },
   "gorsel": {
     "kaynak": "pixabay",
