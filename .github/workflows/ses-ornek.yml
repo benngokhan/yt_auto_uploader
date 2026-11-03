@@ -1,0 +1,79 @@
+name: Ses örnekleri (aday sesler)
+
+# Aynı cümleyi aday Türkçe seslerle okur, Drive "Ses Örnekleri" klasörüne koyar.
+on:
+  workflow_dispatch:
+    inputs:
+      metin:
+        description: "Okunacak metin (boş = varsayılan)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  ornek:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - run: pip install -q google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
+      - name: Örnekleri üret ve yükle
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          METIN: ${{ inputs.metin }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          from pathlib import Path
+          from google.oauth2.credentials import Credentials
+          from google.auth.transport.requests import Request
+          from googleapiclient.discovery import build
+          from googleapiclient.http import MediaFileUpload
+
+          HEDEF_KLASOR = "1Frqd8y7hx625G6uAdP_xKSxvXXZUSRYv"
+          SESLER = [
+              ("NNn9dv8zq2kUo7d3JSGG", "Derya - Dynamic and Friendly Narrator"),
+              ("FDs1ZX5J4e4f2c2erxtW", "Fili - Warm Turkish Female"),
+              ("aIdeZYQ86PeVTKIe5may", "Pinar - Direct and Encouraging"),
+              ("Et3hA9mm8aHhswBL5jmC", "Aslihan - Young, High and Clear"),
+              ("xsGHrtxT5AdDzYXTQT0d", "Gonul Filiz - Airy and Soft"),
+          ]
+          metin = (os.environ.get("METIN") or "").strip() or (
+              "Hiçbir derdin yokken, otururken, göğsünün neden her beş dakikada bir "
+              "kendiliğinden derin iç çektiğini biliyor musun?")
+          anahtar = os.environ["ELEVENLABS_API_KEY"].strip()
+
+          Path("token.json").write_text(os.environ["GOOGLE_TOKEN_JSON"], encoding="utf-8")
+          creds = Credentials.from_authorized_user_file("token.json")
+          if not creds.valid:
+              creds.refresh(Request())
+          drive = build("drive", "v3", credentials=creds)
+
+          for vid, ad in SESLER:
+              govde = {
+                  "text": metin,
+                  "model_id": "eleven_multilingual_v2",
+                  "voice_settings": {"stability": 0.35, "similarity_boost": 0.75,
+                                     "style": 0.35, "speed": 1.0},
+              }
+              istek = urllib.request.Request(
+                  f"https://api.elevenlabs.io/v1/text-to-speech/{vid}",
+                  data=json.dumps(govde).encode(), method="POST",
+                  headers={"xi-api-key": anahtar, "Content-Type": "application/json",
+                           "Accept": "audio/mpeg"})
+              try:
+                  with urllib.request.urlopen(istek, timeout=180) as y:
+                      ses = y.read()
+              except Exception as h:
+                  print(f"  HATA {ad}: {h}")
+                  continue
+              dosya = Path(f"ornek_{vid[:8]}.mp3")
+              dosya.write_bytes(ses)
+              sonuc = drive.files().create(
+                  body={"name": f"ses_ornek_{ad.split(' - ')[0]}.mp3", "parents": [HEDEF_KLASOR]},
+                  media_body=MediaFileUpload(str(dosya), mimetype="audio/mpeg"),
+                  fields="id,name,webViewLink").execute()
+              print(f"  {ad} -> {sonuc.get('webViewLink')}")
+          PY
