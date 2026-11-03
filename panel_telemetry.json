@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-03 09:42:25",
-  "generated_at_iso": "2026-11-03T09:42:25.133958+03:00",
+  "generated_at": "2026-11-03 10:57:25",
+  "generated_at_iso": "2026-11-03T10:57:25.754120+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -496,6 +496,20 @@
         "mimeType": "application/vnd.google-apps.folder",
         "size": 0,
         "modifiedTime": "2026-11-02T13:58:08.486Z"
+      },
+      {
+        "id": "1qjbgO7iiNEm61tM9URDW2ORBwgBEOLbs",
+        "name": "MOTOR_CEVAPLARI.md",
+        "mimeType": "text/markdown",
+        "size": 13941,
+        "modifiedTime": "2026-11-03T07:46:50.236Z"
+      },
+      {
+        "id": "1LuTryXXLSW4aXZf6LfGIL7ciIbjnCSBT",
+        "name": "MOTOR_SORULARI.md",
+        "mimeType": "text/markdown",
+        "size": 6355,
+        "modifiedTime": "2026-11-03T07:39:31.071Z"
       },
       {
         "id": "1LyZBIc52OzaGZBaq8yXODcseZ0wilsrs",
