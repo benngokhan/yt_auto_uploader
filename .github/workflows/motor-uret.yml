@@ -103,7 +103,8 @@ jobs:
               creds.refresh(Request())
           drive = build("drive", "v3", credentials=creds)
 
-          dosyalar = sorted(set(glob.glob("motor/cikti/**/*.mp4", recursive=True))) or \
+          dosyalar = sorted(set(glob.glob("motor/cikti/**/*.mp4", recursive=True))
+                            | set(glob.glob("motor/cikti/**/kapak.jpg", recursive=True))) or \
                      sorted(set(glob.glob("motor/cikti/**/final.mp4", recursive=True)))
           for d in dosyalar:
               ad = (f"kapak_{os.environ.get('RUN_NO','0')}.jpg" if d.endswith(".jpg")
