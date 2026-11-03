@@ -148,6 +148,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--konu", required=True)
     ap.add_argument("--sahne", type=int, default=0, help="0 = ayardan oku")
+    ap.add_argument("--sure-min", type=float, default=0, help="0 = ayardan oku")
+    ap.add_argument("--sure-max", type=float, default=0, help="0 = ayardan oku")
     ap.add_argument("--kuru", action="store_true", help="Sadece üret, hiçbir yere yükleme")
     ap.add_argument("--onay-verildi", action="store_true",
                     help="Kullanıcı videoyu izleyip onayladı: Drive + tablo + yayın kuyruğu")
@@ -155,6 +157,10 @@ def main() -> int:
 
     ayar = ayar_yukle()
     sahne_sayisi = a.sahne or ayar.get("sahne_sayisi", 6)
+    if a.sure_min:
+        ayar.setdefault("sure", {})["min"] = a.sure_min
+    if a.sure_max:
+        ayar.setdefault("sure", {})["max"] = a.sure_max
     re_ = motor_hazirla(ayar)
 
     sahneler = sahne_plani(a.konu, sahne_sayisi, ayar)

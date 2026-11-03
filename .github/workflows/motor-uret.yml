@@ -14,7 +14,22 @@ on:
       kuru:
         description: "Sadece üret, hiçbir yere yükleme"
         type: boolean
-        default: true
+        default: false
+      sahne:
+        description: "Sahne sayısı (boş = 6)"
+        required: false
+        default: "6"
+        type: string
+      sure_min:
+        description: "En kısa süre (sn)"
+        required: false
+        default: "38"
+        type: string
+      sure_max:
+        description: "En uzun süre (sn)"
+        required: false
+        default: "42"
+        type: string
 
 concurrency:
   group: motor-uret
@@ -52,8 +67,11 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           MOTOR_KONU: ${{ inputs.konu }}
           MOTOR_KURU: ${{ inputs.kuru }}
+          MOTOR_SAHNE: ${{ inputs.sahne }}
+          MOTOR_SURE_MIN: ${{ inputs.sure_min }}
+          MOTOR_SURE_MAX: ${{ inputs.sure_max }}
         run: |
-          ARGS="--konu \"$MOTOR_KONU\""
+          ARGS="--konu \"$MOTOR_KONU\" --sahne ${MOTOR_SAHNE:-6} --sure-min ${MOTOR_SURE_MIN:-38} --sure-max ${MOTOR_SURE_MAX:-42}"
           [ "$MOTOR_KURU" = "true" ] && ARGS="$ARGS --kuru"
           echo "Komut: python motor/uret.py $ARGS"
           eval python motor/uret.py $ARGS
