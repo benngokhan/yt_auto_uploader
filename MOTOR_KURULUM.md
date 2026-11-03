@@ -34,3 +34,33 @@ Kod repoya `motor/` altına alındı (tarihsel referans olduğu gibi duruyor, **
 ## Gerekli anahtarlar
 - `ELEVENLABS_VOICE_ID` = **voice-02** ses ID'si (zorunlu)
 - Görsel üretimi için servis seçimi (Gemini image / başka)
+
+## Sahne şeması (pilottan çıkarıldı — orkestratörün üreteceği yapı)
+
+`render_video_master(out_mp4, scenes_cfg, vo_files, plates_bgr, source_line, is_wide=False, target_min_dur=50, target_max_dur=58)`
+
+Her sahne (`scene_configs` öğesi):
+
+```python
+{
+  "img": "scene_01_hook.png",          # sahne görseli (1080x1920 kaynak)
+  "zoom": (1.00, 1.14),                # Ken Burns zoom başlangıç→bitiş
+  "pan_x": (0.0, 0.0),                 # yatay kaydırma (px)
+  "pan_y": (24.0, -24.0),              # dikey kaydırma (px)
+  "emoji": "❓",                       # üst başlık emojisi
+  "title_line1": "SUDA PARMAKLAR",     # BEYAZ
+  "title_line2": "NEDEN BURUŞUR?",     # SARI #FFD600
+  "subs": [                            # (altyazı satırı, vurgulanacak kelimeler)
+    ("Duşta ya da denizde kaldığında", []),
+    ("parmak uçların neden buruşur?", ["neden", "buruşur?"]),
+  ],
+}
+```
+
+- `vo_files`: her sahne için tek WAV (voice-02).
+- `plates_bgr`: ön işlenmiş görseller (teal-amber renk + parçacık efektleri `apply_teal_orange_cinematic` / `add_bioluminescent_particles`).
+- Süre: motor `target_min_dur`/`target_max_dur` ile 51.8–56.5 sn aralığına kalibre ediyor (kural: 50–58 sn).
+
+## Bilinen iki uyumsuzluk (kurulumda düzeltilecek)
+1. **FPS**: `render_video_master` içinde `FPS = 30` sabit; kural 60 fps istiyor → 60'a çekilecek (render süresi ~2 katı).
+2. **Yollar**: `FONT_BLACK_PATH`, `FONT_BOLD_PATH`, `EMOJI_FONT_PATH`, `BGM_PATH` modül sabitleri — orkestratör bunları `motor/assets/` altına yönlendirecek (motor kodu değiştirilmeden, sabit atamasıyla).
