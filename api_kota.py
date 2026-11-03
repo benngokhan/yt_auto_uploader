@@ -48,8 +48,15 @@ def now():
     return datetime.now(timezone.utc)
 
 
+UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+      "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36")
+
+
 def http_json(url: str, headers: dict | None = None, timeout: int = 30):
-    req = urllib.request.Request(url, headers=headers or {})
+    # Groq (Cloudflare 1010) düz urllib imzasını engelliyor: gerçek tarayıcı başlıkları şart.
+    h = {"User-Agent": UA, "Accept": "application/json"}
+    h.update(headers or {})
+    req = urllib.request.Request(url, headers=h)
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode("utf-8"))
 
