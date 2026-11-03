@@ -252,23 +252,44 @@ def make_subtitle_band(W, text_multiline, highlight_words=None, is_wide=False, *
     selected keywords must never masquerade as audio-synchronized highlighting.
     Repeated words are identified by position, not by their spelling.
     """
-    band_h = 175 if is_wide else 240
+    # Altyazı alanı (dikey): 750 x 120 px kutu, en fazla 2 satır (kullanıcı kararı).
+    band_h = 175 if is_wide else 120
     txt_layer = Image.new("RGBA", (W, band_h), (0, 0, 0, 0))
     sh_layer  = Image.new("RGBA", (W, band_h), (0, 0, 0, 0))
     d_txt = ImageDraw.Draw(txt_layer)
     d_sh  = ImageDraw.Draw(sh_layer)
 
-    lines = text_multiline.split("\n")
+    max_sub_w = (W - 260) if is_wide else 750
+    max_satir = 4 if is_wide else 2
     base_sz = 36 if is_wide else 40
-    font = ImageFont.truetype(FONT_BOLD_PATH, base_sz)
-    max_sub_w = W - (260 if is_wide else 130)
-    for ln in lines:
-        if (font.getbbox(ln)[2] - font.getbbox(ln)[0]) > max_sub_w:
-            font = ImageFont.truetype(FONT_BOLD_PATH, base_sz - 5)
+    line_h = 48 if is_wide else 54
+
+    ham = [p.strip() for p in text_multiline.split("\n") if p.strip()]
+    metin = " ".join(ham) if not is_wide else text_multiline
+
+    def _sar(metin_parca, fnt):
+        kelimeler, satirlar, mevcut = metin_parca.split(), [], ""
+        for k in kelimeler:
+            deneme = (mevcut + " " + k).strip()
+            if fnt.getlength(deneme) <= max_sub_w or not mevcut:
+                mevcut = deneme
+            else:
+                satirlar.append(mevcut); mevcut = k
+        if mevcut:
+            satirlar.append(mevcut)
+        return satirlar
+
+    boyut = base_sz
+    while boyut > 26:
+        font = ImageFont.truetype(FONT_BOLD_PATH, boyut)
+        lines = _sar(metin, font)
+        if len(lines) <= max_satir and len(lines) * line_h <= band_h:
             break
+        boyut -= 2
+    font = ImageFont.truetype(FONT_BOLD_PATH, boyut)
+    lines = _sar(metin, font)[:max_satir]
 
     word_index = 0
-    line_h = 48 if is_wide else 54
     start_y = (band_h - len(lines) * line_h) // 2
 
     for li, ln in enumerate(lines):
@@ -579,7 +600,7 @@ def render_video_master(
     bar_x0, bar_x1 = (80, W - 80) if is_wide else (72, W - 72)
     top_pill_y = 42 if is_wide else 74
     title_y    = 44 if is_wide else 155
-    sub_y      = 770 if is_wide else 1240
+    sub_y      = 770 if is_wide else 1288
     cta_y      = 650 if is_wide else 1535
     bot_y      = (H - 120) if is_wide else 1740
 
