@@ -51,6 +51,19 @@ def _env(ad: str, zorunlu: bool = True) -> str:
     return deger
 
 
+def video_kaynagi() -> str:
+    """Stok görüntü sağlayıcısı. Pexels yeni anahtar vermeyi durdurdu (Kas 2026),
+    bu yüzden Pixabay varsayılan. VIDEO_SOURCE ile elle de seçilebilir."""
+    secim = os.getenv("VIDEO_SOURCE", "").strip().lower()
+    if secim in ("pexels", "pixabay", "coverr"):
+        return secim
+    if os.getenv("PIXABAY_API_KEY", "").strip():
+        return "pixabay"
+    if os.getenv("COVERR_API_KEY", "").strip():
+        return "coverr"
+    return "pexels"
+
+
 def mpt_config_yaz() -> Path:
     """config.example.toml -> config.toml, anahtarlar env'den doldurulur."""
     ornek = MPT_DIR / "config.example.toml"
@@ -70,9 +83,17 @@ def mpt_config_yaz() -> Path:
     ayarla("gemini_api_key", _env("GEMINI_API_KEY"))
     ayarla("gemini_model_name", model)
 
-    pexels = _env("PEXELS_API_KEY").replace('"', "")
-    metin = re.sub(r'^pexels_api_keys\s*=\s*.*$', f'pexels_api_keys = ["{pexels}"]', metin, count=1, flags=re.M)
-    ayarla("video_source", "pexels")
+    kaynak = video_kaynagi()
+    if kaynak == "pixabay":
+        anahtar = _env("PIXABAY_API_KEY").replace('"', "")
+        metin = re.sub(r'^pixabay_api_keys\s*=\s*.*$',
+                       f'pixabay_api_keys = ["{anahtar}"]', metin, count=1, flags=re.M)
+    else:
+        anahtar = _env("PEXELS_API_KEY").replace('"', "")
+        metin = re.sub(r'^pexels_api_keys\s*=\s*.*$',
+                       f'pexels_api_keys = ["{anahtar}"]', metin, count=1, flags=re.M)
+    ayarla("video_source", kaynak)
+    print(f"Görüntü kaynağı: {kaynak}")
 
     # ElevenLabs ses bölümü
     el = _env("ELEVENLABS_API_KEY")
@@ -105,7 +126,7 @@ def mpt_calistir(konu: str, ses_edge: bool = False) -> Path:
         "--video-script-prompt", SENARYO_YONERGESI,
         "--paragraph-number", "1",
         "--video-aspect", "9:16",
-        "--video-source", "pexels",
+        "--video-source", video_kaynagi(),
         "--video-clip-duration", "4",
         "--video-count", "1",
         "--voice-name", ses_adi,

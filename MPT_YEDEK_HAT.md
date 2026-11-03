@@ -18,8 +18,11 @@ Sunucu yok, ek ücret yok; GitHub'ın ücretsiz dakikalarını kullanır (~10–
 ## Gereken 2 secret
 | Secret | Nereden | Not |
 |---|---|---|
-| `PEXELS_API_KEY` | https://www.pexels.com/api/ | Ücretsiz. Stok görüntü kaynağı. |
+| `PIXABAY_API_KEY` | https://pixabay.com/api/docs/ (giriş yapınca anahtar sayfada yazar) | Ücretsiz. **Pexels yeni anahtar vermeyi durdurdu** (Kas 2026) → varsayılan Pixabay. Alternatif: `COVERR_API_KEY`. |
 | `ELEVENLABS_VOICE_ID` | ElevenLabs panel → ses → ID | Kanonik ses. **Fallback yok**; yoksa hat durur. |
+
+Görüntü kaynağı otomatik seçilir: `PIXABAY_API_KEY` varsa Pixabay, yoksa Pexels/Coverr.
+`VIDEO_SOURCE` değişkeni (Variables) ile elle sabitlenebilir.
 
 Zaten tanımlı olanlar: `GEMINI_API_KEY` (senaryo), `ELEVENLABS_API_KEY` (ses),
 `GOOGLE_TOKEN_JSON` + `GOOGLE_CLIENT_SECRETS_JSON` (Drive/tablo), `TELEGRAM_*` (bildirim).

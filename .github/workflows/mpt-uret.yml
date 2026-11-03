@@ -42,12 +42,16 @@ jobs:
       - name: Gerekli anahtarlar var mı?
         env:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          COVERR_API_KEY: ${{ secrets.COVERR_API_KEY }}
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           eksik=""
-          [ -z "$PEXELS_API_KEY" ] && eksik="$eksik PEXELS_API_KEY"
+          if [ -z "$PEXELS_API_KEY" ] && [ -z "$PIXABAY_API_KEY" ] && [ -z "$COVERR_API_KEY" ]; then
+            eksik="$eksik PIXABAY_API_KEY (veya PEXELS/COVERR)"
+          fi
           [ -z "$ELEVENLABS_API_KEY" ] && eksik="$eksik ELEVENLABS_API_KEY"
           [ -z "$ELEVENLABS_VOICE_ID" ] && eksik="$eksik ELEVENLABS_VOICE_ID"
           [ -z "$GEMINI_API_KEY" ] && eksik="$eksik GEMINI_API_KEY"
@@ -89,6 +93,9 @@ jobs:
       - name: Video üret ve Drive'a teslim et
         env:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          COVERR_API_KEY: ${{ secrets.COVERR_API_KEY }}
+          VIDEO_SOURCE: ${{ vars.VIDEO_SOURCE }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
           ELEVENLABS_VOICE_NAME: ${{ vars.ELEVENLABS_VOICE_NAME || 'bilgi-dozu' }}
