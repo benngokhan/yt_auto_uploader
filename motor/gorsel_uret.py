@@ -35,15 +35,15 @@ def pixabay_ara(sorgu: str, anahtar: str, adet: int = 20) -> list[dict]:
         "q": sorgu,
         "image_type": "photo",
         "orientation": "vertical",
-        "min_width": 1080,
-        "min_height": 1080,
+        "min_width": 1600,
+        "min_height": 1600,
         "safesearch": "true",
         "order": "popular",
         "per_page": str(min(adet, 200)),
         "lang": "en",
     }
     veri = _istek(f"{ARAMA_URL}?{urllib.parse.urlencode(parametre)}")
-    return [h for h in veri.get("hits", []) if h.get("imageWidth", 0) >= 1080]
+    return [h for h in veri.get("hits", []) if h.get("imageWidth", 0) >= 1600]
 
 
 def dikey_kirp(img: Image.Image) -> Image.Image:

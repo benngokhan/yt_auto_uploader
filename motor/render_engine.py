@@ -212,7 +212,7 @@ def make_upper_title_band(W, emoji_char, line1, line2, is_wide=False):
     d_txt = ImageDraw.Draw(txt_layer)
     d_sh  = ImageDraw.Draw(sh_layer)
 
-    em_px = 48 if is_wide else 56
+    em_px = 60 if is_wide else 72
     em_img = render_emoji_icon(emoji_char, target_px=em_px)
     ew, eh = em_img.size
 
@@ -564,7 +564,8 @@ def render_video_master(
         "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-",
         "-i", audio_input,
         "-map", "0:v:0", "-map", "1:a:0",
-        "-c:v", "libx264", "-preset", "veryfast", "-crf", "22",
+        "-c:v", "libx264", "-preset", os.environ.get("BD_X264_PRESET", "medium"),
+        "-crf", os.environ.get("BD_X264_CRF", "19"),
         "-profile:v", "high", "-pix_fmt", "yuv420p",
         "-c:a", "copy" if master_audio_source else "aac",
         *( [] if master_audio_source else ["-b:a", "192k"] ),
