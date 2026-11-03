@@ -64,6 +64,101 @@ def video_kaynagi() -> str:
     return "pexels"
 
 
+
+# ---------------------------------------------------------- senaryo (LLM)
+def _post_json(url: str, govde: dict, basliklar: dict):
+    import urllib.request
+    veri = json.dumps(govde).encode()
+    h = {"Content-Type": "application/json", **basliklar}
+    istek = urllib.request.Request(url, data=veri, headers=h, method="POST")
+    with urllib.request.urlopen(istek, timeout=90) as y:
+        return json.loads(y.read().decode())
+
+
+SENARYO_SISTEM = (
+    "Sen Türkçe kısa video senaristisin. Yalnızca istenen JSON'u döndür; açıklama yazma. "
+    "Metin tek bir şaşırtıcı bilgiyi anlatır, ikinci bir fikir eklemez."
+)
+
+
+def _senaryo_istem(konu: str) -> str:
+    return (
+        f"Konu: {konu}\n\n"
+        "JSON şeması: {\"senaryo\": \"...\", \"terimler\": \"a, b, c\"}\n"
+        f"- senaryo: Türkçe, {MIN_KRK}-{MAX_KRK} karakter, konuşma dili, 6-9 kısa cümle. "
+        "Selamlama/'bugün sizlere'/'abone olun' YASAK. İlk cümle 3 saniyede merak uyandırsın. "
+        "Son cümle ekranda cevaplanacak bir soru olsun. Sayı ve kaynak somut olsun.\n"
+        "- terimler: stok görüntü aramak için 3-4 İNGİLİZCE anahtar kelime, virgülle."
+    )
+
+
+def _cevap_ayikla(metin: str):
+    import re as _re
+    m = _re.search(r"\{.*\}", metin, _re.S)
+    veri = json.loads(m.group(0)) if m else {}
+    senaryo = (veri.get("senaryo") or "").strip()
+    terimler = (veri.get("terimler") or "").strip()
+    return senaryo, terimler
+
+
+def _groq(konu):
+    anahtar = _env("GROQ_API_KEY")
+    for model in [os.getenv("MPT_SCRIPT_MODEL", "").strip() or "llama-3.3-70b-versatile",
+                  "llama-3.1-8b-instant"]:
+        try:
+            y = _post_json("https://api.groq.com/openai/v1/chat/completions",
+                           {"model": model, "temperature": 0.7,
+                            "messages": [{"role": "system", "content": SENARYO_SISTEM},
+                                         {"role": "user", "content": _senaryo_istem(konu)}]},
+                           {"Authorization": f"Bearer {anahtar}"})
+            return _cevap_ayikla(y["choices"][0]["message"]["content"]), f"groq:{model}"
+        except Exception as hata:  # noqa: BLE001
+            print(f"groq {model} başarısız: {type(hata).__name__}")
+    return None, None
+
+
+def _gemini(konu):
+    anahtar = _env("GEMINI_API_KEY")
+    for model in [os.getenv("MPT_SCRIPT_MODEL", "").strip() or "gemini-3.8-flash", "gemini-3-flash"]:
+        try:
+            y = _post_json(
+                f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={anahtar}",
+                {"systemInstruction": {"parts": [{"text": SENARYO_SISTEM}]},
+                 "contents": [{"role": "user", "parts": [{"text": _senaryo_istem(konu)}]}]},
+                {})
+            metin = y["candidates"][0]["content"]["parts"][0]["text"]
+            return _cevap_ayikla(metin), f"gemini:{model}"
+        except Exception as hata:  # noqa: BLE001
+            print(f"gemini {model} başarısız: {type(hata).__name__}")
+    return None, None
+
+
+def _openrouter(konu):
+    anahtar = _env("OPENROUTER_API_KEY")
+    for model in [os.getenv("MPT_SCRIPT_MODEL", "").strip() or "google/gemini-2.5-flash",
+                  "meta-llama/llama-3.3-70b-instruct"]:
+        try:
+            y = _post_json("https://openrouter.ai/api/v1/chat/completions",
+                           {"model": model, "temperature": 0.7,
+                            "messages": [{"role": "system", "content": SENARYO_SISTEM},
+                                         {"role": "user", "content": _senaryo_istem(konu)}]},
+                           {"Authorization": f"Bearer {anahtar}"})
+            return _cevap_ayikla(y["choices"][0]["message"]["content"]), f"openrouter:{model}"
+        except Exception as hata:  # noqa: BLE001
+            print(f"openrouter {model} başarısız: {type(hata).__name__}")
+    return None, None
+
+
+def senaryo_uret(konu: str):
+    """Sağlayıcı zinciri: groq -> gemini -> openrouter. İlki tutmazsa sıradakine geçer."""
+    for saglayici in (_groq, _gemini, _openrouter):
+        (senaryo, terimler), etiket = saglayici(konu)
+        if senaryo and len(senaryo) >= 400:
+            print(f"Senaryo hazır ({etiket}, {len(senaryo)} karakter)")
+            return senaryo, terimler
+    raise SystemExit("Senaryo üretilemedi: tüm LLM sağlayıcıları başarısız.")
+
+
 def mpt_config_yaz() -> Path:
     """config.example.toml -> config.toml, anahtarlar env'den doldurulur."""
     ornek = MPT_DIR / "config.example.toml"
@@ -108,7 +203,7 @@ def mpt_config_yaz() -> Path:
     return hedef
 
 
-def mpt_calistir(konu: str, ses_edge: bool = False) -> Path:
+def mpt_calistir(konu: str, ses_edge: bool = False, senaryo: str = "", terimler: str = "") -> Path:
     """cli.py'yi çağırır, üretilen mp4 yolunu döndürür."""
     if ses_edge:
         # SADECE TEST: yayına gitmeyen kuru çalışmalarda hattı doğrulamak için.
@@ -123,8 +218,14 @@ def mpt_calistir(konu: str, ses_edge: bool = False) -> Path:
         sys.executable, "cli.py",
         "--video-subject", konu,
         "--video-language", "tr",
-        "--video-script-prompt", SENARYO_YONERGESI,
-        "--paragraph-number", "1",
+    ]
+    if senaryo:
+        argv += ["--video-script", senaryo]
+    else:
+        argv += ["--video-script-prompt", SENARYO_YONERGESI, "--paragraph-number", "1"]
+    if terimler:
+        argv += ["--video-terms", terimler]
+    argv += [
         "--video-aspect", "9:16",
         "--video-source", video_kaynagi(),
         "--video-clip-duration", "4",
@@ -267,7 +368,8 @@ def main() -> int:
         raise SystemExit("--ses-edge yalnız --kuru ile kullanılabilir (kanonik ses kuralı).")
 
     mpt_config_yaz()
-    video = mpt_calistir(args.konu, ses_edge=args.ses_edge)
+    senaryo, terimler = senaryo_uret(args.konu)
+    video = mpt_calistir(args.konu, ses_edge=args.ses_edge, senaryo=senaryo, terimler=terimler)
     sure, durum = sure_kontrol(video)
 
     if args.kuru:

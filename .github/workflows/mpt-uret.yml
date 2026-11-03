@@ -106,6 +106,8 @@ jobs:
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
           ELEVENLABS_VOICE_NAME: ${{ vars.ELEVENLABS_VOICE_NAME || 'bilgi-dozu' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           KONU: ${{ inputs.konu }}
           KURU: ${{ inputs.kuru }}
           TEST: ${{ inputs.test }}
