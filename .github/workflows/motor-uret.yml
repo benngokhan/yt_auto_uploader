@@ -83,7 +83,9 @@ jobs:
           ONAY_KLASOR: ${{ vars.MOTOR_ONAY_KLASOR || '1N6mMUu3rEvCIie4o4XUWegPzFngMgHHM' }}
           RUN_NO: ${{ github.run_number }}
         run: |
-          if ! ls motor/cikti/**/*.mp4 motor/cikti/*.mp4 >/dev/null 2>&1; then
+          shopt -s globstar nullglob
+          videolar=(motor/cikti/**/*.mp4)
+          if [ ${#videolar[@]} -eq 0 ]; then
             echo "Video yok (üretim durdu) — Drive'a bir şey konmadı."; exit 0
           fi
           pip install -q google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
@@ -101,7 +103,8 @@ jobs:
               creds.refresh(Request())
           drive = build("drive", "v3", credentials=creds)
 
-          dosyalar = sorted(set(glob.glob("motor/cikti/**/*.mp4", recursive=True)))
+          dosyalar = sorted(set(glob.glob("motor/cikti/**/*.mp4", recursive=True))) or \
+                     sorted(set(glob.glob("motor/cikti/**/final.mp4", recursive=True)))
           for d in dosyalar:
               ad = f"ONAY_{os.environ.get('RUN_NO','0')}_{Path(d).name}"
               medya = MediaFileUpload(d, mimetype="video/mp4", resumable=True)
