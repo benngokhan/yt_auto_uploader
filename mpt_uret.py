@@ -123,19 +123,53 @@ def _groq(konu):
     return None, None
 
 
+def _gemini_modelleri(anahtar: str) -> list[str]:
+    """Hesapta gerçekten açık modelleri sorar (model adları sık değişiyor)."""
+    import urllib.request as _u
+    try:
+        with _u.urlopen(f"https://generativelanguage.googleapis.com/v1beta/models?key={anahtar}",
+                        timeout=60) as y:
+            veri = json.loads(y.read().decode())
+    except Exception as hata:  # noqa: BLE001
+        print(f"gemini model listesi alınamadı: {hata}")
+        return []
+    adlar = []
+    for m in veri.get("models", []):
+        if "generateContent" not in (m.get("supportedGenerationMethods") or []):
+            continue
+        ad = (m.get("name") or "").split("/")[-1]
+        if "flash" in ad and "thinking" not in ad and "image" not in ad and "tts" not in ad:
+            adlar.append(ad)
+    # yeni sürüm önce
+    adlar.sort(key=lambda a: [int(x) if x.isdigit() else 0 for x in re.findall(r"\d+", a)], reverse=True)
+    print("gemini modelleri:", ", ".join(adlar[:6]) or "(yok)")
+    return adlar
+
+
 def _gemini(konu):
     anahtar = _env("GEMINI_API_KEY")
-    for model in [os.getenv("MPT_SCRIPT_MODEL", "").strip() or "gemini-3.8-flash", "gemini-3-flash"]:
-        try:
-            y = _post_json(
-                f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={anahtar}",
-                {"systemInstruction": {"parts": [{"text": SENARYO_SISTEM}]},
-                 "contents": [{"role": "user", "parts": [{"text": _senaryo_istem(konu)}]}]},
-                {})
-            metin = y["candidates"][0]["content"]["parts"][0]["text"]
-            return _cevap_ayikla(metin), f"gemini:{model}"
-        except Exception as hata:  # noqa: BLE001
-            print(f"gemini {model} başarısız: {hata}")
+    import time as _time
+    modeller = [m for m in [os.getenv("MPT_SCRIPT_MODEL", "").strip()] if m]
+    modeller += _gemini_modelleri(anahtar)
+    if not modeller:
+        modeller = ["gemini-3.8-flash"]
+    for model in modeller[:4]:
+        for deneme in range(3):
+            try:
+                y = _post_json(
+                    f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={anahtar}",
+                    {"systemInstruction": {"parts": [{"text": SENARYO_SISTEM}]},
+                     "contents": [{"role": "user", "parts": [{"text": _senaryo_istem(konu)}]}]},
+                    {})
+                metin = y["candidates"][0]["content"]["parts"][0]["text"]
+                return _cevap_ayikla(metin), f"gemini:{model}"
+            except Exception as hata:  # noqa: BLE001
+                mesaj = str(hata)
+                print(f"gemini {model} (deneme {deneme + 1}) başarısız: {mesaj[:160]}")
+                if "503" in mesaj or "429" in mesaj:
+                    _time.sleep(6 * (deneme + 1))   # yoğunluk: bekle, tekrar dene
+                    continue
+                break                                # 404/403: modeli geç
     return None, None
 
 
