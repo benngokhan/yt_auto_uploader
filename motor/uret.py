@@ -206,6 +206,7 @@ def main() -> int:
 
     # ---------------------------------------------------------- 4) görseller
     import gorsel_uret
+    import altyazi
 
     gorsel_ayar = ayar.get("gorsel", {})
     kaynak = gorsel_ayar.get("kaynak", "")
@@ -242,7 +243,8 @@ def main() -> int:
             "emoji": s.get("emoji", ""),
             "title_line1": s["baslik1"],
             "title_line2": s["baslik2"],
-            "subs": [(c["metin"], s.get("vurgular", [])) for c in hiz.get("cumleler", [])],
+            "subs": altyazi.grupla(s["ses"]),
+            "karaoke": hiz,
         })
 
     cikti = calisma / "final.mp4"

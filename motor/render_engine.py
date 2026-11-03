@@ -518,7 +518,9 @@ def render_video_master(
     upper_titles_pk = []
     sub_timeline = []
     for sm, sc, alignment in zip(scenes_meta, scenes_cfg, karaoke_per_scene):
-        upper_titles_pk.append(pack_fast_band(make_upper_title_band(W, sc["emoji"], sc["t1"], sc["t2"], is_wide=is_wide)))
+        _t1 = sc.get("t1") or sc.get("title_line1", "")
+        _t2 = sc.get("t2") or sc.get("title_line2", "")
+        upper_titles_pk.append(pack_fast_band(make_upper_title_band(W, sc["emoji"], _t1, _t2, is_wide=is_wide)))
         for group in subtitle_groups(sc["subs"], alignment, sm["vo_start"], sm["vo_dur"]):
             text = group["text"]
             group["white_pk"] = pack_fast_band(make_subtitle_band(W, text, is_wide=is_wide))

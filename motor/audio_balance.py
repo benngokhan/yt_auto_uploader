@@ -26,7 +26,7 @@ from typing import Any
 
 VOICE_TARGET_LUFS = -18.0
 MUSIC_BELOW_VOICE_LU = 2.0
-MASTER_TARGET_LUFS = -14.0
+MASTER_TARGET_LUFS = -16.0   # CEO ses kuralı: çıkış -16 LUFS / -1 dBTP (eski kod -14 idi — 167'nin sapması)
 TRUE_PEAK_CEILING_DB = -1.0
 DUCKING_THRESHOLD = 0.030       # linear amplitude, about -30.5 dBFS
 DUCKING_RATIO = 8.0
