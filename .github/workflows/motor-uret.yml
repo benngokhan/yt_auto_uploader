@@ -57,6 +57,41 @@ jobs:
           echo "Komut: python motor/uret.py $ARGS"
           eval python motor/uret.py $ARGS
 
+      - name: Videoyu Drive'a koy (Onay Bekleyen Videolar)
+        if: always()
+        env:
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          ONAY_KLASOR: ${{ vars.MOTOR_ONAY_KLASOR || '1N6mMUu3rEvCIie4o4XUWegPzFngMgHHM' }}
+          RUN_NO: ${{ github.run_number }}
+        run: |
+          if ! ls motor/cikti/**/*.mp4 motor/cikti/*.mp4 >/dev/null 2>&1; then
+            echo "Video yok (üretim durdu) — Drive'a bir şey konmadı."; exit 0
+          fi
+          pip install -q google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
+          python - <<'PY'
+          import os, glob, mimetypes
+          from pathlib import Path
+          from google.oauth2.credentials import Credentials
+          from google.auth.transport.requests import Request
+          from googleapiclient.discovery import build
+          from googleapiclient.http import MediaFileUpload
+
+          Path("token.json").write_text(os.environ["GOOGLE_TOKEN_JSON"], encoding="utf-8")
+          creds = Credentials.from_authorized_user_file("token.json")
+          if not creds.valid:
+              creds.refresh(Request())
+          drive = build("drive", "v3", credentials=creds)
+
+          dosyalar = sorted(set(glob.glob("motor/cikti/**/*.mp4", recursive=True)))
+          for d in dosyalar:
+              ad = f"ONAY_{os.environ.get('RUN_NO','0')}_{Path(d).name}"
+              medya = MediaFileUpload(d, mimetype="video/mp4", resumable=True)
+              sonuc = drive.files().create(
+                  body={"name": ad, "parents": [os.environ["ONAY_KLASOR"]]},
+                  media_body=medya, fields="id,name,webViewLink").execute()
+              print("DRIVE:", sonuc.get("webViewLink"))
+          PY
+
       - name: Videoyu indirilebilir yap
         if: always()
         uses: actions/upload-artifact@v4

@@ -1,6 +1,9 @@
 {
   "sahne_sayisi": 6,
-  "sure": {"min": 38, "max": 42},
+  "sure": {
+    "min": 38,
+    "max": 42
+  },
   "fps": 60,
   "ses": {
     "saglayici": "elevenlabs",
@@ -22,7 +25,9 @@
   "kategori": "Bilim",
   "onay": {
     "mod": "elle",
-    "aciklama": "Render biter, video motor/cikti/onay_bekleyen/ altında durur. Drive'a yükleme ve tablo satırı YOK; kullanıcı onayı beklenir."
+    "aciklama": "Render biter, video motor/cikti/onay_bekleyen/ altında durur. Drive'a yükleme ve tablo satırı YOK; kullanıcı onayı beklenir.",
+    "drive_klasoru": "1N6mMUu3rEvCIie4o4XUWegPzFngMgHHM",
+    "drive_klasoru_adi": "Onay Bekleyen Videolar (CEO)"
   },
   "kararlar": {
     "sure": "38-42 sn (kullanıcı: 3 Kasım 2026)",
