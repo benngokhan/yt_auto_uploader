@@ -78,7 +78,7 @@ def mpt_config_yaz() -> Path:
         yeni = f'{anahtar} = "{deger}"'
         metin = desen.sub(yeni, metin, count=1) if desen.search(metin) else metin
 
-    model = os.getenv("MPT_LLM_MODEL", "gemini-2.5-flash").strip()
+    model = os.getenv("MPT_LLM_MODEL", "gemini-3.8-flash").strip()
     ayarla("llm_provider", "gemini")
     ayarla("gemini_api_key", _env("GEMINI_API_KEY"))
     ayarla("gemini_model_name", model)
