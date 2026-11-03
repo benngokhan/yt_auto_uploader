@@ -25,3 +25,6 @@ build/
 # Motor varlıkları ve çıktıları (workflow her koşuda indirir/üretir)
 motor/assets/
 motor/cikti/
+
+# Drive'a yüklenen büyük dosyalar (geçici)
+paylas/
