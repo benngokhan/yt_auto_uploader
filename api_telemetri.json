@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-03T11:54:05+00:00",
+  "zaman": "2026-11-03T12:04:56+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -18,7 +18,7 @@
     {
       "ad": "OpenRouter",
       "durum": "gecersiz",
-      "mesaj": "HTTP 401 · {\"error\":{\"message\":\"User not found.\",\"code\":401}}",
+      "mesaj": "HTTP 401 · {\"error\":{\"message\":\"User not found.\",\"code\":401}} · anahtar: 73 karakter, 'sk-or-v1…'",
       "yenilenme": "aylık sıfırlanmaz · kredi yükledikçe artar"
     },
     {
@@ -54,16 +54,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4990,
+      "kalan": 4985,
       "limit": 5000,
-      "kullanilan": 10,
+      "kullanilan": 15,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 220.7,
-      "actions_kosu": 248,
+      "actions_dakika": 222.9,
+      "actions_kosu": 250,
       "actions_limit": 2000,
-      "actions_kalan": 1779.3
+      "actions_kalan": 1777.1
     },
     {
       "ad": "Google Drive",
@@ -294,6 +294,10 @@
     },
     {
       "zaman": "2026-11-03T11:54:05+00:00",
+      "elevenlabs_kalan": 7317
+    },
+    {
+      "zaman": "2026-11-03T12:04:56+00:00",
       "elevenlabs_kalan": 7317
     }
   ]
