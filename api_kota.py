@@ -100,7 +100,12 @@ def openrouter():
     try:
         k = http_json("https://openrouter.ai/api/v1/key", h).get("data", {})
     except urllib.error.HTTPError as e:
-        return hata("OpenRouter", f"HTTP {e.code}", "gecersiz" if e.code in (401, 403) else "hata")
+        try:
+            govde = e.read().decode("utf-8", "replace")[:180]
+        except Exception:
+            govde = ""
+        return hata("OpenRouter", f"HTTP {e.code} · {govde}".strip(" ·"),
+                    "gecersiz" if e.code in (401, 403) else "hata")
     except Exception as e:
         return hata("OpenRouter", e)
     limit = k.get("limit")
@@ -284,7 +289,12 @@ def groq():
                   yenilenme="dakika + günlük token · günlük kısım gece 00:00 UTC",
                   not_="ücretsiz katman: dakika bazlı limit")
     except urllib.error.HTTPError as e:
-        return hata("Groq", f"HTTP {e.code}", "gecersiz" if e.code in (401, 403) else "hata")
+        try:
+            govde = e.read().decode("utf-8", "replace")[:180]
+        except Exception:
+            govde = ""
+        return hata("Groq", f"HTTP {e.code} · {govde}".strip(" ·"),
+                    "gecersiz" if e.code in (401, 403) else "hata")
     except Exception as e:
         return hata("Groq", e)
 
