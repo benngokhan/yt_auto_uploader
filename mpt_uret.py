@@ -61,11 +61,11 @@ def video_kaynagi() -> str:
     secim = os.getenv("VIDEO_SOURCE", "").strip().lower()
     if secim in ("pexels", "pixabay", "coverr"):
         return secim
-    # Coverr: HD/4K + dikey filtre, kalite Pixabay'den iyi.
-    if os.getenv("COVERR_API_KEY", "").strip():
-        return "coverr"
+    # Pixabay: kütüphane geniş (dikey aramada Coverr'da 0-4 sonuç çıkıyor).
     if os.getenv("PIXABAY_API_KEY", "").strip():
         return "pixabay"
+    if os.getenv("COVERR_API_KEY", "").strip():
+        return "coverr"
     return "pexels"
 
 
@@ -97,7 +97,9 @@ def _senaryo_istem(konu: str) -> str:
         f"- senaryo: Türkçe, {MIN_KRK}-{MAX_KRK} karakter, konuşma dili, 6-9 kısa cümle. "
         "Selamlama/'bugün sizlere'/'abone olun' YASAK. İlk cümle 3 saniyede merak uyandırsın. "
         "Son cümle ekranda cevaplanacak bir soru olsun. Sayı ve kaynak somut olsun.\n"
-        "- terimler: stok görüntü aramak için 3-4 İNGİLİZCE anahtar kelime, virgülle."
+        "- terimler: stok görüntü aramak için 3-4 İNGİLİZCE anahtar kelime. "
+        "Her terim 1-2 kelime ve GENEL olmalı (örn. 'television', 'retro tv', 'rain window'); "
+        "uzun teknik tamlamalar arama sonucu vermiyor."
     )
 
 
@@ -417,9 +419,26 @@ def main() -> int:
     if args.ses_edge and not args.kuru:
         raise SystemExit("--ses-edge yalnız --kuru ile kullanılabilir (kanonik ses kuralı).")
 
-    mpt_config_yaz()
     senaryo, terimler = senaryo_uret(args.konu)
-    video = mpt_calistir(args.konu, ses_edge=args.ses_edge, senaryo=senaryo, terimler=terimler)
+
+    # Görüntü kaynağı yedekleme: birincil kaynakta malzeme bulunamazsa diğerine geç.
+    adaylar = [video_kaynagi()]
+    for yedek in ("pixabay", "coverr", "pexels"):
+        if yedek not in adaylar and os.getenv(f"{yedek.upper()}_API_KEY", "").strip():
+            adaylar.append(yedek)
+
+    video = None
+    for kaynak in adaylar:
+        os.environ["VIDEO_SOURCE"] = kaynak
+        print(f"Görüntü kaynağı denenecek: {kaynak}")
+        mpt_config_yaz()
+        try:
+            video = mpt_calistir(args.konu, ses_edge=args.ses_edge, senaryo=senaryo, terimler=terimler)
+            break
+        except SystemExit as hata:
+            print(f"{kaynak} başarısız: {hata} — sıradaki kaynak denenecek.")
+    if video is None:
+        raise SystemExit("Hiçbir görüntü kaynağından video üretilemedi.")
     sure, durum = sure_kontrol(video)
 
     if args.kuru:
