@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-03 19:38:35",
-  "generated_at_iso": "2026-11-03T19:38:35.409065+03:00",
+  "generated_at": "2026-11-03 19:58:15",
+  "generated_at_iso": "2026-11-03T19:58:15.905650+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -36,12 +36,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 8,
+    "ready_shorts": 7,
     "ready_longs": 14,
-    "total_ready": 22,
-    "days_of_stock": 11.0,
-    "next_short": "video_159.mp4",
-    "next_short_title": "Aynı Kelimeyi 20 Kez Söyleyince Neden Anlamı Bir Anda Silinir? 🧠 #bilgidozu #shorts",
+    "total_ready": 21,
+    "days_of_stock": 10.5,
+    "next_short": "video_160.mp4",
+    "next_short_title": "Gece Yatakta Tek Ayağını Yorgandan Çıkarınca Neden Hemen Uykun Gelir? 🦶 #bilgidozu #shorts",
     "next_long": "uzun_video_8.mp4",
     "next_long_title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
     "missing_covers": []
@@ -487,8 +487,8 @@
         "id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 90589,
-        "modifiedTime": "2026-11-03T09:59:16.984Z"
+        "size": 90639,
+        "modifiedTime": "2026-11-03T16:58:14.405Z"
       },
       {
         "id": "1LathGn2Mn5Zn_1gf4JqqVz1WnaSm7NVN",
@@ -720,9 +720,9 @@
       "file_name": "video_159.mp4",
       "number": 159,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Aynı Kelimeyi 20 Kez Söyleyince Neden Anlamı Bir Anda Silinir? 🧠 #bilgidozu #shorts",
       "description": "Her gün kullandığın kapı kelimesini yirmi kez üst üste söylediğinde neden bir anda tuhaf bir sese dönüşür? Normalde bir kelimeyi duyduğun salisede beyin kabuğundaki nöron ağı o sesi hafızandaki anlamıyla birleştirir.\n\n📍 BÖLÜMLER\n00:00 Bildiğin kelime 20 saniyede — Neden yabancı dile döner?\n00:15 Peş peşe ateşlenen hücre — Enerji korumaya geçer!\n00:33 Kulak sesi duyar ama — Anlam köprüsü susar!\n\n📊 Kaynaklar:\n• McGill University (Jakobovits James, 1962) & Psychological Science\n• https://www.apa.org/pubs/journals/xge\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #beyin #psikoloji #nörobilim #bilim",
       "tags": [
