@@ -81,8 +81,10 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
         "- baslik1: BÜYÜK HARF, beyaz satır (en fazla 22 karakter)\n"
         "- baslik2: BÜYÜK HARF, sarı satır (en fazla 22 karakter)\n"
         "- emoji: konuya uygun tek emoji\n"
-        "- gorsel: o sahneyi anlatan 2-3 kelimelik İNGİLİZCE stok fotoğraf araması "
-        "(ör. \"deep ocean fish\", \"human hand water\"; yazı/logo içermeyecek sahne)\n"
+        "- gorsel: o sahnede FİZİKSEL OLARAK GÖRÜNECEK somut nesneyi/durumu anlatan 2-3 kelimelik "
+        "İNGİLİZCE stok fotoğraf araması. Mecaz yasak: \"beyin kontrolü\" yerine \"human brain scan\", "
+        "\"ıslak tutuş\" yerine \"wet wrinkled fingertips\" gibi. Fotoğraflanabilir bir şey yaz; "
+        "yazı/logo/tabela içeren sahne istemeyin.\n"
         "- vurgular: o sahnenin altyazısında sarı boyanacak 1-3 kelime\n"
         "Selamlama ve 'abone olun' YASAK. İlk sahnenin sesi tek soru ve ≤6 kelime olsun. "
         "Son sahne 'Sıradaki videoda ... bakacağız.' kalıbıyla bitsin."
@@ -193,7 +195,9 @@ def main() -> int:
         gorsel_klasoru = KOK / gorsel_klasoru
 
     if kaynak == "pixabay":
-        parallelar = gorsel_uret.sahneler_icin_gorseller(sahneler, gorsel_klasoru)
+        konu_kelimeleri = [k for k in {w.strip('.,?!:;').lower() for w in a.konu.split()} if len(k) > 3]
+        yedek = [" ".join(konu_kelimeleri[:3])] if konu_kelimeleri else []
+        parallelar = gorsel_uret.sahneler_icin_gorseller(sahneler, gorsel_klasoru, yedek)
     elif kaynak == "klasor" and gorsel_klasoru.exists():
         parallelar = sorted(gorsel_klasoru.glob("*.png")) + sorted(gorsel_klasoru.glob("*.jpg"))
     else:

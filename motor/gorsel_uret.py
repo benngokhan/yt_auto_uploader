@@ -37,22 +37,57 @@ def _istek(url: str) -> dict:
         raise SystemExit(f"Pixabay isteği başarısız: {hata} | {govde}") from hata
 
 
-def pixabay_ara(sorgu: str, anahtar: str, adet: int = 20) -> list[dict]:
-    """Dikey, yüksek çözünürlüklü fotoğraf sonuçları (beğeniye göre sıralı)."""
-    parametre = {
+def _puanla(hit: dict, sorgu: str) -> float:
+    """Etiket uyumu + çözünürlük + beğeni → alaka puanı."""
+    q = {k.lower() for k in sorgu.replace("+", " ").split() if len(k) > 2}
+    etiketler = {t.lower() for t in str(hit.get("tags", "")).replace(",", " ").split()}
+    ortak = len(q & etiketler)
+    puan = ortak * 10.0
+    puan += min(4.0, (hit.get("imageWidth", 0) * hit.get("imageHeight", 0)) / 6_000_000)
+    puan += min(3.0, (hit.get("likes", 0) + hit.get("downloads", 0) / 50.0) / 100.0)
+    if hit.get("imageHeight", 0) > hit.get("imageWidth", 0):
+        puan += 2.0
+    return puan
+
+
+def pixabay_ara(sorgu: str, anahtar: str, adet: int = 60) -> list[dict]:
+    """Sorguya en uygun dikey fotoğrafları puana göre sıralı döndürür.
+
+    Önce katı (dikey + büyük), sonuç azsa gevşek (her yön) arama yapılır.
+    """
+    temel = {
         "key": anahtar,
         "q": sorgu,
         "image_type": "photo",
-        "orientation": "vertical",
-        "min_width": 1600,
-        "min_height": 1600,
         "safesearch": "true",
         "order": "popular",
         "per_page": str(min(adet, 200)),
         "lang": "en",
     }
-    veri = _istek(f"{ARAMA_URL}?{urllib.parse.urlencode(parametre)}")
-    return [h for h in veri.get("hits", []) if h.get("imageWidth", 0) >= 1600]
+    sonuclar: dict[int, dict] = {}
+    for ek in ({"orientation": "vertical", "min_width": 1400, "min_height": 1400},
+               {"min_width": 1200, "min_height": 900}):
+        try:
+            veri = _istek(f"{ARAMA_URL}?{urllib.parse.urlencode({**temel, **ek})}")
+        except SystemExit:
+            if sonuclar:      # gevşek aramada hata olursa elimizdekiyle devam
+                break
+            raise
+        for h in veri.get("hits", []):
+            sonuclar.setdefault(h["id"], h)
+        if len(sonuclar) >= 8:
+            break
+    return sorted(sonuclar.values(), key=lambda h: _puanla(h, sorgu), reverse=True)
+
+
+def _sorgu_adaylari(sahne: dict, yedek: list[str]) -> list[str]:
+    adaylar = []
+    if sahne.get("gorsel"):
+        adaylar.append(str(sahne["gorsel"]))
+    adaylar += yedek
+    adaylar.append("science laboratory")
+    # tekrarları at
+    return list(dict.fromkeys(a.strip() for a in adaylar if a and a.strip()))
 
 
 def dikey_kirp(img: Image.Image) -> Image.Image:
@@ -76,29 +111,38 @@ def _indir(url: str, hedef: Path) -> None:
         hedef.write_bytes(y.read())
 
 
-def sahneler_icin_gorseller(sahneler: list[dict], klasor: Path, sorgular: dict | None = None) -> list[Path]:
-    """Her sahne için bir görsel indirir, 1080x1920 PNG olarak kaydeder."""
+def sahneler_icin_gorseller(sahneler: list[dict], klasor: Path,
+                             yedek_sorgular: list[str] | None = None) -> list[Path]:
+    """Her sahne için en uygun görseli indirir, 1080x1920 PNG olarak kaydeder."""
     anahtar = os.getenv("PIXABAY_API_KEY", "").strip()
     if not anahtar:
         raise SystemExit("PIXABAY_API_KEY yok — görseller indirilemedi, üretim durdu.")
     klasor.mkdir(parents=True, exist_ok=True)
-    sorgular = sorgular or {}
+    yedek = yedek_sorgular or []
 
     kullanilan: set[int] = set()
     yollar: list[Path] = []
     for i, sahne in enumerate(sahneler, start=1):
-        sorgu = sahne.get("gorsel") or sorgular.get(i) or sahne.get("baslik2") or "science"
-        sonuc = [h for h in pixabay_ara(str(sorgu), anahtar) if h["id"] not in kullanilan]
-        if not sonuc:
-            raise SystemExit(f"Sahne {i} için Pixabay sonucu yok (sorgu: {sorgu!r}) — üretim durdu.")
+        secim = None
+        denenen = []
+        for sorgu in _sorgu_adaylari(sahne, yedek):
+            denenen.append(sorgu)
+            sonuc = [h for h in pixabay_ara(sorgu, anahtar) if h["id"] not in kullanilan]
+            if sonuc:
+                secim = (sorgu, sonuc[0])
+                break
+        if not secim:
+            raise SystemExit(
+                f"Sahne {i} için Pixabay sonucu yok (denenen: {denenen}) — üretim durdu.")
 
+        sorgu, hit = secim
         ham = klasor / f"ham_{i:02d}.jpg"
-        _indir(sonuc[0]["largeImageURL"], ham)
-        kullanilan.add(sonuc[0]["id"])
+        _indir(hit["largeImageURL"], ham)
+        kullanilan.add(hit["id"])
 
         png = klasor / f"sahne_{i:02d}.png"
         with Image.open(ham) as im:
             dikey_kirp(im.convert("RGB")).save(png)
         yollar.append(png)
-        print(f"  görsel {i}: pixabay#{sonuc[0]['id']} / sorgu={sorgu!r}")
+        print(f"  görsel {i}: pixabay#{hit['id']} / sorgu={sorgu!r} / etiket={str(hit.get('tags'))[:60]}")
     return yollar
