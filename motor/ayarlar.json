@@ -1,0 +1,18 @@
+{
+  "sahne_sayisi": 6,
+  "sure": {"min": 50, "max": 58},
+  "fps": 60,
+  "ses": {
+    "saglayici": "elevenlabs",
+    "voice_id": "CEVAP_BEKLIYOR_S1",
+    "model_id": "eleven_multilingual_v2",
+    "stability": 0.35,
+    "similarity_boost": 0.75,
+    "style": 0.35,
+    "speed": 1.0
+  },
+  "gorsel": {"kaynak": "CEVAP_BEKLIYOR_S2", "klasor": ""},
+  "muzik": "ambient_science_bgm.wav",
+  "kaynak_satiri": "Kaynak: doğrulanmış bilimsel yayınlar",
+  "kategori": "Bilim"
+}
