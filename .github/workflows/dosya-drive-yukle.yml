@@ -1,0 +1,60 @@
+name: Dosya -> Drive (genel)
+
+# Elle tetiklenir. Repodaki herhangi bir dosyayı (video/resim/pdf/md) Drive'a yükler.
+on:
+  workflow_dispatch:
+    inputs:
+      dosya:
+        description: "Repodaki dosya yolu (ör. paylas/sablon_demo.mp4)"
+        required: true
+      hedef_klasor:
+        description: "Drive klasör ID (boş = CEO klasörü)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  yukle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
+      - name: Yükle
+        env:
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          DOSYA: ${{ inputs.dosya }}
+          HEDEF: ${{ inputs.hedef_klasor }}
+        run: |
+          python - <<'PY'
+          import os, json, mimetypes
+          from pathlib import Path
+          from google.oauth2.credentials import Credentials
+          from google.auth.transport.requests import Request
+          from googleapiclient.discovery import build
+          from googleapiclient.http import MediaFileUpload
+
+          Path("token.json").write_text(os.environ["GOOGLE_TOKEN_JSON"], encoding="utf-8")
+          creds = Credentials.from_authorized_user_file("token.json")
+          if not creds.valid:
+              creds.refresh(Request())
+          drive = build("drive", "v3", credentials=creds)
+
+          dosya = Path(os.environ["DOSYA"].strip())
+          if not dosya.exists():
+              raise SystemExit(f"Dosya yok: {dosya}")
+          klasor = os.environ.get("HEDEF", "").strip() or "190zQiUYkp8fsQFleva77TKqc9MeGxZiI"
+          mime = mimetypes.guess_type(dosya.name)[0] or "application/octet-stream"
+          medya = MediaFileUpload(str(dosya), mimetype=mime, resumable=True)
+          sonuc = drive.files().create(
+              body={"name": dosya.name, "parents": [klasor]},
+              media_body=medya, fields="id,name,webViewLink,size",
+          ).execute()
+          print("YÜKLENDİ:", json.dumps(sonuc, ensure_ascii=False))
+          print("LINK:", sonuc.get("webViewLink"))
+          PY
