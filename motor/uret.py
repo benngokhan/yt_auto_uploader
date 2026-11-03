@@ -200,6 +200,11 @@ def main() -> int:
     for i, s in enumerate(sahneler, start=1):
         wav = calisma / f"vo_{i:02d}.wav"
         tts_uret(s["ses"], wav, ayar)
+        # kenar düzeltme: uzun sessizlik ve kesme tıkını temizle (metin/hizalama sonrası uygulanır)
+        import ses_kenar
+        kenar = ses_kenar.duzelt(wav)
+        if kenar.get("degisti") and kenar["kirpilan_son_sn"] > 0.4:
+            print(f"  sahne {i}: {kenar['kirpilan_son_sn']} sn boşluk kırpıldı")
         vo_files.append(str(wav))
         hizalamalar.append(hizala(wav, s["ses"], ayar))
         print(f"  sahne {i}: ses {round(re_.wav_duration(str(wav)), 2)} sn")
