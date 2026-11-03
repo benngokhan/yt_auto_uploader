@@ -1,36 +1,36 @@
 {
- "total": 22818,
- "day_gain": 64,
- "updated": 32,
- "baseline_count": 13,
- "compared_count": 35,
+ "total": 23245,
+ "day_gain": 427,
+ "updated": 13,
+ "baseline_count": 0,
+ "compared_count": 48,
  "unavailable_count": 4,
  "dry_run": false,
  "top": [
   {
-   "delta": 18,
+   "delta": 262,
+   "title": "Kesilen Elma Dakikalar İçinde Neden Kararır: Gizli Savunma Z",
+   "file": "video_154.mp4"
+  },
+  {
+   "delta": 104,
+   "title": "Spordan Ertesi Gün Çıkan Kas Ağrısının Sebebi Laktik Asit De",
+   "file": "video_153.mp4"
+  },
+  {
+   "delta": 35,
+   "title": "İlk Yudum Su Daha Kana Karışmadan Susuzluğunu Nasıl Anında K",
+   "file": "video_152.mp4"
+  },
+  {
+   "delta": 8,
+   "title": "Sabah Uyandığında Boyun Geceye Göre Neden 2 Santim Daha Uzun",
+   "file": "video_150.mp4"
+  },
+  {
+   "delta": 8,
    "title": "Göz Kapağın Neden Kendi Kendine Seğirir? Anlamı Bu! 👁🧠 #bilg",
    "file": "video_133.mp4"
-  },
-  {
-   "delta": 9,
-   "title": "Baldır Kasların Aslında İkinci Kalbin! Kanı Kalbe Nasıl Taşı",
-   "file": "video_132.mp4"
-  },
-  {
-   "delta": 6,
-   "title": "Bir Esnedin, Etraf da Esnedi! Esnemenin Bulaşma Sırrı 😮🧠 #bi",
-   "file": "video_134.mp4"
-  },
-  {
-   "delta": 4,
-   "title": "Burnun Nöbetleşe Çalışıyor: İki Delik Aynı Anda Eşit Nefes A",
-   "file": "video_32.mp4"
-  },
-  {
-   "delta": 4,
-   "title": "Bu Minik Karides Avını Kıskacıyla Değil, Patlayan Kabarcıkla",
-   "file": "video_38.mp4"
   }
  ]
 }
