@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-03T11:52:17+00:00",
+  "zaman": "2026-11-03T11:54:05+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -33,9 +33,13 @@
     },
     {
       "ad": "Groq",
-      "durum": "gecersiz",
-      "mesaj": "HTTP 403 · error code: 1010\n",
-      "yenilenme": "dakika + günlük token · günlük kısım 00:00 UTC"
+      "durum": "ok",
+      "limit": null,
+      "kalan": null,
+      "birim": "istek/dk + günlük token",
+      "model_sayisi": 11,
+      "yenilenme": "dakika + günlük token · günlük kısım gece 00:00 UTC",
+      "not_": "ücretsiz katman: dakika bazlı limit"
     },
     {
       "ad": "Telegram",
@@ -50,16 +54,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4995,
+      "kalan": 4990,
       "limit": 5000,
-      "kullanilan": 5,
+      "kullanilan": 10,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 219.2,
-      "actions_kosu": 246,
+      "actions_dakika": 220.7,
+      "actions_kosu": 248,
       "actions_limit": 2000,
-      "actions_kalan": 1780.8
+      "actions_kalan": 1779.3
     },
     {
       "ad": "Google Drive",
@@ -202,9 +206,9 @@
     }
   ],
   "ozet": {
-    "ok": 6,
+    "ok": 7,
     "eksik": 0,
-    "gecersiz": 2,
+    "gecersiz": 1,
     "hata": 0
   },
   "gecmis": [
@@ -286,6 +290,10 @@
     },
     {
       "zaman": "2026-11-03T11:52:17+00:00",
+      "elevenlabs_kalan": 7317
+    },
+    {
+      "zaman": "2026-11-03T11:54:05+00:00",
       "elevenlabs_kalan": 7317
     }
   ]
