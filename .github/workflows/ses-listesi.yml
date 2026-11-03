@@ -1,0 +1,41 @@
+name: Ses listesi (ElevenLabs hesapları)
+
+# Hesaptaki sesleri ve plan/kota bilgisini log'a yazar (ses kimliği seçmek için).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  listele:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Sesleri yazdır
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request, urllib.error
+          anahtar = os.environ.get("ELEVENLABS_API_KEY", "").strip()
+          if not anahtar:
+              raise SystemExit("ELEVENLABS_API_KEY yok")
+          def cagir(url):
+              istek = urllib.request.Request(url, headers={"xi-api-key": anahtar})
+              with urllib.request.urlopen(istek, timeout=60) as y:
+                  return json.loads(y.read().decode())
+          try:
+              abonelik = cagir("https://api.elevenlabs.io/v1/user/subscription")
+              print("PLAN:", abonelik.get("tier"), "| karakter:",
+                    abonelik.get("character_count"), "/", abonelik.get("character_limit"),
+                    "| klonlama:", abonelik.get("can_extend_voice_limit") or abonelik.get("professional_voice_slots_left"))
+          except Exception as h:
+              print("abonelik okunamadı:", h)
+          sesler = cagir("https://api.elevenlabs.io/v1/voices")
+          print("TOPLAM SES:", len(sesler.get("voices", [])))
+          for s in sesler.get("voices", []):
+              etiket = s.get("labels") or {}
+              print(f"  {s.get('voice_id')} | {s.get('name')} | kategori={s.get('category')} | "
+                    f"dil={etiket.get('language')} cinsiyet={etiket.get('gender')} aksan={etiket.get('accent')}")
+          PY
