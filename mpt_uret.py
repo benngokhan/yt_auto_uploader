@@ -19,6 +19,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import urllib.error
+import urllib.request
 import os
 import re
 import subprocess
@@ -71,8 +73,12 @@ def _post_json(url: str, govde: dict, basliklar: dict):
     veri = json.dumps(govde).encode()
     h = {"Content-Type": "application/json", **basliklar}
     istek = urllib.request.Request(url, data=veri, headers=h, method="POST")
-    with urllib.request.urlopen(istek, timeout=90) as y:
-        return json.loads(y.read().decode())
+    try:
+        with urllib.request.urlopen(istek, timeout=90) as y:
+            return json.loads(y.read().decode())
+    except urllib.error.HTTPError as hata:
+        govde = hata.read().decode("utf-8", "replace")[:300]
+        raise RuntimeError(f"HTTP {hata.code}: {govde}") from hata
 
 
 SENARYO_SISTEM = (
@@ -113,7 +119,7 @@ def _groq(konu):
                            {"Authorization": f"Bearer {anahtar}"})
             return _cevap_ayikla(y["choices"][0]["message"]["content"]), f"groq:{model}"
         except Exception as hata:  # noqa: BLE001
-            print(f"groq {model} başarısız: {type(hata).__name__}")
+            print(f"groq {model} başarısız: {hata}")
     return None, None
 
 
@@ -129,7 +135,7 @@ def _gemini(konu):
             metin = y["candidates"][0]["content"]["parts"][0]["text"]
             return _cevap_ayikla(metin), f"gemini:{model}"
         except Exception as hata:  # noqa: BLE001
-            print(f"gemini {model} başarısız: {type(hata).__name__}")
+            print(f"gemini {model} başarısız: {hata}")
     return None, None
 
 
@@ -145,14 +151,17 @@ def _openrouter(konu):
                            {"Authorization": f"Bearer {anahtar}"})
             return _cevap_ayikla(y["choices"][0]["message"]["content"]), f"openrouter:{model}"
         except Exception as hata:  # noqa: BLE001
-            print(f"openrouter {model} başarısız: {type(hata).__name__}")
+            print(f"openrouter {model} başarısız: {hata}")
     return None, None
 
 
 def senaryo_uret(konu: str):
     """Sağlayıcı zinciri: groq -> gemini -> openrouter. İlki tutmazsa sıradakine geçer."""
     for saglayici in (_groq, _gemini, _openrouter):
-        (senaryo, terimler), etiket = saglayici(konu)
+        sonuc, etiket = saglayici(konu)
+        if not sonuc:
+            continue
+        senaryo, terimler = sonuc
         if senaryo and len(senaryo) >= 400:
             print(f"Senaryo hazır ({etiket}, {len(senaryo)} karakter)")
             return senaryo, terimler
