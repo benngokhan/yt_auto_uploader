@@ -7,13 +7,14 @@ Akış:
          → Drive/Kısa Video + tabloya satır → mevcut yükleyici slotta yayınlar
 
 Kurallar (CEO/00_ONCE_OKU_Uretim_Kurallari.md):
-    * 1080x1920, 50-58 sn, 60 fps
+    * 1080x1920, 38-42 sn, 60 fps (kullanıcı kararı 03.11.2026)
     * üst başlık 2 satır: 1. satır beyaz, 2. satır sarı #FFD600, emoji
     * altyazı 2 satır, o an seslendirilen kelime sarı
     * ses voice-02 — farklı sese fallback YOK, hata olursa üretim durur
 
 Kullanım:
-    python motor/uret.py --konu "Parmak uçların suda neden buruşur?" --kuru
+    python motor/uret.py --konu "Parmak uçların suda neden buruşur?"            # render + onay bekleyen
+    python motor/uret.py --konu "..." --onay-verildi        # onaylı: Drive + tablo
 """
 from __future__ import annotations
 
@@ -42,6 +43,10 @@ def motor_hazirla(ayar: dict):
     sys.path.insert(0, str(MOTOR))
     import render_engine as re_  # noqa: N813
 
+    if not (MOTOR / "assets" / "Montserrat-Black.ttf").exists():
+        import varlik_hazirla
+        varlik_hazirla.hazirla(mood=ayar.get("muzik_mood", "doga_kesif"))
+
     font_black = MOTOR / "assets" / "Montserrat-Black.ttf"
     font_bold = MOTOR / "assets" / "Montserrat-Bold.ttf"
     emoji_font = MOTOR / "assets" / "NotoColorEmoji.ttf"
@@ -52,6 +57,7 @@ def motor_hazirla(ayar: dict):
         if not Path(yol).exists():
             raise SystemExit(f"Eksik varlık: {ad} -> {yol}")
         setattr(re_, ad, str(yol))
+    re_.FPS_HEDEF = int(ayar.get("fps", 60))
     return re_
 
 
@@ -68,13 +74,15 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
 
     istem = (
         f"Konu: {konu}\n\n"
-        f"Video {sahne_sayisi} sahne olacak, toplam anlatım ~50-58 saniye.\n"
+        f"Video {sahne_sayisi} sahne olacak, toplam anlatım 38-42 saniye (sahne başına ~6-7 sn).\n"
         "JSON şeması: {\"sahneler\": [{\"ses\": \"...\", \"baslik1\": \"...\", "
-        "\"baslik2\": \"...\", \"emoji\": \"...\", \"vurgular\": [\"kelime\", ...]}]}\n"
-        "- ses: o sahnede söylenecek 1-2 cümle (toplam ~150 karakter/sahne)\n"
+        "\"baslik2\": \"...\", \"emoji\": \"...\", \"gorsel\": \"...\", \"vurgular\": [\"kelime\", ...]}]}\n"
+        "- ses: o sahnede söylenecek 1-2 cümle (toplam ~110 karakter/sahne)\n"
         "- baslik1: BÜYÜK HARF, beyaz satır (en fazla 22 karakter)\n"
         "- baslik2: BÜYÜK HARF, sarı satır (en fazla 22 karakter)\n"
         "- emoji: konuya uygun tek emoji\n"
+        "- gorsel: o sahneyi anlatan 2-3 kelimelik İNGİLİZCE stok fotoğraf araması "
+        "(ör. \"deep ocean fish\", \"human hand water\"; yazı/logo içermeyecek sahne)\n"
         "- vurgular: o sahnenin altyazısında sarı boyanacak 1-3 kelime\n"
         "Selamlama ve 'abone olun' YASAK. İlk sahnenin sesi tek soru ve ≤6 kelime olsun. "
         "Son sahne 'Sıradaki videoda ... bakacağız.' kalıbıyla bitsin."
@@ -175,7 +183,9 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--konu", required=True)
     ap.add_argument("--sahne", type=int, default=0, help="0 = ayardan oku")
-    ap.add_argument("--kuru", action="store_true", help="Drive'a yükleme, sadece üret")
+    ap.add_argument("--kuru", action="store_true", help="Sadece üret, hiçbir yere yükleme")
+    ap.add_argument("--onay-verildi", action="store_true",
+                    help="Kullanıcı videoyu izleyip onayladı: Drive + tablo + yayın kuyruğu")
     a = ap.parse_args()
 
     ayar = ayar_yukle()
@@ -194,16 +204,26 @@ def main() -> int:
         hizalamalar.append(hizala(wav, s["ses"], ayar))
         print(f"  sahne {i}: ses {round(re_.wav_duration(str(wav)), 2)} sn")
 
-    # TODO(cevap bekliyor): sahne görselleri — AI mi arşiv mi (S2 sorusu)
-    gorsel_klasoru = ayar.get("gorsel", {}).get("klasor", "")
-    if not gorsel_klasoru or not Path(gorsel_klasoru).exists():
-        raise SystemExit("Sahne görselleri yok: ayarlar.json -> gorsel.klasor (S2 cevabı bekleniyor).")
+    # ---------------------------------------------------------- 4) görseller
+    import gorsel_uret
+
+    gorsel_ayar = ayar.get("gorsel", {})
+    kaynak = gorsel_ayar.get("kaynak", "")
+    gorsel_klasoru = Path(gorsel_ayar.get("klasor") or (KOK / "motor" / "cikti" / "gorseller"))
+    if not gorsel_klasoru.is_absolute():
+        gorsel_klasoru = KOK / gorsel_klasoru
+
+    if kaynak == "pixabay":
+        parallelar = gorsel_uret.sahneler_icin_gorseller(sahneler, gorsel_klasoru)
+    elif kaynak == "klasor" and gorsel_klasoru.exists():
+        parallelar = sorted(gorsel_klasoru.glob("*.png")) + sorted(gorsel_klasoru.glob("*.jpg"))
+    else:
+        raise SystemExit(f"Görsel kaynağı tanımsız: {kaynak!r} (ayarlar.json -> gorsel)")
 
     from PIL import Image
     import numpy as np
 
     plates = []
-    parallelar = sorted(Path(gorsel_klasoru).glob("*.png")) + sorted(Path(gorsel_klasoru).glob("*.jpg"))
     if len(parallelar) < sahne_sayisi:
         raise SystemExit(f"Görsel sayısı yetersiz: {len(parallelar)} < {sahne_sayisi}")
 
@@ -230,10 +250,19 @@ def main() -> int:
         str(cikti), scene_cfg, vo_files, plates,
         ayar.get("kaynak_satiri", ""),
         is_wide=False,
-        target_min_dur=ayar.get("sure", {}).get("min", 50),
-        target_max_dur=ayar.get("sure", {}).get("max", 58),
+        target_min_dur=ayar.get("sure", {}).get("min", 38),
+        target_max_dur=ayar.get("sure", {}).get("max", 42),
     )
     print(f"Video hazır: {cikti}")
+
+    if ayar.get("onay", {}).get("mod") == "elle" and not a.onay_verildi:
+        onay_dir = calisma / "onay_bekleyen"
+        onay_dir.mkdir(parents=True, exist_ok=True)
+        hedef = onay_dir / cikti.name
+        cikti.replace(hedef)
+        print(f"ONAY BEKLİYOR: {hedef}")
+        print("Drive'a yüklenmedi, tabloya yazılmadı. İzleyip 'tamam' de; --onay-verildi ile teslim edilir.")
+        return 0
 
     if a.kuru:
         print("KURU: Drive'a yüklenmedi.")

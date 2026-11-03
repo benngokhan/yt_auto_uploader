@@ -1,18 +1,33 @@
 {
   "sahne_sayisi": 6,
-  "sure": {"min": 50, "max": 58},
+  "sure": {"min": 38, "max": 42},
   "fps": 60,
   "ses": {
     "saglayici": "elevenlabs",
-    "voice_id": "CEVAP_BEKLIYOR_S1",
+    "voice_id": "KUTUPHANEDEN_SECILECEK",
     "model_id": "eleven_multilingual_v2",
     "stability": 0.35,
     "similarity_boost": 0.75,
     "style": 0.35,
     "speed": 1.0
   },
-  "gorsel": {"kaynak": "CEVAP_BEKLIYOR_S2", "klasor": ""},
-  "muzik": "ambient_science_bgm.wav",
+  "gorsel": {
+    "kaynak": "pixabay",
+    "klasor": "motor/cikti/gorseller",
+    "dikey": true,
+    "min_genislik": 1080
+  },
+  "muzik": "assets/ambient_science_bgm.wav",
   "kaynak_satiri": "Kaynak: doğrulanmış bilimsel yayınlar",
-  "kategori": "Bilim"
+  "kategori": "Bilim",
+  "onay": {
+    "mod": "elle",
+    "aciklama": "Render biter, video motor/cikti/onay_bekleyen/ altında durur. Drive'a yükleme ve tablo satırı YOK; kullanıcı onayı beklenir."
+  },
+  "kararlar": {
+    "sure": "38-42 sn (kullanıcı: 3 Kasım 2026)",
+    "ses": "ElevenLabs Voice Library'den seçilecek — voice-02 oturum sesiydi, taşınabilir kimliği yok",
+    "gorsel": "Pixabay fotoğraf + teal-amber sinematik düzenleme (AI/ücretli servis yok)",
+    "akis": "Her video elle onaylı; otomatik yayın yok"
+  }
 }

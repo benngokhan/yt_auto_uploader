@@ -21,3 +21,7 @@ env/
 *.egg-info/
 dist/
 build/
+
+# Motor varlıkları ve çıktıları (workflow her koşuda indirir/üretir)
+motor/assets/
+motor/cikti/

@@ -1,0 +1,68 @@
+name: Motor - video üret (elle onaylı)
+
+# Kanalın KENDİ motoru (motor/render_engine.py) ile tek video üretir.
+# Onay modu "elle": video üretilir, Drive'a YÜKLENMEZ; izlemen için artifact olarak iner.
+# Ses (voice-02 / ELEVENLABS_VOICE_ID + ELEVENLABS_API_KEY) yoksa üretim DURUR — başka sese geçmez.
+
+on:
+  workflow_dispatch:
+    inputs:
+      konu:
+        description: "Video konusu"
+        required: true
+        type: string
+      kuru:
+        description: "Sadece üret, hiçbir yere yükleme"
+        type: boolean
+        default: true
+
+concurrency:
+  group: motor-uret
+  cancel-in-progress: false
+
+jobs:
+  uret:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+
+      - name: Bağımlılıklar
+        run: pip install -q -r requirements-motor.txt
+
+      - name: Varlıklar (fontlar + fon müziği)
+        run: python motor/varlik_hazirla.py
+
+      - name: Üret
+        env:
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          MOTOR_KONU: ${{ inputs.konu }}
+          MOTOR_KURU: ${{ inputs.kuru }}
+        run: |
+          ARGS="--konu \"$MOTOR_KONU\""
+          [ "$MOTOR_KURU" = "true" ] && ARGS="$ARGS --kuru"
+          echo "Komut: python motor/uret.py $ARGS"
+          eval python motor/uret.py $ARGS
+
+      - name: Videoyu indirilebilir yap
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: motor-video
+          path: |
+            motor/cikti/**/*.mp4
+          if-no-files-found: warn
+          retention-days: 7

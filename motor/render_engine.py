@@ -412,7 +412,7 @@ def render_video_master(
     t_t0 = time.time()
     W, H = (1920, 1080) if is_wide else (1080, 1920)
     UPS_W, UPS_H = (2400, 1350) if is_wide else (1350, 2400)
-    FPS = 30
+    FPS = globals().get("FPS_HEDEF", 30)   # kural: 60 fps (uret.py ayarlar.json'dan set eder)
     CROSS_DISSOLVE = 0.50
     N = len(scenes_cfg)
     if not N or len(vo_files) != N or len(plates_bgr) != N:
