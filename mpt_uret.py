@@ -34,7 +34,9 @@ MPT_DIR = Path(os.getenv("MPT_DIR", str(KOK / "MoneyPrinterTurbo")))
 
 HEDEF_SN = (38, 42)
 SINIR_SN = (30, 45)
-MIN_KRK, MAX_KRK = 600, 680
+# MPT hattı için ölçülen hız: ~13 karakter/sn (40 sn ≈ 520 karakter).
+# Kullanıcının kendi senaryo kuralı 600-680'dir; bu hat daha hızlı konuşuyor.
+MIN_KRK, MAX_KRK = 480, 540
 
 SENARYO_YONERGESI = (
     "Metin Türkçe olacak. Tek bir şaşırtıcı bilgi anlat; ikinci bir fikir ekleme. "
