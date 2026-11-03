@@ -1,12 +1,12 @@
 {
-  "zaman": "2026-11-03T07:12:13+00:00",
+  "zaman": "2026-11-03T10:32:06+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
       "durum": "ok",
-      "kalan": 7897,
+      "kalan": 7317,
       "limit": 10000,
-      "kullanilan": 2103,
+      "kullanilan": 2683,
       "birim": "karakter/kredi",
       "tier": "free",
       "reset_unix": 1794480693,
@@ -56,17 +56,17 @@
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 140.6,
-      "actions_kosu": 179,
+      "actions_dakika": 191.5,
+      "actions_kosu": 231,
       "actions_limit": 2000,
-      "actions_kalan": 1859.4
+      "actions_kalan": 1808.5
     },
     {
       "ad": "Google Drive",
       "durum": "ok",
-      "kalan": 10416149780,
+      "kalan": 10334883721,
       "limit": 16106127360,
-      "kullanilan": 5689977580,
+      "kullanilan": 5771243639,
       "birim": "bayt",
       "kirilim": [
         {
@@ -83,7 +83,7 @@
         },
         {
           "ad": "Kısa Kapaklar",
-          "boyut": 6068134,
+          "boyut": 5989312,
           "dosya": 14,
           "sahip": "gokhanaltundal@gmail.com"
         },
@@ -95,9 +95,9 @@
         },
         {
           "ad": "CEO / Tablolar",
-          "boyut": 262459591,
-          "dosya": 21,
-          "sahip": "gokhanaltundal@gmail.com"
+          "boyut": 343739359,
+          "dosya": 31,
+          "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
         {
           "ad": "Gmail + Fotoğraflar (Drive dışı)",
@@ -139,9 +139,9 @@
           "boyut": 83722104
         }
       ],
-      "drive_gorunen": 3039891376,
-      "kendi_dosyalar": 2245296131,
-      "paylasilan": 794595245,
+      "drive_gorunen": 3122371132,
+      "kendi_dosyalar": 2326562190,
+      "paylasilan": 795808942,
       "disalan": 3444681449,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
@@ -150,11 +150,11 @@
     {
       "ad": "YouTube Data API",
       "durum": "ok",
-      "kalan": 10000,
+      "kalan": 8300,
       "limit": 10000,
-      "kullanilan": 0,
+      "kullanilan": 1700,
       "birim": "birim (tahmini)",
-      "bugun_yukleme": 0,
+      "bugun_yukleme": 1,
       "yenilenme": "günlük · gece 00:00 Pasifik (TR 10:00) sıfırlanır",
       "not_": "gerçek kota API'de yok; yükleme ≈ 1700 birim sayıldı"
     }
@@ -271,6 +271,10 @@
     {
       "zaman": "2026-11-03T07:12:13+00:00",
       "elevenlabs_kalan": 7897
+    },
+    {
+      "zaman": "2026-11-03T10:32:06+00:00",
+      "elevenlabs_kalan": 7317
     }
   ]
 }
