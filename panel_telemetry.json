@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-03 12:42:06",
-  "generated_at_iso": "2026-11-03T12:42:06.065591+03:00",
+  "generated_at": "2026-11-03 12:59:18",
+  "generated_at_iso": "2026-11-03T12:59:18.156273+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -36,12 +36,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 9,
+    "ready_shorts": 8,
     "ready_longs": 14,
-    "total_ready": 23,
-    "days_of_stock": 11.5,
-    "next_short": "video_158.mp4",
-    "next_short_title": "Ağlamamak İçin Kendini Tuttuğunda Boğazına Neden Yumru Oturur? 😢 #bilgidozu #shorts",
+    "total_ready": 22,
+    "days_of_stock": 11.0,
+    "next_short": "video_159.mp4",
+    "next_short_title": "Aynı Kelimeyi 20 Kez Söyleyince Neden Anlamı Bir Anda Silinir? 🧠 #bilgidozu #shorts",
     "next_long": "uzun_video_8.mp4",
     "next_long_title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
     "missing_covers": []
@@ -487,8 +487,8 @@
         "id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 90530,
-        "modifiedTime": "2026-11-02T17:05:08.994Z"
+        "size": 90589,
+        "modifiedTime": "2026-11-03T09:59:16.984Z"
       },
       {
         "id": "1LathGn2Mn5Zn_1gf4JqqVz1WnaSm7NVN",
@@ -552,6 +552,13 @@
         "mimeType": "text/markdown",
         "size": 862,
         "modifiedTime": "2026-11-02T09:13:22.906Z"
+      },
+      {
+        "id": "1Frqd8y7hx625G6uAdP_xKSxvXXZUSRYv",
+        "name": "Ses Örnekleri",
+        "mimeType": "application/vnd.google-apps.folder",
+        "size": 0,
+        "modifiedTime": "2026-11-03T09:45:12.974Z"
       },
       {
         "id": "1bRhgFGax34FGsySde71FqTiMIUpZkw02",
@@ -682,9 +689,9 @@
       "file_name": "video_158.mp4",
       "number": 158,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Ağlamamak İçin Kendini Tuttuğunda Boğazına Neden Yumru Oturur? 😢 #bilgidozu #shorts",
       "description": "Ağlamamak için kendini zor tuttuğun an boğazına koca bir yumru oturmuş gibi yutkunmakta neden zorlanırsın? Yoğun üzüntü başladığında beynin tıpkı tehlike anındaki gibi savaş ya da kaç sistemini devreye sokup daha çok oksijen ister.\n\n📍 BÖLÜMLER\n00:00 Gözyaşını tuttuğun an — Boğazın neden düğümlenir?\n00:16 Ses telleri arasındaki — Nefes kapısı açılır!\n00:35 Ortada hiçbir cisim yok: — Kas çatışması yumru gibi!\n\n📊 Kaynaklar:\n• Cleveland Clinic & Journal of Voice (Autonomic Laryngeal Physiology)\n• https://my.clevelandclinic.org/health/symptoms/globus-sensation\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #insanvücudu #beyin #psikoloji #bilim",
       "tags": [
