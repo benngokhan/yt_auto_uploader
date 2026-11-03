@@ -61,10 +61,18 @@ def video_kaynagi() -> str:
     secim = os.getenv("VIDEO_SOURCE", "").strip().lower()
     if secim in ("pexels", "pixabay", "coverr"):
         return secim
+<<<<<<< HEAD
     if os.getenv("PIXABAY_API_KEY", "").strip():
         return "pixabay"
     if os.getenv("COVERR_API_KEY", "").strip():
         return "coverr"
+=======
+    # Coverr: HD/4K + dikey filtre, kalite Pixabay'den iyi.
+    if os.getenv("COVERR_API_KEY", "").strip():
+        return "coverr"
+    if os.getenv("PIXABAY_API_KEY", "").strip():
+        return "pixabay"
+>>>>>>> 6c02c8b (feat(mpt): coverr birincil goruntu kaynagi (API dogrulandi, HD/dikey))
     return "pexels"
 
 
@@ -224,7 +232,15 @@ def mpt_config_yaz() -> Path:
     ayarla("gemini_model_name", model)
 
     kaynak = video_kaynagi()
+<<<<<<< HEAD
     if kaynak == "pixabay":
+=======
+    if kaynak == "coverr":
+        anahtar = _env("COVERR_API_KEY").replace('"', "")
+        metin = re.sub(r'^coverr_api_keys\s*=\s*.*$',
+                       f'coverr_api_keys = ["{anahtar}"]', metin, count=1, flags=re.M)
+    elif kaynak == "pixabay":
+>>>>>>> 6c02c8b (feat(mpt): coverr birincil goruntu kaynagi (API dogrulandi, HD/dikey))
         anahtar = _env("PIXABAY_API_KEY").replace('"', "")
         metin = re.sub(r'^pixabay_api_keys\s*=\s*.*$',
                        f'pixabay_api_keys = ["{anahtar}"]', metin, count=1, flags=re.M)
