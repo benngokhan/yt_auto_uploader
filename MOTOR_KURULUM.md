@@ -64,3 +64,17 @@ Her sahne (`scene_configs` öğesi):
 ## Bilinen iki uyumsuzluk (kurulumda düzeltilecek)
 1. **FPS**: `render_video_master` içinde `FPS = 30` sabit; kural 60 fps istiyor → 60'a çekilecek (render süresi ~2 katı).
 2. **Yollar**: `FONT_BLACK_PATH`, `FONT_BOLD_PATH`, `EMOJI_FONT_PATH`, `BGM_PATH` modül sabitleri — orkestratör bunları `motor/assets/` altına yönlendirecek (motor kodu değiştirilmeden, sabit atamasıyla).
+
+## Kullanıcı kararları — 3 Kasım 2026
+
+| Konu | Karar |
+|---|---|
+| Süre | **38–42 sn** (6 sahne × ~6,5 sn). 50–58 sn pilot kuralı geçersiz. |
+| Ses | ElevenLabs **Voice Library**'den seçilecek ses. `voice-02` oturum sesiydi, taşınabilir kimliği yok → `voice_id` verilene kadar üretim durur. |
+| Görseller | **Pixabay** fotoğraf + teal-amber sinematik düzenleme. Ücretli/AI servis yok (Pollinations'ta logo var, kullanılmıyor). |
+| Akış | **Her video elle onaylı.** Render → `motor/cikti/onay_bekleyen/` → kullanıcı izler → `--onay-verildi` ile Drive + tablo. |
+| FPS | 60 (`render_engine.FPS_HEDEF`) |
+| Fon müziği | `bgm_composer.py` ile üretiliyor → dış lisans bağımlılığı yok. |
+| Varlıklar | Fontlar + müzik repoya commit edilmez; `motor/varlik_hazirla.py` indirir/üretir (`.gitignore`). |
+
+**Eksik tek şey:** `ELEVENLABS_API_KEY` + `ELEVENLABS_VOICE_ID` (repo secrets) → `motor/ayarlar.json` içindeki `ses.voice_id`.
