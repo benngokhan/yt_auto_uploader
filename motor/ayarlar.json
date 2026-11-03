@@ -20,7 +20,7 @@
     "dikey": true,
     "min_genislik": 1080
   },
-  "muzik": "assets/ambient_science_bgm.wav",
+  "muzik": "ambient_science_bgm.wav",
   "kaynak_satiri": "Kaynak: doğrulanmış bilimsel yayınlar",
   "kategori": "Bilim",
   "onay": {
