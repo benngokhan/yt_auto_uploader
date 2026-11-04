@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-04T00:28:10+00:00",
+  "zaman": "2026-11-04T06:48:56+00:00",
   "anahtar_durumu": "ok",
   "tier": "free",
   "durum": "free",
@@ -27,169 +27,169 @@
       "id": "CwhRBWXzGAHq8TQ4Fs17",
       "ad": "Roger - Laid-Back, Casual, Resonant",
       "kategori": "premade",
-      "etiket": "conversational, en, classy, middle_aged, male, american"
+      "etiket": "en, conversational, classy, american, male, middle_aged"
     },
     {
       "id": "EXAVITQu4vr4xnSDxMaL",
       "ad": "Sarah - Mature, Reassuring, Confident",
       "kategori": "premade",
-      "etiket": "entertainment_tv, en, professional, young, female, american"
+      "etiket": "en, entertainment_tv, professional, american, female, young"
     },
     {
       "id": "FGY2WhTYpPnrIDTdsKH5",
       "ad": "Laura - Enthusiast, Quirky Attitude",
       "kategori": "premade",
-      "etiket": "social_media, en, sassy, young, female, american"
+      "etiket": "en, social_media, sassy, american, female, young"
     },
     {
       "id": "IKne3meq5aSn9XLyUdCD",
       "ad": "Charlie - Deep, Confident, Energetic",
       "kategori": "premade",
-      "etiket": "conversational, en, hyped, young, male, australian"
+      "etiket": "young, male, hyped, conversational, en, australian"
     },
     {
       "id": "JBFqnCBsd6RMkjVDRZzb",
       "ad": "George - Warm, Captivating Storyteller",
       "kategori": "premade",
-      "etiket": "narrative_story, en, mature, middle_aged, male, british"
+      "etiket": "middle_aged, male, mature, narrative_story, en, british"
     },
     {
       "id": "N2lVS1w4EtoT3dr4eOWO",
       "ad": "Callum - Husky Trickster",
       "kategori": "premade",
-      "etiket": "characters_animation, en, middle_aged, american, male"
+      "etiket": "middle_aged, male, characters_animation, en, american"
     },
     {
       "id": "SAz9YHcvj6GT2YYXdXww",
       "ad": "River - Relaxed, Neutral, Informative",
       "kategori": "premade",
-      "etiket": "conversational, en, calm, middle_aged, neutral, american"
+      "etiket": "middle_aged, neutral, calm, conversational, en, american"
     },
     {
       "id": "SOYHLrjzK2X1ezoPC6cr",
       "ad": "Harry - Fierce Warrior",
       "kategori": "premade",
-      "etiket": "characters_animation, en, rough, young, male, american"
+      "etiket": "young, male, rough, characters_animation, en, american"
     },
     {
       "id": "TX3LPaxmHKxFdv7VOQHJ",
       "ad": "Liam - Energetic, Social Media Creator",
       "kategori": "premade",
-      "etiket": "social_media, en, confident, young, male, american"
+      "etiket": "en, social_media, confident, american, male, young"
     },
     {
       "id": "Xb7hH8MSUJpSbSDYk0k2",
       "ad": "Alice - Clear, Engaging Educator",
       "kategori": "premade",
-      "etiket": "informative_educational, en, professional, middle_aged, fema"
+      "etiket": "en, informative_educational, professional, british, female, "
     },
     {
       "id": "XrExE9yKIg1WjnnlVkGX",
       "ad": "Matilda - Knowledgable, Professional",
       "kategori": "premade",
-      "etiket": "informative_educational, en, upbeat, middle_aged, female, am"
+      "etiket": "middle_aged, female, upbeat, informative_educational, en, am"
     },
     {
       "id": "bIHbv24MWmeRgasZH58o",
       "ad": "Will - Relaxed Optimist",
       "kategori": "premade",
-      "etiket": "conversational, en, chill, young, male, american"
+      "etiket": "young, male, chill, conversational, en, american"
     },
     {
       "id": "cgSgspJ2msm6clMCkdW9",
       "ad": "Jessica - Playful, Bright, Warm",
       "kategori": "premade",
-      "etiket": "conversational, en, cute, young, female, american"
+      "etiket": "en, cute, female, conversational, young, american"
     },
     {
       "id": "cjVigY5qzO86Huf0OWal",
       "ad": "Eric - Smooth, Trustworthy",
       "kategori": "premade",
-      "etiket": "conversational, en, classy, middle_aged, male, american"
+      "etiket": "en, conversational, classy, american, male, middle_aged"
     },
     {
       "id": "hpp4J3VqNfWAUOO0d1Us",
       "ad": "Bella - Professional, Bright, Warm",
       "kategori": "premade",
-      "etiket": "informative_educational, en, professional, middle_aged, fema"
+      "etiket": "en, informative_educational, professional, american, female,"
     },
     {
       "id": "iP95p4xoKVk53GoZ742B",
       "ad": "Chris - Charming, Down-to-Earth",
       "kategori": "premade",
-      "etiket": "conversational, en, casual, middle_aged, male, american"
+      "etiket": "middle_aged, male, casual, conversational, en, american"
     },
     {
       "id": "nPczCjzI2devNBz1zQrb",
       "ad": "Brian - Deep, Resonant and Comforting",
       "kategori": "premade",
-      "etiket": "social_media, en, classy, middle_aged, male, american"
+      "etiket": "en, social_media, classy, american, male, middle_aged"
     },
     {
       "id": "onwK4e9ZLuTAKqWW03F9",
       "ad": "Daniel - Steady Broadcaster",
       "kategori": "premade",
-      "etiket": "informative_educational, en, formal, middle_aged, male, brit"
+      "etiket": "middle_aged, male, formal, informative_educational, en, brit"
     },
     {
       "id": "pFZP5JQG7iQjIQuC4Bku",
       "ad": "Lily - Velvety Actress",
       "kategori": "premade",
-      "etiket": "informative_educational, en, confident, middle_aged, female,"
+      "etiket": "female, middle_aged, british, informative_educational, confi"
     },
     {
       "id": "pNInz6obpgDQGcFmaJgB",
       "ad": "Adam - Dominant, Firm",
       "kategori": "premade",
-      "etiket": "social_media, en, middle_aged, american, male"
+      "etiket": "en, social_media, american, male, middle_aged"
     },
     {
       "id": "pqHfZKP75CvOlQylNhV4",
       "ad": "Bill - Wise, Mature, Balanced",
       "kategori": "premade",
-      "etiket": "advertisement, en, crisp, old, male, american"
-    },
-    {
-      "id": "Et3hA9mm8aHhswBL5jmC",
-      "ad": "Aslıhan - Young, High and Clear",
-      "kategori": "professional",
-      "etiket": "confident, female, istanbul, informative_educational, tr, yo"
+      "etiket": "en, advertisement, crisp, american, male, old"
     },
     {
       "id": "NNn9dv8zq2kUo7d3JSGG",
       "ad": "Derya - Dynamic and Friendly Narrator",
       "kategori": "professional",
-      "etiket": "narrative_story, female, standard, casual, tr, young"
-    },
-    {
-      "id": "FDs1ZX5J4e4f2c2erxtW",
-      "ad": "Fili - Warm Turkish Female ",
-      "kategori": "professional",
-      "etiket": "conversational, calm, istanbul, female, tr, young"
-    },
-    {
-      "id": "uvU9jrgGLWNPeNA4NgNT",
-      "ad": "İrem - Authoritarian Female Voice",
-      "kategori": "professional",
-      "etiket": "narrative_story, female, istanbul, professional, tr, middle_"
-    },
-    {
-      "id": "aIdeZYQ86PeVTKIe5may",
-      "ad": "Pınar - Direct and Encouraging",
-      "kategori": "professional",
-      "etiket": "social_media, female, istanbul, confident, tr, middle_aged"
-    },
-    {
-      "id": "N0wraTTB0pquzsz3DLG8",
-      "ad": "Nil - Dynamic, Playful and Clear",
-      "kategori": "professional",
-      "etiket": "social_media, female, standard, tr, middle_aged"
+      "etiket": "casual, young, narrative_story, tr, female, standard"
     },
     {
       "id": "xsGHrtxT5AdDzYXTQT0d",
       "ad": "Gönül Filiz - Airy and Soft",
       "kategori": "professional",
-      "etiket": "narrative_story, female, istanbul, calm, tr, young"
+      "etiket": "calm, young, narrative_story, tr, female, istanbul"
+    },
+    {
+      "id": "FDs1ZX5J4e4f2c2erxtW",
+      "ad": "Fili - Warm Turkish Female ",
+      "kategori": "professional",
+      "etiket": "calm, istanbul, conversational, tr, female, young"
+    },
+    {
+      "id": "Et3hA9mm8aHhswBL5jmC",
+      "ad": "Aslıhan - Young, High and Clear",
+      "kategori": "professional",
+      "etiket": "confident, young, informative_educational, tr, female, istan"
+    },
+    {
+      "id": "aIdeZYQ86PeVTKIe5may",
+      "ad": "Pınar - Direct and Encouraging",
+      "kategori": "professional",
+      "etiket": "confident, middle_aged, social_media, tr, female, istanbul"
+    },
+    {
+      "id": "N0wraTTB0pquzsz3DLG8",
+      "ad": "Nil - Dynamic, Playful and Clear",
+      "kategori": "professional",
+      "etiket": "standard, social_media, tr, female, middle_aged"
+    },
+    {
+      "id": "uvU9jrgGLWNPeNA4NgNT",
+      "ad": "İrem - Authoritarian Female Voice",
+      "kategori": "professional",
+      "etiket": "professional, middle_aged, narrative_story, tr, female, ista"
     }
   ],
   "gecmis": [
@@ -225,6 +225,11 @@
     },
     {
       "zaman": "2026-11-04T00:28:10+00:00",
+      "kalan": 1384,
+      "kullanilan": 8616
+    },
+    {
+      "zaman": "2026-11-04T06:48:56+00:00",
       "kalan": 1384,
       "kullanilan": 8616
     }
