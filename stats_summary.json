@@ -1,36 +1,36 @@
 {
- "total": 23245,
- "day_gain": 427,
- "updated": 13,
+ "total": 23430,
+ "day_gain": 185,
+ "updated": 8,
  "baseline_count": 0,
  "compared_count": 48,
  "unavailable_count": 4,
  "dry_run": false,
  "top": [
   {
-   "delta": 262,
+   "delta": 138,
    "title": "Kesilen Elma Dakikalar İçinde Neden Kararır: Gizli Savunma Z",
    "file": "video_154.mp4"
   },
   {
-   "delta": 104,
+   "delta": 38,
    "title": "Spordan Ertesi Gün Çıkan Kas Ağrısının Sebebi Laktik Asit De",
    "file": "video_153.mp4"
   },
   {
-   "delta": 35,
-   "title": "İlk Yudum Su Daha Kana Karışmadan Susuzluğunu Nasıl Anında K",
-   "file": "video_152.mp4"
+   "delta": 5,
+   "title": "Kışın Kalbi Durup Buz Tutan, Baharda Çözülüp Canlanan Kurbağ",
+   "file": "video_40.mp4"
   },
   {
-   "delta": 8,
+   "delta": 2,
+   "title": "Üçgen ve Açı Kelimelerini Atatürk'ün Bizzat Türettiğini Bili",
+   "file": "video_157.mp4"
+  },
+  {
+   "delta": 2,
    "title": "Sabah Uyandığında Boyun Geceye Göre Neden 2 Santim Daha Uzun",
    "file": "video_150.mp4"
-  },
-  {
-   "delta": 8,
-   "title": "Göz Kapağın Neden Kendi Kendine Seğirir? Anlamı Bu! 👁🧠 #bilg",
-   "file": "video_133.mp4"
   }
  ]
 }
