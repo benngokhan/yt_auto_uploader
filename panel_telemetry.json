@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-04 12:22:26",
-  "generated_at_iso": "2026-11-04T12:22:26.174904+03:00",
+  "generated_at": "2026-11-04 13:08:40",
+  "generated_at_iso": "2026-11-04T13:08:40.201160+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -36,12 +36,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 7,
+    "ready_shorts": 6,
     "ready_longs": 14,
-    "total_ready": 21,
-    "days_of_stock": 10.5,
-    "next_short": "video_160.mp4",
-    "next_short_title": "Gece Yatakta Tek Ayağını Yorgandan Çıkarınca Neden Hemen Uykun Gelir? 🦶 #bilgidozu #shorts",
+    "total_ready": 20,
+    "days_of_stock": 10.0,
+    "next_short": "video_161.mp4",
+    "next_short_title": "Saate İlk Baktığın Saniye Neden Donmuş Gibi Daha Uzun Sürer? ⏱️ #bilgidozu #shorts",
     "next_long": "uzun_video_8.mp4",
     "next_long_title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
     "missing_covers": []
@@ -487,8 +487,8 @@
         "id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 90639,
-        "modifiedTime": "2026-11-03T16:58:14.405Z"
+        "size": 90704,
+        "modifiedTime": "2026-11-04T10:08:38.529Z"
       },
       {
         "id": "1LathGn2Mn5Zn_1gf4JqqVz1WnaSm7NVN",
@@ -751,9 +751,9 @@
       "file_name": "video_160.mp4",
       "number": 160,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Gece Yatakta Tek Ayağını Yorgandan Çıkarınca Neden Hemen Uykun Gelir? 🦶 #bilgidozu #shorts",
       "description": "Gece yatakta dönerken tek ayağını yorganın dışına çıkardığın an neden saniyeler içinde ferahlayıp uyursun? Beyninin uyku şalterini açması için iç vücut sıcaklığının bir derece düşmesi şarttır; kalın yorgan ise ısıyı hapseder.\n\n📍 BÖLÜMLER\n00:00 Tek ayağı yorgandan çıkarmak — Neden anında uyutur?\n00:17 Ayak tabanında gizli — Özel radyatör damarlar!\n00:35 Serinleyen kan beyne — Uyku sinyalini verir!\n\n📊 Kaynaklar:\n• National Sleep Foundation & Northumbria Univ. Sleep Research\n• https://www.sleepfoundation.org/bedroom-environment/touch/what-temperature-should-your-bedroom-be\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #uyku #insanvücudu #beyin #bilim",
       "tags": [
