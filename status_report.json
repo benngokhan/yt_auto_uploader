@@ -1,17 +1,17 @@
 {
-  "updated_at": "2026-11-04 13:08",
-  "updated_at_iso": "2026-11-04T13:08:36.187480+03:00",
+  "updated_at": "2026-11-04 19:58",
+  "updated_at_iso": "2026-11-04T19:58:12.036957+03:00",
   "overall_status": "ok",
   "overall_label": "Her şey çalışıyor",
   "summary": {
     "total_views": 42790,
-    "subscribers": 62,
-    "total_videos_published": 83,
-    "weekly_uploaded": 16,
-    "total_comments": 32,
-    "total_likes": 115,
+    "subscribers": 67,
+    "total_videos_published": 84,
+    "weekly_uploaded": 15,
+    "total_comments": 34,
+    "total_likes": 138,
     "failed_jobs": 0,
-    "stock_shorts": 7,
+    "stock_shorts": 6,
     "stock_long": 14
   },
   "workers": [
@@ -20,9 +20,9 @@
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-04 13:08",
-      "jobs_done": 83,
-      "last_action": "video_160.mp4 yayınlandı (https://youtu.be/P4ReB0TGUwk)",
+      "updated_at": "2026-11-04 19:58",
+      "jobs_done": 84,
+      "last_action": "video_161.mp4 yayınlandı (https://youtu.be/YaQm-1T0fxA)",
       "error_message": ""
     },
     {
@@ -30,9 +30,9 @@
       "name": "Kapak İşçisi (Drive Hazır Kapak -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-04 13:08",
-      "jobs_done": 83,
-      "last_action": "video_160.mp4 için hazır Drive kapağı uygulandı",
+      "updated_at": "2026-11-04 19:58",
+      "jobs_done": 84,
+      "last_action": "video_161.mp4 için hazır Drive kapağı uygulandı",
       "error_message": ""
     },
     {
@@ -40,9 +40,9 @@
       "name": "Yorumcu (Sabit Yorum İşçisi)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-04 13:08",
-      "jobs_done": 83,
-      "last_action": "video_160.mp4 altına ilk sabit yorum yazıldı",
+      "updated_at": "2026-11-04 19:58",
+      "jobs_done": 84,
+      "last_action": "video_161.mp4 altına ilk sabit yorum yazıldı",
       "error_message": ""
     },
     {
@@ -50,7 +50,7 @@
       "name": "Analitik çekici (YouTube API)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-04 13:08",
+      "updated_at": "2026-11-04 19:58",
       "jobs_done": 30,
       "last_action": "30 videonun gerçek görüntülenme ve yorum verisi güncellendi",
       "error_message": ""
@@ -72,7 +72,7 @@
       "title": "YouTube API günlük kotası",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-11-04 13:08",
+      "updated_at": "2026-11-04 19:58",
       "detail": "Günlük 10.000 birim kotası aktif ve yeterli."
     },
     {
@@ -80,35 +80,44 @@
       "title": "Google Drive ve Sheets bağlantısı",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-11-04 13:08",
-      "detail": "YOUTUBE_OTOMASYON klasörü ve CEO yükleme tablosu canlı bağlı (Stok: 7 Shorts, 14 Uzun)."
+      "updated_at": "2026-11-04 19:58",
+      "detail": "YOUTUBE_OTOMASYON klasörü ve CEO yükleme tablosu canlı bağlı (Stok: 6 Shorts, 14 Uzun)."
     },
     {
       "id": "comment_worker",
       "title": "Yorum ve kapak işçisi durumu",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-11-04 13:08",
+      "updated_at": "2026-11-04 19:58",
       "detail": "Kapak: Çalışıyor · Yorum: Çalışıyor"
     }
   ],
   "videos": [
     {
-      "id": "P4ReB0TGUwk",
-      "url": "https://youtu.be/P4ReB0TGUwk",
-      "title": "Gece Yatakta Tek Ayağını Yorgandan Çıkarınca Neden Hemen Uykun Gelir? 🦶 #bilgidozu #shorts",
-      "publishedAt": "2026-11-04T10:08:22Z",
+      "id": "YaQm-1T0fxA",
+      "url": "https://youtu.be/YaQm-1T0fxA",
+      "title": "Saate İlk Baktığın Saniye Neden Donmuş Gibi Daha Uzun Sürer? ⏱️ #bilgidozu #shorts",
+      "publishedAt": "2026-11-04T16:57:58Z",
       "views": 0,
       "likes": 0,
       "comments": 1
+    },
+    {
+      "id": "P4ReB0TGUwk",
+      "url": "https://youtu.be/P4ReB0TGUwk",
+      "title": "Gece Yatakta Tek Ayağını Yorgandan Çıkarınca Neden Hemen Uykun Gelir? 🦶 #bilgidozu #shorts",
+      "publishedAt": "2026-11-04T10:08:48Z",
+      "views": 774,
+      "likes": 23,
+      "comments": 3
     },
     {
       "id": "YtvsarKc75s",
       "url": "https://youtu.be/YtvsarKc75s",
       "title": "Aynı Kelimeyi 20 Kez Söyleyince Neden Anlamı Bir Anda Silinir? 🧠 #bilgidozu #shorts",
       "publishedAt": "2026-11-03T16:58:28Z",
-      "views": 154,
-      "likes": 2,
+      "views": 183,
+      "likes": 3,
       "comments": 1
     },
     {
@@ -116,7 +125,7 @@
       "url": "https://youtu.be/I5aWsBZ0cx4",
       "title": "Ağlamamak İçin Kendini Tuttuğunda Boğazına Neden Yumru Oturur? 😢 #bilgidozu #shorts",
       "publishedAt": "2026-11-03T09:59:22Z",
-      "views": 964,
+      "views": 973,
       "likes": 8,
       "comments": 1
     },
@@ -125,7 +134,7 @@
       "url": "https://youtu.be/KfHoxTt2y60",
       "title": "Havuç Gece Görüşünü Güçlendirir Efsanesi Nasıl Gizli Radar Oyunu Çıktı? 🥕 #bilgidozu #shorts",
       "publishedAt": "2026-11-02T17:05:23Z",
-      "views": 1017,
+      "views": 1020,
       "likes": 7,
       "comments": 1
     },
@@ -134,7 +143,7 @@
       "url": "https://youtu.be/MgpEXhYe2-8",
       "title": "Buzun Üzeri Neden Kaygandır: Eksi Derecede Bile Akan Gizli Katman! 🧊 #bilgidozu #shorts",
       "publishedAt": "2026-11-02T10:11:35Z",
-      "views": 383,
+      "views": 406,
       "likes": 6,
       "comments": 1
     },
@@ -143,7 +152,7 @@
       "url": "https://youtu.be/DDdoh5PRoQQ",
       "title": "Kesilen Elma Dakikalar İçinde Neden Kararır: Gizli Savunma Zırhı! 🍏 #bilgidozu #shorts",
       "publishedAt": "2026-11-01T17:00:06Z",
-      "views": 461,
+      "views": 463,
       "likes": 10,
       "comments": 1
     },
@@ -152,7 +161,7 @@
       "url": "https://youtu.be/UiqMegJbkJ8",
       "title": "Spordan Ertesi Gün Çıkan Kas Ağrısının Sebebi Laktik Asit Değilmiş! 💪 #bilgidozu #shorts",
       "publishedAt": "2026-11-01T10:08:41Z",
-      "views": 393,
+      "views": 396,
       "likes": 5,
       "comments": 1
     },
@@ -170,7 +179,7 @@
       "url": "https://youtu.be/8UCQK5YKWxM",
       "title": "Odaya Girince Buraya Neden Gelmiştim Diye Unutmanın Bilimsel Sırrı! 🚪 #bilgidozu #shorts",
       "publishedAt": "2026-10-31T10:26:25Z",
-      "views": 85,
+      "views": 86,
       "likes": 1,
       "comments": 1
     },
@@ -179,7 +188,7 @@
       "url": "https://youtu.be/GA6Etnh6OEs",
       "title": "Sabah Uyandığında Boyun Geceye Göre Neden 2 Santim Daha Uzun Çıkar? 📏 #bilgidozu #shorts",
       "publishedAt": "2026-10-30T17:09:59Z",
-      "views": 619,
+      "views": 620,
       "likes": 10,
       "comments": 1
     },
@@ -188,7 +197,7 @@
       "url": "https://youtu.be/QhqHWaVWLJY",
       "title": "Karanlıkta Gözümüz Gece Görüşünü Nasıl Açar? Korsan Bandı ve Rodopsin Sırrı 👁️ #bilgidozu",
       "publishedAt": "2026-10-30T10:10:51Z",
-      "views": 5,
+      "views": 7,
       "likes": 0,
       "comments": 1
     },
@@ -224,8 +233,8 @@
       "url": "https://youtu.be/j8J7rqtyyFg",
       "title": "Utandığında Neden Sadece Yüzün ve Kulakların Kızarır? 😳 #bilgidozu #shorts",
       "publishedAt": "2026-10-28T16:37:53Z",
-      "views": 518,
-      "likes": 2,
+      "views": 519,
+      "likes": 3,
       "comments": 1
     },
     {
@@ -233,7 +242,7 @@
       "url": "https://youtu.be/0vGKrBpJh0Q",
       "title": "Sevdiğin Birine Bakınca Göz Bebeğin Neden Otomatik Büyür? 👀 #bilgidozu #shorts",
       "publishedAt": "2026-10-28T11:07:39Z",
-      "views": 135,
+      "views": 138,
       "likes": 2,
       "comments": 1
     },
@@ -242,7 +251,7 @@
       "url": "https://youtu.be/7DG1etjQlR4",
       "title": "Voynich El Yazması: 600 Yıldır Kimsenin Okuyamadığı Şifreli Kitap! 📜 #bilgidozu #shorts",
       "publishedAt": "2026-10-28T07:58:42Z",
-      "views": 128,
+      "views": 129,
       "likes": 2,
       "comments": 1
     },
@@ -251,7 +260,7 @@
       "url": "https://youtu.be/LGXmOwTtGOw",
       "title": "Güneşe Dönünce Hapşırıyor musun? Bu Bir Refleks: ACHOO! ☀️🤧 #bilgidozu #shorts",
       "publishedAt": "2026-10-27T22:00:54Z",
-      "views": 146,
+      "views": 147,
       "likes": 3,
       "comments": 1
     },
@@ -260,7 +269,7 @@
       "url": "https://youtu.be/zynVVf8GQTw",
       "title": "Bir Esnedin, Etraf da Esnedi! Esnemenin Bulaşma Sırrı 😮🧠 #bilgidozu #shorts",
       "publishedAt": "2026-10-27T20:09:45Z",
-      "views": 79,
+      "views": 80,
       "likes": 2,
       "comments": 1
     },
@@ -352,15 +361,6 @@
       "publishedAt": "2026-10-24T20:19:12Z",
       "views": 313,
       "likes": 3,
-      "comments": 1
-    },
-    {
-      "id": "HUAR-nBaEQQ",
-      "url": "https://youtu.be/HUAR-nBaEQQ",
-      "title": "Bu Canlı Kaybettiği Bacağını ve Hatta Organlarını Yeniden Büyütüyor! 🦎🧬 #bilgidozu #shorts",
-      "publishedAt": "2026-10-24T18:19:15Z",
-      "views": 109,
-      "likes": 2,
       "comments": 1
     }
   ]

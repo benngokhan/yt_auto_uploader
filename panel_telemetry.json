@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-04 19:39:46",
-  "generated_at_iso": "2026-11-04T19:39:46.159721+03:00",
+  "generated_at": "2026-11-04 19:58:16",
+  "generated_at_iso": "2026-11-04T19:58:16.532330+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -36,12 +36,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 6,
+    "ready_shorts": 5,
     "ready_longs": 14,
-    "total_ready": 20,
-    "days_of_stock": 10.0,
-    "next_short": "video_161.mp4",
-    "next_short_title": "Saate İlk Baktığın Saniye Neden Donmuş Gibi Daha Uzun Sürer? ⏱️ #bilgidozu #shorts",
+    "total_ready": 19,
+    "days_of_stock": 9.5,
+    "next_short": "video_162.mp4",
+    "next_short_title": "Çok Tuzlu Çekirdek Yediğinde Dudakların Neden Kuruyup Büzüşür? 🧂 #bilgidozu #shorts",
     "next_long": "uzun_video_8.mp4",
     "next_long_title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
     "missing_covers": []
@@ -487,8 +487,8 @@
         "id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 90704,
-        "modifiedTime": "2026-11-04T10:08:38.529Z"
+        "size": 90760,
+        "modifiedTime": "2026-11-04T16:58:14.603Z"
       },
       {
         "id": "1LathGn2Mn5Zn_1gf4JqqVz1WnaSm7NVN",
@@ -781,9 +781,9 @@
       "file_name": "video_161.mp4",
       "number": 161,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Saate İlk Baktığın Saniye Neden Donmuş Gibi Daha Uzun Sürer? ⏱️ #bilgidozu #shorts",
       "description": "Gözünü aniden duvar saatine çevirdiğin ilk an saniye ibresinin bozulmuş gibi daha uzun beklediğini fark ettin mi? Gözün saate hızla sıçrarken görüntü bulanıklaşmasın diye beynin yaklaşık elli milisaniye boyunca kaydı kapatır.\n\n📍 BÖLÜMLER\n00:00 Saate ilk baktığın an — Saniye neden donakalır?\n00:16 Karanlık boşluğu örtmek için — Geriye dönük montaj!\n00:35 Aynada kendi gözünün — Hareketini göremezsin!\n\n📊 Kaynaklar:\n• University College London (Yarrow et al., Nature 2001)\n• https://www.nature.com/articles/35104551\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #beyin #zaman #psikoloji #bilim",
       "tags": [
