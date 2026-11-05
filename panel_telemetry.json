@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-06 00:29:31",
-  "generated_at_iso": "2026-11-06T00:29:31.898081+03:00",
+  "generated_at": "2026-11-06 01:15:38",
+  "generated_at_iso": "2026-11-06T01:15:38.673713+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -36,12 +36,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 3,
+    "ready_shorts": 0,
     "ready_longs": 14,
-    "total_ready": 17,
-    "days_of_stock": 8.5,
-    "next_short": "video_164.mp4",
-    "next_short_title": "Tıka Basa Doysan Bile Tatlıya Neden Her Zaman Yer Açılır? 🍰 #bilgidozu #shorts",
+    "total_ready": 14,
+    "days_of_stock": 7.0,
+    "next_short": null,
+    "next_short_title": "",
     "next_long": "uzun_video_8.mp4",
     "next_long_title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
     "missing_covers": []
@@ -110,27 +110,6 @@
         "mimeType": "video/mp4",
         "size": 62252543,
         "modifiedTime": "2026-11-02T04:49:12.546Z"
-      },
-      {
-        "id": "1n00O3UrSxsMQgsQVj7PhYXeFlgBVQEvT",
-        "name": "video_164.mp4",
-        "mimeType": "video/mp4",
-        "size": 16909491,
-        "modifiedTime": "2026-10-30T06:42:41.724Z"
-      },
-      {
-        "id": "1EmBE1qjegAjSfGsgaz-OpunusCnke5pq",
-        "name": "video_165.mp4",
-        "mimeType": "video/mp4",
-        "size": 17188306,
-        "modifiedTime": "2026-10-30T06:42:42.377Z"
-      },
-      {
-        "id": "1dnW2wofoZ12-ncwQKJ3LYrn715elgrov",
-        "name": "video_166.mp4",
-        "mimeType": "video/mp4",
-        "size": 16172312,
-        "modifiedTime": "2026-10-30T06:42:43.112Z"
       },
       {
         "id": "1lA8QNmVuDvex_gQN680rXx_RFPFw5Pwh",
@@ -891,9 +870,9 @@
       "category_name": "İnsan Vücudu ve Beyin",
       "pinned_comment": "Yemekten sonra ne kadar tok olursan ol asla hayır diyemediğin o tatlı hangisi? Yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1n00O3UrSxsMQgsQVj7PhYXeFlgBVQEvT",
-      "drive_video_size_mb": 16.13,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_164.jpeg",
       "has_drive_cover": true,
       "drive_cover_id": "1CKa1MeUAlu_vVjpLyoJvg1SgPguQx0NC"
@@ -922,9 +901,9 @@
       "category_name": "Fizik ve Bilim",
       "pinned_comment": "Sahilde kumdan kale yaparken senin de kulelerin fazla sudan çökmüş müydü? Yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1EmBE1qjegAjSfGsgaz-OpunusCnke5pq",
-      "drive_video_size_mb": 16.39,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_165.jpeg",
       "has_drive_cover": true,
       "drive_cover_id": "1oVNpllA-2eIgIr-XhTaeMWrsewWn5ilx"
@@ -953,9 +932,9 @@
       "category_name": "Bilim Tarihi ve Efsaneler",
       "pinned_comment": "Okulda sana da 'dilin ucu tatlı, yanları ekşi alır' şeması çizdirilmiş miydi? Yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1dnW2wofoZ12-ncwQKJ3LYrn715elgrov",
-      "drive_video_size_mb": 15.42,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_166.jpeg",
       "has_drive_cover": true,
       "drive_cover_id": "1KbAsfC4HRO_bNp3gwU8GAM2QlVn-Yfgg"
