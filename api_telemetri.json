@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-05T13:14:12+00:00",
+  "zaman": "2026-11-05T18:58:20+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -60,10 +60,10 @@
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 328.5,
-      "actions_kosu": 349,
+      "actions_dakika": 339.8,
+      "actions_kosu": 365,
       "actions_limit": 2000,
-      "actions_kalan": 1671.5
+      "actions_kalan": 1660.2
     },
     {
       "ad": "Google Drive",
@@ -87,7 +87,7 @@
         },
         {
           "ad": "Kısa Kapaklar",
-          "boyut": 5639911,
+          "boyut": 5572240,
           "dosya": 14,
           "sahip": "gokhanaltundal@gmail.com"
         },
@@ -99,7 +99,7 @@
         },
         {
           "ad": "CEO / Tablolar",
-          "boyut": 436894401,
+          "boyut": 436894468,
           "dosya": 38,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
@@ -143,9 +143,9 @@
           "boyut": 83722104
         }
       ],
-      "drive_gorunen": 3243627290,
+      "drive_gorunen": 3243559686,
       "kendi_dosyalar": 2448001010,
-      "paylasilan": 795626280,
+      "paylasilan": 795558676,
       "disalan": 3444681449,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
@@ -154,11 +154,11 @@
     {
       "ad": "YouTube Data API",
       "durum": "ok",
-      "kalan": 8300,
+      "kalan": 6600,
       "limit": 10000,
-      "kullanilan": 1700,
+      "kullanilan": 3400,
       "birim": "birim (tahmini)",
-      "bugun_yukleme": 1,
+      "bugun_yukleme": 2,
       "yenilenme": "günlük · gece 00:00 Pasifik (TR 10:00) sıfırlanır",
       "not_": "gerçek kota API'de yok; yükleme ≈ 1700 birim sayıldı"
     }
@@ -334,6 +334,10 @@
     },
     {
       "zaman": "2026-11-05T13:14:12+00:00",
+      "elevenlabs_kalan": 1384
+    },
+    {
+      "zaman": "2026-11-05T18:58:20+00:00",
       "elevenlabs_kalan": 1384
     }
   ]
