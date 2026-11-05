@@ -18,9 +18,15 @@ on:
         required: true
         type: string
       dosya:
-        description: "Repo içindeki kapak yolu (ör. kapak_gelen/kapak_155.jpg)"
-        required: true
+        description: "Repo içindeki kapak yolu (telefondan yükleme için)"
+        required: false
         type: string
+        default: ""
+      drive_file_id:
+        description: "Drive'dan seçilen hazır kapağın dosya ID'si"
+        required: false
+        type: string
+        default: ""
       video_id:
         description: "Yayınlanmış video ID (boş bırakılırsa sadece Drive'a yazılır)"
         required: false
@@ -81,10 +87,13 @@ jobs:
           TIP: ${{ inputs.tip }}
           NUMARA: ${{ inputs.numara }}
           DOSYA: ${{ inputs.dosya }}
+          DRIVE_FILE_ID: ${{ inputs.drive_file_id }}
           VIDEO_ID: ${{ inputs.video_id }}
           TEMIZLE: ${{ inputs.temizle }}
         run: |
-          ARGS="--tip $TIP --no $NUMARA --dosya $DOSYA"
+          ARGS="--tip $TIP --no $NUMARA"
+          if [ -n "$DOSYA" ]; then ARGS="$ARGS --dosya $DOSYA"; fi
+          if [ -n "$DRIVE_FILE_ID" ]; then ARGS="$ARGS --drive-id $DRIVE_FILE_ID"; fi
           if [ -n "$VIDEO_ID" ]; then ARGS="$ARGS --video-id $VIDEO_ID"; fi
           if [ "$TEMIZLE" = "true" ]; then ARGS="$ARGS --temizle"; fi
           echo "kapak_yukle.py $ARGS"

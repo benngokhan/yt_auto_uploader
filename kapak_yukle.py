@@ -69,8 +69,8 @@ def canonical_name(tip: str, no: str) -> str:
     return f"kapak_{no}.jpg" if tip == "short" else f"uzun_kapak_{no}.jpg"
 
 
-def prepare_image(src: Path, tip: str) -> tuple[bytes, int, int, str]:
-    """Boyut/oran doğrula, gerekirse 2 MB altına indir. Döner: (jpeg_bytes, w, h, not)."""
+def prepare_image(src, tip: str) -> tuple[bytes, int, int, str]:
+    """Path veya dosya-benzeri kaynağı doğrula, 2 MB altı JPEG'e çevir."""
     with Image.open(src) as im:
         im.load()
         if im.mode not in ("RGB", "L"):
@@ -100,6 +100,22 @@ def prepare_image(src: Path, tip: str) -> tuple[bytes, int, int, str]:
         if len(data) > YT_LIMIT:
             raise ValueError(f"Kapak 2 MB altına indirilemedi ({len(data)/1024:.0f} KB).")
         return data, w, h, note
+
+
+def download_drive_file(drive, file_id: str) -> tuple[io.BytesIO, str]:
+    """Drive'daki hazır kapağı belleğe indir; telefona indirme/yükleme gerekmez."""
+    from googleapiclient.http import MediaIoBaseDownload
+
+    meta = drive.files().get(fileId=file_id, fields="id,name,mimeType,size").execute()
+    if not str(meta.get("mimeType", "")).startswith("image/"):
+        raise ValueError("Seçilen Drive dosyası görsel değil.")
+    buf = io.BytesIO()
+    dl = MediaIoBaseDownload(buf, drive.files().get_media(fileId=file_id))
+    done = False
+    while not done:
+        _, done = dl.next_chunk()
+    buf.seek(0)
+    return buf, meta.get("name", file_id)
 
 
 def find_existing(drive, folder_id: str, name: str):
@@ -152,7 +168,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--tip", choices=["short", "long"], required=True)
     ap.add_argument("--no", required=True, help="Video numarası (ör. 155)")
-    ap.add_argument("--dosya", required=True, help="Repo içindeki kapak yolu")
+    ap.add_argument("--dosya", default="", help="Repo içindeki kapak yolu")
+    ap.add_argument("--drive-id", default="", help="Drive'dan seçilen hazır kapağın dosya ID'si")
     ap.add_argument("--video-id", default="", help="Yayınlanmış videoya hemen uygula")
     ap.add_argument("--temizle", action="store_true", help="Aynı numaralı eski varyantları çöpe at")
     args = ap.parse_args()
@@ -161,11 +178,8 @@ def main() -> int:
     if not no.isdigit():
         log("HATA: --no sayı olmalı")
         return 2
-    src = Path(args.dosya)
-    if not src.is_absolute():
-        src = BASE_DIR / src
-    if not src.exists():
-        log(f"HATA: dosya yok: {src}")
+    if bool(args.dosya) == bool(args.drive_id):
+        log("HATA: --dosya veya --drive-id seçeneklerinden yalnız biri verilmeli")
         return 2
 
     result = {
@@ -177,10 +191,20 @@ def main() -> int:
         "adimlar": [],
     }
     try:
-        data, w, h, note = prepare_image(src, args.tip)
+        youtube, drive = clients()
+        if args.drive_id:
+            kaynak, kaynak_adi = download_drive_file(drive, args.drive_id)
+            result["kaynak"] = f"Drive: {kaynak_adi}"
+            result["adimlar"].append(f"Drive'dan seçildi: {kaynak_adi}")
+        else:
+            kaynak = Path(args.dosya)
+            if not kaynak.is_absolute():
+                kaynak = BASE_DIR / kaynak
+            if not kaynak.exists():
+                raise FileNotFoundError(f"Dosya yok: {kaynak}")
+        data, w, h, note = prepare_image(kaynak, args.tip)
         result["boyut"] = note
         log(f"Kapak hazır: {note}")
-        youtube, drive = clients()
         folder = SHORTS_COVER_FOLDER_ID if args.tip == "short" else LONG_COVER_FOLDER_ID
         ad = canonical_name(args.tip, no)
         file_id, islem = upsert_cover(drive, folder, ad, data)
