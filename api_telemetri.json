@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-06T13:07:35+00:00",
+  "zaman": "2026-11-06T18:55:41+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -60,17 +60,17 @@
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 377.7,
-      "actions_kosu": 413,
+      "actions_dakika": 387.3,
+      "actions_kosu": 428,
       "actions_limit": 2000,
-      "actions_kalan": 1622.3
+      "actions_kalan": 1612.7
     },
     {
       "ad": "Google Drive",
       "durum": "ok",
-      "kalan": 10014196575,
+      "kalan": 10013536245,
       "limit": 16106127360,
-      "kullanilan": 6091930785,
+      "kullanilan": 6092591115,
       "birim": "bayt",
       "kirilim": [
         {
@@ -99,8 +99,8 @@
         },
         {
           "ad": "CEO / Tablolar",
-          "boyut": 3939555551,
-          "dosya": 49,
+          "boyut": 3947888384,
+          "dosya": 53,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
         {
@@ -143,9 +143,9 @@
           "boyut": 87042844
         }
       ],
-      "drive_gorunen": 7159404470,
-      "kendi_dosyalar": 2647249336,
-      "paylasilan": 4512155134,
+      "drive_gorunen": 7167737303,
+      "kendi_dosyalar": 2647909666,
+      "paylasilan": 4519827637,
       "disalan": 3444681449,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
@@ -350,6 +350,10 @@
     },
     {
       "zaman": "2026-11-06T13:07:35+00:00",
+      "elevenlabs_kalan": 1384
+    },
+    {
+      "zaman": "2026-11-06T18:55:41+00:00",
       "elevenlabs_kalan": 1384
     }
   ]
