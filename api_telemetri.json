@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-05T18:58:20+00:00",
+  "zaman": "2026-11-06T01:11:06+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -60,10 +60,10 @@
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 339.8,
-      "actions_kosu": 365,
+      "actions_dakika": 347.2,
+      "actions_kosu": 375,
       "actions_limit": 2000,
-      "actions_kalan": 1660.2
+      "actions_kalan": 1652.8
     },
     {
       "ad": "Google Drive",
@@ -75,8 +75,8 @@
       "kirilim": [
         {
           "ad": "Kısa Videolar",
-          "boyut": 235996374,
-          "dosya": 13,
+          "boyut": 185726265,
+          "dosya": 10,
           "sahip": "gokhanaltundal@gmail.com"
         },
         {
@@ -99,8 +99,8 @@
         },
         {
           "ad": "CEO / Tablolar",
-          "boyut": 436894468,
-          "dosya": 38,
+          "boyut": 482741895,
+          "dosya": 44,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
         {
@@ -143,9 +143,9 @@
           "boyut": 83722104
         }
       ],
-      "drive_gorunen": 3243559686,
+      "drive_gorunen": 3239137004,
       "kendi_dosyalar": 2448001010,
-      "paylasilan": 795558676,
+      "paylasilan": 791135994,
       "disalan": 3444681449,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
@@ -154,11 +154,11 @@
     {
       "ad": "YouTube Data API",
       "durum": "ok",
-      "kalan": 6600,
+      "kalan": 10000,
       "limit": 10000,
-      "kullanilan": 3400,
+      "kullanilan": 0,
       "birim": "birim (tahmini)",
-      "bugun_yukleme": 2,
+      "bugun_yukleme": 0,
       "yenilenme": "günlük · gece 00:00 Pasifik (TR 10:00) sıfırlanır",
       "not_": "gerçek kota API'de yok; yükleme ≈ 1700 birim sayıldı"
     }
@@ -166,42 +166,42 @@
   "secretler": [
     {
       "ad": "ELEVENLABS_API_KEY",
-      "var": true,
+      "var": false,
       "aciklama": "Ses üretimi (ElevenLabs)"
     },
     {
       "ad": "OPENROUTER_API_KEY",
-      "var": true,
+      "var": false,
       "aciklama": "Yedek LLM + TTS (OpenRouter)"
     },
     {
       "ad": "GEMINI_API_KEY",
-      "var": true,
+      "var": false,
       "aciklama": "Başlık/açıklama üretimi, Gemini TTS"
     },
     {
       "ad": "GROQ_API_KEY",
-      "var": true,
+      "var": false,
       "aciklama": "Hızlı LLM (Groq)"
     },
     {
       "ad": "GOOGLE_TOKEN_JSON",
-      "var": true,
+      "var": false,
       "aciklama": "Drive + YouTube OAuth"
     },
     {
       "ad": "GOOGLE_CLIENT_SECRETS_JSON",
-      "var": true,
+      "var": false,
       "aciklama": "Drive + YouTube OAuth"
     },
     {
       "ad": "TELEGRAM_BOT_TOKEN",
-      "var": true,
+      "var": false,
       "aciklama": "Telegram bildirimleri"
     },
     {
       "ad": "SITE_SYNC_TOKEN",
-      "var": true,
+      "var": false,
       "aciklama": "Panele veri yayını + secret yazma"
     }
   ],
@@ -338,6 +338,10 @@
     },
     {
       "zaman": "2026-11-05T18:58:20+00:00",
+      "elevenlabs_kalan": 1384
+    },
+    {
+      "zaman": "2026-11-06T01:11:06+00:00",
       "elevenlabs_kalan": 1384
     }
   ]
