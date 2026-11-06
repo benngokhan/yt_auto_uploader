@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-06 12:20:49",
-  "generated_at_iso": "2026-11-06T12:20:49.849962+03:00",
+  "generated_at": "2026-11-06 12:48:35",
+  "generated_at_iso": "2026-11-06T12:48:35.010649+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -469,6 +469,13 @@
       }
     ],
     "ceo_files": [
+      {
+        "id": "1N6yPInUu-KqLcoVIsuSzuz0LKrGFCQaS",
+        "name": "00_ZORUNLU_CEO_KURALLARI",
+        "mimeType": "application/vnd.google-apps.folder",
+        "size": 0,
+        "modifiedTime": "2026-11-06T09:26:19.973Z"
+      },
       {
         "id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
         "name": "bilgidozu_yukleme_tablosu.xlsx",

@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-11-06 12:20:57",
- "generated_at_iso": "2026-11-06T12:20:57.949383+03:00",
+ "generated_at": "2026-11-06 12:48:42",
+ "generated_at_iso": "2026-11-06T12:48:42.928014+03:00",
  "source": {
   "api": "YouTube Data API v3 · videos.list?part=statistics",
   "ytdlp": "yt-dlp --print like_count|view_count",
@@ -12,432 +12,432 @@
   "IrutrnRqyWM": {
    "likes": 24,
    "views": 1336,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "4TU_VDiQvzA": {
    "likes": 35,
    "views": 1280,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "gBe0fwts7lU": {
    "likes": 12,
    "views": 1240,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "SREO3qV8yuc": {
    "likes": 8,
    "views": 1205,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "qYzG9jVSLDw": {
    "likes": 19,
    "views": 1170,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "BOmRddkkZfE": {
    "likes": 18,
    "views": 1155,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "ML2-a_smuEY": {
    "likes": 27,
    "views": 1143,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "lYtn7rjqKD8": {
    "likes": 12,
    "views": 1140,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "h3kYyYVeEsY": {
    "likes": 15,
    "views": 1137,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "znBAuA2MY3Y": {
    "likes": 18,
    "views": 1113,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "CPITUvh_5rs": {
    "likes": 18,
    "views": 1086,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "5lREZUglUqU": {
    "likes": 23,
    "views": 1050,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "JO2Vxbd5gLM": {
    "likes": 13,
    "views": 1044,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "OSkYdtOPHqU": {
    "likes": 10,
    "views": 1042,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "Es86PRkY1hw": {
    "likes": 6,
    "views": 1028,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "NGHtductf2Y": {
    "likes": 11,
-   "views": 1024,
-   "fetched_at": "2026-11-06 12:20:57"
+   "views": 1025,
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "I9u1ueNOZi4": {
    "likes": 15,
    "views": 1009,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "DEhC0RBlZvM": {
    "likes": 23,
    "views": 1008,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "OuOe6-JsAnI": {
    "likes": 22,
    "views": 988,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "MG5oXVSwuto": {
    "likes": 17,
    "views": 973,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "mANNR6Tf21o": {
    "likes": 10,
    "views": 971,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "GMKWwDnabuQ": {
    "likes": 8,
    "views": 961,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "kZ41nV2oLi0": {
    "likes": 5,
    "views": 950,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "MOxaXPkS0zw": {
    "likes": 10,
    "views": 732,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "8HI5KUWLQuM": {
    "likes": 6,
    "views": 709,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "jrySNivbPcQ": {
    "likes": 7,
    "views": 662,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "j8J7rqtyyFg": {
    "likes": 3,
    "views": 524,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "W2v90CvX9_4": {
    "likes": 13,
    "views": 527,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "ah1-d0TQepk": {
    "likes": 24,
    "views": 522,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "c0lcGGWy-hw": {
    "likes": 10,
    "views": 455,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "TTquqw3WSTg": {
    "likes": 9,
    "views": 411,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "sPERykVE-cM": {
    "likes": 5,
    "views": 361,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "_weo5Nxygkc": {
    "likes": 9,
    "views": 347,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "-99K-qaVFkk": {
    "likes": 4,
    "views": 315,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "5b2Xru597kk": {
    "likes": 3,
    "views": 313,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "PQYWNjOvUvs": {
    "likes": 1,
    "views": 243,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "VJGkf3fA-LI": {
    "likes": 2,
    "views": 240,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "OMDKbkGYfUM": {
    "likes": 1,
    "views": 240,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "obPceKVDg3k": {
    "likes": 3,
    "views": 253,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "RwcXzEOpFDE": {
    "likes": 5,
    "views": 221,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "Bn5vzNjsnWo": {
    "likes": 3,
    "views": 221,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "r94N2FfcDl8": {
    "likes": 1,
    "views": 216,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "xay0KAwfl34": {
    "likes": 4,
    "views": 205,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "GA6Etnh6OEs": {
    "likes": 10,
    "views": 621,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "da3y0_DfWYQ": {
    "likes": 2,
    "views": 188,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "aat1STZfbps": {
    "likes": 3,
    "views": 176,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "SBOuforDIV4": {
    "likes": 2,
    "views": 166,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "07gRpcD8Hp0": {
    "likes": 3,
    "views": 150,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "LGXmOwTtGOw": {
    "likes": 3,
    "views": 148,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "DrqVzn372Hk": {
    "likes": 1,
    "views": 145,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "0vGKrBpJh0Q": {
    "likes": 2,
    "views": 145,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "7DG1etjQlR4": {
    "likes": 2,
    "views": 129,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "vh_h0diuFG8": {
    "likes": 0,
    "views": 129,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "tCuQNw_V74I": {
    "likes": 2,
    "views": 111,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "HUAR-nBaEQQ": {
    "likes": 2,
    "views": 109,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "UEpxfr912Ao": {
    "likes": 4,
    "views": 107,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "AoaTRIpChhw": {
    "likes": 1,
    "views": 99,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "sh9zYFybcHY": {
    "likes": 1,
    "views": 81,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "zynVVf8GQTw": {
    "likes": 2,
    "views": 79,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "mWJEOqczBaQ": {
    "likes": 1,
    "views": 74,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "t2lphcITKXs": {
    "likes": 1,
    "views": 75,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "q6YFVt6JV4c": {
    "likes": 1,
    "views": 45,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "lmAwoqHmYoo": {
    "likes": 1,
    "views": 73,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "uae2IJoZMb8": {
    "likes": 1,
    "views": 101,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "w0X3T08NOiI": {
    "likes": 1,
    "views": 50,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "_agvVDP_Dcg": {
    "likes": 12,
    "views": 1169,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "uAL5ygdZxr8": {
    "likes": 1,
    "views": 42,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "tQJg3mG2Kvo": {
    "likes": 0,
    "views": 37,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "c12v1QSDg5E": {
    "likes": 4,
    "views": 746,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "e0cA_Aji83w": {
    "likes": 8,
    "views": 1266,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "eAnBBamiD1U": {
    "likes": 0,
    "views": 14,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "ExNJqJLhHP0": {
    "likes": 0,
    "views": 27,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "yBetRsBy0TE": {
    "likes": 1,
    "views": 34,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "P7yW5vbv-8k": {
    "likes": 1,
    "views": 415,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "QhqHWaVWLJY": {
    "likes": 0,
    "views": 9,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "XbjukOkKz6M": {
    "likes": 10,
    "views": 1186,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "jo5mDrRkROY": {
    "likes": 10,
    "views": 672,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "tI1B2NofdLY": {
    "likes": 1,
    "views": 29,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "ALzLcnPSZtY": {
    "likes": 7,
    "views": 175,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "8UCQK5YKWxM": {
    "likes": 1,
    "views": 86,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "UiqMegJbkJ8": {
    "likes": 5,
    "views": 401,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "DDdoh5PRoQQ": {
    "likes": 10,
    "views": 468,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "KfHoxTt2y60": {
    "likes": 7,
    "views": 1028,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "MgpEXhYe2-8": {
    "likes": 6,
    "views": 407,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "I5aWsBZ0cx4": {
    "likes": 10,
    "views": 1011,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   },
   "YtvsarKc75s": {
    "likes": 5,
    "views": 360,
-   "fetched_at": "2026-11-06 12:20:57"
+   "fetched_at": "2026-11-06 12:48:42"
   }
  }
 }
