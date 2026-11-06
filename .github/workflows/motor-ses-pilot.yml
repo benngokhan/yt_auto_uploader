@@ -1,0 +1,27 @@
+name: Motor · Sabit Ses Pilotu
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ses-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -q -r requirements.txt -r requirements-motor.txt
+      - name: Noktalama ve doğal vurgu ses pilotu
+        env:
+          SPEECHIFY_API_KEY: ${{ secrets.SPEECHIFY_API_KEY }}
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          MOTOR_VOICE_ID: ahmet
+          MOTOR_PAKET_DRIVE_ID: 1lKrhKOx9ywnhhA9xRkBGlhjxY8Ee9fg1
+        run: |
+          printf '%s' "$GOOGLE_TOKEN_JSON" > token.json
+          python motor/ses_pilot.py
