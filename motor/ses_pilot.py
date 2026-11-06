@@ -13,7 +13,7 @@ METIN=("Bazen beynin, sen fark etmeden küçük bir mola ister. "
        "İşte o an, bedenin sana şunu söyler: Bir saniye dur ve yeniden başla.")
 
 def main():
- cfg=uret.ayar_yukle(); cfg['ses']['voice_id']=os.getenv('MOTOR_VOICE_ID',cfg['ses'].get('voice_id','ahmet'))
+ cfg=uret.ayar_yukle(); cfg['ses']['voice_id']=os.getenv('MOTOR_VOICE_ID',cfg['ses'].get('voice_id','klon_095_xtts'))
  out=ROOT/'motor'/'cikti'/'ses_pilot'; out.mkdir(parents=True,exist_ok=True)
  wav=out/f"ses_pilot_{cfg['ses']['voice_id']}.wav"; timing=tts.uret(METIN,wav,cfg)
  (out/'ses_pilot_zaman.json').write_text(json.dumps(timing,ensure_ascii=False,indent=2),encoding='utf-8')

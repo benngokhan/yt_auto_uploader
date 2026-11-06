@@ -13,6 +13,8 @@ import base64
 import hashlib
 import json
 import os
+import subprocess
+import tempfile
 import urllib.request
 from pathlib import Path
 
@@ -137,6 +139,66 @@ def _elevenlabs(metin: str, cikti: Path, ayar: dict) -> None:
         raise SesHatasi(f"ElevenLabs hatası: {str(hata)[:160]}") from hata
 
 
+def _xtts_referansini_hazirla(ses: dict) -> Path:
+    """Onaylı 0,95 referansı Drive'dan indirir; referansın kendisini işlemez."""
+    yol = Path(os.getenv("MOTOR_XTTS_REFERENCE", ses.get("referans_yolu", "ref_095.wav")))
+    if yol.is_file() and yol.stat().st_size > 0:
+        return yol
+    token = os.getenv("GOOGLE_TOKEN_JSON", "").strip()
+    if token:
+        Path("token.json").write_text(token, encoding="utf-8")
+    if not Path("token.json").is_file():
+        raise SesHatasi("XTTS referansı yok ve GOOGLE_TOKEN_JSON bulunamadı.")
+    try:
+        from google.auth.transport.requests import Request
+        from google.oauth2.credentials import Credentials
+        from googleapiclient.discovery import build
+        from googleapiclient.http import MediaIoBaseDownload
+        kimlik = Credentials.from_authorized_user_file("token.json")
+        if not kimlik.valid:
+            kimlik.refresh(Request())
+        drive = build("drive", "v3", credentials=kimlik, cache_discovery=False)
+        yol.parent.mkdir(parents=True, exist_ok=True)
+        with yol.open("wb") as dosya:
+            indir = MediaIoBaseDownload(dosya, drive.files().get_media(
+                fileId=ses.get("referans_drive_id", "1c1lstH03Kkf4pzvHVu5vavDJ_xDigxNQ")))
+            tamam = False
+            while not tamam:
+                _, tamam = indir.next_chunk()
+    except Exception as hata:  # noqa: BLE001
+        yol.unlink(missing_ok=True)
+        raise SesHatasi(f"XTTS referansı indirilemedi: {str(hata)[:160]}") from hata
+    return yol
+
+
+def _xtts(metin: str, cikti: Path, ayar: dict) -> None:
+    """Onaylı referansla XTTS-v2 üretir; yeni çıktıya ses işlemini tam bir kez uygular."""
+    ses = ayar.get("ses", {})
+    referans = _xtts_referansini_hazirla(ses)
+    with tempfile.TemporaryDirectory(prefix="xtts_") as gecici:
+        ham = Path(gecici) / "ham.wav"
+        komut = [
+            "tts", "--text", metin,
+            "--model_name", ses.get("model", "tts_models/multilingual/multi-dataset/xtts_v2"),
+            "--speaker_wav", str(referans), "--language_idx", ses.get("dil", "tr"),
+            "--out_path", str(ham),
+        ]
+        try:
+            subprocess.run(komut, check=True, timeout=900)
+            filtre = (
+                "highpass=f=70,equalizer=f=250:t=q:width=1.1:g=-1.0,"
+                "equalizer=f=3500:t=q:width=1.0:g=0.8,atempo=0.95,"
+                "loudnorm=I=-18:TP=-1.5:LRA=11"
+            )
+            subprocess.run(["ffmpeg", "-y", "-i", str(ham), "-af", filtre,
+                            "-ar", "48000", "-ac", "1", "-c:a", "pcm_s16le", str(cikti)],
+                           check=True, timeout=180, stdout=subprocess.DEVNULL,
+                           stderr=subprocess.DEVNULL)
+        except Exception as hata:  # noqa: BLE001
+            cikti.unlink(missing_ok=True)
+            raise SesHatasi(f"XTTS-v2 üretimi başarısız: {str(hata)[:160]}") from hata
+
+
 def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
     """Sesi üretir. Hizalama hazırsa döndürür; yoksa None (çağıran Whisper'a düşer)."""
     cikti = Path(cikti)
@@ -147,5 +209,8 @@ def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
         return _speechify(metin, cikti, ayar)
     if saglayici == "elevenlabs":
         _elevenlabs(metin, cikti, ayar)
+        return None
+    if saglayici in {"xtts", "xtts_v2", "coqui_xtts"}:
+        _xtts(metin, cikti, ayar)
         return None
     raise SesHatasi(f"Desteklenmeyen ses sağlayıcısı: {saglayici!r}")

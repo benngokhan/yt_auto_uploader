@@ -6,12 +6,14 @@
   },
   "fps": 60,
   "ses": {
-    "saglayici": "speechify",
-    "voice_id": "ahmet",
-    "model": "simba-3.5",
+    "saglayici": "xtts_v2",
+    "voice_id": "klon_095_xtts",
+    "model": "tts_models/multilingual/multi-dataset/xtts_v2",
     "dil": "tr",
-    "yedek_saglayici": "elevenlabs",
-    "yedek_voice_id": "KUTUPHANEDEN_SECILECEK"
+    "referans_drive_id": "1c1lstH03Kkf4pzvHVu5vavDJ_xDigxNQ",
+    "referans_yolu": "ref_095.wav",
+    "islem": "highpass=70;eq250=-1dB;eq3500=+0.8dB;atempo=0.95;loudnorm=-18LUFS",
+    "fallback": false
   },
   "gorsel": {
     "kaynak": "pixabay",
@@ -30,7 +32,7 @@
   },
   "kararlar": {
     "sure": "38-42 sn (kullanıcı: 3 Kasım 2026)",
-    "ses": "ElevenLabs Voice Library'den seçilecek — voice-02 oturum sesiydi, taşınabilir kimliği yok",
+    "ses": "Onaylı klon_095_xtts — XTTS-v2, Türkçe, 0.95 işlem yeni çıktıya bir kez; başka sese fallback yok",
     "gorsel": "Pixabay fotoğraf + teal-amber sinematik düzenleme (AI/ücretli servis yok)",
     "akis": "Her video elle onaylı; otomatik yayın yok"
   }

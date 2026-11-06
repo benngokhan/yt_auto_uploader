@@ -35,7 +35,7 @@ def upload_file(svc, path: Path, parent: str):
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument("--baslik", required=True); a=ap.parse_args()
     cfg=uret.ayar_yukle(); cfg["sahne_sayisi"]=4
-    cfg["ses"]["voice_id"] = os.getenv("MOTOR_VOICE_ID", cfg["ses"].get("voice_id", "ahmet"))
+    cfg["ses"]["voice_id"] = os.getenv("MOTOR_VOICE_ID", cfg["ses"].get("voice_id", "klon_095_xtts"))
     scenes=uret.sahne_plani(a.baslik, 4, cfg)
     stamp=datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     out=ROOT/"motor"/"cikti"/"paketler"/f"{stamp}_{slug(a.baslik)}"; out.mkdir(parents=True, exist_ok=True)

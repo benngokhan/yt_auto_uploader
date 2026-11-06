@@ -52,8 +52,10 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
 
-      - name: Bağımlılıklar
-        run: pip install -q -r requirements-motor.txt
+      - name: Bağımlılıklar (XTTS-v2 CPU)
+        run: |
+          pip install -q torch torchaudio torchcodec --index-url https://download.pytorch.org/whl/cpu
+          pip install -q six coqui-tts -r requirements.txt -r requirements-motor.txt
 
       - name: Varlıklar (fontlar + fon müziği)
         run: python motor/varlik_hazirla.py
@@ -61,8 +63,9 @@ jobs:
       - name: Üret
         env:
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
-          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
-          SPEECHIFY_API_KEY: ${{ secrets.SPEECHIFY_API_KEY }}
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          MOTOR_VOICE_ID: klon_095_xtts
+          MOTOR_XTTS_REFERENCE: ref_095.wav
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           MOTOR_KONU: ${{ inputs.konu }}
