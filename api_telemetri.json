@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-06T07:19:25+00:00",
+  "zaman": "2026-11-06T13:07:35+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -60,17 +60,17 @@
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 353.7,
-      "actions_kosu": 385,
+      "actions_dakika": 377.7,
+      "actions_kosu": 413,
       "actions_limit": 2000,
-      "actions_kalan": 1646.3
+      "actions_kalan": 1622.3
     },
     {
       "ad": "Google Drive",
       "durum": "ok",
-      "kalan": 10213444901,
+      "kalan": 10014196575,
       "limit": 16106127360,
-      "kullanilan": 5892682459,
+      "kullanilan": 6091930785,
       "birim": "bayt",
       "kirilim": [
         {
@@ -99,8 +99,8 @@
         },
         {
           "ad": "CEO / Tablolar",
-          "boyut": 482743522,
-          "dosya": 45,
+          "boyut": 3939555551,
+          "dosya": 49,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
         {
@@ -110,6 +110,18 @@
         }
       ],
       "buyuk_dosyalar": [
+        {
+          "ad": "ESKI_BILGI_DOZU_ARSIVI_2026_10_30.zip",
+          "boyut": 3341929532
+        },
+        {
+          "ad": "Pixellab DG by DT.zip",
+          "boyut": 195891694
+        },
+        {
+          "ad": "bilgi_dozu_kapak_paketi.zip",
+          "boyut": 99232924
+        },
         {
           "ad": "uzun_video_10.mp4",
           "boyut": 95768604
@@ -129,23 +141,11 @@
         {
           "ad": "163 - 6 GÖRSEL HAREKET KONTROLÜ.mp4",
           "boyut": 87042844
-        },
-        {
-          "ad": "uzun_video_9.mp4",
-          "boyut": 85769016
-        },
-        {
-          "ad": "uzun_video_6.mp4",
-          "boyut": 83807712
-        },
-        {
-          "ad": "uzun_video_8.mp4",
-          "boyut": 83722104
         }
       ],
-      "drive_gorunen": 3334319898,
-      "kendi_dosyalar": 2448001010,
-      "paylasilan": 886318888,
+      "drive_gorunen": 7159404470,
+      "kendi_dosyalar": 2647249336,
+      "paylasilan": 4512155134,
       "disalan": 3444681449,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
@@ -154,11 +154,11 @@
     {
       "ad": "YouTube Data API",
       "durum": "ok",
-      "kalan": 10000,
+      "kalan": 8300,
       "limit": 10000,
-      "kullanilan": 0,
+      "kullanilan": 1700,
       "birim": "birim (tahmini)",
-      "bugun_yukleme": 0,
+      "bugun_yukleme": 1,
       "yenilenme": "günlük · gece 00:00 Pasifik (TR 10:00) sıfırlanır",
       "not_": "gerçek kota API'de yok; yükleme ≈ 1700 birim sayıldı"
     }
@@ -346,6 +346,10 @@
     },
     {
       "zaman": "2026-11-06T07:19:25+00:00",
+      "elevenlabs_kalan": 1384
+    },
+    {
+      "zaman": "2026-11-06T13:07:35+00:00",
       "elevenlabs_kalan": 1384
     }
   ]
