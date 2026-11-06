@@ -61,5 +61,8 @@ jobs:
           name='KLON_PILOT_XTTS_095_'+datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')
           folder=d.files().create(body={'name':name,'mimeType':'application/vnd.google-apps.folder','parents':[os.environ['DRIVE_PARENT_ID']]},fields='id,name,webViewLink').execute()
           r=d.files().create(body={'name':'klon_095_xtts.wav','parents':[folder['id']]},media_body=MediaFileUpload('klon_095_xtts.wav',mimetype='audio/wav'),fields='id,name,webViewLink,size').execute()
+          # Link yalnız iki Google hesabına kilitlenmesin; paylaşım otomatik uygulansın.
+          for file_id in (folder['id'], r['id']):
+              d.permissions().create(fileId=file_id,body={'type':'anyone','role':'reader'},fields='id').execute()
           print('FILE',r); print('FOLDER',folder)
           PY
