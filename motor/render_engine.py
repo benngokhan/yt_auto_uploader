@@ -302,11 +302,12 @@ def make_subtitle_band(W, text_multiline, highlight_words=None, is_wide=False, *
         for w, ww in zip(words, word_widths):
             col = YELLOW if word_index == active_word_index else WHITE
             word_index += 1
-            d_sh.text((cx, cy + 4), w, font=font, fill=(0, 0, 0, 235), stroke_width=6, stroke_fill=(0, 0, 0, 220))
-            d_txt.text((cx, cy), w, font=font, fill=col, stroke_width=2, stroke_fill=(0, 0, 0, 185))
+            # Mobil Shorts için tek, ince kontur: çift/kalın gölge harfleri çamurlaştırıyordu.
+            d_sh.text((cx, cy + 2), w, font=font, fill=(0, 0, 0, 205), stroke_width=3, stroke_fill=(0, 0, 0, 205))
+            d_txt.text((cx, cy), w, font=font, fill=col, stroke_width=2, stroke_fill=(0, 0, 0, 210))
             cx += ww + space_w
 
-    comb = Image.alpha_composite(sh_layer.filter(ImageFilter.GaussianBlur(radius=6)), txt_layer)
+    comb = Image.alpha_composite(sh_layer.filter(ImageFilter.GaussianBlur(radius=3)), txt_layer)
     return rgba_to_bgra(comb)
 
 def make_static_brand_layers(W, source_line, is_wide=False):

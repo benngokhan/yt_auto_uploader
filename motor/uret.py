@@ -48,7 +48,8 @@ def motor_hazirla(ayar: dict):
         varlik_hazirla.hazirla(mood=ayar.get("muzik_mood", "doga_kesif"))
 
     font_black = MOTOR / "assets" / "Montserrat-Black.ttf"
-    font_bold = MOTOR / "assets" / "Montserrat-Bold.ttf"
+    # Shorts altyazısı: ExtraBold (800), mobilde daha net ve sıkıştırmaya dayanıklı.
+    font_bold = MOTOR / "assets" / "Montserrat-ExtraBold.ttf"
     emoji_font = MOTOR / "assets" / "NotoColorEmoji.ttf"
     bgm = MOTOR / "assets" / ayar.get("muzik", "ambient_science_bgm.wav")
 
@@ -219,9 +220,10 @@ def main() -> int:
         plates.append(bgr)
         scene_cfg.append({
             "img": str(parallelar[i]),
-            "zoom": (1.00, 1.13),
+            # 38–42 sn / 4 sahne: efekt hissedilmeyecek kadar yavaş, akıcı hareket.
+            "zoom": (1.00, 1.04),
             "pan_x": (0.0, 0.0),
-            "pan_y": (24.0, -24.0) if i % 2 == 0 else (-20.0, 20.0),
+            "pan_y": (8.0, -8.0) if i % 2 == 0 else (-8.0, 8.0),
             "emoji": s.get("emoji", ""),
             "title_line1": s["baslik1"],
             "title_line2": s["baslik2"],

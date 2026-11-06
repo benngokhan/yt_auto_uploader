@@ -1,5 +1,5 @@
 {
-  "sahne_sayisi": 6,
+  "sahne_sayisi": 4,
   "sure": {
     "min": 38,
     "max": 42
@@ -7,7 +7,7 @@
   "fps": 60,
   "ses": {
     "saglayici": "speechify",
-    "voice_id": "ayse",
+    "voice_id": "ahmet",
     "model": "simba-3.5",
     "dil": "tr",
     "yedek_saglayici": "elevenlabs",
