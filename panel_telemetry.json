@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-06 03:46:29",
-  "generated_at_iso": "2026-11-06T03:46:29.158553+03:00",
+  "generated_at": "2026-11-06 04:54:42",
+  "generated_at_iso": "2026-11-06T04:54:42.291261+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -475,6 +475,13 @@
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "size": 90890,
         "modifiedTime": "2026-11-05T17:13:39.152Z"
+      },
+      {
+        "id": "1lEm4h79f6Q6Jzf4DsHXaVBPGEzgDpuHR",
+        "name": "CEO_VIDEO_KALITE_UYARISI_2026-11-06.md",
+        "mimeType": "text/markdown",
+        "size": 1627,
+        "modifiedTime": "2026-11-06T01:51:34.070Z"
       },
       {
         "id": "1LathGn2Mn5Zn_1gf4JqqVz1WnaSm7NVN",
