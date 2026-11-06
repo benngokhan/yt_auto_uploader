@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-06 12:48:35",
-  "generated_at_iso": "2026-11-06T12:48:35.010649+03:00",
+  "generated_at": "2026-11-06 13:07:53",
+  "generated_at_iso": "2026-11-06T13:07:53.208508+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -37,13 +37,13 @@
   },
   "queue_summary": {
     "ready_shorts": 0,
-    "ready_longs": 14,
-    "total_ready": 14,
-    "days_of_stock": 7.0,
+    "ready_longs": 13,
+    "total_ready": 13,
+    "days_of_stock": 6.5,
     "next_short": null,
     "next_short_title": "",
-    "next_long": "uzun_video_8.mp4",
-    "next_long_title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
+    "next_long": "uzun_video_9.mp4",
+    "next_long_title": "Beynin Seni Ayakta Tutan 3 Gizli Sensörü: İç Kulak Pusulası, Kristaller ve Algı #bilgidozu",
     "missing_covers": []
   },
   "drive_inventory": {
@@ -480,8 +480,8 @@
         "id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 90890,
-        "modifiedTime": "2026-11-05T17:13:39.152Z"
+        "size": 90958,
+        "modifiedTime": "2026-11-06T10:07:51.489Z"
       },
       {
         "id": "1lEm4h79f6Q6Jzf4DsHXaVBPGEzgDpuHR",
@@ -958,9 +958,9 @@
       "file_name": "uzun_video_8.mp4",
       "number": 8,
       "type": "long",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
       "description": "Güneş ışığının ulaşamadığı derin okyanus sularında kendi ışığını üreten canlıların kimyasal sırrı ne? Denizlerin alacakaranlık kuşağında parlayan biyolüminesans dünyasını inceliyoruz! 🌊✨\n\nBÖLÜMLER:\n🧪 SOĞUK IŞIĞIN KİMYASI — Lusiferin ve lusiferaz reaksiyonu ısı yaymadan nasıl ışık üretir?\n🎣 KARANLIKTA AV TUZAĞI — Fener balığının parlayan yem organı ve simbiyotik bakteriler\n🦑 GÖRÜNMEZLİK PELERİNİ — Karşı aydınlatma (counter-illumination) ile silüeti gizleyen kalamarlar\n\n📊 Kaynaklar: NOAA Ocean Exploration • Smithsonian Ocean\n\nYeni bilgi dozları için ABONE OL! ⚗️\n#bilgidozu #okyanus #bilim #biyolüminesans #doğa #denizcanlıları",
       "tags": [
