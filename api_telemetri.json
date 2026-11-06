@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-06T01:11:06+00:00",
+  "zaman": "2026-11-06T07:19:25+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -60,10 +60,10 @@
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 347.2,
-      "actions_kosu": 375,
+      "actions_dakika": 353.7,
+      "actions_kosu": 385,
       "actions_limit": 2000,
-      "actions_kalan": 1652.8
+      "actions_kalan": 1646.3
     },
     {
       "ad": "Google Drive",
@@ -99,8 +99,8 @@
         },
         {
           "ad": "CEO / Tablolar",
-          "boyut": 482741895,
-          "dosya": 44,
+          "boyut": 482743522,
+          "dosya": 45,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
         {
@@ -143,9 +143,9 @@
           "boyut": 83722104
         }
       ],
-      "drive_gorunen": 3239137004,
+      "drive_gorunen": 3334319898,
       "kendi_dosyalar": 2448001010,
-      "paylasilan": 791135994,
+      "paylasilan": 886318888,
       "disalan": 3444681449,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
@@ -342,6 +342,10 @@
     },
     {
       "zaman": "2026-11-06T01:11:06+00:00",
+      "elevenlabs_kalan": 1384
+    },
+    {
+      "zaman": "2026-11-06T07:19:25+00:00",
       "elevenlabs_kalan": 1384
     }
   ]
