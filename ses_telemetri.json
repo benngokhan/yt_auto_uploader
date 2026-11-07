@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-07T00:28:22+00:00",
+  "zaman": "2026-11-07T06:35:47+00:00",
   "anahtar_durumu": "ok",
   "tier": "free",
   "durum": "free",
@@ -153,43 +153,43 @@
       "id": "Et3hA9mm8aHhswBL5jmC",
       "ad": "Aslıhan - Young, High and Clear",
       "kategori": "professional",
-      "etiket": "confident, young, tr, female, informative_educational, istan"
-    },
-    {
-      "id": "FDs1ZX5J4e4f2c2erxtW",
-      "ad": "Fili - Warm Turkish Female ",
-      "kategori": "professional",
-      "etiket": "calm, young, tr, female, conversational, istanbul"
-    },
-    {
-      "id": "NNn9dv8zq2kUo7d3JSGG",
-      "ad": "Derya - Dynamic and Friendly Narrator",
-      "kategori": "professional",
-      "etiket": "casual, young, tr, female, narrative_story, standard"
-    },
-    {
-      "id": "aIdeZYQ86PeVTKIe5may",
-      "ad": "Pınar - Direct and Encouraging",
-      "kategori": "professional",
-      "etiket": "confident, middle_aged, tr, female, social_media, istanbul"
-    },
-    {
-      "id": "uvU9jrgGLWNPeNA4NgNT",
-      "ad": "İrem - Authoritarian Female Voice",
-      "kategori": "professional",
-      "etiket": "professional, middle_aged, tr, female, narrative_story, ista"
+      "etiket": "informative_educational, confident, istanbul, young, female,"
     },
     {
       "id": "xsGHrtxT5AdDzYXTQT0d",
       "ad": "Gönül Filiz - Airy and Soft",
       "kategori": "professional",
-      "etiket": "calm, young, tr, female, narrative_story, istanbul"
+      "etiket": "narrative_story, istanbul, calm, young, female, tr"
+    },
+    {
+      "id": "aIdeZYQ86PeVTKIe5may",
+      "ad": "Pınar - Direct and Encouraging",
+      "kategori": "professional",
+      "etiket": "social_media, istanbul, tr, middle_aged, female, confident"
+    },
+    {
+      "id": "NNn9dv8zq2kUo7d3JSGG",
+      "ad": "Derya - Dynamic and Friendly Narrator",
+      "kategori": "professional",
+      "etiket": "narrative_story, standard, tr, young, female, casual"
     },
     {
       "id": "N0wraTTB0pquzsz3DLG8",
       "ad": "Nil - Dynamic, Playful and Clear",
       "kategori": "professional",
-      "etiket": "middle_aged, tr, female, social_media, standard"
+      "etiket": "social_media, standard, tr, middle_aged, female"
+    },
+    {
+      "id": "uvU9jrgGLWNPeNA4NgNT",
+      "ad": "İrem - Authoritarian Female Voice",
+      "kategori": "professional",
+      "etiket": "tr, istanbul, narrative_story, middle_aged, female, professi"
+    },
+    {
+      "id": "FDs1ZX5J4e4f2c2erxtW",
+      "ad": "Fili - Warm Turkish Female ",
+      "kategori": "professional",
+      "etiket": "conversational, istanbul, tr, young, female, calm"
     }
   ],
   "gecmis": [
@@ -285,6 +285,11 @@
     },
     {
       "zaman": "2026-11-07T00:28:22+00:00",
+      "kalan": 1384,
+      "kullanilan": 8616
+    },
+    {
+      "zaman": "2026-11-07T06:35:47+00:00",
       "kalan": 1384,
       "kullanilan": 8616
     }
