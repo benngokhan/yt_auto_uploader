@@ -39,16 +39,29 @@ def main():
          "Somut, doğrulanabilir, güçlü görseli olan ve ilk saniyede merak uyandıran soru biçimi kullan. Sağlık tavsiyesi ve yanıltıcı iddia kullanma. "
          "Yalnız JSON döndür: {\"suggestions\":[{\"title\":\"...\",\"score\":0-100,\"reason\":\"...\",\"duplicate_check\":\"hangi geçmiş alanlardan farklı\"}]}.\nGEÇMİŞ:\n"+'\n'.join(used[-500:]))
  body={'contents':[{'parts':[{'text':prompt}]}],'generationConfig':{'responseMimeType':'application/json','temperature':0.85}}
- key=os.environ['GEMINI_API_KEY']
- with urllib.request.urlopen('https://generativelanguage.googleapis.com/v1beta/models?key='+key,timeout=60) as r: models=json.load(r).get('models',[])
- suitable=[m['name'].split('/',1)[-1] for m in models if 'generateContent' in m.get('supportedGenerationMethods',[]) and 'flash' in m.get('name','').lower() and all(x not in m.get('name','').lower() for x in ('tts','image','live'))]
- if not suitable: raise RuntimeError('Metin üreten kullanılabilir Gemini Flash modeli bulunamadı')
- model=sorted(suitable,key=lambda x:(('preview' in x),x),reverse=True)[0]
- print('model',model)
- url=f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}'
- req=urllib.request.Request(url,data=json.dumps(body).encode(),headers={'Content-Type':'application/json'})
- with urllib.request.urlopen(req,timeout=180) as r:data=json.load(r)
- out=json.loads(data['candidates'][0]['content']['parts'][0]['text']);accepted=[]
+ text=None; errors=[]
+ groq=os.getenv('GROQ_API_KEY','').strip()
+ if groq:
+  try:
+   gb={'model':'llama-3.3-70b-versatile','temperature':0.8,'response_format':{'type':'json_object'},'messages':[{'role':'user','content':prompt}]}
+   req=urllib.request.Request('https://api.groq.com/openai/v1/chat/completions',data=json.dumps(gb).encode(),headers={'Content-Type':'application/json','Authorization':'Bearer '+groq})
+   with urllib.request.urlopen(req,timeout=180) as r:text=json.load(r)['choices'][0]['message']['content']
+   print('provider groq')
+  except Exception as e: errors.append('groq:'+repr(e))
+ if text is None:
+  try:
+   key=os.environ['GEMINI_API_KEY']
+   with urllib.request.urlopen('https://generativelanguage.googleapis.com/v1beta/models?key='+key,timeout=60) as r: models=json.load(r).get('models',[])
+   suitable=[m['name'].split('/',1)[-1] for m in models if 'generateContent' in m.get('supportedGenerationMethods',[]) and 'flash' in m.get('name','').lower() and all(x not in m.get('name','').lower() for x in ('tts','image','live','omni'))]
+   if not suitable: raise RuntimeError('uygun Gemini modeli yok')
+   model=sorted(suitable,key=lambda x:(('preview' not in x),x),reverse=True)[0];print('provider gemini',model)
+   url=f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}'
+   req=urllib.request.Request(url,data=json.dumps(body).encode(),headers={'Content-Type':'application/json'})
+   with urllib.request.urlopen(req,timeout=180) as r:data=json.load(r)
+   text=data['candidates'][0]['content']['parts'][0]['text']
+  except Exception as e: errors.append('gemini:'+repr(e))
+ if text is None: raise RuntimeError('Tüm konu sağlayıcıları başarısız: '+' | '.join(errors))
+ out=json.loads(text);accepted=[]
  for x in sorted(out.get('suggestions',[]),key=lambda z:z.get('score',0),reverse=True):
   t=str(x.get('title','')).strip()
   if len(t)<15 or any(sim(t,u)>=0.42 for u in used+ [a['title'] for a in accepted]):continue
