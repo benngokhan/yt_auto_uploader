@@ -1,10 +1,30 @@
 {
- "zaman": "2026-11-07T23:34:10.648573+00:00",
+ "zaman": "2026-11-07T23:41:15.554316+00:00",
  "ozet": {
-  "toplam": 0,
-  "kritik": 0,
-  "yeni": 0
+  "toplam": 1,
+  "kritik": 1,
+  "yeni": 1
  },
- "uyarilar": [],
- "yeni_uyarilar": []
+ "uyarilar": [
+  {
+   "id": "ElevenLabs_gecersiz",
+   "servis": "ElevenLabs",
+   "seviye": "kritik",
+   "baslik": "ElevenLabs anahtarı geçersiz",
+   "mesaj": "HTTP 401",
+   "yuzde": null,
+   "islem": "Anahtarı yenile"
+  }
+ ],
+ "yeni_uyarilar": [
+  {
+   "id": "ElevenLabs_gecersiz",
+   "servis": "ElevenLabs",
+   "seviye": "kritik",
+   "baslik": "ElevenLabs anahtarı geçersiz",
+   "mesaj": "HTTP 401",
+   "yuzde": null,
+   "islem": "Anahtarı yenile"
+  }
+ ]
 }

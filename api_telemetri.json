@@ -1,19 +1,11 @@
 {
-  "zaman": "2026-11-07T23:34:10+00:00",
+  "zaman": "2026-11-07T23:41:15+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
-      "durum": "ok",
-      "kalan": 1384,
-      "limit": 10000,
-      "kullanilan": 8616,
-      "birim": "karakter/kredi",
-      "tier": "free",
-      "reset_unix": 1794480693,
-      "reset_iso": "2026-11-12T10:51:33+00:00",
-      "klonlama": false,
-      "yenilenme": "aylık · fatura dönemi başında sıfırlanır (kredi devretmez)",
-      "not_": "1 kredi = 1 karakter (v2/v3) · Flash/Turbo yarı fiyat"
+      "durum": "gecersiz",
+      "mesaj": "HTTP 401",
+      "yenilenme": "aylık · fatura dönemi başında sıfırlanır (kalan kredi devretmez)"
     },
     {
       "ad": "OpenRouter",
@@ -61,16 +53,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4979,
+      "kalan": 4974,
       "limit": 5000,
-      "kullanilan": 21,
+      "kullanilan": 26,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 521.6,
+      "actions_dakika": 523.9,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1478.4
+      "actions_kalan": 1476.1
     },
     {
       "ad": "Google Drive",
@@ -213,9 +205,9 @@
     }
   ],
   "ozet": {
-    "ok": 8,
+    "ok": 7,
     "eksik": 0,
-    "gecersiz": 0,
+    "gecersiz": 1,
     "hata": 0
   },
   "gecmis": [
@@ -394,6 +386,10 @@
     {
       "zaman": "2026-11-07T23:34:10+00:00",
       "elevenlabs_kalan": 1384
+    },
+    {
+      "zaman": "2026-11-07T23:41:15+00:00",
+      "elevenlabs_kalan": null
     }
   ]
 }
