@@ -199,6 +199,31 @@ def _xtts(metin: str, cikti: Path, ayar: dict) -> None:
             raise SesHatasi(f"XTTS-v2 üretimi başarısız: {str(hata)[:160]}") from hata
 
 
+
+def _edge_tts(metin: str, cikti: Path, ayar: dict) -> None:
+    """Ücretsiz Ahmet Neural; uzun nokta boşluklarını yaklaşık 0,40 sn ile sınırlar."""
+    ses = ayar.get("ses", {})
+    voice = ses.get("voice_id", "tr-TR-AhmetNeural")
+    with tempfile.TemporaryDirectory(prefix="edge_tts_") as gecici:
+        ham = Path(gecici) / "ham.mp3"
+        try:
+            subprocess.run(["edge-tts", "--voice", voice, "--rate=+2%", "--pitch=-5Hz",
+                            "--text", metin, "--write-media", str(ham)],
+                           check=True, timeout=240)
+            filtre = (
+                "silenceremove=start_periods=1:start_duration=0.05:start_threshold=-38dB:"
+                "start_silence=0.05:stop_periods=-1:stop_duration=0.35:"
+                "stop_threshold=-38dB:stop_silence=0.05,"
+                "highpass=f=70,loudnorm=I=-18:TP=-1.5:LRA=11"
+            )
+            subprocess.run(["ffmpeg", "-y", "-i", str(ham), "-af", filtre,
+                            "-ar", "48000", "-ac", "1", "-c:a", "pcm_s16le", str(cikti)],
+                           check=True, timeout=180, stdout=subprocess.DEVNULL,
+                           stderr=subprocess.DEVNULL)
+        except Exception as hata:
+            cikti.unlink(missing_ok=True)
+            raise SesHatasi(f"Edge Ahmet Neural üretimi başarısız: {str(hata)[:160]}") from hata
+
 def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
     """Sesi üretir. Hizalama hazırsa döndürür; yoksa None (çağıran Whisper'a düşer)."""
     cikti = Path(cikti)
@@ -212,5 +237,8 @@ def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
         return None
     if saglayici in {"xtts", "xtts_v2", "coqui_xtts"}:
         _xtts(metin, cikti, ayar)
+        return None
+    if saglayici in {"edge", "edge_tts", "ahmet_neural"}:
+        _edge_tts(metin, cikti, ayar)
         return None
     raise SesHatasi(f"Desteklenmeyen ses sağlayıcısı: {saglayici!r}")

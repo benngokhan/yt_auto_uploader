@@ -6,13 +6,13 @@
   },
   "fps": 60,
   "ses": {
-    "saglayici": "xtts_v2",
-    "voice_id": "klon_095_xtts",
-    "model": "tts_models/multilingual/multi-dataset/xtts_v2",
+    "saglayici": "edge_tts",
+    "voice_id": "tr-TR-AhmetNeural",
+    "model": "edge-neural",
     "dil": "tr",
     "referans_drive_id": "1c1lstH03Kkf4pzvHVu5vavDJ_xDigxNQ",
     "referans_yolu": "ref_095.wav",
-    "islem": "highpass=70;eq250=-1dB;eq3500=+0.8dB;atempo=0.95;loudnorm=-18LUFS",
+    "islem": "rate=+2%;pitch=-5Hz;nokta_sessizligi<=0.40sn;loudnorm=-18LUFS",
     "fallback": false
   },
   "gorsel": {
@@ -32,7 +32,7 @@
   },
   "kararlar": {
     "sure": "38-42 sn (kullanıcı: 3 Kasım 2026)",
-    "ses": "Onaylı klon_095_xtts — XTTS-v2, Türkçe, 0.95 işlem yeni çıktıya bir kez; başka sese fallback yok",
+    "ses": "Onaylı ücretsiz tr-TR-AhmetNeural — +2% hız, -5Hz ton, nokta arası en fazla yaklaşık 0.40 sn; XTTS yedekte korunur",
     "gorsel": "Pixabay fotoğraf + teal-amber sinematik düzenleme (AI/ücretli servis yok)",
     "akis": "Her video elle onaylı; otomatik yayın yok"
   }
