@@ -83,8 +83,7 @@ GitHub Actions env'de görünüyordu (`GEMINI_API_KEY: ***`) ama anahtar geçers
 
 **Sahibi hiçbir şeyi tekrar anlatmaz.** Bilgi dosyada durur, ajanın hafızasında değil.
 
-## CEO GÜNCELLEME — 2026-11-08
-- Telegram yayın kartı tüm metadata ve dört gerçek işlem butonuyla bağlandı; işleyici testi geçti.
-- Konu önerisi 404 hatası için Gemini modeli otomatik keşif/seçim sistemine çevrildi.
-- Mevcut köpekbalığı videosu onaysız kalacak; işlem yapılmayacak.
-- Sıradaki kapı: konu analizi başarılı sonuç + panel doğrulaması; ardından tek uçtan uca video testi.
+## 7. SON İŞLEM (2026-11-08)
+- Telegram tam yayın kartı ve dört gerçek işlem butonu bağlandı; işleyici testi başarılı.
+- Konu önerisi 404 hatası sabit model uç noktasından kaynaklandı; hesapta kullanılabilir modeli otomatik seçme düzeltmesi hazırlandı.
+- Video üretimi, konu analizi doğrulanana kadar başlatılmayacak.
