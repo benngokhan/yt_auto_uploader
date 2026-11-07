@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-07 19:27:45",
-  "generated_at_iso": "2026-11-07T19:27:45.453125+03:00",
+  "generated_at": "2026-11-07 19:42:20",
+  "generated_at_iso": "2026-11-07T19:42:20.025299+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -36,12 +36,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 2,
+    "ready_shorts": 1,
     "ready_longs": 13,
-    "total_ready": 15,
-    "days_of_stock": 7.5,
-    "next_short": "video_165.mp4",
-    "next_short_title": "Mariana Çukuru Ne Kadar Derin? 🌊 #bilgidozu #shorts",
+    "total_ready": 14,
+    "days_of_stock": 7.0,
+    "next_short": "video_166.mp4",
+    "next_short_title": "Benzin Pompası Depo Dolunca Çipsiz ve Sensörsüz Nasıl Kendi Durur? ⛽ #bilgidozu #shorts",
     "next_long": "uzun_video_9.mp4",
     "next_long_title": "Beynin Seni Ayakta Tutan 3 Gizli Sensörü: İç Kulak Pusulası, Kristaller ve Algı #bilgidozu",
     "missing_covers": []
@@ -543,8 +543,8 @@
         "id": "1ulh13cnzYTaIlp1vehJ7lDrSsgjKyM_X",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 166791,
-        "modifiedTime": "2026-11-07T13:57:13.944Z"
+        "size": 172939,
+        "modifiedTime": "2026-11-07T16:42:18.172Z"
       },
       {
         "id": "1HfgCzbGwSuZcdYhfFalzSeKygnflJLsJ",
@@ -994,9 +994,9 @@
       "file_name": "video_165.mp4",
       "number": 165,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Kuru Kum Dağılırken Yüzde 1 Su Kumdan Kaleyi Nasıl Taş Gibi Tutar? 🏰 #bilgidozu #shorts",
       "description": "Sahilde kuru kum parmaklarının arasından su gibi akarken, biraz ıslattığında nasıl metrelerce yüksek kale gibi dimdik durur? Kuma az miktarda su eklediğinde su damlacıkları kum tanelerinin arasına yerleşip görünmez kapiler sıvı köprüleri kurar.\n\n📍 BÖLÜMLER\n00:00 Kuru kum akıp giderken — Islak kum nasıl taşlaşır?\n00:19 Yüzey gerilimi taneleri — Vantuz gibi çeker!\n00:38 Fazla su köprüyü yıkar: — Kale çamur olup çöker!\n\n📊 Kaynaklar:\n• Univ. of Amsterdam (Fall & Bonn, Nature Scientific Reports)\n• https://www.nature.com/articles/srep00549\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #fizik #doğa #keşif #bilim",
       "tags": [
