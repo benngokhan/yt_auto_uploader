@@ -90,7 +90,7 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
         "yazı/logo/tabela içeren sahne istemeyin. Ana konu arı/petek ise mum, su damlası gibi yalnızca benzetmeyi gösteren konu dışı görsel YASAK; ana nesne her sorguda geçsin.\n"
         "- vurgular: o sahnenin altyazısında sarı boyanacak 1-3 kelime\n"
         "Selamlama ve 'abone olun' YASAK. İlk sahnenin sesi tek soru ve ≤6 kelime olsun. "
-        "Son sahne 'Sıradaki videoda ... bakacağız.' kalıbıyla bitsin."
+        "Son sahne yumuşak ve doğal bir cümleyle bitsin. 'Bakacağız' kelimesini ve sert slogan tonunu kullanma; gerekiyorsa 'Bir sonraki videoda bunu inceleyeceğiz.' de."
     )
 
     def _cagir(url, govde, basliklar):
@@ -170,6 +170,14 @@ def main() -> int:
     re_ = motor_hazirla(ayar)
 
     sahneler = sahne_plani(a.konu, sahne_sayisi, ayar)
+    # XTTS'nin sert veya hatalı okuduğu kalıpları senaryo düzeyinde doğal Türkçeyle değiştir.
+    # Böylece ses ile ekrandaki altyazı birebir aynı kalır.
+    for s in sahneler:
+        metin = str(s.get("ses", ""))
+        metin = metin.replace("Sıradaki videoda bakacağız", "Bir sonraki videoda inceleyeceğiz")
+        metin = metin.replace("bakacağız.", "inceleyeceğiz.")
+        metin = metin.replace("Bakacağız.", "İnceleyeceğiz.")
+        s["ses"] = metin
 
     calisma = KOK / "motor" / "cikti" / "son"
     calisma.mkdir(parents=True, exist_ok=True)
