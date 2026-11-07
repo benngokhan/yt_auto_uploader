@@ -23,6 +23,20 @@
   </div>
 </header>
 
+
+<!-- ── API Uyarı Şeridi (kırmızı, sadece %90+ veya geçersiz anahtar) ── -->
+<div id="api-uyari" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-left:5px solid #dc2626;border-radius:10px;margin:12px 16px;padding:14px 16px;">
+  <div style="display:flex;align-items:flex-start;gap:10px;">
+    <span style="font-size:18px;line-height:1;">🔴</span>
+    <div style="flex:1;">
+      <div style="font-weight:700;color:#991b1b;font-size:14px;margin-bottom:6px;" id="api-uyari-baslik">API uyarısı</div>
+      <div id="api-uyari-liste" style="font-size:13px;color:#7f1d1d;line-height:1.6;"></div>
+    </div>
+    <button onclick="document.getElementById('api-uyari').style.display='none'"
+            style="background:none;border:none;color:#991b1b;cursor:pointer;font-size:16px;">✕</button>
+  </div>
+</div>
+
 <!-- ── Global Stats Bar ─────────────────────────────────────────────── -->
 <div class="stats-bar">
   <div class="stat-pill">
@@ -273,6 +287,67 @@
           <button class="btn btn-primary btn-sm" onclick="saveGeminiKey()">Save Key</button>
           <a href="https://aistudio.google.com/app/apikey" target="_blank">
             <button class="btn btn-ghost btn-sm">Get Free Key ↗</button>
+          </a>
+        </div>
+      </div>
+
+
+      <!-- ElevenLabs (ses kredisi) -->
+      <div>
+        <div class="settings-section-title">ElevenLabs — Ses Kredisi</div>
+        <div class="settings-desc">Ses üretimi için kalan karakter kredisi. Limit dolunca ses üretilemez.</div>
+        <div id="elevenlabs-status" class="status-pill missing">✗ API key not set</div>
+        <div class="form-group" style="margin-top:12px">
+          <label>ElevenLabs API Key</label>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="s-elevenlabs-key" placeholder="sk_…" style="flex:1" />
+            <button class="btn btn-ghost btn-sm" onclick="toggleGorunum('s-elevenlabs-key')">Show</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-primary btn-sm" onclick="secretKaydet('ELEVENLABS_API_KEY','s-elevenlabs-key','elevenlabs-status')">Save Key</button>
+          <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank">
+            <button class="btn btn-ghost btn-sm">Get Key ↗</button>
+          </a>
+        </div>
+      </div>
+
+      <!-- OpenRouter -->
+      <div>
+        <div class="settings-section-title">OpenRouter — Yedek LLM</div>
+        <div class="settings-desc">Gemini ve Groq çökerse devreye girer. Anahtar geçersizse kırmızı uyarı çıkar.</div>
+        <div id="openrouter-status" class="status-pill missing">✗ API key not set</div>
+        <div class="form-group" style="margin-top:12px">
+          <label>OpenRouter API Key</label>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="s-openrouter-key" placeholder="sk-or-v1…" style="flex:1" />
+            <button class="btn btn-ghost btn-sm" onclick="toggleGorunum('s-openrouter-key')">Show</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-primary btn-sm" onclick="secretKaydet('OPENROUTER_API_KEY','s-openrouter-key','openrouter-status')">Save Key</button>
+          <a href="https://openrouter.ai/keys" target="_blank">
+            <button class="btn btn-ghost btn-sm">Get Key ↗</button>
+          </a>
+        </div>
+      </div>
+
+      <!-- Telegram -->
+      <div>
+        <div class="settings-section-title">Telegram — Bildirim Botu</div>
+        <div class="settings-desc">Yayın kartı, onay butonları ve alarmlar bu bot üzerinden gelir.</div>
+        <div id="telegram-status" class="status-pill missing">✗ API key not set</div>
+        <div class="form-group" style="margin-top:12px">
+          <label>Telegram Bot Token</label>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="s-telegram-key" placeholder="123456:ABC…" style="flex:1" />
+            <button class="btn btn-ghost btn-sm" onclick="toggleGorunum('s-telegram-key')">Show</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-primary btn-sm" onclick="secretKaydet('TELEGRAM_BOT_TOKEN','s-telegram-key','telegram-status')">Save Token</button>
+          <a href="https://t.me/BotFather" target="_blank">
+            <button class="btn btn-ghost btn-sm">@BotFather ↗</button>
           </a>
         </div>
       </div>

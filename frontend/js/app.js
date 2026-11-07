@@ -687,3 +687,108 @@ function esc(s) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+// ── API uyarı şeridi ─────────────────────────────────────────────
+// Kural: %90+ veya geçersiz anahtar -> ana sayfada kırmızı şerit.
+// Tekrar etmez: aynı uyarı bir kez gösterilir, düzelene kadar tekrar yazmaz.
+async function apiUyarilariniYukle() {
+  try {
+    const r = await fetch('/api_uyarilari', { cache: 'no-store' });
+    if (!r.ok) return;
+    const d = await r.json();
+    const liste = d.uyarilar || [];
+    const kutu = document.getElementById('api-uyari');
+    if (!kutu) return;
+    if (!liste.length) { kutu.style.display = 'none'; return; }
+
+    const kritik = liste.filter(u => u.seviye === 'kritik').length;
+    document.getElementById('api-uyari-baslik').textContent =
+      kritik ? `${kritik} kritik API uyarısı` : `${liste.length} API uyarısı`;
+
+    document.getElementById('api-uyari-liste').innerHTML = liste.map(u =>
+      `<div style="margin-bottom:4px;">
+         <strong>${u.servis}</strong> — ${u.mesaj}
+         ${u.islem ? `<span style="color:#b91c1c;">→ ${u.islem}</span>` : ''}
+       </div>`).join('');
+
+    kutu.style.display = 'block';
+  } catch (e) { /* sessiz */ }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  apiUyarilariniYukle();
+  setInterval(apiUyarilariniYukle, 5 * 60 * 1000);   // 5 dakikada bir tazele
+});
+
+// ── Panelden secret (API anahtarı) kaydetme ──────────────────────
+// workflow_dispatch -> api-kota.yml "api_anahtar" olayı -> gh secret set
+// Desteklenen: ELEVENLABS_API_KEY, OPENROUTER_API_KEY, GEMINI_API_KEY,
+//              GROQ_API_KEY, TELEGRAM_BOT_TOKEN
+const SECRET_ISIMLERI = {
+  ELEVENLABS_API_KEY:  'elevenlabs',
+  OPENROUTER_API_KEY:  'openrouter',
+  GEMINI_API_KEY:      'gemini',
+  GROQ_API_KEY:        'groq',
+  TELEGRAM_BOT_TOKEN:  'telegram',
+};
+
+async function secretKaydet(secretAdi, inputId, durumId) {
+  const el = document.getElementById(inputId);
+  const durum = document.getElementById(durumId);
+  const deger = (el?.value || '').trim();
+
+  if (!deger) { alert('Anahtar boş.'); return; }
+  if (!/^[A-Za-z0-9._:\-]{16,}$/.test(deger)) {
+    if (!confirm('Anahtar çok kısa veya geçersiz karakter içeriyor. Yine de kaydedilsin mi?')) return;
+  }
+  if (!confirm(`${secretAdi} güncellenecek. Emin misin?`)) return;
+
+  if (durum) { durum.textContent = '⏳ kaydediliyor…'; durum.className = 'status-pill'; }
+
+  try {
+    // GitHub Actions'ı tetikle (api-kota.yml -> api_anahtar)
+    const r = await fetch('/api/secret-yaz', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret_adi: secretAdi, deger }),
+    });
+    const d = await r.json().catch(() => ({}));
+
+    if (r.ok && d.ok !== false) {
+      if (durum) { durum.textContent = '✓ kaydedildi (1-2 dk içinde etkin)'; durum.className = 'status-pill ok'; }
+      el.value = '';
+    } else {
+      if (durum) { durum.textContent = '✗ kaydedilemedi: ' + (d.hata || r.status); durum.className = 'status-pill missing'; }
+    }
+  } catch (e) {
+    if (durum) { durum.textContent = '✗ bağlantı hatası'; durum.className = 'status-pill missing'; }
+  }
+}
+
+function toggleGorunum(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+// Telemetriden hangi anahtarların kurulu olduğunu yansıt
+async function secretDurumlariniYukle() {
+  try {
+    const r = await fetch('/api/uyarilari', { cache: 'no-store' });
+    if (!r.ok) return;
+    const d = await r.json();
+    const servisler = {};
+    (d.uyarilar || []).forEach(u => { servisler[u.servis] = u; });
+
+    Object.entries(SECRET_ISIMLERI).forEach(([adi, kisa]) => {
+      const durum = document.getElementById(kisa + '-status');
+      if (!durum) return;
+      const uyari = Object.values(servisler).find(s =>
+        (s.servis || '').toLowerCase().includes(kisa));
+      if (uyari && uyari.id.endsWith('_gecersiz')) {
+        durum.textContent = '✗ anahtar geçersiz';
+        durum.className = 'status-pill missing';
+      }
+    });
+  } catch (e) { /* sessiz */ }
+}
+document.addEventListener('DOMContentLoaded', secretDurumlariniYukle);

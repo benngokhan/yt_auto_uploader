@@ -169,6 +169,67 @@ def api_logs(limit: int = 100):
 # ---------------------------------------------------------------------------
 # Dashboard
 # ---------------------------------------------------------------------------
+
+
+@app.post("/api/secret-yaz", summary="Panelden API anahtari yaz (GitHub secret guncelle)")
+async def api_secret_yaz(istek: dict):
+    """
+    Anahtari GitHub Actions uzerinden secret olarak yazar.
+    api-kota.yml -> repository_dispatch(api_anahtar) -> gh secret set
+    Anahtar ASLA repoya veya loga yazilmaz.
+    """
+    import os, json as _json
+    import urllib.request as _u
+    from urllib.error import HTTPError
+
+    secret_adi = str(istek.get("secret_adi", "")).strip()
+    deger = str(istek.get("deger", "")).strip()
+
+    izinli = {"ELEVENLABS_API_KEY", "OPENROUTER_API_KEY", "GEMINI_API_KEY",
+              "GROQ_API_KEY", "TELEGRAM_BOT_TOKEN"}
+    if secret_adi not in izinli:
+        return {"ok": False, "hata": f"Bu anahtar panelden yazılamaz: {secret_adi}"}
+    if not deger:
+        return {"ok": False, "hata": "Değer boş"}
+
+    token = os.environ.get("SITE_SYNC_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    repo = os.environ.get("GITHUB_REPO", "benngokhan/yt_auto_uploader")
+    if not token:
+        return {"ok": False, "hata": "Sunucuda SITE_SYNC_TOKEN yok — Settings → Secrets'tan elle ekle"}
+
+    govde = _json.dumps({
+        "event_type": "api_anahtar",
+        "client_payload": {"secret_adi": secret_adi, "deger": deger},
+    }).encode()
+    req = _u.Request(
+        f"https://api.github.com/repos/{repo}/dispatches",
+        data=govde, method="POST",
+        headers={"Authorization": f"Bearer {token}",
+                 "Accept": "application/vnd.github+json",
+                 "Content-Type": "application/json",
+                 "User-Agent": "panel"},
+    )
+    try:
+        with _u.urlopen(req, timeout=20) as r:
+            return {"ok": r.status in (204, 200), "mesaj": "1-2 dk içinde etkin olur"}
+    except HTTPError as e:
+        return {"ok": False, "hata": f"GitHub {e.code}: {e.read().decode()[:140]}"}
+    except Exception as e:
+        return {"ok": False, "hata": str(e)[:140]}
+
+@app.get("/api_uyarilari", summary="API kullanim uyarilari (%90+ ve gecersiz anahtar)")
+def api_uyarilari():
+    """Panel ana sayfasindaki kirmizi serit buradan beslenir."""
+    import json as _json
+    from pathlib import Path as _Path
+    p = _Path(__file__).parent / "api_uyarilari.json"
+    if not p.exists():
+        return {"ozet": {"toplam": 0, "kritik": 0, "yeni": 0}, "uyarilar": []}
+    try:
+        return _json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return {"ozet": {"toplam": 0, "kritik": 0, "yeni": 0}, "uyarilar": []}
+
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 def dashboard():
     return _HTML
