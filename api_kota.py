@@ -67,12 +67,23 @@ def http_json(url: str, headers: dict | None = None, timeout: int = 30):
 
 
 def son_bilinen(ad: str) -> dict:
-    """Onceki telemetriden son bilinen kalan/limit degerlerini alir."""
+    """Onceki telemetriden VEYA gecmis listesinden son bilinen kotayi alir."""
     try:
         eski = json.loads((Path(__file__).parent / "api_telemetri.json").read_text(encoding="utf-8"))
         for x in eski.get("servisler", []):
             if x.get("ad") == ad and x.get("limit"):
                 return {k: x.get(k) for k in ("kalan", "limit", "kullanilan") if x.get(k) is not None}
+        # servis kaydi limitini kaybettiyse gecmise bak
+        if ad == "ElevenLabs":
+            for g in reversed(eski.get("gecmis") or []):
+                kalan = g.get("elevenlabs_kalan")
+                if kalan is not None:
+                    limit = 10000
+                    for x in eski.get("servisler", []):
+                        if x.get("ad") == ad and x.get("limit"):
+                            limit = x["limit"]
+                            break
+                    return {"kalan": kalan, "limit": limit, "kullanilan": limit - kalan}
     except Exception:
         pass
     return {}
@@ -95,7 +106,7 @@ def elevenlabs():
     key = (os.getenv("ELEVENLABS_API_KEY") or "").strip()
     if not key:
         return hata("ElevenLabs", "Anahtar tanımlı değil (ELEVENLABS_API_KEY)", "yok",
-                    panel_aksiyon="Ses & Kredi sayfasından anahtar yükle")
+                    panel_aksiyon="Ses & Kredi sayfasından anahtar yükle", **son_bilinen("ElevenLabs"))
     try:
         s = http_json("https://api.elevenlabs.io/v1/user/subscription", {"xi-api-key": key})
     except urllib.error.HTTPError as e:
