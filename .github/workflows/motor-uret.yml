@@ -132,12 +132,14 @@ jobs:
               print("DRIVE:", sonuc.get("webViewLink"))
           PY
 
-      - name: Telegram'a onay videosunu gönder
+      - name: Telegram'a onay kartını gönder
         if: always()
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           KONU: ${{ inputs.konu }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_NO: ${{ github.run_number }}
         run: |
           if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
             echo "Telegram anahtarı/sohbet kimliği yok; gönderim atlandı."; exit 0
@@ -145,17 +147,37 @@ jobs:
           shopt -s globstar nullglob
           kapaklar=(motor/cikti/**/kapak.jpg)
           videolar=(motor/cikti/**/*.mp4)
+          if [ ${#videolar[@]} -eq 0 ]; then exit 0; fi
+          BOYUT=$(du -h "${videolar[0]}" | cut -f1)
+          SURE=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "${videolar[0]}" | awk '{printf "%.2f",$1}')
+          KART=$(python - <<'PY2'
+          import json,os
+          rid=os.environ['RUN_ID']; rn=os.environ['RUN_NO']
+          print(json.dumps({"inline_keyboard":[
+            [{"text":"✅ Yayın kuyruğuna al","callback_data":f"bd_queue:{rn}:{rid}"}],
+            [{"text":"🔄 Yeniden üret","callback_data":f"bd_retry:{rn}:{rid}"},
+             {"text":"❌ Reddet","callback_data":f"bd_reject:{rn}:{rid}"}],
+            [{"text":"📁 Sadece Drive'da tut","callback_data":f"bd_keep:{rn}:{rid}"}]
+          ]},ensure_ascii=False))
+          PY2
+          )
+          CAPTION=$(printf '🎬 <b>YENİ VİDEO · ONAY BEKLİYOR</b>
+
+<b>Konu:</b> %s
+<b>Ses:</b> Ahmet Neural
+<b>Süre:</b> %s sn
+<b>Boyut:</b> %s
+
+⚠️ Siz onaylamadan yayın kuyruğuna alınmaz.' "$KONU" "$SURE" "$BOYUT")
           if [ ${#kapaklar[@]} -gt 0 ]; then
             curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto" \
               -F "chat_id=${TELEGRAM_CHAT_ID}" -F "photo=@${kapaklar[0]}" \
-              -F "caption=🖼 YENİ VİDEO KAPAĞI%0A${KONU}"
+              -F "parse_mode=HTML" -F "caption=🖼 <b>Video kapağı</b> · ${KONU}"
           fi
-          if [ ${#videolar[@]} -gt 0 ]; then
-            curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo" \
-              -F "chat_id=${TELEGRAM_CHAT_ID}" -F "video=@${videolar[0]}" \
-              -F "supports_streaming=true" \
-              -F "caption=🎬 ONAY BEKLEYEN VİDEO%0A${KONU}%0A%0AOnay verilmeden yayın kuyruğuna alınmaz."
-          fi
+          curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo" \
+            -F "chat_id=${TELEGRAM_CHAT_ID}" -F "video=@${videolar[0]}" \
+            -F "supports_streaming=true" -F "parse_mode=HTML" \
+            -F "caption=${CAPTION}" -F "reply_markup=${KART}"
 
       - name: Videoyu indirilebilir yap
         if: always()
