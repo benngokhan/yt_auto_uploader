@@ -156,6 +156,7 @@ def main() -> int:
     ap.add_argument("--sure-min", type=float, default=0, help="0 = ayardan oku")
     ap.add_argument("--sure-max", type=float, default=0, help="0 = ayardan oku")
     ap.add_argument("--kuru", action="store_true", help="Sadece üret, hiçbir yere yükleme")
+    ap.add_argument("--sadece-ses", action="store_true", help="Görsel/video üretmeden yalnızca onay sesi üret")
     ap.add_argument("--onay-verildi", action="store_true",
                     help="Kullanıcı videoyu izleyip onayladı: Drive + tablo + yayın kuyruğu")
     a = ap.parse_args()
@@ -186,6 +187,19 @@ def main() -> int:
         vo_files.append(str(wav))
         hizalamalar.append(hiz)
         print(f"  sahne {i}: ses {round(re_.wav_duration(str(wav)), 2)} sn")
+
+    if a.sadece_ses:
+        # Geçici kalite modu: görsel ve video yok. Sahne seslerini doğal cümle
+        # aralarıyla tek WAV'da birleştir; kullanıcının ses onayını bekle.
+        liste = calisma / "ses_birlestir.txt"
+        liste.write_text("\n".join(f"file '{Path(v).resolve()}'" for v in vo_files), encoding="utf-8")
+        ses_cikti = calisma / "ses_onay.wav"
+        subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(liste),
+                        "-af", "aresample=async=1:first_pts=0,loudnorm=I=-18:TP=-1.5:LRA=11",
+                        "-ar", "48000", "-ac", "1", "-c:a", "pcm_s16le", str(ses_cikti)],
+                       check=True, timeout=240)
+        print(f"Ses onayı hazır: {ses_cikti}")
+        return 0
 
     # ---------------------------------------------------------- 4) görseller
     import gorsel_uret
