@@ -754,8 +754,20 @@ async function secretKaydet(secretAdi, inputId, durumId) {
     const d = await r.json().catch(() => ({}));
 
     if (r.ok && d.ok !== false) {
-      if (durum) { durum.textContent = '✓ kaydedildi (1-2 dk içinde etkin)'; durum.className = 'status-pill ok'; }
-      el.value = '';
+      // GitHub gercekten yazdi mi? Sonucu bekle (en fazla ~90 sn)
+      if (durum) { durum.textContent = '⏳ GitHub\'a yazılıyor…'; }
+      const sonuc = await secretSonucuBekle(90);
+      if (sonuc && sonuc.ok === true) {
+        if (durum) { durum.textContent = '✓ kaydedildi — ' + secretAdi; durum.className = 'status-pill ok'; }
+        el.value = '';
+      } else {
+        if (durum) {
+          durum.textContent = '✗ GitHub REDDETTİ — ' + ((sonuc && sonuc.mesaj) || 'sonuç alınamadı');
+          durum.className = 'status-pill missing';
+        }
+        alert('Anahtar kaydedilemedi!\n\nSebep: ' + ((sonuc && sonuc.mesaj) || 'bilinmiyor') +
+              '\n\nÇözüm: GitHub → Settings → Secrets → Actions → New repository secret ile elle ekle.');
+      }
     } else {
       if (durum) { durum.textContent = '✗ kaydedilemedi: ' + (d.hata || r.status); durum.className = 'status-pill missing'; }
     }
@@ -792,3 +804,23 @@ async function secretDurumlariniYukle() {
   } catch (e) { /* sessiz */ }
 }
 document.addEventListener('DOMContentLoaded', secretDurumlariniYukle);
+
+// Panelden yazilan anahtarin gercek sonucunu bekle
+async function secretSonucuBekle(saniye) {
+  const bitis = Date.now() + saniye * 1000;
+  const baslangic = Date.now();
+  while (Date.now() < bitis) {
+    await new Promise(r => setTimeout(r, 6000));
+    try {
+      const r = await fetch('/api/secret-sonuc', { cache: 'no-store' });
+      if (!r.ok) continue;
+      const d = await r.json();
+      // bu kayittan sonra olusmus bir sonuc mu?
+      if (d.var && d.ok !== null && d.zaman) {
+        const t = Date.parse(d.zaman);
+        if (t >= baslangic - 120000) return d;
+      }
+    } catch (e) { /* devam */ }
+  }
+  return null;
+}

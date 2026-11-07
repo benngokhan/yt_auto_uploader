@@ -68,9 +68,14 @@ jobs:
           if [ -z "$GELEN_DEGER" ]; then echo "::error::Değer boş"; exit 1; fi
           if gh secret set "$SECRET_ADI" --repo "$GITHUB_REPOSITORY" --body "$GELEN_DEGER"; then
             echo "✅ $SECRET_ADI güncellendi."
+            echo "SECRET_SONUC=1" >> $GITHUB_ENV
+            echo "SECRET_MESAJ=$SECRET_ADI güncellendi" >> $GITHUB_ENV
           else
             echo "⚠️ Secret yazılamadı (SITE_SYNC_TOKEN yetkisi). Elle ekle: Settings → Secrets."
+            echo "SECRET_SONUC=0" >> $GITHUB_ENV
+            echo "SECRET_MESAJ=GitHub reddetti: SITE_SYNC_TOKEN gecersiz veya suresi dolmus. Settings -> Secrets tan elle ekle" >> $GITHUB_ENV
           fi
+          python3 secret_sonuc_yaz.py || true
           # bu koşuda da kullan
           echo "YAZILAN_SECRET=$SECRET_ADI" >> $GITHUB_ENV
 
@@ -108,7 +113,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- api_telemetri.json api_uyarilari.json api_uyari_gecmisi.json || true
+          git add -A -- api_telemetri.json api_uyarilari.json api_uyari_gecmisi.json api_secret_sonuc.json || true
           git diff --cached --quiet || (git commit -m "chore: api kota telemetrisi + uyarilar [skip ci]" && git pull --rebase --autostash origin main && git push origin HEAD:main)
 
       - name: Özet

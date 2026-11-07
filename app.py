@@ -217,7 +217,23 @@ async def api_secret_yaz(istek: dict):
     except Exception as e:
         return {"ok": False, "hata": str(e)[:140]}
 
-@app.get("/api_uyarilari", summary="API kullanim uyarilari (%90+ ve gecersiz anahtar)")
+@app.get("/api/secret-sonuc", summary="Panelden yazilan anahtarin gercek sonucu")
+def api_secret_sonuc():
+    """Panelin 'kaydedildi' demesinden once GitHub'in gercekten yazip yazmadigini dogrular."""
+    import json as _json
+    from pathlib import Path as _Path
+    p = _Path(__file__).parent / "api_secret_sonuc.json"
+    if not p.exists():
+        return {"var": False, "ok": None, "mesaj": "Henuz panelden anahtar yazilmadi"}
+    try:
+        d = _json.loads(p.read_text(encoding="utf-8"))
+        d["var"] = True
+        return d
+    except Exception as e:
+        return {"var": False, "ok": None, "mesaj": f"Okunamadi: {e}"}
+
+
+@app.get("/api/uyarilari", summary="API kullanim uyarilari (%90+ ve gecersiz anahtar)")
 def api_uyarilari():
     """Panel ana sayfasindaki kirmizi serit buradan beslenir."""
     import json as _json
