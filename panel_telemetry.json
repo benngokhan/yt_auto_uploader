@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-11-07 20:00:46",
-  "generated_at_iso": "2026-11-07T20:00:46.188280+03:00",
+  "generated_at": "2026-11-07 20:55:00",
+  "generated_at_iso": "2026-11-07T20:55:00.410343+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
     "table_file_id": "1ulh13cnzYTaIlp1vehJ7lDrSsgjKyM_X",
-    "shorts_video": "1LfW4adjq0x4ZjBuphjebAbKLVsgY8TXY",
-    "shorts_cover": "1xleUU8CO3gsJVCnZMtYxtf2r0hs2yDKS",
-    "long_video": "16jMIabV8mdJIRlc_e55Gmlwu5asfcBGN",
-    "long_cover": "1g3QluGyaLByQgXmoXO0i1PPtr3ORjRQR",
+    "shorts_video": "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR",
+    "shorts_cover": "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR",
+    "long_video": "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR",
+    "long_cover": "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR",
     "retention_folder": "1LyZBIc52OzaGZBaq8yXODcseZ0wilsrs",
     "retention_report": "1-04hX_5htkheIkCe-W-56bu4zBkfXOvT"
   },
@@ -37,86 +37,107 @@
   },
   "queue_summary": {
     "ready_shorts": 1,
-    "ready_longs": 13,
-    "total_ready": 14,
-    "days_of_stock": 7.0,
+    "ready_longs": 1,
+    "total_ready": 2,
+    "days_of_stock": 1.0,
     "next_short": "video_166.mp4",
     "next_short_title": "Benzin Pompası Depo Dolunca Çipsiz ve Sensörsüz Nasıl Kendi Durur? ⛽ #bilgidozu #shorts",
-    "next_long": "uzun_video_9.mp4",
-    "next_long_title": "Beynin Seni Ayakta Tutan 3 Gizli Sensörü: İç Kulak Pusulası, Kristaller ve Algı #bilgidozu",
+    "next_long": "uzun_video_22.mp4",
+    "next_long_title": "Tokken Neden Tatlı İsteriz? Beyindeki 'Tatlı Midesi' Şalterinin 2025 Bilimsel Kanıtı 🍰 #bilgidozu",
     "missing_covers": []
   },
   "drive_inventory": {
     "shorts_videos": [
       {
-        "id": "1gy9oKoKOwQDxUC-rYMNN64KYf80ZS_t-",
-        "name": "video_155.mp4",
-        "mimeType": "video/mp4",
-        "size": 11500831,
-        "modifiedTime": "2026-10-30T06:42:24.015Z"
+        "id": "1lecGAec31EmrMBVZKbeHy-40AI3auHay",
+        "name": "kapak_165.jpg",
+        "mimeType": "image/jpeg",
+        "size": 319661,
+        "modifiedTime": "2026-11-07T03:15:58.457Z"
       },
       {
-        "id": "1YCY-8cvOXZhAehJ8rSlcAw0TgfemJ0Xm",
-        "name": "video_156.mp4",
-        "mimeType": "video/mp4",
-        "size": 10103932,
-        "modifiedTime": "2026-10-30T06:42:29.773Z"
+        "id": "1_T1DagfTMsg6W1rWyef_pWyZyQ4PF6ne",
+        "name": "kapak_166.jpg",
+        "mimeType": "image/jpeg",
+        "size": 342689,
+        "modifiedTime": "2026-11-07T13:46:13.669Z"
       },
       {
-        "id": "1PzclvBCMlkt9DaQR49Bd3XTOjNsIXaa7",
-        "name": "video_157.mp4",
-        "mimeType": "video/mp4",
-        "size": 14063238,
-        "modifiedTime": "2026-10-29T16:29:06.652Z"
+        "id": "17pzKEOmCwjxYxoS80z708pcl320_oo21",
+        "name": "kapak_167.jpg",
+        "mimeType": "image/jpeg",
+        "size": 472931,
+        "modifiedTime": "2026-11-07T13:46:13.664Z"
       },
       {
-        "id": "18tFRo-unZ-U1Xv7DEGLnyPMvc5oxZuYX",
-        "name": "video_158.mp4",
-        "mimeType": "video/mp4",
-        "size": 10058523,
-        "modifiedTime": "2026-10-30T06:42:32.321Z"
+        "id": "1KnJ8ShwFoXf2WiUbtu78ddEeU11gMyrT",
+        "name": "kapak_168.jpg",
+        "mimeType": "image/jpeg",
+        "size": 610539,
+        "modifiedTime": "2026-11-07T13:46:13.633Z"
       },
       {
-        "id": "1t3f4eXm0QhpENLjyEcCQM4UrpTtsFDCu",
-        "name": "video_159.mp4",
-        "mimeType": "video/mp4",
-        "size": 13003616,
-        "modifiedTime": "2026-10-30T06:42:32.963Z"
+        "id": "1Ga01UlGb0NpKaXDvpiPqiLv8aIPfr83f",
+        "name": "kapak_169.jpg",
+        "mimeType": "image/jpeg",
+        "size": 479770,
+        "modifiedTime": "2026-11-07T13:46:13.672Z"
       },
       {
-        "id": "1ZPU6JT8nHmZCohP7wx17a-FfoW9BCKPL",
-        "name": "video_160.mp4",
-        "mimeType": "video/mp4",
-        "size": 11357378,
-        "modifiedTime": "2026-10-30T06:42:33.617Z"
+        "id": "1eLKfcXAFw_Zwz1gRnnhLOgDAH0hTz4Qu",
+        "name": "kapak_170.jpg",
+        "mimeType": "image/jpeg",
+        "size": 480406,
+        "modifiedTime": "2026-11-07T13:46:13.648Z"
       },
       {
-        "id": "18-b_M7qo2NsaaLT6T8EetVcq7-uJrhLK",
-        "name": "video_161.mp4",
-        "mimeType": "video/mp4",
-        "size": 15117638,
-        "modifiedTime": "2026-10-30T06:42:34.257Z"
+        "id": "1PaGdgMlrOIqqv_R7TREz5eY215lSSb9N",
+        "name": "kapak_171.jpg",
+        "mimeType": "image/jpeg",
+        "size": 457926,
+        "modifiedTime": "2026-11-07T13:46:13.655Z"
       },
       {
-        "id": "1xwogYEA49ym92lGPbbW8RARcAlnMlVqM",
-        "name": "video_162.mp4",
-        "mimeType": "video/mp4",
-        "size": 9983214,
-        "modifiedTime": "2026-10-30T06:42:40.336Z"
+        "id": "1A1ZQNOpu9YU3sIKhLs4GJ9pfpme8XBg5",
+        "name": "kapak_172.jpg",
+        "mimeType": "image/jpeg",
+        "size": 399392,
+        "modifiedTime": "2026-11-07T13:46:13.736Z"
       },
       {
-        "id": "1-ag1ZRblavOInWCi4qRm-lHSYGy_U47e",
-        "name": "video_163.mp4",
-        "mimeType": "video/mp4",
-        "size": 62252543,
-        "modifiedTime": "2026-11-02T04:49:12.546Z"
+        "id": "1zuDzTaMFITQW4_r_ZMzuuvnGoCW7CHwQ",
+        "name": "kapak_173.jpg",
+        "mimeType": "image/jpeg",
+        "size": 384137,
+        "modifiedTime": "2026-11-07T13:46:13.918Z"
       },
       {
-        "id": "1lA8QNmVuDvex_gQN680rXx_RFPFw5Pwh",
-        "name": "video_164.mp4",
+        "id": "11XWdgQvfdkFFMykeU1EPTbcmiDloNbQb",
+        "name": "kapak_174.jpg",
+        "mimeType": "image/jpeg",
+        "size": 443085,
+        "modifiedTime": "2026-11-07T13:46:14.156Z"
+      },
+      {
+        "id": "1zUwD_-BqtP-fe4xToJzUJ6YTP9wbwgiS",
+        "name": "kapak_175.jpg",
+        "mimeType": "image/jpeg",
+        "size": 358870,
+        "modifiedTime": "2026-11-07T13:46:14.538Z"
+      },
+      {
+        "id": "1e22SUjKLwfd2W9DjGMVS6cBsQjK7O0L6",
+        "name": "uzun_kapak_22.png",
+        "mimeType": "image/png",
+        "size": 1796645,
+        "modifiedTime": "2026-11-02T09:11:21.077Z"
+      },
+      {
+        "id": "1v7NJbO692Lp55qjSqycja_CJooyBvUXm",
+        "name": "uzun_video_22.mp4",
         "mimeType": "video/mp4",
-        "size": 28285352,
-        "modifiedTime": "2026-11-07T02:53:20.716Z"
+        "size": 26890531,
+        "modifiedTime": "2026-10-30T06:42:45.208Z"
       },
       {
         "id": "1rlJGXzkPRgGAxOUZ6F7idMhIQI1_gwij",
@@ -198,12 +219,175 @@
     ],
     "shorts_covers": [
       {
-        "id": "1qTk66NkArFlFJ1DXoi4M4TsedemglFeP",
-        "name": "kapak_164.jpg",
+        "id": "1lecGAec31EmrMBVZKbeHy-40AI3auHay",
+        "name": "kapak_165.jpg",
         "mimeType": "image/jpeg",
-        "size": 478610,
-        "modifiedTime": "2026-11-07T14:36:53.448Z"
+        "size": 319661,
+        "modifiedTime": "2026-11-07T03:15:58.457Z"
       },
+      {
+        "id": "1_T1DagfTMsg6W1rWyef_pWyZyQ4PF6ne",
+        "name": "kapak_166.jpg",
+        "mimeType": "image/jpeg",
+        "size": 342689,
+        "modifiedTime": "2026-11-07T13:46:13.669Z"
+      },
+      {
+        "id": "17pzKEOmCwjxYxoS80z708pcl320_oo21",
+        "name": "kapak_167.jpg",
+        "mimeType": "image/jpeg",
+        "size": 472931,
+        "modifiedTime": "2026-11-07T13:46:13.664Z"
+      },
+      {
+        "id": "1KnJ8ShwFoXf2WiUbtu78ddEeU11gMyrT",
+        "name": "kapak_168.jpg",
+        "mimeType": "image/jpeg",
+        "size": 610539,
+        "modifiedTime": "2026-11-07T13:46:13.633Z"
+      },
+      {
+        "id": "1Ga01UlGb0NpKaXDvpiPqiLv8aIPfr83f",
+        "name": "kapak_169.jpg",
+        "mimeType": "image/jpeg",
+        "size": 479770,
+        "modifiedTime": "2026-11-07T13:46:13.672Z"
+      },
+      {
+        "id": "1eLKfcXAFw_Zwz1gRnnhLOgDAH0hTz4Qu",
+        "name": "kapak_170.jpg",
+        "mimeType": "image/jpeg",
+        "size": 480406,
+        "modifiedTime": "2026-11-07T13:46:13.648Z"
+      },
+      {
+        "id": "1PaGdgMlrOIqqv_R7TREz5eY215lSSb9N",
+        "name": "kapak_171.jpg",
+        "mimeType": "image/jpeg",
+        "size": 457926,
+        "modifiedTime": "2026-11-07T13:46:13.655Z"
+      },
+      {
+        "id": "1A1ZQNOpu9YU3sIKhLs4GJ9pfpme8XBg5",
+        "name": "kapak_172.jpg",
+        "mimeType": "image/jpeg",
+        "size": 399392,
+        "modifiedTime": "2026-11-07T13:46:13.736Z"
+      },
+      {
+        "id": "1zuDzTaMFITQW4_r_ZMzuuvnGoCW7CHwQ",
+        "name": "kapak_173.jpg",
+        "mimeType": "image/jpeg",
+        "size": 384137,
+        "modifiedTime": "2026-11-07T13:46:13.918Z"
+      },
+      {
+        "id": "11XWdgQvfdkFFMykeU1EPTbcmiDloNbQb",
+        "name": "kapak_174.jpg",
+        "mimeType": "image/jpeg",
+        "size": 443085,
+        "modifiedTime": "2026-11-07T13:46:14.156Z"
+      },
+      {
+        "id": "1zUwD_-BqtP-fe4xToJzUJ6YTP9wbwgiS",
+        "name": "kapak_175.jpg",
+        "mimeType": "image/jpeg",
+        "size": 358870,
+        "modifiedTime": "2026-11-07T13:46:14.538Z"
+      },
+      {
+        "id": "1e22SUjKLwfd2W9DjGMVS6cBsQjK7O0L6",
+        "name": "uzun_kapak_22.png",
+        "mimeType": "image/png",
+        "size": 1796645,
+        "modifiedTime": "2026-11-02T09:11:21.077Z"
+      },
+      {
+        "id": "1v7NJbO692Lp55qjSqycja_CJooyBvUXm",
+        "name": "uzun_video_22.mp4",
+        "mimeType": "video/mp4",
+        "size": 26890531,
+        "modifiedTime": "2026-10-30T06:42:45.208Z"
+      },
+      {
+        "id": "1rlJGXzkPRgGAxOUZ6F7idMhIQI1_gwij",
+        "name": "video_165.mp4",
+        "mimeType": "video/mp4",
+        "size": 34089114,
+        "modifiedTime": "2026-11-07T03:02:40.680Z"
+      },
+      {
+        "id": "1Me32hP9ITYUFFeLSdHrE3pOLy7ED8skR",
+        "name": "video_166.mp4",
+        "mimeType": "video/mp4",
+        "size": 20379776,
+        "modifiedTime": "2026-11-07T13:46:13.925Z"
+      },
+      {
+        "id": "1Kpy8u2lOvwamvaFwW2MXNTqA76Smvf4i",
+        "name": "video_167.mp4",
+        "mimeType": "video/mp4",
+        "size": 24507033,
+        "modifiedTime": "2026-11-07T13:46:13.919Z"
+      },
+      {
+        "id": "1IO3p5a3742keI6u6_0geShgaQNlmseG0",
+        "name": "video_168.mp4",
+        "mimeType": "video/mp4",
+        "size": 26291984,
+        "modifiedTime": "2026-11-07T13:46:13.927Z"
+      },
+      {
+        "id": "18NDNFUII6IfI6-kSGGJC1pNygWgIFtsB",
+        "name": "video_169.mp4",
+        "mimeType": "video/mp4",
+        "size": 22171684,
+        "modifiedTime": "2026-11-07T13:46:14.203Z"
+      },
+      {
+        "id": "17czxfO63HEWKjC_RDFy1i7ztyFFNa2K9",
+        "name": "video_170.mp4",
+        "mimeType": "video/mp4",
+        "size": 27881190,
+        "modifiedTime": "2026-11-07T13:46:13.912Z"
+      },
+      {
+        "id": "1dSMVFJzrWqMtuRQwELF9RD1pDD5h_GFr",
+        "name": "video_171.mp4",
+        "mimeType": "video/mp4",
+        "size": 22230683,
+        "modifiedTime": "2026-11-07T13:46:14.119Z"
+      },
+      {
+        "id": "1uenxAEdlpHYl-OL7MvAN9luKbO711uH5",
+        "name": "video_172.mp4",
+        "mimeType": "video/mp4",
+        "size": 19634071,
+        "modifiedTime": "2026-11-07T13:46:13.899Z"
+      },
+      {
+        "id": "1B29wk44IWhyc6BUH7-7vKd6ctaN3rW-M",
+        "name": "video_173.mp4",
+        "mimeType": "video/mp4",
+        "size": 25099907,
+        "modifiedTime": "2026-11-07T13:46:14.107Z"
+      },
+      {
+        "id": "1z8q9Aj2wCDGmkAikBvOicP8ZhtBMLhxF",
+        "name": "video_174.mp4",
+        "mimeType": "video/mp4",
+        "size": 18489994,
+        "modifiedTime": "2026-11-07T13:46:14.150Z"
+      },
+      {
+        "id": "1EalOn2FqjDBdPD-dQ8uEn2qwj9z1QCbe",
+        "name": "video_175.mp4",
+        "mimeType": "video/mp4",
+        "size": 19890037,
+        "modifiedTime": "2026-11-07T13:46:14.145Z"
+      }
+    ],
+    "long_videos": [
       {
         "id": "1lecGAec31EmrMBVZKbeHy-40AI3auHay",
         "name": "kapak_165.jpg",
@@ -280,213 +464,6 @@
         "mimeType": "image/jpeg",
         "size": 358870,
         "modifiedTime": "2026-11-07T13:46:14.538Z"
-      }
-    ],
-    "long_videos": [
-      {
-        "id": "1lltDL8ype5n64_YiVIT05ueS9h7bYoDy",
-        "name": "uzun_video_10.mp4",
-        "mimeType": "video/mp4",
-        "size": 95768604,
-        "modifiedTime": "2026-10-21T06:48:07.760Z"
-      },
-      {
-        "id": "1higVkpVZsQqZmlV8gCQwFUB6atImqIrq",
-        "name": "uzun_video_11.mp4",
-        "mimeType": "video/mp4",
-        "size": 73557803,
-        "modifiedTime": "2026-10-22T11:09:34.894Z"
-      },
-      {
-        "id": "1UtmDpdqS7H-FP18vtYqDVFRVlfUX2A2o",
-        "name": "uzun_video_12.mp4",
-        "mimeType": "video/mp4",
-        "size": 91996704,
-        "modifiedTime": "2026-10-23T18:19:03.558Z"
-      },
-      {
-        "id": "1SXwmT40zgpwql-9iqz9tHG11PoM-y_jW",
-        "name": "uzun_video_13.mp4",
-        "mimeType": "video/mp4",
-        "size": 56755064,
-        "modifiedTime": "2026-10-24T14:26:28.563Z"
-      },
-      {
-        "id": "10_8u3UfhVCTkpCoETJ2T5ynRewlHUnaQ",
-        "name": "uzun_video_14.mp4",
-        "mimeType": "video/mp4",
-        "size": 54733836,
-        "modifiedTime": "2026-10-28T22:30:02.179Z"
-      },
-      {
-        "id": "1hJwUNT7cJX8ZoDuDpV6C8qRtQwf1IKVW",
-        "name": "uzun_video_15.mp4",
-        "mimeType": "video/mp4",
-        "size": 42042562,
-        "modifiedTime": "2026-10-28T22:30:05.902Z"
-      },
-      {
-        "id": "1DkQB1eWOX4PZf4cB_T85JI_bwptr1qMJ",
-        "name": "uzun_video_16.mp4",
-        "mimeType": "video/mp4",
-        "size": 53969733,
-        "modifiedTime": "2026-10-28T22:30:09.504Z"
-      },
-      {
-        "id": "1xPl6QRzHp6UZZ_ZMWSZ-oa0eFxfl6iax",
-        "name": "uzun_video_17.mp4",
-        "mimeType": "video/mp4",
-        "size": 21311864,
-        "modifiedTime": "2026-10-30T06:42:30.407Z"
-      },
-      {
-        "id": "1sL_Td-hlSk7Vq9kTqPV8eBqJUuo2Fbaa",
-        "name": "uzun_video_18.mp4",
-        "mimeType": "video/mp4",
-        "size": 17537408,
-        "modifiedTime": "2026-10-30T06:42:31.061Z"
-      },
-      {
-        "id": "1eUkviF0XGskcYAlvwJhFflbSemU44aBd",
-        "name": "uzun_video_19.mp4",
-        "mimeType": "video/mp4",
-        "size": 17336587,
-        "modifiedTime": "2026-10-30T06:42:31.719Z"
-      },
-      {
-        "id": "1fao6xZA2G594tEDPzocoILsOuHjYlM7U",
-        "name": "uzun_video_20.mp4",
-        "mimeType": "video/mp4",
-        "size": 20158481,
-        "modifiedTime": "2026-10-30T06:42:43.795Z"
-      },
-      {
-        "id": "1kxn3E7Un55nTdvH-SY30-8_7bpUXyg5e",
-        "name": "uzun_video_21.mp4",
-        "mimeType": "video/mp4",
-        "size": 26434399,
-        "modifiedTime": "2026-10-30T06:42:44.485Z"
-      },
-      {
-        "id": "1v7NJbO692Lp55qjSqycja_CJooyBvUXm",
-        "name": "uzun_video_22.mp4",
-        "mimeType": "video/mp4",
-        "size": 26890531,
-        "modifiedTime": "2026-10-30T06:42:45.208Z"
-      },
-      {
-        "id": "1-qWhR9bbqqWdGvVZsA9225xzOWnexMew",
-        "name": "uzun_video_8.mp4",
-        "mimeType": "video/mp4",
-        "size": 83722104,
-        "modifiedTime": "2026-10-20T21:29:27.994Z"
-      },
-      {
-        "id": "1weJEy_9zjDGeqfLFHapdZ3Tt8UXMqYzn",
-        "name": "uzun_video_9.mp4",
-        "mimeType": "video/mp4",
-        "size": 85769016,
-        "modifiedTime": "2026-10-20T21:36:09.141Z"
-      }
-    ],
-    "long_covers": [
-      {
-        "id": "1OK0Ut0Nkvt0PEJ3kKh1O1GiAaLjdzWX9",
-        "name": "uzun_kapak_1.jpeg",
-        "mimeType": "image/jpeg",
-        "size": 422594,
-        "modifiedTime": "2026-11-02T03:11:16.353Z"
-      },
-      {
-        "id": "1WuE3DXRU6pC-tM_POwrIdMWZP1e3d2Ak",
-        "name": "uzun_kapak_10.png",
-        "mimeType": "image/png",
-        "size": 789855,
-        "modifiedTime": "2026-11-02T09:10:59.208Z"
-      },
-      {
-        "id": "1JwmEhko71Rypt3ljDpONcSv5SkChzJO6",
-        "name": "uzun_kapak_11.png",
-        "mimeType": "image/png",
-        "size": 842007,
-        "modifiedTime": "2026-11-02T09:10:59.192Z"
-      },
-      {
-        "id": "1PJpoC-ZpFCwBdjcGTIhiIqs46_Z-hXQo",
-        "name": "uzun_kapak_12.png",
-        "mimeType": "image/png",
-        "size": 1464905,
-        "modifiedTime": "2026-11-02T09:11:00.128Z"
-      },
-      {
-        "id": "1mHW8OhMfoOATbtH3DaJj_xSohRWEIYdU",
-        "name": "uzun_kapak_13.png",
-        "mimeType": "image/png",
-        "size": 1770572,
-        "modifiedTime": "2026-11-02T09:10:59.604Z"
-      },
-      {
-        "id": "1blqePOc1OzIy5JgcupC-lmhCz-XSeY-B",
-        "name": "uzun_kapak_14.png",
-        "mimeType": "image/png",
-        "size": 1818663,
-        "modifiedTime": "2026-11-02T09:10:59.465Z"
-      },
-      {
-        "id": "1Eabpdlk-tDG9P9z81DHTrGf9JBHyDzW0",
-        "name": "uzun_kapak_15.png",
-        "mimeType": "image/png",
-        "size": 1666183,
-        "modifiedTime": "2026-11-02T09:10:59.746Z"
-      },
-      {
-        "id": "1QlQRA3iWdD0bpotTmlqPWjeUqzw2Umma",
-        "name": "uzun_kapak_16.png",
-        "mimeType": "image/png",
-        "size": 1725704,
-        "modifiedTime": "2026-11-02T09:11:20.509Z"
-      },
-      {
-        "id": "1E4X5qHX_lxrWMmrTFU9xrzRdwhEITZvH",
-        "name": "uzun_kapak_17.png",
-        "mimeType": "image/png",
-        "size": 1569528,
-        "modifiedTime": "2026-11-02T09:11:20.791Z"
-      },
-      {
-        "id": "1CWhMMxPJKP0zWOdcH_biAa6Lo0UVinYB",
-        "name": "uzun_kapak_18.png",
-        "mimeType": "image/png",
-        "size": 1537069,
-        "modifiedTime": "2026-11-02T09:11:20.679Z"
-      },
-      {
-        "id": "1lG8rubtRPhU90yYqbffbCviiX1Y7LI1h",
-        "name": "uzun_kapak_19.png",
-        "mimeType": "image/png",
-        "size": 850188,
-        "modifiedTime": "2026-11-02T09:11:20.546Z"
-      },
-      {
-        "id": "1frRFR8Io5aY-13TWq1uQftwmBahVbO6d",
-        "name": "uzun_kapak_2.jpeg",
-        "mimeType": "image/jpeg",
-        "size": 332099,
-        "modifiedTime": "2026-11-02T03:11:16.332Z"
-      },
-      {
-        "id": "1p5n_m1iu8SArGUGK3-N6PxJXW8OUXUPD",
-        "name": "uzun_kapak_20.png",
-        "mimeType": "image/png",
-        "size": 1768498,
-        "modifiedTime": "2026-11-02T09:11:20.701Z"
-      },
-      {
-        "id": "1n6qQ3oyTU60UlV-lg3KSU23EnZQbvzhl",
-        "name": "uzun_kapak_21.png",
-        "mimeType": "image/png",
-        "size": 1911555,
-        "modifiedTime": "2026-11-02T09:11:21.207Z"
       },
       {
         "id": "1e22SUjKLwfd2W9DjGMVS6cBsQjK7O0L6",
@@ -496,39 +473,258 @@
         "modifiedTime": "2026-11-02T09:11:21.077Z"
       },
       {
-        "id": "1wOWKMFbrxo1d-clfq1LDvPXkgn0emXs0",
-        "name": "uzun_kapak_3.jpeg",
-        "mimeType": "image/jpeg",
-        "size": 571887,
-        "modifiedTime": "2026-11-02T03:11:16.325Z"
+        "id": "1v7NJbO692Lp55qjSqycja_CJooyBvUXm",
+        "name": "uzun_video_22.mp4",
+        "mimeType": "video/mp4",
+        "size": 26890531,
+        "modifiedTime": "2026-10-30T06:42:45.208Z"
       },
       {
-        "id": "1sec9pIzmCotB7WGF36ttNza3QMzQuE8m",
-        "name": "uzun_kapak_4.jpeg",
-        "mimeType": "image/jpeg",
-        "size": 533867,
-        "modifiedTime": "2026-11-02T03:11:16.371Z"
+        "id": "1rlJGXzkPRgGAxOUZ6F7idMhIQI1_gwij",
+        "name": "video_165.mp4",
+        "mimeType": "video/mp4",
+        "size": 34089114,
+        "modifiedTime": "2026-11-07T03:02:40.680Z"
       },
       {
-        "id": "1rpt3FQImeuRLTk07gvJUTPD25waJtJFy",
-        "name": "uzun_kapak_5.jpeg",
-        "mimeType": "image/jpeg",
-        "size": 441708,
-        "modifiedTime": "2026-11-02T03:11:16.354Z"
+        "id": "1Me32hP9ITYUFFeLSdHrE3pOLy7ED8skR",
+        "name": "video_166.mp4",
+        "mimeType": "video/mp4",
+        "size": 20379776,
+        "modifiedTime": "2026-11-07T13:46:13.925Z"
       },
       {
-        "id": "1KqEPvriafHU7YZP4cCnppWOG_lN1z_mb",
-        "name": "uzun_kapak_8.png",
+        "id": "1Kpy8u2lOvwamvaFwW2MXNTqA76Smvf4i",
+        "name": "video_167.mp4",
+        "mimeType": "video/mp4",
+        "size": 24507033,
+        "modifiedTime": "2026-11-07T13:46:13.919Z"
+      },
+      {
+        "id": "1IO3p5a3742keI6u6_0geShgaQNlmseG0",
+        "name": "video_168.mp4",
+        "mimeType": "video/mp4",
+        "size": 26291984,
+        "modifiedTime": "2026-11-07T13:46:13.927Z"
+      },
+      {
+        "id": "18NDNFUII6IfI6-kSGGJC1pNygWgIFtsB",
+        "name": "video_169.mp4",
+        "mimeType": "video/mp4",
+        "size": 22171684,
+        "modifiedTime": "2026-11-07T13:46:14.203Z"
+      },
+      {
+        "id": "17czxfO63HEWKjC_RDFy1i7ztyFFNa2K9",
+        "name": "video_170.mp4",
+        "mimeType": "video/mp4",
+        "size": 27881190,
+        "modifiedTime": "2026-11-07T13:46:13.912Z"
+      },
+      {
+        "id": "1dSMVFJzrWqMtuRQwELF9RD1pDD5h_GFr",
+        "name": "video_171.mp4",
+        "mimeType": "video/mp4",
+        "size": 22230683,
+        "modifiedTime": "2026-11-07T13:46:14.119Z"
+      },
+      {
+        "id": "1uenxAEdlpHYl-OL7MvAN9luKbO711uH5",
+        "name": "video_172.mp4",
+        "mimeType": "video/mp4",
+        "size": 19634071,
+        "modifiedTime": "2026-11-07T13:46:13.899Z"
+      },
+      {
+        "id": "1B29wk44IWhyc6BUH7-7vKd6ctaN3rW-M",
+        "name": "video_173.mp4",
+        "mimeType": "video/mp4",
+        "size": 25099907,
+        "modifiedTime": "2026-11-07T13:46:14.107Z"
+      },
+      {
+        "id": "1z8q9Aj2wCDGmkAikBvOicP8ZhtBMLhxF",
+        "name": "video_174.mp4",
+        "mimeType": "video/mp4",
+        "size": 18489994,
+        "modifiedTime": "2026-11-07T13:46:14.150Z"
+      },
+      {
+        "id": "1EalOn2FqjDBdPD-dQ8uEn2qwj9z1QCbe",
+        "name": "video_175.mp4",
+        "mimeType": "video/mp4",
+        "size": 19890037,
+        "modifiedTime": "2026-11-07T13:46:14.145Z"
+      }
+    ],
+    "long_covers": [
+      {
+        "id": "1lecGAec31EmrMBVZKbeHy-40AI3auHay",
+        "name": "kapak_165.jpg",
+        "mimeType": "image/jpeg",
+        "size": 319661,
+        "modifiedTime": "2026-11-07T03:15:58.457Z"
+      },
+      {
+        "id": "1_T1DagfTMsg6W1rWyef_pWyZyQ4PF6ne",
+        "name": "kapak_166.jpg",
+        "mimeType": "image/jpeg",
+        "size": 342689,
+        "modifiedTime": "2026-11-07T13:46:13.669Z"
+      },
+      {
+        "id": "17pzKEOmCwjxYxoS80z708pcl320_oo21",
+        "name": "kapak_167.jpg",
+        "mimeType": "image/jpeg",
+        "size": 472931,
+        "modifiedTime": "2026-11-07T13:46:13.664Z"
+      },
+      {
+        "id": "1KnJ8ShwFoXf2WiUbtu78ddEeU11gMyrT",
+        "name": "kapak_168.jpg",
+        "mimeType": "image/jpeg",
+        "size": 610539,
+        "modifiedTime": "2026-11-07T13:46:13.633Z"
+      },
+      {
+        "id": "1Ga01UlGb0NpKaXDvpiPqiLv8aIPfr83f",
+        "name": "kapak_169.jpg",
+        "mimeType": "image/jpeg",
+        "size": 479770,
+        "modifiedTime": "2026-11-07T13:46:13.672Z"
+      },
+      {
+        "id": "1eLKfcXAFw_Zwz1gRnnhLOgDAH0hTz4Qu",
+        "name": "kapak_170.jpg",
+        "mimeType": "image/jpeg",
+        "size": 480406,
+        "modifiedTime": "2026-11-07T13:46:13.648Z"
+      },
+      {
+        "id": "1PaGdgMlrOIqqv_R7TREz5eY215lSSb9N",
+        "name": "kapak_171.jpg",
+        "mimeType": "image/jpeg",
+        "size": 457926,
+        "modifiedTime": "2026-11-07T13:46:13.655Z"
+      },
+      {
+        "id": "1A1ZQNOpu9YU3sIKhLs4GJ9pfpme8XBg5",
+        "name": "kapak_172.jpg",
+        "mimeType": "image/jpeg",
+        "size": 399392,
+        "modifiedTime": "2026-11-07T13:46:13.736Z"
+      },
+      {
+        "id": "1zuDzTaMFITQW4_r_ZMzuuvnGoCW7CHwQ",
+        "name": "kapak_173.jpg",
+        "mimeType": "image/jpeg",
+        "size": 384137,
+        "modifiedTime": "2026-11-07T13:46:13.918Z"
+      },
+      {
+        "id": "11XWdgQvfdkFFMykeU1EPTbcmiDloNbQb",
+        "name": "kapak_174.jpg",
+        "mimeType": "image/jpeg",
+        "size": 443085,
+        "modifiedTime": "2026-11-07T13:46:14.156Z"
+      },
+      {
+        "id": "1zUwD_-BqtP-fe4xToJzUJ6YTP9wbwgiS",
+        "name": "kapak_175.jpg",
+        "mimeType": "image/jpeg",
+        "size": 358870,
+        "modifiedTime": "2026-11-07T13:46:14.538Z"
+      },
+      {
+        "id": "1e22SUjKLwfd2W9DjGMVS6cBsQjK7O0L6",
+        "name": "uzun_kapak_22.png",
         "mimeType": "image/png",
-        "size": 1657459,
-        "modifiedTime": "2026-11-02T08:56:55.392Z"
+        "size": 1796645,
+        "modifiedTime": "2026-11-02T09:11:21.077Z"
       },
       {
-        "id": "1bwJtSzvnFeN3Fb1zx-VBwCBsmcWWadpz",
-        "name": "uzun_kapak_9.png",
-        "mimeType": "image/png",
-        "size": 1518729,
-        "modifiedTime": "2026-11-02T09:11:00.040Z"
+        "id": "1v7NJbO692Lp55qjSqycja_CJooyBvUXm",
+        "name": "uzun_video_22.mp4",
+        "mimeType": "video/mp4",
+        "size": 26890531,
+        "modifiedTime": "2026-10-30T06:42:45.208Z"
+      },
+      {
+        "id": "1rlJGXzkPRgGAxOUZ6F7idMhIQI1_gwij",
+        "name": "video_165.mp4",
+        "mimeType": "video/mp4",
+        "size": 34089114,
+        "modifiedTime": "2026-11-07T03:02:40.680Z"
+      },
+      {
+        "id": "1Me32hP9ITYUFFeLSdHrE3pOLy7ED8skR",
+        "name": "video_166.mp4",
+        "mimeType": "video/mp4",
+        "size": 20379776,
+        "modifiedTime": "2026-11-07T13:46:13.925Z"
+      },
+      {
+        "id": "1Kpy8u2lOvwamvaFwW2MXNTqA76Smvf4i",
+        "name": "video_167.mp4",
+        "mimeType": "video/mp4",
+        "size": 24507033,
+        "modifiedTime": "2026-11-07T13:46:13.919Z"
+      },
+      {
+        "id": "1IO3p5a3742keI6u6_0geShgaQNlmseG0",
+        "name": "video_168.mp4",
+        "mimeType": "video/mp4",
+        "size": 26291984,
+        "modifiedTime": "2026-11-07T13:46:13.927Z"
+      },
+      {
+        "id": "18NDNFUII6IfI6-kSGGJC1pNygWgIFtsB",
+        "name": "video_169.mp4",
+        "mimeType": "video/mp4",
+        "size": 22171684,
+        "modifiedTime": "2026-11-07T13:46:14.203Z"
+      },
+      {
+        "id": "17czxfO63HEWKjC_RDFy1i7ztyFFNa2K9",
+        "name": "video_170.mp4",
+        "mimeType": "video/mp4",
+        "size": 27881190,
+        "modifiedTime": "2026-11-07T13:46:13.912Z"
+      },
+      {
+        "id": "1dSMVFJzrWqMtuRQwELF9RD1pDD5h_GFr",
+        "name": "video_171.mp4",
+        "mimeType": "video/mp4",
+        "size": 22230683,
+        "modifiedTime": "2026-11-07T13:46:14.119Z"
+      },
+      {
+        "id": "1uenxAEdlpHYl-OL7MvAN9luKbO711uH5",
+        "name": "video_172.mp4",
+        "mimeType": "video/mp4",
+        "size": 19634071,
+        "modifiedTime": "2026-11-07T13:46:13.899Z"
+      },
+      {
+        "id": "1B29wk44IWhyc6BUH7-7vKd6ctaN3rW-M",
+        "name": "video_173.mp4",
+        "mimeType": "video/mp4",
+        "size": 25099907,
+        "modifiedTime": "2026-11-07T13:46:14.107Z"
+      },
+      {
+        "id": "1z8q9Aj2wCDGmkAikBvOicP8ZhtBMLhxF",
+        "name": "video_174.mp4",
+        "mimeType": "video/mp4",
+        "size": 18489994,
+        "modifiedTime": "2026-11-07T13:46:14.150Z"
+      },
+      {
+        "id": "1EalOn2FqjDBdPD-dQ8uEn2qwj9z1QCbe",
+        "name": "video_175.mp4",
+        "mimeType": "video/mp4",
+        "size": 19890037,
+        "modifiedTime": "2026-11-07T13:46:14.145Z"
       }
     ],
     "ceo_files": [
@@ -545,34 +741,6 @@
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "size": 172939,
         "modifiedTime": "2026-11-07T16:42:18.172Z"
-      },
-      {
-        "id": "1HfgCzbGwSuZcdYhfFalzSeKygnflJLsJ",
-        "name": "bilgidozu_yukleme_tablosu_164_165_ONCESI_YEDEK.xlsx",
-        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 225304,
-        "modifiedTime": "2026-11-07T13:46:56.511Z"
-      },
-      {
-        "id": "1PvYUAzC3aE9MV7Cw-wyyqENOjOwdwX39",
-        "name": "bilgidozu_yukleme_tablosu_EKSIK_164_165_YEDEK.xlsx",
-        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 230696,
-        "modifiedTime": "2026-11-07T03:50:02.723Z"
-      },
-      {
-        "id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
-        "name": "bilgidozu_yukleme_tablosu_YEDEK_2026-11-07.xlsx",
-        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 212950,
-        "modifiedTime": "2026-11-07T03:17:38.459Z"
-      },
-      {
-        "id": "1RrQIebJZyJswOPGJf14PvGfU1SHcPRyq",
-        "name": "bilgidozu_yukleme_tablosu_YOUTUBE_ESLESMELI.xlsx",
-        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 166932,
-        "modifiedTime": "2026-11-07T04:04:21.450Z"
       },
       {
         "id": "1lEm4h79f6Q6Jzf4DsHXaVBPGEzgDpuHR",
@@ -624,20 +792,6 @@
         "modifiedTime": "2026-11-01T22:59:58.786Z"
       },
       {
-        "id": "1IM-HEFfsVfkNkRCNDva-x-8w2487p4bP",
-        "name": "sablon_demo.mp4",
-        "mimeType": "video/mp4",
-        "size": 12611975,
-        "modifiedTime": "2026-11-03T08:23:00.649Z"
-      },
-      {
-        "id": "1Xf1iXRufTV-rYBaVJ6ChQmn4wCoV4Yqs",
-        "name": "sablon_demo_v2.mp4",
-        "mimeType": "video/mp4",
-        "size": 32878295,
-        "modifiedTime": "2026-11-03T08:30:06.601Z"
-      },
-      {
         "id": "19EEmVW4U2TH0F07UDWW2Dp5DTp4AZ0t6",
         "name": "senaryo_kurallari.md",
         "mimeType": "text/markdown",
@@ -657,27 +811,6 @@
         "mimeType": "application/vnd.google-apps.folder",
         "size": 0,
         "modifiedTime": "2026-11-03T09:45:12.974Z"
-      },
-      {
-        "id": "1bRhgFGax34FGsySde71FqTiMIUpZkw02",
-        "name": "Shorts Kapak Şablon",
-        "mimeType": "application/vnd.google-apps.folder",
-        "size": 0,
-        "modifiedTime": "2026-11-01T21:25:45.740Z"
-      },
-      {
-        "id": "14Al4fpEuNuWNLDvBh1p_IYqHyVdOP0eM",
-        "name": "TAŞINACAKLAR — DİĞER HESAP ARŞİVİ",
-        "mimeType": "application/vnd.google-apps.folder",
-        "size": 0,
-        "modifiedTime": "2026-11-06T11:58:39.354Z"
-      },
-      {
-        "id": "1Zr7qxRszk73BvC0DZTmBhJ6Gs6qwR026",
-        "name": "Uzun Kapak Şablon",
-        "mimeType": "application/vnd.google-apps.folder",
-        "size": 0,
-        "modifiedTime": "2026-11-01T21:25:15.086Z"
       }
     ]
   },
@@ -706,9 +839,9 @@
       "category_name": "Fizik ve Bilim",
       "pinned_comment": "Kışın düz yolda yürürken bile kaymayı başaran o arkadaşına bunu gönder! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1gy9oKoKOwQDxUC-rYMNN64KYf80ZS_t-",
-      "drive_video_size_mb": 10.97,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_155.jpg",
       "has_drive_cover": false,
       "drive_cover_id": ""
@@ -736,9 +869,9 @@
       "category_name": "Bilim Tarihi ve Efsaneler",
       "pinned_comment": "Çocukken doğru sanıp büyüyünce şaşırdığın başka hangi meşhur efsane var? Yoruma bırak! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1YCY-8cvOXZhAehJ8rSlcAw0TgfemJ0Xm",
-      "drive_video_size_mb": 9.64,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_156.jpg",
       "has_drive_cover": false,
       "drive_cover_id": ""
@@ -768,9 +901,9 @@
       "category_name": "29 Ekim Özel — Bilim Tarihi",
       "pinned_comment": "Üçgen, açı, uzay, köşegen, artı, eksi... Senin en sevdiğin Türkçe bilim kelimesi hangisi? 29 Ekim Cumhuriyet Bayramımız kutlu olsun! 👇",
       "youtube_url": "https://youtu.be/t2lphcITKXs",
-      "has_drive_video": true,
-      "drive_video_id": "1PzclvBCMlkt9DaQR49Bd3XTOjNsIXaa7",
-      "drive_video_size_mb": 13.41,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_157.jpg",
       "has_drive_cover": false,
       "drive_cover_id": ""
@@ -799,9 +932,9 @@
       "category_name": "İnsan Vücudu ve Beyin",
       "pinned_comment": "Boğazının en son düğümlendiği o an bir film sahnesi miydi yoksa gerçek hayat mı? Yoruma bırak! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "18tFRo-unZ-U1Xv7DEGLnyPMvc5oxZuYX",
-      "drive_video_size_mb": 9.59,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_158.jpg",
       "has_drive_cover": false,
       "drive_cover_id": ""
@@ -830,9 +963,9 @@
       "category_name": "Beyin ve Psikoloji",
       "pinned_comment": "Şu an 'kaşık' ya da 'kapı' kelimesini 15 kez üst üste fısılda; kaçıncı tekrarda yabancılaştı? Yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1t3f4eXm0QhpENLjyEcCQM4UrpTtsFDCu",
-      "drive_video_size_mb": 12.4,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_159.jpg",
       "has_drive_cover": false,
       "drive_cover_id": ""
@@ -860,9 +993,9 @@
       "category_name": "İnsan Vücudu ve Beyin",
       "pinned_comment": "Sen de yaz kış demeden tek ayağını yorganın dışına çıkaranlardan mısın? Yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1ZPU6JT8nHmZCohP7wx17a-FfoW9BCKPL",
-      "drive_video_size_mb": 10.83,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_160.jpg",
       "has_drive_cover": false,
       "drive_cover_id": ""
@@ -890,9 +1023,9 @@
       "category_name": "Beyin ve Psikoloji",
       "pinned_comment": "Bu videodan hemen sonra bir saate ya da telefon sayacına hızla gözünü çevirip ilk saniyeyi dene; fark ettin mi? 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "18-b_M7qo2NsaaLT6T8EetVcq7-uJrhLK",
-      "drive_video_size_mb": 14.42,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_161.jpg",
       "has_drive_cover": false,
       "drive_cover_id": ""
@@ -921,9 +1054,9 @@
       "category_name": "Biyoloji ve Vücut",
       "pinned_comment": "Çekirdek çitlemeye başlayınca dudakların beyazlayana kadar duramayan arkadaşını etiketle veya ona gönder! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1xwogYEA49ym92lGPbbW8RARcAlnMlVqM",
-      "drive_video_size_mb": 9.52,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_162.jpg",
       "has_drive_cover": false,
       "drive_cover_id": ""
@@ -952,9 +1085,9 @@
       "category_name": "İnsan Vücudu ve Beyin",
       "pinned_comment": "Şimdi burnundan üst üste iki kısa nefes çekip ağzından yavaşça ver; o anlık rahatlamayı hissettin mi? 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1-ag1ZRblavOInWCi4qRm-lHSYGy_U47e",
-      "drive_video_size_mb": 59.37,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_163.jpg",
       "has_drive_cover": false,
       "drive_cover_id": ""
@@ -982,12 +1115,12 @@
       "category_name": "İnsan Vücudu ve Beyin",
       "pinned_comment": "Yemekten sonra ne kadar tok olursan ol asla hayır diyemediğin o tatlı hangisi? Yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1lA8QNmVuDvex_gQN680rXx_RFPFw5Pwh",
-      "drive_video_size_mb": 26.98,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_164.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1qTk66NkArFlFJ1DXoi4M4TsedemglFeP"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 166,
@@ -1075,12 +1208,12 @@
       "category_name": "Uzun — Doğa ve Hayvanlar",
       "pinned_comment": "Derin okyanustaki hangi ışık stratejisi seni en çok şaşırttı? 🌊 1-Soğuk Işık 2-Fener Tuzağı 3-Görünmezlik — Yorumlara yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1-qWhR9bbqqWdGvVZsA9225xzOWnexMew",
-      "drive_video_size_mb": 79.84,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_8.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1KqEPvriafHU7YZP4cCnppWOG_lN1z_mb"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 65,
@@ -1106,12 +1239,12 @@
       "category_name": "Uzun — Beyin ve Psikoloji",
       "pinned_comment": "Arabada veya gemide giderken telefon okuyabiliyor musun, yoksa hemen miden mi bulanıyor? 🚗🧠 Yorumlara yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1weJEy_9zjDGeqfLFHapdZ3Tt8UXMqYzn",
-      "drive_video_size_mb": 81.8,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_9.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1bwJtSzvnFeN3Fb1zx-VBwCBsmcWWadpz"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 66,
@@ -1138,12 +1271,12 @@
       "category_name": "Uzun — Uzay ve Astronomi",
       "pinned_comment": "Perseus kara deliğinin 57 oktav yükseltilmiş gerçek basınç sesini duymuş muydun? 🕳️🔊 Duyanlar 1, yeni öğrenenler 2 yazsın! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1lltDL8ype5n64_YiVIT05ueS9h7bYoDy",
-      "drive_video_size_mb": 91.33,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_10.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1WuE3DXRU6pC-tM_POwrIdMWZP1e3d2Ak"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 67,
@@ -1169,12 +1302,12 @@
       "category_name": "Uzun — Fizik ve Uzay",
       "pinned_comment": "Einstein'ın görelilik hesabı olmasa GPS konumunun günde 10 kilometre sapacağını biliyor muydun? ⏱️🛰️ 1 veya 2 yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1higVkpVZsQqZmlV8gCQwFUB6atImqIrq",
-      "drive_video_size_mb": 70.15,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_11.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1JwmEhko71Rypt3ljDpONcSv5SkChzJO6"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 68,
@@ -1201,12 +1334,12 @@
       "category_name": "Uzun — Bilim ve Doğa",
       "pinned_comment": "Bu 3 olaydan sizi en çok hangisi şaşırttı: 1 mi, 2 mi, 3 mü? Yorumlara yazın! (1 Kargalar, 2 Ahtapotlar, 3 Tardigradlar)",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1UtmDpdqS7H-FP18vtYqDVFRVlfUX2A2o",
-      "drive_video_size_mb": 87.73,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_12.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1PJpoC-ZpFCwBdjcGTIhiIqs46_Z-hXQo"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 69,
@@ -1231,12 +1364,12 @@
       "category_name": "Uzun — Nörobilim ve Psikoloji",
       "pinned_comment": "Bu 3 beyin hilesinden seni en çok şaşırtan hangisi oldu: Kendi sesinin kemik iletimi mi, yüksek yerdeki Boşluğun Çağrısı mı, yoksa acı biberin sahte yanık alarmı mı? Yorumlarda buluşalım! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1SXwmT40zgpwql-9iqz9tHG11PoM-y_jW",
-      "drive_video_size_mb": 54.13,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_13.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1mHW8OhMfoOATbtH3DaJj_xSohRWEIYdU"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 135,
@@ -1263,12 +1396,12 @@
       "category_name": "Uzun — Biyoloji ve Vücut",
       "pinned_comment": "Bu 3 sinir ve eklem olayından en sık hangisini yaşıyorsun? ⚡ 1-Dirsek şoku 2-Parmak çıtlatma 3-Ayak uyuşması — Numaranı yorumlara bırak! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "10_8u3UfhVCTkpCoETJ2T5ynRewlHUnaQ",
-      "drive_video_size_mb": 52.2,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_14.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1blqePOc1OzIy5JgcupC-lmhCz-XSeY-B"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 139,
@@ -1293,12 +1426,12 @@
       "category_name": "Uzun — Biyoloji ve Vücut",
       "pinned_comment": "Vücudun bu 3 otomatik kalkanından hangisi seni daha çok şaşırttı? 🛡️ 1-Ürperti ve kök hücre 2-Hıçkırık mirası 3-Soğan kimyası — Numaranı yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1hJwUNT7cJX8ZoDuDpV6C8qRtQwf1IKVW",
-      "drive_video_size_mb": 40.09,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_15.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1Eabpdlk-tDG9P9z81DHTrGf9JBHyDzW0"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 143,
@@ -1324,12 +1457,12 @@
       "category_name": "Uzun — Beyin ve Psikoloji",
       "pinned_comment": "Vücudun bu 3 gizli sinyalinden hangisini daha sık yaşıyorsun? 👁️ 1-Karanlıkta ışık halkaları 2-Kulak tıkanması 3-Karın gurultusu — Numaranı bırak! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1DkQB1eWOX4PZf4cB_T85JI_bwptr1qMJ",
-      "drive_video_size_mb": 51.47,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_16.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1QlQRA3iWdD0bpotTmlqPWjeUqzw2Umma"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 148,
@@ -1353,12 +1486,12 @@
       "category_name": "İnsan Vücudu ve Beyin",
       "pinned_comment": "Korsanların göz bandı taktiğini daha önce duymuş muydun, yoksa yaralı olduklarını mı sanıyordun? Yoruma yaz! 👇",
       "youtube_url": "https://youtu.be/QhqHWaVWLJY",
-      "has_drive_video": true,
-      "drive_video_id": "1xPl6QRzHp6UZZ_ZMWSZ-oa0eFxfl6iax",
-      "drive_video_size_mb": 20.32,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_17.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1E4X5qHX_lxrWMmrTFU9xrzRdwhEITZvH"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 152,
@@ -1383,12 +1516,12 @@
       "category_name": "İnsan Vücudu ve Beyin",
       "pinned_comment": "Telefon ekranında yeni sekme açınca ne arayacağını unuttuğun da oluyor mu? Yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1sL_Td-hlSk7Vq9kTqPV8eBqJUuo2Fbaa",
-      "drive_video_size_mb": 16.72,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_18.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1CWhMMxPJKP0zWOdcH_biAa6Lo0UVinYB"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 156,
@@ -1412,12 +1545,12 @@
       "category_name": "Fizik ve Bilim",
       "pinned_comment": "Suyun donunca genleşmesi mi yoksa buzun kayganlığı mı sence daha şaşırtıcı? Yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1eUkviF0XGskcYAlvwJhFflbSemU44aBd",
-      "drive_video_size_mb": 16.53,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_19.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1lG8rubtRPhU90yYqbffbCviiX1Y7LI1h"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 160,
@@ -1442,12 +1575,12 @@
       "category_name": "İnsan Vücudu ve Beyin",
       "pinned_comment": "Boğazın düğümlendiğinde bir yudum ılık su taktiğini biliyor muydun, yoksa yutkunmaya mı çalışıyordun? Yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1fao6xZA2G594tEDPzocoILsOuHjYlM7U",
-      "drive_video_size_mb": 19.22,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_20.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1p5n_m1iu8SArGUGK3-N6PxJXW8OUXUPD"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 164,
@@ -1472,12 +1605,12 @@
       "category_name": "Beyin ve Psikoloji",
       "pinned_comment": "Aynada sağ gözünden sol gözüne bakarken hareketi yakalamayı denedin mi? Sonucu yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1kxn3E7Un55nTdvH-SY30-8_7bpUXyg5e",
-      "drive_video_size_mb": 25.21,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_21.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1n6qQ3oyTU60UlV-lg3KSU23EnZQbvzhl"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 168,
