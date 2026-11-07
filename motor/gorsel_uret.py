@@ -80,14 +80,28 @@ def pixabay_ara(sorgu: str, anahtar: str, adet: int = 60) -> list[dict]:
     return sorted(sonuclar.values(), key=lambda h: _puanla(h, sorgu), reverse=True)
 
 
-def _sorgu_adaylari(sahne: dict, yedek: list[str]) -> list[str]:
+def _sorgu_adaylari(sahne: dict, yedek: list[str], ana_konu: str) -> list[str]:
+    """Genel stok yerine ana konu + sahne ayrıntısını birlikte arar."""
+    detay = str(sahne.get("gorsel") or "").strip()
+    anchor = str(ana_konu or "").strip()
     adaylar = []
-    if sahne.get("gorsel"):
-        adaylar.append(str(sahne["gorsel"]))
+    if anchor and detay:
+        adaylar += [f"{anchor} {detay}", f"{anchor} macro {detay}",
+                    f"{anchor} close up {detay}", f"{anchor} nature documentary"]
+    if detay:
+        adaylar += [detay, f"{detay} macro photography", f"{detay} close up"]
     adaylar += yedek
-    adaylar.append("science laboratory")
-    # tekrarları at
-    return list(dict.fromkeys(a.strip() for a in adaylar if a and a.strip()))
+    # "science laboratory" gibi konu dışı genel kaçış YOK.
+    return list(dict.fromkeys(" ".join(a.split()) for a in adaylar if a and a.strip()))
+
+
+def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str) -> bool:
+    """Etiketler sorgunun ana nesnesini taşımıyorsa görseli reddet."""
+    tags = {t.strip().lower() for t in str(hit.get("tags", "")).split(",") if t.strip()}
+    tag_words = set(" ".join(tags).replace("-", " ").split())
+    q_words = {w.lower() for w in (ana_konu + " " + sorgu).replace("-", " ").split()
+               if len(w) >= 4 and w.lower() not in {"macro", "close", "photography", "documentary", "nature"}}
+    return bool(q_words & tag_words) and _puanla(hit, sorgu) >= 10.0
 
 
 def dikey_kirp(img: Image.Image) -> Image.Image:
@@ -122,15 +136,19 @@ def sahneler_icin_gorseller(sahneler: list[dict], klasor: Path,
 
     kullanilan: set[int] = set()
     yollar: list[Path] = []
+    # İlk sahnenin somut ana nesnesi tüm sahnelerde konu çıpasıdır.
+    ana_konu = str((sahneler[0] if sahneler else {}).get("gorsel") or "").strip()
     for i, sahne in enumerate(sahneler, start=1):
         secim = None
         denenen = []
-        for sorgu in _sorgu_adaylari(sahne, yedek):
+        for sorgu in _sorgu_adaylari(sahne, yedek, ana_konu):
             denenen.append(sorgu)
-            sonuc = [h for h in pixabay_ara(sorgu, anahtar) if h["id"] not in kullanilan]
+            sonuc = [h for h in pixabay_ara(sorgu, anahtar)
+                      if h["id"] not in kullanilan and _yeterince_uygun(h, sorgu, ana_konu)]
             if sonuc:
                 secim = (sorgu, sonuc[0])
                 break
+            print(f"  görsel {i}: uygun sonuç yok, yeni sorguya geçiliyor: {sorgu!r}")
         if not secim:
             raise SystemExit(
                 f"Sahne {i} için Pixabay sonucu yok (denenen: {denenen}) — üretim durdu.")
