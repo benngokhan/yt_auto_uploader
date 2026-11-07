@@ -83,7 +83,10 @@ GitHub Actions env'de görünüyordu (`GEMINI_API_KEY: ***`) ama anahtar geçers
 
 **Sahibi hiçbir şeyi tekrar anlatmaz.** Bilgi dosyada durur, ajanın hafızasında değil.
 
-## 7. SON İŞLEM (2026-11-08)
-- Telegram tam yayın kartı ve dört gerçek işlem butonu bağlandı; işleyici testi başarılı.
-- Konu önerisi 404 hatası sabit model uç noktasından kaynaklandı; hesapta kullanılabilir modeli otomatik seçme düzeltmesi hazırlandı.
-- Video üretimi, konu analizi doğrulanana kadar başlatılmayacak.
+
+## 7. SON İŞLEM NOTLARI
+- Telegram yayın kartı; başlık, özet, açıklama, hashtag, etiket, kategori ve sabit yorumu gösterecek şekilde bağlandı.
+- Dört Telegram butonu gerçek işleyiciye bağlı; kuyruğa alma hatasında Drive taşıması geri alınıyor.
+- Konu sistemi Drive tablosunu ve onay metadata dosyalarını okuyup anlamsal/kelime benzerliği kontrolü yapıyor.
+- Konu analizindeki sabit Gemini model 404 hatası, kullanılabilir modeli API listesinden otomatik seçerek düzeltildi.
+- Yeni video, konu sistemi ve panel doğrulanmadan üretilmeyecek.
