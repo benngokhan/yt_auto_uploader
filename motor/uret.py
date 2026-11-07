@@ -130,7 +130,8 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
             f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
             f"?key={os.environ['GEMINI_API_KEY']}",
             {"systemInstruction": {"parts": [{"text": SAHNE_SISTEM}]},
-             "contents": [{"role": "user", "parts": [{"text": istem}]}]},
+             "contents": [{"role": "user", "parts": [{"text": istem}]}],
+             "generationConfig": {"responseMimeType": "application/json", "temperature": 0.7}},
             {},
         )["candidates"][0]["content"]["parts"][0]["text"]))
 
@@ -141,6 +142,7 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
             if len(sahneler) >= 3:
                 print(f"Sahne planı hazır ({len(sahneler)} sahne)")
                 return sahneler
+            print("LLM yanıtı geçersiz sahne şeması döndürdü")
         except Exception as hata:  # noqa: BLE001
             print(f"LLM denemesi başarısız: {type(hata).__name__}: {str(hata)[:120]}")
     raise SystemExit("Sahne planı üretilemedi: tüm LLM sağlayıcıları başarısız.")
