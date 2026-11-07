@@ -1,14 +1,16 @@
 {
-  "zaman": "2026-11-05T17:31:59+00:00",
+  "zaman": "2026-11-07T14:36:51+00:00",
   "tip": "short",
-  "no": "163",
-  "video_id": "m1O6pNJvPwQ",
+  "no": "164",
+  "video_id": "-9AQb4ZMLGE",
   "ok": true,
   "adimlar": [
-    "Drive: kapak_163.jpg (güncellendi)",
-    "YouTube kapak isteği kabul edildi (m1O6pNJvPwQ)"
+    "Drive'dan seçildi: kapak_164.jpg",
+    "Drive: kapak_164.jpg (güncellendi)",
+    "YouTube kapak isteği kabul edildi (-9AQb4ZMLGE)"
   ],
-  "boyut": "1080x1920 JPEG q92 · 291 KB",
-  "drive_ad": "kapak_163.jpg",
-  "drive_id": "1Arx0rFAUsdjoHtN29-wJUVryZy_yqijH"
+  "kaynak": "Drive: kapak_164.jpg",
+  "boyut": "1080x1920 JPEG q92 · 467 KB",
+  "drive_ad": "kapak_164.jpg",
+  "drive_id": "1qTk66NkArFlFJ1DXoi4M4TsedemglFeP"
 }
