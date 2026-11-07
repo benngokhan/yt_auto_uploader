@@ -140,33 +140,35 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
 
 def yayin_bilgisi_uret(konu: str, sahneler: list[dict]) -> dict:
     """Onay kartı ve Excel için eksiksiz YouTube yayın metadatası üretir."""
-    import urllib.request, re
-    key = os.getenv("GEMINI_API_KEY", "").strip()
-    if not key:
-        raise SystemExit("GEMINI_API_KEY yok: yayın bilgisi üretilemedi.")
+    import urllib.request, urllib.error, re
     anlatim = " ".join(str(x.get("ses", "")) for x in sahneler)
-    prompt = (
-        f"Konu: {konu}\nAnlatım: {anlatim}\n"
-        "Bilgi Dozu YouTube Shorts için yalnız JSON döndür: "
-        "{\"baslik\":\"70 karakteri geçmeyen merak uyandırıcı başlık\","
-        "\"aciklama\":\"2 kısa paragraf, doğrulanmamış iddia yok\","
-        "\"hashtag\":\"3-5 hashtag\",\"etiketler\":\"virgülle 8-12 arama etiketi\","
-        "\"sabit_yorum\":\"doğal, konuya özel tek soru ve emoji\","
-        "\"kategori\":\"kategori\",\"konu_ozeti\":\"tek cümle\"}. "
-        "Abartılı garanti, sahte bilgi ve genel/geçici metin kullanma."
-    )
-    body = {"contents":[{"parts":[{"text":prompt}]}],
-            "generationConfig":{"responseMimeType":"application/json","temperature":0.5}}
-    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + key
-    req = urllib.request.Request(url, data=json.dumps(body).encode(), headers={"Content-Type":"application/json"})
-    with urllib.request.urlopen(req, timeout=120) as r:
-        data = json.load(r)
-    text = data["candidates"][0]["content"]["parts"][0]["text"]
-    m = re.search(r"\{.*\}", text, re.S)
-    out = json.loads(m.group(0) if m else text)
-    gerekli = ["baslik","aciklama","hashtag","etiketler","sabit_yorum","kategori","konu_ozeti"]
-    if any(not str(out.get(k, "")).strip() for k in gerekli):
-        raise SystemExit("Yayın bilgisi eksik üretildi.")
+    prompt = (f"Konu: {konu}\nAnlatım: {anlatim}\nBilgi Dozu YouTube Shorts için yalnız JSON döndür: "
+              '{"baslik":"70 karakteri geçmeyen merak uyandırıcı başlık","aciklama":"2 kısa paragraf, doğrulanmamış iddia yok",'
+              '"hashtag":"3-5 hashtag","etiketler":"virgülle 8-12 arama etiketi","sabit_yorum":"doğal, konuya özel tek soru ve emoji",'
+              '"kategori":"kategori","konu_ozeti":"tek cümle"}. Abartılı garanti, sahte bilgi ve genel/geçici metin kullanma.')
+    text=None; errors=[]
+    groq=os.getenv("GROQ_API_KEY","").strip()
+    if groq:
+        try:
+            body={"model":"llama-3.3-70b-versatile","temperature":0.5,"response_format":{"type":"json_object"},"messages":[{"role":"user","content":prompt}]}
+            req=urllib.request.Request("https://api.groq.com/openai/v1/chat/completions",data=json.dumps(body).encode(),headers={"Content-Type":"application/json","Authorization":"Bearer "+groq})
+            with urllib.request.urlopen(req,timeout=120) as r:text=json.load(r)["choices"][0]["message"]["content"]
+        except Exception as e: errors.append("groq:"+repr(e))
+    key=os.getenv("GEMINI_API_KEY","").strip()
+    if text is None and key:
+        try:
+            with urllib.request.urlopen("https://generativelanguage.googleapis.com/v1beta/models?key="+key,timeout=60) as r:models=json.load(r).get("models",[])
+            usable=[m["name"].split("/",1)[-1] for m in models if "generateContent" in m.get("supportedGenerationMethods",[]) and "flash" in m.get("name","").lower() and not any(x in m.get("name","").lower() for x in ("tts","image","live","omni"))]
+            model=sorted(usable,key=lambda x:(("preview" not in x),x),reverse=True)[0]
+            body={"contents":[{"parts":[{"text":prompt}]}],"generationConfig":{"responseMimeType":"application/json","temperature":0.5}}
+            req=urllib.request.Request(f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}",data=json.dumps(body).encode(),headers={"Content-Type":"application/json"})
+            with urllib.request.urlopen(req,timeout=120) as r:data=json.load(r)
+            text=data["candidates"][0]["content"]["parts"][0]["text"]
+        except Exception as e: errors.append("gemini:"+repr(e))
+    if text is None: raise SystemExit("Yayın bilgisi üretilemedi: "+" | ".join(errors))
+    m=re.search(r"\{.*\}",text,re.S);out=json.loads(m.group(0) if m else text)
+    gerekli=["baslik","aciklama","hashtag","etiketler","sabit_yorum","kategori","konu_ozeti"]
+    if any(not str(out.get(k,"")).strip() for k in gerekli): raise SystemExit("Yayın bilgisi eksik üretildi.")
     return out
 
 
