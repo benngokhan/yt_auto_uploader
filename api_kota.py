@@ -156,6 +156,14 @@ def openrouter():
         extra = {"kredi_alimi": c.get("total_credits"), "kredi_kullanimi": c.get("total_usage")}
     except Exception:
         pass
+    # Ücretsiz katman: kredi yoksa günlük ücretsiz model hakkı gösterilir
+    say = (kota_sayac.bugun_ozet().get("openrouter") if kota_sayac else None) or {}
+    if kalan is None or float(kalan or 0) <= 0:
+        return ok("OpenRouter",
+                  kalan=say.get("kalan"), limit=say.get("limit"), kullanilan=say.get("kullanilan"),
+                  birim="istek/gün (ücretsiz modeller)", ucretsiz=True,
+                  yenilenme="günlük · gece 00:00 UTC · ücretsiz model hakkı",
+                  not_="ÜCRETSİZ KATMAN · kredi yüklemeden ücretsiz modeller", **extra)
     return ok("OpenRouter", kalan=kalan, limit=limit, kullanilan=usage,
               birim="USD kredi", ucretsiz=bool(k.get("is_free_tier")),
               yenilenme="aylık sıfırlanmaz · kredi yükledikçe artar",

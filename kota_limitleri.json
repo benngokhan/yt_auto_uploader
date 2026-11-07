@@ -1,15 +1,22 @@
 {
- "_aciklama": "Gemini/Groq kotayi API'de vermedigi icin gunluk limitleri burada tanimliyoruz. Ihtiyaca gore degistir.",
+ "_aciklama": "Gercek UCRETSIZ KATMAN limitleri. Gemini/Groq kotayi API'de vermedigi icin burada tanimli; sayac bunlara gore hesaplar.",
+ "_kaynak": "Gemini: 1500 RPD / 15 RPM (Flash, gunluk reset 00:00 Pasifik) - Groq llama-3.3-70b: 1000 RPD / 30 RPM (gunluk reset 00:00 UTC)",
+ "_guncelleme": "2026-11-08",
  "gemini": {
-  "gunluk_istek": 250,
-  "birim": "istek/gün"
+  "gunluk_istek": 1500,
+  "dakika_istek": 15,
+  "birim": "istek/gün",
+  "model": "gemini-3.6-flash"
  },
  "groq": {
   "gunluk_istek": 1000,
-  "birim": "istek/gün"
+  "dakika_istek": 30,
+  "birim": "istek/gün",
+  "model": "llama-3.3-70b-versatile"
  },
  "openrouter": {
-  "gunluk_istek": null,
-  "birim": "USD kredi"
+  "gunluk_istek": 50,
+  "birim": "istek/gün",
+  "not_": "ucretsiz modeller gunluk hak"
  }
 }

@@ -28,9 +28,10 @@ LIMITLER = BASE / "kota_limitleri.json"
 
 # Gemini/Groq ücretsiz katman için makul varsayılanlar — elle ayarlanabilir
 VARSAYILAN_LIMIT = {
-    "gemini": {"gunluk_istek": 250, "birim": "istek/gün"},
-    "groq": {"gunluk_istek": 1000, "birim": "istek/gün"},
-    "openrouter": {"gunluk_istek": None, "birim": "USD kredi"},
+    # Gerçek ÜCRETSİZ KATMAN değerleri (Google AI + Groq rate-limit dokümanı)
+    "gemini": {"gunluk_istek": 1500, "dakika_istek": 15, "birim": "istek/gün"},
+    "groq": {"gunluk_istek": 1000, "dakika_istek": 30, "birim": "istek/gün"},
+    "openrouter": {"gunluk_istek": 50, "birim": "istek/gün"},  # ücretsiz modeller
 }
 
 _SAYAC = {"gemini": 0, "groq": 0, "openrouter": 0, "elevenlabs": 0, "telegram": 0}
