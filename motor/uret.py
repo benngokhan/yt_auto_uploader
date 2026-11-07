@@ -138,6 +138,38 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
     raise SystemExit("Sahne planı üretilemedi: tüm LLM sağlayıcıları başarısız.")
 
 
+def yayin_bilgisi_uret(konu: str, sahneler: list[dict]) -> dict:
+    """Onay kartı ve Excel için eksiksiz YouTube yayın metadatası üretir."""
+    import urllib.request, re
+    key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not key:
+        raise SystemExit("GEMINI_API_KEY yok: yayın bilgisi üretilemedi.")
+    anlatim = " ".join(str(x.get("ses", "")) for x in sahneler)
+    prompt = (
+        f"Konu: {konu}\nAnlatım: {anlatim}\n"
+        "Bilgi Dozu YouTube Shorts için yalnız JSON döndür: "
+        "{\"baslik\":\"70 karakteri geçmeyen merak uyandırıcı başlık\","
+        "\"aciklama\":\"2 kısa paragraf, doğrulanmamış iddia yok\","
+        "\"hashtag\":\"3-5 hashtag\",\"etiketler\":\"virgülle 8-12 arama etiketi\","
+        "\"sabit_yorum\":\"doğal, konuya özel tek soru ve emoji\","
+        "\"kategori\":\"kategori\",\"konu_ozeti\":\"tek cümle\"}. "
+        "Abartılı garanti, sahte bilgi ve genel/geçici metin kullanma."
+    )
+    body = {"contents":[{"parts":[{"text":prompt}]}],
+            "generationConfig":{"responseMimeType":"application/json","temperature":0.5}}
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + key
+    req = urllib.request.Request(url, data=json.dumps(body).encode(), headers={"Content-Type":"application/json"})
+    with urllib.request.urlopen(req, timeout=120) as r:
+        data = json.load(r)
+    text = data["candidates"][0]["content"]["parts"][0]["text"]
+    m = re.search(r"\{.*\}", text, re.S)
+    out = json.loads(m.group(0) if m else text)
+    gerekli = ["baslik","aciklama","hashtag","etiketler","sabit_yorum","kategori","konu_ozeti"]
+    if any(not str(out.get(k, "")).strip() for k in gerekli):
+        raise SystemExit("Yayın bilgisi eksik üretildi.")
+    return out
+
+
 # ------------------------------------------------------------------- 2) TTS
 # ------------------------------------------------------- 3) hizalama (karaoke)
 def hizala(ses_yolu: Path, metin: str, ayar: dict) -> dict:
@@ -276,6 +308,9 @@ def main() -> int:
         alt_aciklama=f"{a.konu} · {ayar.get('kaynak_satiri', '')}".strip(" ·"),
     )
     print(f"Kapak hazır: {kapak_yolu}")
+    metadata = yayin_bilgisi_uret(a.konu, sahneler)
+    (cikti.parent / "yayin_bilgisi.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
+    print("Yayın bilgileri hazır: başlık, açıklama, hashtag, etiket ve sabit yorum")
 
     if ayar.get("onay", {}).get("mod") == "elle" and not a.onay_verildi:
         onay_dir = calisma / "onay_bekleyen"
