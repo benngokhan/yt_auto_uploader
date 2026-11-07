@@ -200,6 +200,29 @@ def _xtts(metin: str, cikti: Path, ayar: dict) -> None:
 
 
 
+
+def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
+    """Onaylı doğal Gemini erkek anlatıcı; pilotla aynı ham 24 kHz PCM çıkışı."""
+    import wave
+    anahtar = os.getenv("GEMINI_API_KEY", "").strip()
+    if not anahtar:
+        raise SesHatasi("GEMINI_API_KEY yok — doğal ses üretimi durduruldu.")
+    ses = ayar.get("ses", {})
+    tarz = ses.get("tarz", "Sıcak, merak uyandıran ve doğal bir erkek bilim anlatıcısı gibi anlat. Kağıttan okur gibi monoton olma. Soruda hafifçe yüksel; şaşırtıcı bilgileri doğal biçimde vurgula. Enerjik ol ama bağırma. Cümle aralarını kısa ve akıcı tut.")
+    prompt = f"Türkçe konuş. {tarz} Metin: {metin}"
+    govde = {"contents":[{"parts":[{"text":prompt}]}], "generationConfig":{"responseModalities":["AUDIO"], "speechConfig":{"voiceConfig":{"prebuiltVoiceConfig":{"voiceName":ses.get("voice_id", "Charon")}}}}}
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=" + anahtar
+    istek = urllib.request.Request(url, data=json.dumps(govde).encode(), method="POST", headers={"Content-Type":"application/json"})
+    try:
+        with urllib.request.urlopen(istek, timeout=180) as y:
+            veri = json.loads(y.read().decode())
+        raw = base64.b64decode(veri["candidates"][0]["content"]["parts"][0]["inlineData"]["data"])
+        with wave.open(str(cikti), "wb") as w:
+            w.setnchannels(1); w.setsampwidth(2); w.setframerate(24000); w.writeframes(raw)
+    except Exception as hata:
+        cikti.unlink(missing_ok=True)
+        raise SesHatasi(f"Gemini doğal ses üretimi başarısız: {str(hata)[:160]}") from hata
+
 def _edge_tts(metin: str, cikti: Path, ayar: dict) -> None:
     """Ücretsiz Ahmet Neural; uzun nokta boşluklarını yaklaşık 0,40 sn ile sınırlar."""
     ses = ayar.get("ses", {})
@@ -240,5 +263,8 @@ def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
         return None
     if saglayici in {"edge", "edge_tts", "ahmet_neural"}:
         _edge_tts(metin, cikti, ayar)
+        return None
+    if saglayici in {"gemini", "gemini_tts", "gemini_natural"}:
+        _gemini_tts(metin, cikti, ayar)
         return None
     raise SesHatasi(f"Desteklenmeyen ses sağlayıcısı: {saglayici!r}")

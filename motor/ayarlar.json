@@ -6,14 +6,15 @@
   },
   "fps": 60,
   "ses": {
-    "saglayici": "edge_tts",
-    "voice_id": "tr-TR-AhmetNeural",
-    "model": "edge-neural",
+    "saglayici": "gemini_tts",
+    "voice_id": "Charon",
+    "model": "gemini-2.5-flash-preview-tts",
     "dil": "tr",
     "referans_drive_id": "1c1lstH03Kkf4pzvHVu5vavDJ_xDigxNQ",
     "referans_yolu": "ref_095.wav",
-    "islem": "rate=+2%;pitch=-5Hz;nokta_sessizligi<=0.40sn;loudnorm=-18LUFS",
-    "fallback": false
+    "islem": "Onaylı doğal Gemini pilotu; ham 24kHz PCM; ek ton/hız filtresi yok",
+    "fallback": false,
+    "tarz": "Sıcak, merak uyandıran ve doğal bir erkek bilim anlatıcısı gibi anlat. Kağıttan okur gibi monoton olma. Soruda hafifçe yüksel; şaşırtıcı bilgileri doğal biçimde vurgula. Enerjik ol ama bağırma. Cümle aralarını kısa ve akıcı tut."
   },
   "gorsel": {
     "kaynak": "pixabay",
@@ -32,7 +33,7 @@
   },
   "kararlar": {
     "sure": "38-42 sn (kullanıcı: 3 Kasım 2026)",
-    "ses": "Onaylı ücretsiz tr-TR-AhmetNeural — +2% hız, -5Hz ton, nokta arası en fazla yaklaşık 0.40 sn; XTTS yedekte korunur",
+    "ses": "Onaylı Gemini Charon doğal erkek anlatıcı; Ahmet Neural yedekte korunur; otomatik fallback yok",
     "gorsel": "Pixabay fotoğraf + teal-amber sinematik düzenleme (AI/ücretli servis yok)",
     "akis": "Her video elle onaylı; otomatik yayın yok"
   }

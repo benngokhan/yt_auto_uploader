@@ -71,7 +71,7 @@ jobs:
           COQUI_TOS_AGREED: "1"
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
-          MOTOR_VOICE_ID: tr-TR-AhmetNeural
+          MOTOR_VOICE_ID: Charon
           MOTOR_XTTS_REFERENCE: ref_095.wav
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -161,7 +161,7 @@ jobs:
           ]},ensure_ascii=False))
           PY2
           )
-          CAPTION=$(printf '🎬 <b>YENİ VİDEO · ONAY BEKLİYOR</b>\n\n<b>Konu:</b> %s\n<b>Ses:</b> Ahmet Neural\n<b>Süre:</b> %s sn\n<b>Boyut:</b> %s\n\n⚠️ Siz onaylamadan yayın kuyruğuna alınmaz.' "$KONU" "$SURE" "$BOYUT")
+          CAPTION=$(printf '🎬 <b>YENİ VİDEO · ONAY BEKLİYOR</b>\n\n<b>Konu:</b> %s\n<b>Ses:</b> Gemini doğal erkek\n<b>Süre:</b> %s sn\n<b>Boyut:</b> %s\n\n⚠️ Siz onaylamadan yayın kuyruğuna alınmaz.' "$KONU" "$SURE" "$BOYUT")
           if [ ${#kapaklar[@]} -gt 0 ]; then
             curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto" \
               -F "chat_id=${TELEGRAM_CHAT_ID}" -F "photo=@${kapaklar[0]}" \
