@@ -106,6 +106,7 @@ jobs:
         run: |
           # panelden yeni yazılan anahtar bu koşuda da geçerli olsun
           if [ "$YAZILAN_SECRET" = "ELEVENLABS_API_KEY" ]; then export ELEVENLABS_API_KEY="$GELEN_DEGER"; fi
+          python yoklama_gecici.py || true
           python api_kota.py
           python api_uyari.py
 
