@@ -1,0 +1,34 @@
+name: Analizli konu önerilerini güncelle
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: konu-onerileri
+  cancel-in-progress: true
+jobs:
+  analiz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -q google-api-python-client google-auth google-auth-httplib2 openpyxl
+      - name: Drive geçmişini kontrol et ve önerileri üret
+        env:
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          WORKBOOK_ID: 1ulh13cnzYTaIlp1vehJ7lDrSsgjKyM_X
+          APPROVAL_FOLDER: 1N6mMUu3rEvCIie4o4XUWegPzFngMgHHM
+        run: python konu_onerileri_uret.py
+      - name: Güncel önerileri kaydet
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add konu_onerileri.json
+          git diff --cached --quiet || git commit -m 'Konu önerilerini gerçek geçmişe göre güncelle [skip ci]'
+          git push
