@@ -146,7 +146,7 @@ def hizala(ses_yolu: Path, metin: str, ayar: dict) -> dict:
 
     model_boyut = ayar.get("teknik", {}).get("whisper_model", "small")
     aligner = kt.KaraokeAligner(model_name=model_boyut)
-    return aligner.align(ses_yolu, metin)
+    return aligner.align(ses_yolu, [metin])
 
 
 def main() -> int:
