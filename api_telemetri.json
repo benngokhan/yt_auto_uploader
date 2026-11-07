@@ -1,10 +1,10 @@
 {
-  "zaman": "2026-11-07T23:41:15+00:00",
+  "zaman": "2026-11-07T23:44:37+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
       "durum": "gecersiz",
-      "mesaj": "HTTP 401",
+      "mesaj": "HTTP 401 — anahtar geçersiz, kredi yenilenmeli",
       "yenilenme": "aylık · fatura dönemi başında sıfırlanır (kalan kredi devretmez)"
     },
     {
@@ -23,28 +23,31 @@
     {
       "ad": "Gemini",
       "durum": "ok",
-      "limit": null,
-      "kalan": null,
-      "birim": "istek/dk (kota panelde yok)",
+      "limit": 250,
+      "kalan": 250,
+      "kullanilan": 0,
+      "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 50,
       "yenilenme": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
-      "not_": "LLM + TTS (gemini-2.5-flash-preview-tts)"
+      "not_": "LLM + TTS · kota API'de yok, yaptığımız çağrılar sayılıyor"
     },
     {
       "ad": "Groq",
       "durum": "ok",
-      "limit": null,
-      "kalan": null,
-      "birim": "istek/dk + günlük token",
+      "limit": 1000,
+      "kalan": 1000,
+      "kullanilan": 0,
+      "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 11,
       "yenilenme": "dakika + günlük token · günlük kısım gece 00:00 UTC",
-      "not_": "ücretsiz katman: dakika bazlı limit"
+      "not_": "ücretsiz katman · kota API'de yok, çağrılar sayılıyor"
     },
     {
       "ad": "Telegram",
       "durum": "ok",
       "limit": null,
       "kalan": null,
+      "kullanilan": null,
       "birim": "mesaj/gün (limit yok pratikte)",
       "bot": "@Bilgindozlu_bot",
       "yenilenme": "saniye başına limit · günlük kota yok",
@@ -53,16 +56,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4974,
+      "kalan": 4969,
       "limit": 5000,
-      "kullanilan": 26,
+      "kullanilan": 31,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 523.9,
+      "actions_dakika": 524.5,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1476.1
+      "actions_kalan": 1475.5
     },
     {
       "ad": "Google Drive",
@@ -389,6 +392,10 @@
     },
     {
       "zaman": "2026-11-07T23:41:15+00:00",
+      "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-07T23:44:37+00:00",
       "elevenlabs_kalan": null
     }
   ]

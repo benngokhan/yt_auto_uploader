@@ -1,9 +1,9 @@
 {
- "zaman": "2026-11-07T23:41:15.554316+00:00",
+ "zaman": "2026-11-07T23:44:37.054450+00:00",
  "ozet": {
   "toplam": 1,
   "kritik": 1,
-  "yeni": 1
+  "yeni": 0
  },
  "uyarilar": [
   {
@@ -11,20 +11,10 @@
    "servis": "ElevenLabs",
    "seviye": "kritik",
    "baslik": "ElevenLabs anahtarı geçersiz",
-   "mesaj": "HTTP 401",
+   "mesaj": "HTTP 401 — anahtar geçersiz, kredi yenilenmeli",
    "yuzde": null,
    "islem": "Anahtarı yenile"
   }
  ],
- "yeni_uyarilar": [
-  {
-   "id": "ElevenLabs_gecersiz",
-   "servis": "ElevenLabs",
-   "seviye": "kritik",
-   "baslik": "ElevenLabs anahtarı geçersiz",
-   "mesaj": "HTTP 401",
-   "yuzde": null,
-   "islem": "Anahtarı yenile"
-  }
- ]
+ "yeni_uyarilar": []
 }
