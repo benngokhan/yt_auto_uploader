@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-07T18:48:12+00:00",
+  "zaman": "2026-11-07T23:20:19+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -60,17 +60,17 @@
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 493.8,
+      "actions_dakika": 522.3,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1506.2
+      "actions_kalan": 1477.7
     },
     {
       "ad": "Google Drive",
       "durum": "ok",
-      "kalan": 10589109864,
+      "kalan": 10514046658,
       "limit": 16106127360,
-      "kullanilan": 5517017496,
+      "kullanilan": 5592080702,
       "birim": "bayt",
       "kirilim": [
         {
@@ -99,8 +99,8 @@
         },
         {
           "ad": "CEO / Tablolar",
-          "boyut": 285680628,
-          "dosya": 40,
+          "boyut": 360743834,
+          "dosya": 44,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
         {
@@ -131,21 +131,21 @@
           "boyut": 57323884
         },
         {
+          "ad": "ONAY_20_final.mp4",
+          "boyut": 48102915
+        },
+        {
           "ad": "final.mp4",
           "boyut": 46493659
         },
         {
           "ad": "ONAY_16_final.mp4",
           "boyut": 42831080
-        },
-        {
-          "ad": "ONAY_18_final.mp4",
-          "boyut": 35527413
         }
       ],
-      "drive_gorunen": 2441657749,
-      "kendi_dosyalar": 1997074480,
-      "paylasilan": 444583269,
+      "drive_gorunen": 2528935138,
+      "kendi_dosyalar": 2072137686,
+      "paylasilan": 456797452,
       "disalan": 3519943016,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
@@ -370,6 +370,10 @@
     },
     {
       "zaman": "2026-11-07T18:48:12+00:00",
+      "elevenlabs_kalan": 1384
+    },
+    {
+      "zaman": "2026-11-07T23:20:19+00:00",
       "elevenlabs_kalan": 1384
     }
   ]
