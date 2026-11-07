@@ -30,8 +30,8 @@ from PIL import Image
 BASE_DIR = Path(__file__).parent
 RESULT_FILE = BASE_DIR / "kapak_sonuc.json"
 
-SHORTS_COVER_FOLDER_ID = "1xleUU8CO3gsJVCnZMtYxtf2r0hs2yDKS"
-LONG_COVER_FOLDER_ID = "1g3QluGyaLByQgXmoXO0i1PPtr3ORjRQR"
+SHORTS_COVER_FOLDER_ID = "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR"
+LONG_COVER_FOLDER_ID = "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR"
 
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.force-ssl",
