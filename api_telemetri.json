@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-07T23:46:17+00:00",
+  "zaman": "2026-11-07T23:50:39+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -13,22 +13,22 @@
     {
       "ad": "OpenRouter",
       "durum": "ok",
-      "kalan": null,
-      "limit": null,
-      "kullanilan": 0,
-      "birim": "USD kredi",
+      "kalan": 46,
+      "limit": 50,
+      "kullanilan": 4,
+      "birim": "istek/gün (ücretsiz modeller)",
       "ucretsiz": true,
-      "yenilenme": "aylık sıfırlanmaz · kredi yükledikçe artar",
-      "not_": "TTS + LLM aynı bakiye",
+      "yenilenme": "günlük · gece 00:00 UTC · ücretsiz model hakkı",
+      "not_": "ÜCRETSİZ KATMAN · kredi yüklemeden ücretsiz modeller",
       "kredi_alimi": 0,
       "kredi_kullanimi": 0
     },
     {
       "ad": "Gemini",
       "durum": "ok",
-      "limit": 250,
-      "kalan": 249,
-      "kullanilan": 1,
+      "limit": 1500,
+      "kalan": 1498,
+      "kullanilan": 2,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 50,
       "yenilenme": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
@@ -38,8 +38,8 @@
       "ad": "Groq",
       "durum": "ok",
       "limit": 1000,
-      "kalan": 999,
-      "kullanilan": 1,
+      "kalan": 998,
+      "kullanilan": 2,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 11,
       "yenilenme": "dakika + günlük token · günlük kısım gece 00:00 UTC",
@@ -59,16 +59,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4964,
+      "kalan": 4959,
       "limit": 5000,
-      "kullanilan": 36,
+      "kullanilan": 41,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 523.4,
+      "actions_dakika": 526.6,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1476.6
+      "actions_kalan": 1473.4
     },
     {
       "ad": "Google Drive",
@@ -403,6 +403,10 @@
     },
     {
       "zaman": "2026-11-07T23:46:17+00:00",
+      "elevenlabs_kalan": 1384
+    },
+    {
+      "zaman": "2026-11-07T23:50:39+00:00",
       "elevenlabs_kalan": 1384
     }
   ]
