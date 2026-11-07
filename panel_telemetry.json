@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-07 15:33:48",
-  "generated_at_iso": "2026-11-07T15:33:48.368094+03:00",
+  "generated_at": "2026-11-07 16:38:43",
+  "generated_at_iso": "2026-11-07T16:38:43.855751+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -36,17 +36,16 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 2,
+    "ready_shorts": 1,
     "ready_longs": 13,
-    "total_ready": 15,
-    "days_of_stock": 7.5,
+    "total_ready": 14,
+    "days_of_stock": 7.0,
     "next_short": "video_165.mp4",
     "next_short_title": "Mariana Çukuru Ne Kadar Derin? 🌊 #bilgidozu #shorts",
     "next_long": "uzun_video_9.mp4",
     "next_long_title": "Beynin Seni Ayakta Tutan 3 Gizli Sensörü: İç Kulak Pusulası, Kristaller ve Algı #bilgidozu",
     "missing_covers": [
-      "video_165.mp4",
-      "video_166.mp4"
+      "video_165.mp4"
     ]
   },
   "drive_inventory": {
@@ -129,67 +128,74 @@
         "modifiedTime": "2026-11-07T03:02:40.680Z"
       },
       {
-        "id": "1YVceXfb-gxKzr__fuDzrcE2apLh16Hzk",
-        "name": "video_166.mp4",
+        "id": "1Me32hP9ITYUFFeLSdHrE3pOLy7ED8skR",
+        "name": "video_70.mp4",
         "mimeType": "video/mp4",
-        "size": 14567673,
-        "modifiedTime": "2026-11-07T04:00:29.167Z"
+        "size": 20379776,
+        "modifiedTime": "2026-10-22T23:03:26.816Z"
       },
       {
-        "id": "1-aTBdIjES5y30kUhdjBk_f8CPYNrxWQs",
-        "name": "video_167.mp4",
+        "id": "1Kpy8u2lOvwamvaFwW2MXNTqA76Smvf4i",
+        "name": "video_73.mp4",
         "mimeType": "video/mp4",
-        "size": 19001754,
-        "modifiedTime": "2026-11-07T04:00:29.192Z"
+        "size": 24507033,
+        "modifiedTime": "2026-10-22T23:03:26.656Z"
       },
       {
-        "id": "15glA8t8AhrQ2vH1gtiUWtvZyS_pYpIET",
-        "name": "video_168.mp4",
+        "id": "1IO3p5a3742keI6u6_0geShgaQNlmseG0",
+        "name": "video_75.mp4",
         "mimeType": "video/mp4",
-        "size": 14762032,
-        "modifiedTime": "2026-11-07T04:00:29.281Z"
+        "size": 26291984,
+        "modifiedTime": "2026-10-22T23:03:28.161Z"
       },
       {
-        "id": "1PR285e4ODgKv_tFrHOPqFj4tjhJro6wZ",
-        "name": "video_169.mp4",
+        "id": "18NDNFUII6IfI6-kSGGJC1pNygWgIFtsB",
+        "name": "video_77.mp4",
         "mimeType": "video/mp4",
-        "size": 15215266,
-        "modifiedTime": "2026-11-07T04:00:29.340Z"
+        "size": 22171684,
+        "modifiedTime": "2026-10-22T23:03:29.196Z"
       },
       {
-        "id": "1_Psgp2oAfoT831CGDIM6Lp4V2j1su4GW",
-        "name": "video_170.mp4",
+        "id": "17czxfO63HEWKjC_RDFy1i7ztyFFNa2K9",
+        "name": "video_78.mp4",
         "mimeType": "video/mp4",
-        "size": 12490476,
-        "modifiedTime": "2026-11-07T04:00:29.369Z"
+        "size": 27881190,
+        "modifiedTime": "2026-10-22T23:03:27.214Z"
       },
       {
-        "id": "1hTZEHVAhqEzuv10eWsWsjum81tJy577K",
-        "name": "video_171.mp4",
+        "id": "1dSMVFJzrWqMtuRQwELF9RD1pDD5h_GFr",
+        "name": "video_79.mp4",
         "mimeType": "video/mp4",
-        "size": 15660067,
-        "modifiedTime": "2026-11-07T04:00:29.328Z"
+        "size": 22230683,
+        "modifiedTime": "2026-10-22T23:03:28.394Z"
       },
       {
-        "id": "1wB_faJTYap_7tKoK4wDc1luvLfa4VeT7",
-        "name": "video_172.mp4",
+        "id": "1uenxAEdlpHYl-OL7MvAN9luKbO711uH5",
+        "name": "video_80.mp4",
         "mimeType": "video/mp4",
-        "size": 14587342,
-        "modifiedTime": "2026-11-07T04:00:29.292Z"
+        "size": 19634071,
+        "modifiedTime": "2026-10-22T23:03:28.809Z"
       },
       {
-        "id": "1g-dHytiiSBHU9_zZ6k3Uhu6BSxGPwwS3",
-        "name": "video_173.mp4",
+        "id": "1B29wk44IWhyc6BUH7-7vKd6ctaN3rW-M",
+        "name": "video_91.mp4",
         "mimeType": "video/mp4",
-        "size": 16243920,
-        "modifiedTime": "2026-11-07T04:00:29.633Z"
+        "size": 25099907,
+        "modifiedTime": "2026-10-27T21:45:44.093Z"
       },
       {
-        "id": "1lKfj2FR7sjzoD6Qvq4s9vSVMiGsK_8Oq",
-        "name": "video_174.mp4",
+        "id": "1z8q9Aj2wCDGmkAikBvOicP8ZhtBMLhxF",
+        "name": "video_93.mp4",
         "mimeType": "video/mp4",
-        "size": 12523886,
-        "modifiedTime": "2026-11-07T04:00:29.591Z"
+        "size": 18489994,
+        "modifiedTime": "2026-10-27T21:45:44.594Z"
+      },
+      {
+        "id": "1EalOn2FqjDBdPD-dQ8uEn2qwj9z1QCbe",
+        "name": "video_97.mp4",
+        "mimeType": "video/mp4",
+        "size": 19890037,
+        "modifiedTime": "2026-10-27T21:45:48.493Z"
       }
     ],
     "shorts_covers": [],
@@ -948,9 +954,9 @@
       "category_name": "Bilim Tarihi ve Efsaneler",
       "pinned_comment": "Okulda sana da 'dilin ucu tatlı, yanları ekşi alır' şeması çizdirilmiş miydi? Yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1YVceXfb-gxKzr__fuDzrcE2apLh16Hzk",
-      "drive_video_size_mb": 13.89,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_166.jpg",
       "has_drive_cover": false,
       "drive_cover_id": ""
