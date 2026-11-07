@@ -36,7 +36,7 @@ ACTIONS_FREE_DK = 2_000        # private repo ücretsiz Actions dakikası
 DRIVE_KLASORLER = [
     ("Kısa Videolar", "1LfW4adjq0x4ZjBuphjebAbKLVsgY8TXY"),
     ("Uzun Videolar", "16jMIabV8mdJIRlc_e55Gmlwu5asfcBGN"),
-    ("Kısa Kapaklar", "1INXnZpMGBGOZ03o4cqm5MuC5MporWSkD"),
+    ("Kısa Kapaklar", "1xleUU8CO3gsJVCnZMtYxtf2r0hs2yDKS"),
     ("Uzun Kapaklar", "1g3QluGyaLByQgXmoXO0i1PPtr3ORjRQR"),
     ("CEO / Tablolar", "190zQiUYkp8fsQFleva77TKqc9MeGxZiI"),
 ]
