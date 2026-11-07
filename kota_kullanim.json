@@ -1,12 +1,12 @@
 {
  "gun": "2026-11-07",
  "sayaclar": {
-  "gemini": 3,
-  "groq": 3,
-  "openrouter": 6,
-  "elevenlabs": 3,
-  "telegram": 3
+  "gemini": 4,
+  "groq": 4,
+  "openrouter": 8,
+  "elevenlabs": 4,
+  "telegram": 4
  },
  "gecmis": [],
- "guncelleme": "2026-11-07T23:50:39.044097+00:00"
+ "guncelleme": "2026-11-07T23:54:32.524467+00:00"
 }

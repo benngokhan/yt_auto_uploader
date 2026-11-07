@@ -1,10 +1,10 @@
 {
-  "zaman": "2026-11-07T23:50:39+00:00",
+  "zaman": "2026-11-07T23:54:32+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
       "durum": "gecersiz",
-      "mesaj": "HTTP 401 — anahtar geçersiz, kredi yenilenmeli",
+      "mesaj": "HTTP 401 · {\"detail\":{\"type\":\"authentication_error\",\"code\":\"unauthorized\",\"message\":\"The API key you used is missing the permission user_read to execute this operation.\",\" · anahtar 51 karakter, 'sk_3a3…'",
       "kalan": 1384,
       "limit": 10000,
       "kullanilan": 8616,
@@ -13,9 +13,9 @@
     {
       "ad": "OpenRouter",
       "durum": "ok",
-      "kalan": 46,
+      "kalan": 44,
       "limit": 50,
-      "kullanilan": 4,
+      "kullanilan": 6,
       "birim": "istek/gün (ücretsiz modeller)",
       "ucretsiz": true,
       "yenilenme": "günlük · gece 00:00 UTC · ücretsiz model hakkı",
@@ -27,8 +27,8 @@
       "ad": "Gemini",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1498,
-      "kullanilan": 2,
+      "kalan": 1497,
+      "kullanilan": 3,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 50,
       "yenilenme": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
@@ -38,8 +38,8 @@
       "ad": "Groq",
       "durum": "ok",
       "limit": 1000,
-      "kalan": 998,
-      "kullanilan": 2,
+      "kalan": 997,
+      "kullanilan": 3,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 11,
       "yenilenme": "dakika + günlük token · günlük kısım gece 00:00 UTC",
@@ -59,16 +59,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4959,
+      "kalan": 4954,
       "limit": 5000,
-      "kullanilan": 41,
+      "kullanilan": 46,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 526.6,
+      "actions_dakika": 526.5,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1473.4
+      "actions_kalan": 1473.5
     },
     {
       "ad": "Google Drive",
@@ -407,6 +407,10 @@
     },
     {
       "zaman": "2026-11-07T23:50:39+00:00",
+      "elevenlabs_kalan": 1384
+    },
+    {
+      "zaman": "2026-11-07T23:54:32+00:00",
       "elevenlabs_kalan": 1384
     }
   ]
