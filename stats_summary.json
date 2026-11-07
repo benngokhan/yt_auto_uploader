@@ -1,36 +1,36 @@
 {
- "total": 23484,
- "day_gain": 20,
- "updated": 12,
+ "total": 23491,
+ "day_gain": 7,
+ "updated": 7,
  "baseline_count": 0,
  "compared_count": 48,
  "unavailable_count": 4,
  "dry_run": false,
  "top": [
   {
-   "delta": 5,
-   "title": "Burnun Nöbetleşe Çalışıyor: İki Delik Aynı Anda Eşit Nefes A",
-   "file": "video_32.mp4"
+   "delta": 1,
+   "title": "İlk Yudum Su Daha Kana Karışmadan Susuzluğunu Nasıl Anında K",
+   "file": "video_152.mp4"
   },
   {
-   "delta": 4,
-   "title": "Sevdiğin Birine Bakınca Göz Bebeğin Neden Otomatik Büyür? 👀 ",
-   "file": "video_83.mp4"
-  },
-  {
-   "delta": 2,
+   "delta": 1,
    "title": "Utandığında Neden Sadece Yüzün ve Kulakların Kızarır? 😳 #bil",
    "file": "video_100.mp4"
   },
   {
-   "delta": 2,
-   "title": "Kesilen Elma Dakikalar İçinde Neden Kararır: Gizli Savunma Z",
-   "file": "video_154.mp4"
+   "delta": 1,
+   "title": "Su Aslında Şeffaf Değil, Doğal Olarak Mavidir! 💧 #bilgidozu ",
+   "file": "video_6.mp4"
   },
   {
-   "delta": 2,
-   "title": "Göz Kapağın Neden Kendi Kendine Seğirir? Anlamı Bu! 👁🧠 #bilg",
-   "file": "video_133.mp4"
+   "delta": 1,
+   "title": "Sevdiğin Birine Bakınca Göz Bebeğin Neden Otomatik Büyür? 👀 ",
+   "file": "video_83.mp4"
+  },
+  {
+   "delta": 1,
+   "title": "Küçücük Kâğıt Kesiği Neden Bu Kadar Çok Acıtır? 🩹⚡ #bilgidoz",
+   "file": "video_131.mp4"
   }
  ]
 }
