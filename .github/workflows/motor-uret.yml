@@ -164,7 +164,12 @@ jobs:
           ]},ensure_ascii=False))
           PY2
           )
-          CAPTION=$(printf '🎬 <b>YENİ VİDEO · ONAY BEKLİYOR</b>\n\n<b>Konu:</b> %s\n<b>Ses:</b> Gemini doğal erkek\n<b>Süre:</b> %s sn\n<b>Boyut:</b> %s\n\n⚠️ Siz onaylamadan yayın kuyruğuna alınmaz.' "$KONU" "$SURE" "$BOYUT")
+          META=$(find motor/cikti -name yayin_bilgisi.json | head -1)
+          BASLIK=$(jq -r '.baslik // "—"' "$META")
+          KATEGORI=$(jq -r '.kategori // "—"' "$META")
+          SABIT=$(jq -r '.sabit_yorum // "—"' "$META")
+          HASHTAG=$(jq -r '.hashtag // "—"' "$META")
+          CAPTION=$(printf '🎬 <b>YENİ VİDEO · ONAY BEKLİYOR</b>\n\n<b>Başlık:</b> %s\n<b>Konu:</b> %s\n<b>Kategori:</b> %s\n<b>Hashtag:</b> %s\n<b>Sabit yorum:</b> %s\n<b>Ses:</b> Gemini doğal erkek\n<b>Süre:</b> %s sn · <b>Boyut:</b> %s\n\n⚠️ Siz onaylamadan yayın kuyruğuna alınmaz.' "$BASLIK" "$KONU" "$KATEGORI" "$HASHTAG" "$SABIT" "$SURE" "$BOYUT")
           if [ ${#kapaklar[@]} -gt 0 ]; then
             curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto" \
               -F "chat_id=${TELEGRAM_CHAT_ID}" -F "photo=@${kapaklar[0]}" \
