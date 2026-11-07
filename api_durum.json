@@ -1,0 +1,16 @@
+{
+  "guncellendi": "2026-11-07T23:48:18.350060+00:00",
+  "not": "Sağlayıcı yalnız sunduğu limit başlıklarını gösterir; Gemini kalan günlük kotayı API anahtarıyla açıklamaz.",
+  "gemini": {
+    "durum": "aktif",
+    "http": 200,
+    "limit": {},
+    "mesaj": ""
+  },
+  "groq": {
+    "durum": "hata",
+    "http": 403,
+    "limit": {},
+    "mesaj": "error code: 1010\n"
+  }
+}
