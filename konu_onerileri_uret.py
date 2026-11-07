@@ -39,7 +39,14 @@ def main():
          "Somut, doğrulanabilir, güçlü görseli olan ve ilk saniyede merak uyandıran soru biçimi kullan. Sağlık tavsiyesi ve yanıltıcı iddia kullanma. "
          "Yalnız JSON döndür: {\"suggestions\":[{\"title\":\"...\",\"score\":0-100,\"reason\":\"...\",\"duplicate_check\":\"hangi geçmiş alanlardan farklı\"}]}.\nGEÇMİŞ:\n"+'\n'.join(used[-500:]))
  body={'contents':[{'parts':[{'text':prompt}]}],'generationConfig':{'responseMimeType':'application/json','temperature':0.85}}
- url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+os.environ['GEMINI_API_KEY']
+ key=os.environ['GEMINI_API_KEY']
+ with urllib.request.urlopen('https://generativelanguage.googleapis.com/v1beta/models?key='+key,timeout=60) as r: models=json.load(r).get('models',[])
+ usable=[m['name'].split('/',1)[-1] for m in models if 'generateContent' in m.get('supportedGenerationMethods',[]) and 'flash' in m['name'].lower() and 'tts' not in m['name'].lower() and 'image' not in m['name'].lower()]
+ preferred=['gemini-3-flash-preview','gemini-2.5-flash','gemini-2.5-flash-preview','gemini-2.0-flash']
+ model=next((x for x in preferred if x in usable),usable[0] if usable else None)
+ if not model: raise RuntimeError('Gemini generateContent modeli bulunamadı')
+ print('model',model)
+ url=f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key='+key
  req=urllib.request.Request(url,data=json.dumps(body).encode(),headers={'Content-Type':'application/json'})
  with urllib.request.urlopen(req,timeout=180) as r:data=json.load(r)
  out=json.loads(data['candidates'][0]['content']['parts'][0]['text']);accepted=[]
