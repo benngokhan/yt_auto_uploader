@@ -73,14 +73,19 @@ def workbook_add(drive,no,topic,meta):
     drive.files().update(fileId=BOOK,media_body=MediaFileUpload(str(p),mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')).execute()
 
 def topic_from(cb):
-    cap=(cb.get('message') or {}).get('caption','')
-    m=re.search(r'Konu:\s*(.+)',cap)
+    msg=cb.get('message') or {}; content=msg.get('text') or msg.get('caption') or ''
+    m=re.search(r'Konu:\s*(.+)',content)
     return m.group(1).strip() if m else 'Yeni Bilgi Dozu videosu'
 
 def finish(cb,text):
     tg('answerCallbackQuery',{'callback_query_id':cb['id'],'text':text[:180],'show_alert':False})
-    msg=cb.get('message') or {}; cap=msg.get('caption','')
-    tg('editMessageCaption',{'chat_id':msg['chat']['id'],'message_id':msg['message_id'],'caption':cap+'\n\n'+text,'parse_mode':'HTML','reply_markup':{'inline_keyboard':[]}})
+    msg=cb.get('message') or {}; content=msg.get('text') or msg.get('caption') or ''
+    payload={'chat_id':msg['chat']['id'],'message_id':msg['message_id'],'parse_mode':'HTML','reply_markup':{'inline_keyboard':[]}}
+    if msg.get('text') is not None:
+        payload['text']=content+'\n\n'+text; method='editMessageText'
+    else:
+        payload['caption']=content+'\n\n'+text; method='editMessageCaption'
+    tg(method,payload)
 
 def process(cb,drive):
     if str((cb.get('message',{}).get('chat') or {}).get('id'))!=CHAT:return
@@ -100,9 +105,16 @@ def process(cb,drive):
         if not video: finish(cb,'⚠️ Onay videosu Drive’da bulunamadı.');return
         no=next_no(drive)
         meta=metadata_read(drive,meta_file,topic)
-        drive.files().update(fileId=video['id'],addParents=QUEUE,removeParents=APPROVAL,body={'name':f'video_{no}.mp4'},fields='id').execute()
-        if cover:drive.files().update(fileId=cover['id'],addParents=QUEUE,removeParents=APPROVAL,body={'name':f'kapak_{no}.jpg'},fields='id').execute()
-        workbook_add(drive,no,topic,meta)
+        moved=[]
+        try:
+            drive.files().update(fileId=video['id'],addParents=QUEUE,removeParents=APPROVAL,body={'name':f'video_{no}.mp4'},fields='id').execute(); moved.append((video,f'ONAY_{run_no}_geri_alindi.mp4'))
+            if cover:
+                drive.files().update(fileId=cover['id'],addParents=QUEUE,removeParents=APPROVAL,body={'name':f'kapak_{no}.jpg'},fields='id').execute(); moved.append((cover,f'kapak_{run_no}.jpg'))
+            workbook_add(drive,no,topic,meta)
+        except Exception:
+            for f,old_name in moved:
+                drive.files().update(fileId=f['id'],addParents=APPROVAL,removeParents=QUEUE,body={'name':old_name},fields='id').execute()
+            raise
         if meta_file: drive.files().update(fileId=meta_file['id'],body={'trashed':True}).execute()
         finish(cb,f"✅ Yayın kuyruğuna alındı: video_{no}.mp4 / kapak_{no}.jpg\nBaşlık: {meta['baslik']}")
 
