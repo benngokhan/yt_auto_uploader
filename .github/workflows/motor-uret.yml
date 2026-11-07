@@ -132,6 +132,31 @@ jobs:
               print("DRIVE:", sonuc.get("webViewLink"))
           PY
 
+      - name: Telegram'a onay videosunu gönder
+        if: always()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          KONU: ${{ inputs.konu }}
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "Telegram anahtarı/sohbet kimliği yok; gönderim atlandı."; exit 0
+          fi
+          shopt -s globstar nullglob
+          kapaklar=(motor/cikti/**/kapak.jpg)
+          videolar=(motor/cikti/**/*.mp4)
+          if [ ${#kapaklar[@]} -gt 0 ]; then
+            curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto" \
+              -F "chat_id=${TELEGRAM_CHAT_ID}" -F "photo=@${kapaklar[0]}" \
+              -F "caption=🖼 YENİ VİDEO KAPAĞI%0A${KONU}"
+          fi
+          if [ ${#videolar[@]} -gt 0 ]; then
+            curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo" \
+              -F "chat_id=${TELEGRAM_CHAT_ID}" -F "video=@${videolar[0]}" \
+              -F "supports_streaming=true" \
+              -F "caption=🎬 ONAY BEKLEYEN VİDEO%0A${KONU}%0A%0AOnay verilmeden yayın kuyruğuna alınmaz."
+          fi
+
       - name: Videoyu indirilebilir yap
         if: always()
         uses: actions/upload-artifact@v4
