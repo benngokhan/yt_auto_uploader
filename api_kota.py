@@ -21,6 +21,11 @@ import os
 import re
 import urllib.error
 import urllib.request
+
+try:
+    import kota_sayac  # Gemini/Groq çağrılarını sayar (kota API'de yok)
+except Exception:  # sayaç yoksa da çalışsın
+    kota_sayac = None
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -61,6 +66,18 @@ def http_json(url: str, headers: dict | None = None, timeout: int = 30):
         return json.loads(r.read().decode("utf-8"))
 
 
+def son_bilinen(ad: str) -> dict:
+    """Onceki telemetriden son bilinen kalan/limit degerlerini alir."""
+    try:
+        eski = json.loads((Path(__file__).parent / "api_telemetri.json").read_text(encoding="utf-8"))
+        for x in eski.get("servisler", []):
+            if x.get("ad") == ad and x.get("limit"):
+                return {k: x.get(k) for k in ("kalan", "limit", "kullanilan") if x.get(k) is not None}
+    except Exception:
+        pass
+    return {}
+
+
 def ok(ad, **kw):
     d = {"ad": ad, "durum": "ok"}
     d.update(kw)
@@ -82,7 +99,10 @@ def elevenlabs():
     try:
         s = http_json("https://api.elevenlabs.io/v1/user/subscription", {"xi-api-key": key})
     except urllib.error.HTTPError as e:
-        return hata("ElevenLabs", f"HTTP {e.code}", "gecersiz" if e.code in (401, 403) else "hata")
+        # 401/403 olsa bile son bilinen kotayı koru (panelde sayı boş kalmasın)
+        son = son_bilinen("ElevenLabs")
+        return hata("ElevenLabs", f"HTTP {e.code} — anahtar geçersiz, kredi yenilenmeli",
+                    "gecersiz" if e.code in (401, 403) else "hata", **son)
     except Exception as e:
         return hata("ElevenLabs", e)
     limit = int(s.get("character_limit") or 0)
@@ -276,10 +296,13 @@ def gemini():
         return hata("Gemini", "Anahtar yok (GEMINI_API_KEY)", "yok")
     try:
         d = http_json(f"https://generativelanguage.googleapis.com/v1beta/models?key={key}")
-        return ok("Gemini", limit=None, kalan=None, birim="istek/dk (kota panelde yok)",
+        say = (kota_sayac.bugun_ozet().get("gemini") if kota_sayac else None) or {}
+        return ok("Gemini",
+                  limit=say.get("limit"), kalan=say.get("kalan"), kullanilan=say.get("kullanilan"),
+                  birim="istek/gün (kendi sayacimiz)",
                   model_sayisi=len(d.get("models", [])),
                   yenilenme="günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
-                  not_="LLM + TTS (gemini-2.5-flash-preview-tts)")
+                  not_="LLM + TTS · kota API'de yok, yaptığımız çağrılar sayılıyor")
     except urllib.error.HTTPError as e:
         return hata("Gemini", f"HTTP {e.code}", "gecersiz" if e.code in (400, 401, 403) else "hata")
     except Exception as e:
@@ -292,10 +315,13 @@ def groq():
         return hata("Groq", "Anahtar yok (GROQ_API_KEY)", "yok")
     try:
         d = http_json("https://api.groq.com/openai/v1/models", {"Authorization": "Bearer " + key})
-        return ok("Groq", limit=None, kalan=None, birim="istek/dk + günlük token",
+        say = (kota_sayac.bugun_ozet().get("groq") if kota_sayac else None) or {}
+        return ok("Groq",
+                  limit=say.get("limit"), kalan=say.get("kalan"), kullanilan=say.get("kullanilan"),
+                  birim="istek/gün (kendi sayacimiz)",
                   model_sayisi=len(d.get("data", [])),
                   yenilenme="dakika + günlük token · günlük kısım gece 00:00 UTC",
-                  not_="ücretsiz katman: dakika bazlı limit")
+                  not_="ücretsiz katman · kota API'de yok, çağrılar sayılıyor")
     except urllib.error.HTTPError as e:
         try:
             govde = e.read().decode("utf-8", "replace")[:180]
@@ -313,7 +339,9 @@ def telegram():
         return hata("Telegram", "Token yok (TELEGRAM_BOT_TOKEN)", "yok")
     try:
         d = http_json(f"https://api.telegram.org/bot{tok}/getMe").get("result", {})
-        return ok("Telegram", limit=None, kalan=None, birim="mesaj/gün (limit yok pratikte)",
+        say = (kota_sayac.bugun_ozet().get("telegram") if kota_sayac else None) or {}
+        return ok("Telegram", limit=None, kalan=None, kullanilan=say.get("kullanilan"),
+                  birim="mesaj/gün (limit yok pratikte)",
                   bot="@" + str(d.get("username", "")),
                   yenilenme="saniye başına limit · günlük kota yok",
                   not_="bildirim kanalı")

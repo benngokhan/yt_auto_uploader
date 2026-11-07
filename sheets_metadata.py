@@ -13,6 +13,11 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
+try:  # Gemini/Groq çağrılarını say (kota API'de yok)
+    import kota_sayac  # noqa: F401
+except Exception:
+    pass
+
 import openpyxl
 from openpyxl.styles import PatternFill
 

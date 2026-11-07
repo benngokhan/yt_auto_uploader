@@ -9,6 +9,11 @@ Kural: ses kimliği sabittir. Sağlayıcı hata verirse başka sese GEÇİLMEZ,
 """
 from __future__ import annotations
 
+try:  # Gemini/Groq çağrılarını say (kota API'de yok)
+    import kota_sayac  # noqa: F401
+except Exception:
+    pass
+
 import base64
 import hashlib
 import json

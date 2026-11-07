@@ -6,6 +6,11 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 from openpyxl import load_workbook
+
+try:  # Gemini/Groq çağrılarını say (kota API'de yok)
+    import kota_sayac  # noqa: F401
+except Exception:
+    pass
 BOOK=os.getenv('WORKBOOK_ID','1ulh13cnzYTaIlp1vehJ7lDrSsgjKyM_X')
 APPROVAL=os.getenv('APPROVAL_FOLDER','1N6mMUu3rEvCIie4o4XUWegPzFngMgHHM')
 

@@ -1,0 +1,15 @@
+{
+ "_aciklama": "Gemini/Groq kotayi API'de vermedigi icin gunluk limitleri burada tanimliyoruz. Ihtiyaca gore degistir.",
+ "gemini": {
+  "gunluk_istek": 250,
+  "birim": "istek/gün"
+ },
+ "groq": {
+  "gunluk_istek": 1000,
+  "birim": "istek/gün"
+ },
+ "openrouter": {
+  "gunluk_istek": null,
+  "birim": "USD kredi"
+ }
+}

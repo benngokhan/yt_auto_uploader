@@ -18,6 +18,11 @@ Kullanım:
 """
 from __future__ import annotations
 
+try:  # Gemini/Groq çağrılarını say (kota API'de yok)
+    import kota_sayac  # noqa: F401
+except Exception:
+    pass
+
 import argparse
 import json
 import os
