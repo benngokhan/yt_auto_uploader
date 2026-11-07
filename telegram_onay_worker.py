@@ -44,23 +44,31 @@ def find_files(drive,run_no):
     files=drive.files().list(q=q,fields='files(id,name,mimeType)',pageSize=1000).execute().get('files',[])
     video=next((x for x in files if x['name'].startswith(f'ONAY_{run_no}_') and x['name'].endswith('.mp4')),None)
     cover=next((x for x in files if x['name']==f'kapak_{run_no}.jpg'),None)
-    return video,cover
+    meta=next((x for x in files if x['name']==f'YAYIN_BILGISI_{run_no}.json'),None)
+    return video,cover,meta
 
 def next_no(drive):
     fs=drive.files().list(q=f"'{QUEUE}' in parents and trashed=false",fields='files(name)',pageSize=1000).execute().get('files',[])
     nums=[int(m.group(1)) for x in fs if (m:=re.fullmatch(r'video_(\d+)\.mp4',x['name']))]
     return max(nums+[175])+1
 
-def workbook_add(drive,no,topic):
+def metadata_read(drive, meta, topic):
+    if not meta: raise RuntimeError("Yayın bilgisi dosyası bulunamadı; kuyruğa alma durduruldu")
+    raw=drive.files().get_media(fileId=meta['id']).execute()
+    d=json.loads(raw.decode('utf-8'))
+    for k in ('baslik','aciklama','hashtag','etiketler','sabit_yorum','kategori'):
+        if not str(d.get(k,'')).strip(): raise RuntimeError("Eksik yayın bilgisi: "+k)
+    return d
+
+def workbook_add(drive,no,topic,meta):
     req=drive.files().get_media(fileId=BOOK); p=Path('workbook.xlsx')
     with p.open('wb') as f:
         dl=MediaIoBaseDownload(f,req);done=False
         while not done:_,done=dl.next_chunk()
     wb=load_workbook(p);ws=wb['DRIVE']; row=ws.max_row+1
     while row>2 and not ws.cell(row-1,2).value: row-=1
-    ws.cell(row,1,'BEKLEMEDE');ws.cell(row,2,f'video_{no}.mp4');ws.cell(row,3,f'{topic} #bilgidozu #shorts')
-    ws.cell(row,4,topic);ws.cell(row,5,'#bilgidozu #shorts #bilim');ws.cell(row,6,'bilgidozu, bilim, shorts')
-    ws.cell(row,7,'Bu bilgiye şaşırdın mı? Yorumlara yaz! 👇');ws.cell(row,8,'Bilim')
+    ws.cell(row,1,'BEKLEMEDE');ws.cell(row,2,f'video_{no}.mp4');ws.cell(row,3,meta['baslik']);ws.cell(row,4,meta['aciklama']);ws.cell(row,5,meta['hashtag']);ws.cell(row,6,meta['etiketler'])
+    ws.cell(row,7,meta['sabit_yorum']);ws.cell(row,8,meta['kategori'])
     wb.save(p)
     drive.files().update(fileId=BOOK,media_body=MediaFileUpload(str(p),mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')).execute()
 
@@ -79,10 +87,10 @@ def process(cb,drive):
     data=cb.get('data','');m=re.fullmatch(r'bd_(queue|retry|reject|keep):(\d+):(\d+)',data)
     if not m:return
     action,run_no,run_id=m.group(1),m.group(2),m.group(3);topic=topic_from(cb)
-    video,cover=find_files(drive,run_no)
+    video,cover,meta_file=find_files(drive,run_no)
     if action=='keep': finish(cb,'📁 Drive’da onay bekleyen olarak tutuluyor.');return
     if action=='reject':
-        for f in (video,cover):
+        for f in (video,cover,meta_file):
             if f:drive.files().update(fileId=f['id'],body={'trashed':True}).execute()
         finish(cb,'❌ Reddedildi; dosyalar geri alınabilir şekilde çöpe taşındı.');return
     if action=='retry':
@@ -91,9 +99,12 @@ def process(cb,drive):
     if action=='queue':
         if not video: finish(cb,'⚠️ Onay videosu Drive’da bulunamadı.');return
         no=next_no(drive)
+        meta=metadata_read(drive,meta_file,topic)
         drive.files().update(fileId=video['id'],addParents=QUEUE,removeParents=APPROVAL,body={'name':f'video_{no}.mp4'},fields='id').execute()
         if cover:drive.files().update(fileId=cover['id'],addParents=QUEUE,removeParents=APPROVAL,body={'name':f'kapak_{no}.jpg'},fields='id').execute()
-        workbook_add(drive,no,topic);finish(cb,f'✅ Yayın kuyruğuna alındı: video_{no}.mp4 / kapak_{no}.jpg')
+        workbook_add(drive,no,topic,meta)
+        if meta_file: drive.files().update(fileId=meta_file['id'],body={'trashed':True}).execute()
+        finish(cb,f"✅ Yayın kuyruğuna alındı: video_{no}.mp4 / kapak_{no}.jpg\nBaşlık: {meta['baslik']}")
 
 def main():
     off,sha=offset_load(); data=tg('getUpdates',{'offset':off,'timeout':0,'allowed_updates':['callback_query']})
