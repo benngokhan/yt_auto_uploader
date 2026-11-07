@@ -1,0 +1,50 @@
+name: Gemini doğal ses pilotu
+on:
+  workflow_dispatch:
+    inputs:
+      metin:
+        description: "Okunacak Türkçe metin"
+        required: true
+        type: string
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Gemini doğal erkek ses üret
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          METIN: ${{ inputs.metin }}
+        run: |
+          python - <<'PY'
+          import os,json,base64,wave,urllib.request
+          prompt=("Türkçe konuş. Sıcak, merak uyandıran ve doğal bir erkek bilim anlatıcısı gibi anlat. "
+                  "Kağıttan okur gibi monoton olma. Soruda hafifçe yüksel; şaşırtıcı bilgileri doğal biçimde vurgula. "
+                  "Enerjik ol ama bağırma. Cümle aralarını kısa ve akıcı tut. Metin: "+os.environ['METIN'])
+          body={"contents":[{"parts":[{"text":prompt}]}],"generationConfig":{"responseModalities":["AUDIO"],"speechConfig":{"voiceConfig":{"prebuiltVoiceConfig":{"voiceName":"Charon"}}}}}
+          url="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key="+os.environ['GEMINI_API_KEY']
+          req=urllib.request.Request(url,data=json.dumps(body).encode(),headers={"Content-Type":"application/json"})
+          with urllib.request.urlopen(req,timeout=180) as r: data=json.load(r)
+          part=data['candidates'][0]['content']['parts'][0]['inlineData']
+          raw=base64.b64decode(part['data'])
+          with wave.open('gemini_dogal_erkek.wav','wb') as w:
+              w.setnchannels(1);w.setsampwidth(2);w.setframerate(24000);w.writeframes(raw)
+          print(part.get('mimeType'),len(raw))
+          PY
+      - name: Telegram'a gönder
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendAudio" \
+            -F "chat_id=${TELEGRAM_CHAT_ID}" -F "audio=@gemini_dogal_erkek.wav" \
+            -F "caption=🎙 Gemini doğal erkek ses pilotu · yalnızca ses testi"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gemini-dogal-ses
+          path: gemini_dogal_erkek.wav
+          retention-days: 7
