@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-07T01:00:45+00:00",
+  "zaman": "2026-11-07T06:59:21+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -60,10 +60,10 @@
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 416.7,
-      "actions_kosu": 447,
+      "actions_dakika": 422.6,
+      "actions_kosu": 456,
       "actions_limit": 2000,
-      "actions_kalan": 1583.3
+      "actions_kalan": 1577.4
     },
     {
       "ad": "Google Drive",
@@ -75,8 +75,8 @@
       "kirilim": [
         {
           "ad": "Kısa Videolar",
-          "boyut": 185726265,
-          "dosya": 10,
+          "boyut": 354867795,
+          "dosya": 20,
           "sahip": "gokhanaltundal@gmail.com"
         },
         {
@@ -87,9 +87,9 @@
         },
         {
           "ad": "Kısa Kapaklar",
-          "boyut": 5572240,
-          "dosya": 14,
-          "sahip": "gokhanaltundal@gmail.com"
+          "boyut": 0,
+          "dosya": 0,
+          "sahip": ""
         },
         {
           "ad": "Uzun Kapaklar",
@@ -99,8 +99,8 @@
         },
         {
           "ad": "CEO / Tablolar",
-          "boyut": 3718543186,
-          "dosya": 41,
+          "boyut": 3719293923,
+          "dosya": 44,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
         {
@@ -143,9 +143,9 @@
           "boyut": 85769016
         }
       ],
-      "drive_gorunen": 6715953290,
+      "drive_gorunen": 7018313213,
       "kendi_dosyalar": 2647909666,
-      "paylasilan": 4068043624,
+      "paylasilan": 4370403547,
       "disalan": 3444681449,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
@@ -358,6 +358,10 @@
     },
     {
       "zaman": "2026-11-07T01:00:45+00:00",
+      "elevenlabs_kalan": 1384
+    },
+    {
+      "zaman": "2026-11-07T06:59:21+00:00",
       "elevenlabs_kalan": 1384
     }
   ]
