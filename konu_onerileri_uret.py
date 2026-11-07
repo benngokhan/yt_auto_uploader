@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os,json,re,base64,urllib.request,tempfile
+import os,json,re,base64,urllib.request,urllib.error,tempfile
 from pathlib import Path
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
@@ -43,11 +43,20 @@ def main():
  with urllib.request.urlopen('https://generativelanguage.googleapis.com/v1beta/models?key='+key,timeout=60) as r: catalog=json.load(r)
  usable=[m['name'].split('/',1)[-1] for m in catalog.get('models',[]) if 'generateContent' in m.get('supportedGenerationMethods',[]) and 'tts' not in m['name'].lower()]
  preferred=['gemini-2.5-flash','gemini-2.5-flash-lite','gemini-2.0-flash']
- model=next((x for x in preferred if x in usable), usable[0] if usable else None)
- if not model: raise RuntimeError('Gemini hesabında generateContent modeli bulunamadı')
- url=f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key='+key
- req=urllib.request.Request(url,data=json.dumps(body).encode(),headers={'Content-Type':'application/json'})
- with urllib.request.urlopen(req,timeout=180) as r:data=json.load(r)
+ candidates=preferred+[x for x in usable if 'flash' in x.lower() and x not in preferred]+[x for x in usable if x not in preferred]
+ data=None; errors=[]
+ for model in candidates:
+  if model not in usable: continue
+  try:
+   print('Gemini model:',model)
+   url=f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key='+key
+   req=urllib.request.Request(url,data=json.dumps(body).encode(),headers={'Content-Type':'application/json'})
+   with urllib.request.urlopen(req,timeout=180) as r:data=json.load(r)
+   break
+  except urllib.error.HTTPError as e:
+   errors.append(f'{model}:{e.code}')
+   if e.code not in (404,429,503): raise
+ if data is None: raise RuntimeError('Kullanılabilir Gemini modeli yanıt vermedi: '+','.join(errors))
  out=json.loads(data['candidates'][0]['content']['parts'][0]['text']);accepted=[]
  for x in sorted(out.get('suggestions',[]),key=lambda z:z.get('score',0),reverse=True):
   t=str(x.get('title','')).strip()
