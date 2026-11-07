@@ -111,8 +111,14 @@ def elevenlabs():
         s = http_json("https://api.elevenlabs.io/v1/user/subscription", {"xi-api-key": key})
     except urllib.error.HTTPError as e:
         # 401/403 olsa bile son bilinen kotayı koru (panelde sayı boş kalmasın)
+        try:
+            govde = e.read().decode("utf-8", "replace")[:160]
+        except Exception:
+            govde = ""
+        ipucu = f"anahtar {len(key)} karakter, '{key[:6]}…'"
         son = son_bilinen("ElevenLabs")
-        return hata("ElevenLabs", f"HTTP {e.code} — anahtar geçersiz, kredi yenilenmeli",
+        return hata("ElevenLabs",
+                    f"HTTP {e.code} · {govde.strip()} · {ipucu}".strip(" ·"),
                     "gecersiz" if e.code in (401, 403) else "hata", **son)
     except Exception as e:
         return hata("ElevenLabs", e)
