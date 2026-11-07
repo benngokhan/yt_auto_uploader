@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-07 05:16:49",
-  "generated_at_iso": "2026-11-07T05:16:49.364606+03:00",
+  "generated_at": "2026-11-07 06:12:00",
+  "generated_at_iso": "2026-11-07T06:12:00.362346+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -36,15 +36,18 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 0,
+    "ready_shorts": 2,
     "ready_longs": 13,
-    "total_ready": 13,
-    "days_of_stock": 6.5,
-    "next_short": null,
-    "next_short_title": "",
+    "total_ready": 15,
+    "days_of_stock": 7.5,
+    "next_short": "video_164.mp4",
+    "next_short_title": "kaplan",
     "next_long": "uzun_video_9.mp4",
     "next_long_title": "Beynin Seni Ayakta Tutan 3 Gizli Sensörü: İç Kulak Pusulası, Kristaller ve Algı #bilgidozu",
-    "missing_covers": []
+    "missing_covers": [
+      "video_164.mp4",
+      "video_165.mp4"
+    ]
   },
   "drive_inventory": {
     "shorts_videos": [
@@ -113,112 +116,20 @@
       },
       {
         "id": "1lA8QNmVuDvex_gQN680rXx_RFPFw5Pwh",
-        "name": "video_167.mp4",
+        "name": "video_164.mp4",
         "mimeType": "video/mp4",
         "size": 28285352,
-        "modifiedTime": "2026-11-02T14:04:13.535Z"
+        "modifiedTime": "2026-11-07T02:53:20.716Z"
+      },
+      {
+        "id": "1rlJGXzkPRgGAxOUZ6F7idMhIQI1_gwij",
+        "name": "video_165.mp4",
+        "mimeType": "video/mp4",
+        "size": 34089114,
+        "modifiedTime": "2026-11-07T03:02:40.680Z"
       }
     ],
-    "shorts_covers": [
-      {
-        "id": "1jiScwcmRqXEC5xt8mUJj7ODoE_mZ1y-z",
-        "name": "kapak_155.jpg",
-        "mimeType": "image/jpeg",
-        "size": 425705,
-        "modifiedTime": "2026-11-02T10:51:43.836Z"
-      },
-      {
-        "id": "1Q1i0AbU6XgEppUzRn-pr_McKGWb1J1i4",
-        "name": "kapak_155_yeni.jpg",
-        "mimeType": "image/jpeg",
-        "size": 452285,
-        "modifiedTime": "2026-11-01T23:10:03.708Z"
-      },
-      {
-        "id": "1miH9dD9DoyzBKHKQkS2hWwvNdEd507Bc",
-        "name": "kapak_156.jpg",
-        "mimeType": "image/jpeg",
-        "size": 393762,
-        "modifiedTime": "2026-11-02T21:43:12.352Z"
-      },
-      {
-        "id": "1Pn4FrVtlVWNVwR83adi4EdF2wsk6VwX6",
-        "name": "kapak_157.jpg",
-        "mimeType": "image/jpeg",
-        "size": 476230,
-        "modifiedTime": "2026-11-01T18:33:52.006Z"
-      },
-      {
-        "id": "1q9spYyS39ZR3rPY3vr_zBHKzyRJNYgeq",
-        "name": "kapak_158.jpg",
-        "mimeType": "image/jpeg",
-        "size": 261856,
-        "modifiedTime": "2026-11-03T10:29:57.549Z"
-      },
-      {
-        "id": "1sTjhRkAYL432ogtAhARNGxkV1OIbSa0Q",
-        "name": "kapak_159.jpg",
-        "mimeType": "image/jpeg",
-        "size": 426469,
-        "modifiedTime": "2026-11-04T19:20:11.139Z"
-      },
-      {
-        "id": "1dtuV1FbFxpSS9vomzVxlKxSyn3COonxq",
-        "name": "kapak_160.jpg",
-        "mimeType": "image/jpeg",
-        "size": 291900,
-        "modifiedTime": "2026-11-04T19:23:05.257Z"
-      },
-      {
-        "id": "1U90eAyu_McOxlJPy41_gDfeZOEpJLI3V",
-        "name": "kapak_161.jpg",
-        "mimeType": "image/jpeg",
-        "size": 469754,
-        "modifiedTime": "2026-11-04T19:20:56.514Z"
-      },
-      {
-        "id": "157LBXRQKnOwbZbXm5REt5D3W8PKlprbx",
-        "name": "kapak_162.jpg",
-        "mimeType": "image/jpeg",
-        "size": 306283,
-        "modifiedTime": "2026-11-05T11:27:57.145Z"
-      },
-      {
-        "id": "1Arx0rFAUsdjoHtN29-wJUVryZy_yqijH",
-        "name": "kapak_163.jpg",
-        "mimeType": "image/jpeg",
-        "size": 298123,
-        "modifiedTime": "2026-11-05T17:32:01.529Z"
-      },
-      {
-        "id": "1CKa1MeUAlu_vVjpLyoJvg1SgPguQx0NC",
-        "name": "kapak_164.jpeg",
-        "mimeType": "image/jpeg",
-        "size": 410354,
-        "modifiedTime": "2026-11-01T23:37:01.992Z"
-      },
-      {
-        "id": "1oVNpllA-2eIgIr-XhTaeMWrsewWn5ilx",
-        "name": "kapak_165.jpeg",
-        "mimeType": "image/jpeg",
-        "size": 425137,
-        "modifiedTime": "2026-11-01T23:41:19.073Z"
-      },
-      {
-        "id": "1KbAsfC4HRO_bNp3gwU8GAM2QlVn-Yfgg",
-        "name": "kapak_166.jpeg",
-        "mimeType": "image/jpeg",
-        "size": 333759,
-        "modifiedTime": "2026-11-01T23:41:18.571Z"
-      },
-      {
-        "id": "1HcuSg6M8A3nLHjQO0JcdNq75eNpwnLLG",
-        "name": "kapak_167.jpg",
-        "mimeType": "image/jpeg",
-        "size": 600623,
-        "modifiedTime": "2026-11-02T13:42:13.019Z"
-      }
-    ],
+    "shorts_covers": [],
     "long_videos": [
       {
         "id": "1lltDL8ype5n64_YiVIT05ueS9h7bYoDy",
@@ -480,8 +391,8 @@
         "id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 91147,
-        "modifiedTime": "2026-11-06T17:59:58.021Z"
+        "size": 211887,
+        "modifiedTime": "2026-11-07T03:09:25.658Z"
       },
       {
         "id": "1lEm4h79f6Q6Jzf4DsHXaVBPGEzgDpuHR",
@@ -619,8 +530,8 @@
       "drive_video_id": "1gy9oKoKOwQDxUC-rYMNN64KYf80ZS_t-",
       "drive_video_size_mb": 10.97,
       "expected_cover": "kapak_155.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1jiScwcmRqXEC5xt8mUJj7ODoE_mZ1y-z"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 155,
@@ -649,8 +560,8 @@
       "drive_video_id": "1YCY-8cvOXZhAehJ8rSlcAw0TgfemJ0Xm",
       "drive_video_size_mb": 9.64,
       "expected_cover": "kapak_156.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1miH9dD9DoyzBKHKQkS2hWwvNdEd507Bc"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 144,
@@ -681,8 +592,8 @@
       "drive_video_id": "1PzclvBCMlkt9DaQR49Bd3XTOjNsIXaa7",
       "drive_video_size_mb": 13.41,
       "expected_cover": "kapak_157.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1Pn4FrVtlVWNVwR83adi4EdF2wsk6VwX6"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 157,
@@ -712,8 +623,8 @@
       "drive_video_id": "18tFRo-unZ-U1Xv7DEGLnyPMvc5oxZuYX",
       "drive_video_size_mb": 9.59,
       "expected_cover": "kapak_158.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1q9spYyS39ZR3rPY3vr_zBHKzyRJNYgeq"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 158,
@@ -743,8 +654,8 @@
       "drive_video_id": "1t3f4eXm0QhpENLjyEcCQM4UrpTtsFDCu",
       "drive_video_size_mb": 12.4,
       "expected_cover": "kapak_159.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1sTjhRkAYL432ogtAhARNGxkV1OIbSa0Q"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 159,
@@ -773,8 +684,8 @@
       "drive_video_id": "1ZPU6JT8nHmZCohP7wx17a-FfoW9BCKPL",
       "drive_video_size_mb": 10.83,
       "expected_cover": "kapak_160.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1dtuV1FbFxpSS9vomzVxlKxSyn3COonxq"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 161,
@@ -803,8 +714,8 @@
       "drive_video_id": "18-b_M7qo2NsaaLT6T8EetVcq7-uJrhLK",
       "drive_video_size_mb": 14.42,
       "expected_cover": "kapak_161.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1U90eAyu_McOxlJPy41_gDfeZOEpJLI3V"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 162,
@@ -834,8 +745,8 @@
       "drive_video_id": "1xwogYEA49ym92lGPbbW8RARcAlnMlVqM",
       "drive_video_size_mb": 9.52,
       "expected_cover": "kapak_162.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "157LBXRQKnOwbZbXm5REt5D3W8PKlprbx"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 163,
@@ -865,8 +776,8 @@
       "drive_video_id": "1-ag1ZRblavOInWCi4qRm-lHSYGy_U47e",
       "drive_video_size_mb": 59.37,
       "expected_cover": "kapak_163.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1Arx0rFAUsdjoHtN29-wJUVryZy_yqijH"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 165,
@@ -891,12 +802,12 @@
       "category_name": "İnsan Vücudu ve Beyin",
       "pinned_comment": "Yemekten sonra ne kadar tok olursan ol asla hayır diyemediğin o tatlı hangisi? Yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": false,
-      "drive_video_id": "",
-      "drive_video_size_mb": 0,
-      "expected_cover": "kapak_164.jpeg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1CKa1MeUAlu_vVjpLyoJvg1SgPguQx0NC"
+      "has_drive_video": true,
+      "drive_video_id": "1lA8QNmVuDvex_gQN680rXx_RFPFw5Pwh",
+      "drive_video_size_mb": 26.98,
+      "expected_cover": "kapak_164.jpg",
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 166,
@@ -922,12 +833,12 @@
       "category_name": "Fizik ve Bilim",
       "pinned_comment": "Sahilde kumdan kale yaparken senin de kulelerin fazla sudan çökmüş müydü? Yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": false,
-      "drive_video_id": "",
-      "drive_video_size_mb": 0,
-      "expected_cover": "kapak_165.jpeg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1oVNpllA-2eIgIr-XhTaeMWrsewWn5ilx"
+      "has_drive_video": true,
+      "drive_video_id": "1rlJGXzkPRgGAxOUZ6F7idMhIQI1_gwij",
+      "drive_video_size_mb": 32.51,
+      "expected_cover": "kapak_165.jpg",
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 167,
@@ -956,9 +867,9 @@
       "has_drive_video": false,
       "drive_video_id": "",
       "drive_video_size_mb": 0,
-      "expected_cover": "kapak_166.jpeg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1KbAsfC4HRO_bNp3gwU8GAM2QlVn-Yfgg"
+      "expected_cover": "kapak_166.jpg",
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
       "row": 64,
