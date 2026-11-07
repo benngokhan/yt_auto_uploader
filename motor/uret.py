@@ -18,11 +18,6 @@ Kullanım:
 """
 from __future__ import annotations
 
-try:  # Gemini/Groq çağrılarını say (kota API'de yok)
-    import kota_sayac  # noqa: F401
-except Exception:
-    pass
-
 import argparse
 import json
 import os
@@ -122,7 +117,15 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
             {"Authorization": f"Bearer {os.environ['GROQ_API_KEY']}"},
         )["choices"][0]["message"]["content"]))
     if os.getenv("GEMINI_API_KEY"):
-        model = os.getenv("MOTOR_LLM_MODEL", "gemini-3.6-flash")
+        model = os.getenv("MOTOR_LLM_MODEL", "").strip()
+        if not model or model.startswith("llama-") or model == "gemini-3.6-flash":
+            try:
+                with urllib.request.urlopen("https://generativelanguage.googleapis.com/v1beta/models?key=" + os.environ["GEMINI_API_KEY"], timeout=60) as y:
+                    modeller = json.load(y).get("models", [])
+                uygun = [m["name"].split("/",1)[-1] for m in modeller if "generateContent" in m.get("supportedGenerationMethods",[]) and "flash" in m.get("name","").lower() and not any(x in m.get("name","").lower() for x in ("tts","image","live","omni"))]
+                model = sorted(uygun, key=lambda x: (("preview" not in x), x), reverse=True)[0]
+            except Exception:
+                model = "gemini-2.5-flash"
         denemeler.append(lambda: _ayikla(_cagir(
             f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
             f"?key={os.environ['GEMINI_API_KEY']}",
