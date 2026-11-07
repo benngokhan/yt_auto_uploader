@@ -34,10 +34,10 @@ ACTIONS_FREE_DK = 2_000        # private repo ücretsiz Actions dakikası
 
 # Drive kırılımı (hangi klasör ne kadar yer tutuyor)
 DRIVE_KLASORLER = [
-    ("Kısa Videolar", "1LfW4adjq0x4ZjBuphjebAbKLVsgY8TXY"),
-    ("Uzun Videolar", "16jMIabV8mdJIRlc_e55Gmlwu5asfcBGN"),
-    ("Kısa Kapaklar", "1xleUU8CO3gsJVCnZMtYxtf2r0hs2yDKS"),
-    ("Uzun Kapaklar", "1g3QluGyaLByQgXmoXO0i1PPtr3ORjRQR"),
+    ("Kısa Videolar", "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR"),
+    ("Uzun Videolar", "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR"),
+    ("Kısa Kapaklar", "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR"),
+    ("Uzun Kapaklar", "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR"),
     ("CEO / Tablolar", "190zQiUYkp8fsQFleva77TKqc9MeGxZiI"),
 ]
 # Arşiv klasörü (botun günlük akışı kullanmaz, yer kaplar)
