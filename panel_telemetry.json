@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-11-07 06:12:00",
-  "generated_at_iso": "2026-11-07T06:12:00.362346+03:00",
+  "generated_at": "2026-11-07 07:15:02",
+  "generated_at_iso": "2026-11-07T07:15:02.440880+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
-    "table_file_id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
+    "table_file_id": "1RrQIebJZyJswOPGJf14PvGfU1SHcPRyq",
     "shorts_video": "1LfW4adjq0x4ZjBuphjebAbKLVsgY8TXY",
     "shorts_cover": "1INXnZpMGBGOZ03o4cqm5MuC5MporWSkD",
     "long_video": "16jMIabV8mdJIRlc_e55Gmlwu5asfcBGN",
@@ -36,17 +36,18 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 2,
+    "ready_shorts": 3,
     "ready_longs": 13,
-    "total_ready": 15,
-    "days_of_stock": 7.5,
+    "total_ready": 16,
+    "days_of_stock": 8.0,
     "next_short": "video_164.mp4",
-    "next_short_title": "kaplan",
+    "next_short_title": "Kaplanların Çizgileri Neden Her Birinde Farklıdır? 🐅 #bilgidozu #shorts",
     "next_long": "uzun_video_9.mp4",
     "next_long_title": "Beynin Seni Ayakta Tutan 3 Gizli Sensörü: İç Kulak Pusulası, Kristaller ve Algı #bilgidozu",
     "missing_covers": [
       "video_164.mp4",
-      "video_165.mp4"
+      "video_165.mp4",
+      "video_166.mp4"
     ]
   },
   "drive_inventory": {
@@ -127,6 +128,90 @@
         "mimeType": "video/mp4",
         "size": 34089114,
         "modifiedTime": "2026-11-07T03:02:40.680Z"
+      },
+      {
+        "id": "1YVceXfb-gxKzr__fuDzrcE2apLh16Hzk",
+        "name": "video_166.mp4",
+        "mimeType": "video/mp4",
+        "size": 14567673,
+        "modifiedTime": "2026-11-07T04:00:29.167Z"
+      },
+      {
+        "id": "1-aTBdIjES5y30kUhdjBk_f8CPYNrxWQs",
+        "name": "video_167.mp4",
+        "mimeType": "video/mp4",
+        "size": 19001754,
+        "modifiedTime": "2026-11-07T04:00:29.192Z"
+      },
+      {
+        "id": "15glA8t8AhrQ2vH1gtiUWtvZyS_pYpIET",
+        "name": "video_168.mp4",
+        "mimeType": "video/mp4",
+        "size": 14762032,
+        "modifiedTime": "2026-11-07T04:00:29.281Z"
+      },
+      {
+        "id": "1PR285e4ODgKv_tFrHOPqFj4tjhJro6wZ",
+        "name": "video_169.mp4",
+        "mimeType": "video/mp4",
+        "size": 15215266,
+        "modifiedTime": "2026-11-07T04:00:29.340Z"
+      },
+      {
+        "id": "1_Psgp2oAfoT831CGDIM6Lp4V2j1su4GW",
+        "name": "video_170.mp4",
+        "mimeType": "video/mp4",
+        "size": 12490476,
+        "modifiedTime": "2026-11-07T04:00:29.369Z"
+      },
+      {
+        "id": "1hTZEHVAhqEzuv10eWsWsjum81tJy577K",
+        "name": "video_171.mp4",
+        "mimeType": "video/mp4",
+        "size": 15660067,
+        "modifiedTime": "2026-11-07T04:00:29.328Z"
+      },
+      {
+        "id": "1wB_faJTYap_7tKoK4wDc1luvLfa4VeT7",
+        "name": "video_172.mp4",
+        "mimeType": "video/mp4",
+        "size": 14587342,
+        "modifiedTime": "2026-11-07T04:00:29.292Z"
+      },
+      {
+        "id": "1g-dHytiiSBHU9_zZ6k3Uhu6BSxGPwwS3",
+        "name": "video_173.mp4",
+        "mimeType": "video/mp4",
+        "size": 16243920,
+        "modifiedTime": "2026-11-07T04:00:29.633Z"
+      },
+      {
+        "id": "1lKfj2FR7sjzoD6Qvq4s9vSVMiGsK_8Oq",
+        "name": "video_174.mp4",
+        "mimeType": "video/mp4",
+        "size": 12523886,
+        "modifiedTime": "2026-11-07T04:00:29.591Z"
+      },
+      {
+        "id": "1dgtRg5Rm72gherjsWiAf_xgxSH6dEXum",
+        "name": "video_175.mp4",
+        "mimeType": "video/mp4",
+        "size": 88715905,
+        "modifiedTime": "2026-11-07T04:00:29.588Z"
+      },
+      {
+        "id": "16mMYGTwi5RVKZ2zn2AOSdtKFUV4FXAdX",
+        "name": "video_176.mp4",
+        "mimeType": "video/mp4",
+        "size": 87818519,
+        "modifiedTime": "2026-11-07T04:00:29.654Z"
+      },
+      {
+        "id": "1qYSGE8qFjdSVXwxzYxcFuWzhTEGZCuoy",
+        "name": "video_177.mp4",
+        "mimeType": "video/mp4",
+        "size": 83807712,
+        "modifiedTime": "2026-11-07T04:00:29.332Z"
       }
     ],
     "shorts_covers": [],
@@ -388,11 +473,32 @@
         "modifiedTime": "2026-11-06T09:26:19.973Z"
       },
       {
-        "id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
+        "id": "1HfgCzbGwSuZcdYhfFalzSeKygnflJLsJ",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 211887,
-        "modifiedTime": "2026-11-07T03:09:25.658Z"
+        "size": 231306,
+        "modifiedTime": "2026-11-07T03:50:10.335Z"
+      },
+      {
+        "id": "1PvYUAzC3aE9MV7Cw-wyyqENOjOwdwX39",
+        "name": "bilgidozu_yukleme_tablosu_EKSIK_164_165_YEDEK.xlsx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "size": 230696,
+        "modifiedTime": "2026-11-07T03:50:02.723Z"
+      },
+      {
+        "id": "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ",
+        "name": "bilgidozu_yukleme_tablosu_YEDEK_2026-11-07.xlsx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "size": 212950,
+        "modifiedTime": "2026-11-07T03:17:38.459Z"
+      },
+      {
+        "id": "1RrQIebJZyJswOPGJf14PvGfU1SHcPRyq",
+        "name": "bilgidozu_yukleme_tablosu_YOUTUBE_ESLESMELI.xlsx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "size": 166932,
+        "modifiedTime": "2026-11-07T04:04:21.450Z"
       },
       {
         "id": "1lEm4h79f6Q6Jzf4DsHXaVBPGEzgDpuHR",
@@ -864,9 +970,9 @@
       "category_name": "Bilim Tarihi ve Efsaneler",
       "pinned_comment": "Okulda sana da 'dilin ucu tatlı, yanları ekşi alır' şeması çizdirilmiş miydi? Yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": false,
-      "drive_video_id": "",
-      "drive_video_size_mb": 0,
+      "has_drive_video": true,
+      "drive_video_id": "1YVceXfb-gxKzr__fuDzrcE2apLh16Hzk",
+      "drive_video_size_mb": 13.89,
       "expected_cover": "kapak_166.jpg",
       "has_drive_cover": false,
       "drive_cover_id": ""
