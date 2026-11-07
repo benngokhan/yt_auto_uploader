@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-11-07 12:14:16",
-  "generated_at_iso": "2026-11-07T12:14:16.347524+03:00",
+  "generated_at": "2026-11-07 12:52:05",
+  "generated_at_iso": "2026-11-07T12:52:05.269739+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
-    "table_file_id": "1RrQIebJZyJswOPGJf14PvGfU1SHcPRyq",
+    "table_file_id": "1HfgCzbGwSuZcdYhfFalzSeKygnflJLsJ",
     "shorts_video": "1LfW4adjq0x4ZjBuphjebAbKLVsgY8TXY",
     "shorts_cover": "1INXnZpMGBGOZ03o4cqm5MuC5MporWSkD",
     "long_video": "16jMIabV8mdJIRlc_e55Gmlwu5asfcBGN",
@@ -36,16 +36,15 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 3,
+    "ready_shorts": 2,
     "ready_longs": 13,
-    "total_ready": 16,
-    "days_of_stock": 8.0,
-    "next_short": "video_164.mp4",
-    "next_short_title": "Kaplanların Çizgileri Neden Her Birinde Farklıdır? 🐅 #bilgidozu #shorts",
+    "total_ready": 15,
+    "days_of_stock": 7.5,
+    "next_short": "video_165.mp4",
+    "next_short_title": "Mariana Çukuru Ne Kadar Derin? 🌊 #bilgidozu #shorts",
     "next_long": "uzun_video_9.mp4",
     "next_long_title": "Beynin Seni Ayakta Tutan 3 Gizli Sensörü: İç Kulak Pusulası, Kristaller ve Algı #bilgidozu",
     "missing_covers": [
-      "video_164.mp4",
       "video_165.mp4",
       "video_166.mp4"
     ]
@@ -455,8 +454,8 @@
         "id": "1HfgCzbGwSuZcdYhfFalzSeKygnflJLsJ",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 231306,
-        "modifiedTime": "2026-11-07T03:50:10.335Z"
+        "size": 225304,
+        "modifiedTime": "2026-11-07T09:52:03.599Z"
       },
       {
         "id": "1PvYUAzC3aE9MV7Cw-wyyqENOjOwdwX39",
@@ -869,9 +868,9 @@
       "file_name": "video_164.mp4",
       "number": 164,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Tıka Basa Doysan Bile Tatlıya Neden Her Zaman Yer Açılır? 🍰 #bilgidozu #shorts",
       "description": "Akşam yemeğinde tek lokma bile yiyemeyecek kadar doyduğun halde masaya tatlı geldiği an midende nasıl mucizevi yer açılır? Şaka sandığımız tatlı için ayrı mide sözü gerçek çıktı; Max Planck Enstitüsü bu gizli şalterin tam beyinde olduğunu kanıtladı.\n\n📍 BÖLÜMLER\n00:00 Tek lokma yiyemeyecekken — Tatlıya nasıl yer açılır?\n00:19 Tokluk nöronları yemekte — Artık doydun diyor!\n00:38 Atalarımızdan kalan — Hızlı enerji kodu!\n\n📊 Kaynaklar:\n• Max Planck Institute for Metabolism Research (Science, 2025)\n• https://www.mpg.de/24159607/0211-neur-dessert-stomach-emerges-in-the-brain-153735-x\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #beyin #tatlı #insanvücudu #bilim",
       "tags": [
