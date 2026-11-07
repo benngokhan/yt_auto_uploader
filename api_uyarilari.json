@@ -1,9 +1,9 @@
 {
- "zaman": "2026-11-07T23:20:19.966961+00:00",
+ "zaman": "2026-11-07T23:25:07.975100+00:00",
  "ozet": {
   "toplam": 1,
   "kritik": 1,
-  "yeni": 1
+  "yeni": 0
  },
  "uyarilar": [
   {
@@ -16,15 +16,5 @@
    "islem": "Anahtarı yenile"
   }
  ],
- "yeni_uyarilar": [
-  {
-   "id": "OpenRouter_gecersiz",
-   "servis": "OpenRouter",
-   "seviye": "kritik",
-   "baslik": "OpenRouter anahtarı geçersiz",
-   "mesaj": "HTTP 401 · {\"error\":{\"message\":\"User not found.\",\"code\":401}} · anahtar: 73 karakter, 'sk-or-v1…'",
-   "yuzde": null,
-   "islem": "Anahtarı yenile"
-  }
- ]
+ "yeni_uyarilar": []
 }
