@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-07 07:15:02",
-  "generated_at_iso": "2026-11-07T07:15:02.440880+03:00",
+  "generated_at": "2026-11-07 08:14:00",
+  "generated_at_iso": "2026-11-07T08:14:00.380045+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -191,27 +191,6 @@
         "mimeType": "video/mp4",
         "size": 12523886,
         "modifiedTime": "2026-11-07T04:00:29.591Z"
-      },
-      {
-        "id": "1dgtRg5Rm72gherjsWiAf_xgxSH6dEXum",
-        "name": "video_175.mp4",
-        "mimeType": "video/mp4",
-        "size": 88715905,
-        "modifiedTime": "2026-11-07T04:00:29.588Z"
-      },
-      {
-        "id": "16mMYGTwi5RVKZ2zn2AOSdtKFUV4FXAdX",
-        "name": "video_176.mp4",
-        "mimeType": "video/mp4",
-        "size": 87818519,
-        "modifiedTime": "2026-11-07T04:00:29.654Z"
-      },
-      {
-        "id": "1qYSGE8qFjdSVXwxzYxcFuWzhTEGZCuoy",
-        "name": "video_177.mp4",
-        "mimeType": "video/mp4",
-        "size": 83807712,
-        "modifiedTime": "2026-11-07T04:00:29.332Z"
       }
     ],
     "shorts_covers": [],
