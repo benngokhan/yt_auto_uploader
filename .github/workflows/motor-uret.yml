@@ -166,19 +166,36 @@ jobs:
           )
           META=$(find motor/cikti -name yayin_bilgisi.json | head -1)
           BASLIK=$(jq -r '.baslik // "—"' "$META")
-          KATEGORI=$(jq -r '.kategori // "—"' "$META")
-          SABIT=$(jq -r '.sabit_yorum // "—"' "$META")
-          HASHTAG=$(jq -r '.hashtag // "—"' "$META")
-          CAPTION=$(printf '🎬 <b>YENİ VİDEO · ONAY BEKLİYOR</b>\n\n<b>Başlık:</b> %s\n<b>Konu:</b> %s\n<b>Kategori:</b> %s\n<b>Hashtag:</b> %s\n<b>Sabit yorum:</b> %s\n<b>Ses:</b> Gemini doğal erkek\n<b>Süre:</b> %s sn · <b>Boyut:</b> %s\n\n⚠️ Siz onaylamadan yayın kuyruğuna alınmaz.' "$BASLIK" "$KONU" "$KATEGORI" "$HASHTAG" "$SABIT" "$SURE" "$BOYUT")
+          CAPTION=$(printf '🎬 YENİ VİDEO · ONAY BEKLİYOR\n\nBaşlık: %s\nKonu: %s\nSes: Gemini doğal erkek\nSüre: %s sn · Boyut: %s\n\nYayın bilgileri ve işlem düğmeleri aşağıdaki mesajdadır.' "$BASLIK" "$KONU" "$SURE" "$BOYUT")
           if [ ${#kapaklar[@]} -gt 0 ]; then
             curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto" \
               -F "chat_id=${TELEGRAM_CHAT_ID}" -F "photo=@${kapaklar[0]}" \
-              -F "parse_mode=HTML" -F "caption=🖼 <b>Video kapağı</b> · ${KONU}"
+              -F "caption=🖼 Video kapağı · ${KONU}"
           fi
           curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo" \
             -F "chat_id=${TELEGRAM_CHAT_ID}" -F "video=@${videolar[0]}" \
-            -F "supports_streaming=true" -F "parse_mode=HTML" \
-            -F "caption=${CAPTION}" -F "reply_markup=${KART}"
+            -F "supports_streaming=true" -F "caption=${CAPTION}"
+          python - "$META" "$KONU" > /tmp/yayin_karti.txt <<'PY3'
+          import json,sys,html
+          d=json.load(open(sys.argv[1])); konu=sys.argv[2]
+          def e(k): return html.escape(str(d.get(k,'—')))
+          text=("📋 <b>YAYIN BİLGİLERİ · ONAY BEKLİYOR</b>\n\n"
+                f"<b>Başlık:</b> {e('baslik')}\n"
+                f"<b>Konu:</b> {html.escape(konu)}\n"
+                f"<b>Özet:</b> {e('konu_ozeti')}\n\n"
+                f"<b>Açıklama:</b>\n{e('aciklama')}\n\n"
+                f"<b>Hashtag:</b> {e('hashtag')}\n"
+                f"<b>Arama etiketleri:</b> {e('etiketler')}\n"
+                f"<b>Kategori:</b> {e('kategori')}\n\n"
+                f"<b>Sabit yorum:</b>\n{e('sabit_yorum')}\n\n"
+                "⚠️ Siz onaylamadan yayın kuyruğuna alınmaz.")
+          if len(text)>4096: raise SystemExit(f'Yayın kartı Telegram sınırını aşıyor: {len(text)}')
+          print(text)
+          PY3
+          curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" --data-urlencode "parse_mode=HTML" \
+            --data-urlencode "text@/tmp/yayin_karti.txt" --data-urlencode "reply_markup=${KART}"
+
 
       - name: Videoyu indirilebilir yap
         if: always()
