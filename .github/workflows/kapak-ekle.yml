@@ -94,7 +94,7 @@ jobs:
           ARGS="--tip $TIP --no $NUMARA"
           if [ -n "$DOSYA" ]; then ARGS="$ARGS --dosya $DOSYA"; fi
           if [ -n "$DRIVE_FILE_ID" ]; then ARGS="$ARGS --drive-id $DRIVE_FILE_ID"; fi
-          if [ -n "$VIDEO_ID" ]; then ARGS="$ARGS --video-id $VIDEO_ID"; fi
+          if [ -n "$VIDEO_ID" ]; then ARGS="$ARGS --video-id=$VIDEO_ID"; fi
           if [ "$TEMIZLE" = "true" ]; then ARGS="$ARGS --temizle"; fi
           echo "kapak_yukle.py $ARGS"
           python kapak_yukle.py $ARGS
