@@ -1,10 +1,13 @@
 {
-  "zaman": "2026-11-07T23:44:37+00:00",
+  "zaman": "2026-11-07T23:46:17+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
       "durum": "gecersiz",
       "mesaj": "HTTP 401 — anahtar geçersiz, kredi yenilenmeli",
+      "kalan": 1384,
+      "limit": 10000,
+      "kullanilan": 8616,
       "yenilenme": "aylık · fatura dönemi başında sıfırlanır (kalan kredi devretmez)"
     },
     {
@@ -24,8 +27,8 @@
       "ad": "Gemini",
       "durum": "ok",
       "limit": 250,
-      "kalan": 250,
-      "kullanilan": 0,
+      "kalan": 249,
+      "kullanilan": 1,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 50,
       "yenilenme": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
@@ -35,8 +38,8 @@
       "ad": "Groq",
       "durum": "ok",
       "limit": 1000,
-      "kalan": 1000,
-      "kullanilan": 0,
+      "kalan": 999,
+      "kullanilan": 1,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 11,
       "yenilenme": "dakika + günlük token · günlük kısım gece 00:00 UTC",
@@ -56,16 +59,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4969,
+      "kalan": 4964,
       "limit": 5000,
-      "kullanilan": 31,
+      "kullanilan": 36,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 524.5,
+      "actions_dakika": 523.4,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1475.5
+      "actions_kalan": 1476.6
     },
     {
       "ad": "Google Drive",
@@ -397,6 +400,10 @@
     {
       "zaman": "2026-11-07T23:44:37+00:00",
       "elevenlabs_kalan": null
+    },
+    {
+      "zaman": "2026-11-07T23:46:17+00:00",
+      "elevenlabs_kalan": 1384
     }
   ]
 }
