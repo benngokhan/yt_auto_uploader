@@ -90,3 +90,11 @@ GitHub Actions env'de görünüyordu (`GEMINI_API_KEY: ***`) ama anahtar geçers
 - Konu sistemi Drive tablosunu ve onay metadata dosyalarını okuyup anlamsal/kelime benzerliği kontrolü yapıyor.
 - Konu analizindeki sabit Gemini model 404 hatası, kullanılabilir modeli API listesinden otomatik seçerek düzeltildi.
 - Yeni video, konu sistemi ve panel doğrulanmadan üretilmeyecek.
+
+
+## 8. GECE DEVİR NOTU — 2026-11-08
+- Konu otomasyonu çalışıyor: Drive/onay geçmişindeki 176 kayıt kontrol edildi; panel canlı beş öneriyi gösteriyor.
+- Telegram eksiksiz metadata kartı ve dört buton bağlandı; Reddet gerçek dosyaları Drive çöpüne taşıdı fakat Telegram kartı gecikmeli/görsel olarak güncellenmedi.
+- Son test `42427542928` üretildi ancak anlatım yalnız 16,96 sn (2,26+5,56+4,40+4,74); hedef 38–42 sn olmadığı için reddedildi, kuyruğa alınmadı.
+- Yarın ilk iş: gerçek karakter sayısını kaydet, minimum anlatım/38–42 sn kalite kapısı ekle, kısa metinde yeniden üret veya durdur; sonra buton kartı anlık güncellemesini düzelt.
+- API paneli eklendi: Gemini aktif HTTP 200; Groq GitHub üzerinden HTTP 403 / Cloudflare 1010; yeni video kalite kapısı ve buton testi geçmeden onaylanmayacak.
