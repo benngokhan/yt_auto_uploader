@@ -1,20 +1,10 @@
 {
- "zaman": "2026-11-07T23:54:32.597287+00:00",
+ "zaman": "2026-11-08T01:06:43.904582+00:00",
  "ozet": {
-  "toplam": 1,
-  "kritik": 1,
+  "toplam": 0,
+  "kritik": 0,
   "yeni": 0
  },
- "uyarilar": [
-  {
-   "id": "ElevenLabs_gecersiz",
-   "servis": "ElevenLabs",
-   "seviye": "kritik",
-   "baslik": "ElevenLabs anahtarı geçersiz",
-   "mesaj": "HTTP 401 · {\"detail\":{\"type\":\"authentication_error\",\"code\":\"unauthorized\",\"message\":\"The API key you used is missing the permission user_read to execute this operation.\",\" · anahta",
-   "yuzde": null,
-   "islem": "Anahtarı yenile"
-  }
- ],
+ "uyarilar": [],
  "yeni_uyarilar": []
 }

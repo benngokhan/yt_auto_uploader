@@ -1,21 +1,26 @@
 {
-  "zaman": "2026-11-07T23:54:32+00:00",
+  "zaman": "2026-11-08T01:06:43+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
-      "durum": "gecersiz",
-      "mesaj": "HTTP 401 · {\"detail\":{\"type\":\"authentication_error\",\"code\":\"unauthorized\",\"message\":\"The API key you used is missing the permission user_read to execute this operation.\",\" · anahtar 51 karakter, 'sk_3a3…'",
-      "kalan": 1384,
+      "durum": "ok",
+      "kalan": 10000,
       "limit": 10000,
-      "kullanilan": 8616,
-      "yenilenme": "aylık · fatura dönemi başında sıfırlanır (kalan kredi devretmez)"
+      "kullanilan": 0,
+      "birim": "karakter/kredi",
+      "tier": "free",
+      "reset_unix": 1796620024,
+      "reset_iso": "2026-12-07T05:07:04+00:00",
+      "klonlama": false,
+      "yenilenme": "aylık · fatura dönemi başında sıfırlanır (kredi devretmez)",
+      "not_": "1 kredi = 1 karakter (v2/v3) · Flash/Turbo yarı fiyat"
     },
     {
       "ad": "OpenRouter",
       "durum": "ok",
-      "kalan": 44,
+      "kalan": 50,
       "limit": 50,
-      "kullanilan": 6,
+      "kullanilan": 0,
       "birim": "istek/gün (ücretsiz modeller)",
       "ucretsiz": true,
       "yenilenme": "günlük · gece 00:00 UTC · ücretsiz model hakkı",
@@ -27,8 +32,8 @@
       "ad": "Gemini",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1497,
-      "kullanilan": 3,
+      "kalan": 1500,
+      "kullanilan": 0,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 50,
       "yenilenme": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
@@ -38,8 +43,8 @@
       "ad": "Groq",
       "durum": "ok",
       "limit": 1000,
-      "kalan": 997,
-      "kullanilan": 3,
+      "kalan": 1000,
+      "kullanilan": 0,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 11,
       "yenilenme": "dakika + günlük token · günlük kısım gece 00:00 UTC",
@@ -59,23 +64,23 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 4954,
+      "kalan": 5000,
       "limit": 5000,
-      "kullanilan": 46,
+      "kullanilan": 0,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 526.5,
+      "actions_dakika": 538.2,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1473.5
+      "actions_kalan": 1461.8
     },
     {
       "ad": "Google Drive",
       "durum": "ok",
-      "kalan": 10514046658,
+      "kalan": 10465797706,
       "limit": 16106127360,
-      "kullanilan": 5592080702,
+      "kullanilan": 5640329654,
       "birim": "bayt",
       "kirilim": [
         {
@@ -104,13 +109,13 @@
         },
         {
           "ad": "CEO / Tablolar",
-          "boyut": 360743834,
-          "dosya": 44,
+          "boyut": 384459058,
+          "dosya": 47,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
         {
           "ad": "Gmail + Fotoğraflar (Drive dışı)",
-          "boyut": 3519943016,
+          "boyut": 3544476744,
           "dosya": 0
         }
       ],
@@ -148,10 +153,10 @@
           "boyut": 42831080
         }
       ],
-      "drive_gorunen": 2528935138,
-      "kendi_dosyalar": 2072137686,
+      "drive_gorunen": 2552650362,
+      "kendi_dosyalar": 2095852910,
       "paylasilan": 456797452,
-      "disalan": 3519943016,
+      "disalan": 3544476744,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
       "not_": "Kota hesap bazlı: klasör başka hesaba aitse yer ONUN kotasından düşer"
@@ -159,11 +164,11 @@
     {
       "ad": "YouTube Data API",
       "durum": "ok",
-      "kalan": 6600,
+      "kalan": 10000,
       "limit": 10000,
-      "kullanilan": 3400,
+      "kullanilan": 0,
       "birim": "birim (tahmini)",
-      "bugun_yukleme": 2,
+      "bugun_yukleme": 0,
       "yenilenme": "günlük · gece 00:00 Pasifik (TR 10:00) sıfırlanır",
       "not_": "gerçek kota API'de yok; yükleme ≈ 1700 birim sayıldı"
     }
@@ -211,9 +216,9 @@
     }
   ],
   "ozet": {
-    "ok": 7,
+    "ok": 8,
     "eksik": 0,
-    "gecersiz": 1,
+    "gecersiz": 0,
     "hata": 0
   },
   "gecmis": [
@@ -412,6 +417,10 @@
     {
       "zaman": "2026-11-07T23:54:32+00:00",
       "elevenlabs_kalan": 1384
+    },
+    {
+      "zaman": "2026-11-08T01:06:43+00:00",
+      "elevenlabs_kalan": 10000
     }
   ]
 }
