@@ -37,6 +37,8 @@ Başka hiçbir şey anlatmasına gerek yok. Proje bilgisi, kurallar, sınırlar 
 | Motor | 🔴 **İki hata veriyor** (08.11 tespit) — aşağıya bak |
 | Açık karar | Uzun videolar bırakılsın mı? (sayılar: 14-129 izlenme vs Shorts 532) |
 | Bilinen sorun | Analitik: 151 videodan sadece 38'inde izlenme verisi · günde +7 izlenme |
+| **API paneli** | ✅ 8 API sağlıklı · kota kartları anlık · %90 kırmızı şerit canlı |
+| **Panelden anahtar girişi** | 🔴 **Çalışmıyor** — `SITE_SYNC_TOKEN` ölü (§10) |
 
 ---
 
@@ -98,3 +100,40 @@ GitHub Actions env'de görünüyordu (`GEMINI_API_KEY: ***`) ama anahtar geçers
 - Son test `42427542928` üretildi ancak anlatım yalnız 16,96 sn (2,26+5,56+4,40+4,74); hedef 38–42 sn olmadığı için reddedildi, kuyruğa alınmadı.
 - Yarın ilk iş: gerçek karakter sayısını kaydet, minimum anlatım/38–42 sn kalite kapısı ekle, kısa metinde yeniden üret veya durdur; sonra buton kartı anlık güncellemesini düzelt.
 - API paneli eklendi: Gemini aktif HTTP 200; Groq GitHub üzerinden HTTP 403 / Cloudflare 1010; yeni video kalite kapısı ve buton testi geçmeden onaylanmayacak.
+
+
+## 9. API PANELİ + KOTA SAYACI — 2026-11-08
+
+**Ne yapıldı (hepsi canlıda, test edildi):**
+
+1. **Gerçek panel bulundu ve düzeltildi.** Sahibin kullandığı panel `benngokhan.github.io/admin/` (Vue 3, ayrı repo). İlk turda yanlışlıkla `yt_auto_uploader/frontend/` içine yazılmıştı — **o panel kullanılmıyor.** Doğru yer: `benngokhan.github.io/admin/js/`.
+2. **Kırmızı uyarı şeridi** — Kontrol Paneli ve API & Kota sayfalarında. Kural: **%90+ doluluk veya geçersiz anahtar.** Sorun yoksa hiç görünmez. Aynı uyarı tekrar yazmaz (`api_uyari_gecmisi.json`).
+3. **`api_uyari.py`** (yt_auto_uploader) — `api_telemetri.json` → `api_uyarilari.json`. `api-kota.yml` her koşuda çalıştırır, çıktı commit edilir.
+4. **Kartlarda anlık kota.** Bar artık **doluluk** yüzdesi gösteriyor (eskiden kalan gösteriyordu = ters mantık). %75 turuncu, **%90 kırmızı**. Her kartta `kalan / limit` + `kullanılan · %x`.
+5. **`kota_sayac.py`** — Gemini ve Groq **kota bilgisini API'de vermiyor** (test edildi, rate-limit başlığı yok). Bu yüzden kendi sayacımız: urllib çağrılarını sayar, `kota_kullanim.json`'a yazar. Bağlandığı dosyalar: `motor/uret.py`, `motor/tts.py`, `mpt_uret.py`, `konu_onerileri_uret.py`, `sheets_metadata.py`, `tablet/ses.py`.
+6. **Gerçek ÜCRETSİZ KATMAN limitleri** (`kota_limitleri.json`): Gemini **1.500/gün** (15/dk), Groq **1.000/gün** (30/dk), OpenRouter **50/gün** (ücretsiz modeller). Hepsi kredi kartsız.
+7. **ElevenLabs kotası kaybolmuyor** — anahtar 401 verse bile son bilinen kredi gösterilir (`son_bilinen()`).
+
+**Kanıtlı sonuçlar:** Gemini 1.498/1.500 · Groq 998/1.000 · OpenRouter 46/50 · ElevenLabs 1.384/10.000 · YouTube 6.600/10.000 · Drive 9,8/15 GB · GitHub 4.959/5.000. **8 API sağlıklı, uyarı yok.**
+
+---
+
+## 10. YARIN İLK İŞ — 2 AÇIK SORUN
+
+| # | Sorun | Sebep (kanıtlı) | Çözüm |
+|---|---|---|---|
+| **P1** | **Panelden anahtar girişi ÇALIŞMIYOR** | `SITE_SYNC_TOKEN` ölü. GitHub log: `failed to fetch public key: HTTP 401: Bad credentials`. Panel "kaydedildi" diyordu ama GitHub reddediyordu. | Yeni PAT (`repo` + `workflow`) → Secrets → `SITE_SYNC_TOKEN` **Update**. Sonra `api_secret_sonuc.json` doğrulaması devrede. |
+| **P2** | **ElevenLabs 401** | Anahtar GitHub'a girdi (51 karakter, `sk_3a3…`) ama **yetki eksik**: `"The API key you used is missing the permission user_read"` | ElevenLabs → yeni anahtar → **User: Read** + Voices: Read + TTS: Write işaretle → Secrets `ELEVENLABS_API_KEY` **Update** |
+
+**Not:** P2 üretimi durdurmuyor — ses **Gemini TTS**'ten geliyor (`motor/ayarlar.json` → `saglayici: gemini_tts`, `voice_id: Charon`). ElevenLabs sadece yedek.
+
+---
+
+## 11. PANEL ANAHTAR GİRİŞİ — NASIL ÇALIŞMALI
+
+Panel → `/api/secret-yaz` → GitHub `repository_dispatch(api_anahtar)` → `api-kota.yml` → `gh secret set` → sonuç `api_secret_sonuc.json`'a yazılır → panel **90 sn bekleyip gerçek sonucu gösterir** (artık sahte "kaydedildi" demiyor).
+
+Panelden yazılabilen 5 anahtar: `ELEVENLABS_API_KEY`, `OPENROUTER_API_KEY`, `GEMINI_API_KEY`, `GROQ_API_KEY`, `TELEGRAM_BOT_TOKEN`.
+
+**Anahtar asla repoya/loga yazılmaz** — `::add-mask::` ile maskelenir.
+
