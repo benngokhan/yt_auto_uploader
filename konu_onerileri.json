@@ -1,37 +1,37 @@
 {
-  "generated_at": "2026-11-07T22:57:18.219979+00:00",
-  "used_count": 176,
+  "generated_at": "2026-11-08T04:10:27.852151+00:00",
+  "used_count": 178,
   "method": "Drive yükleme tablosu + onay bekleyen metadata + Gemini anlamsal tekrar kontrolü + yerel benzerlik kapısı",
   "suggestions": [
     {
-      "title": "Sabahları Alarm Çalmadan Hemen Önce Neden Kendiliğinden Uyanırsın? ⏰🧠 #bilgidozu #shorts",
-      "score": 96,
-      "reason": "Herkesin hayatında en az bir kez yaşadığı ezber bozucu biyolojik saati ilk saniyede soruyla yakalıyor.",
-      "duplicate_check": "Geçmişte uykudan sıçrama, boyun uzunluğu ve rüyalar işlenmişti; iç saat ve alarm öncesi uyanma mekanizması yenidir."
-    },
-    {
-      "title": "Neden Telefon Ekranına Dokunduğunda Parmak İzi Kalır da Camın Arkası Pırıl Pırıl Kalır? 📱 #bilgidozu #shorts",
+      "title": "Sakız Yutunca Midede 7 Yıl Kalır Efsanesi Neden Tamamen Yalan? 🍬 #bilgidozu #shorts",
       "score": 95,
-      "reason": "Günlük hayatta herkesin her an gördüğü ancak sebebini bilmediği somut bir detayı ilk saniyede sorgulatıyor.",
-      "duplicate_check": "Geçmişte cam akması veya mikrodalga teli işlenmişti, dokunmatik ekran yağ tabakası ve parmak izi fiziği tamamen yenidir."
+      "reason": "Günlük hayatta sıkça bilinen ama yanlış olan bir miti somut sindirim bilimiyle çürütür, ilk saniyede merak uyandırır.",
+      "duplicate_check": "Geçmiş başlıklardaki sakız, sindirim veya mide asidi konularından tamamen farklıdır."
     },
     {
-      "title": "Neden Koltuğa Uzandığında Burnun Tıkanır da Ayağa Kalkınca Anında Açılır? 🛋️👃 #bilgidozu #shorts",
-      "score": 95,
-      "reason": "Yatarken yaşanan garip burun tıkanıklığı sorununu somut bir yerçekimi ve doku sorusuyla yakalıyor.",
-      "duplicate_check": "Geçmişte burnun nöbetleşe çalışması işlenmişti, yatay pozisyonda doku şişmesi ve yerçekimi etkisi işlenmedi."
-    },
-    {
-      "title": "Neden Karanlıkta Telefonuna Bakarken Gözün Otomatik Olarak Sulanır? 📱💧 #bilgidozu #shorts",
+      "title": "Uçak Tuvaletindeki Vakum Sistemi Seni Dışarı Çekebilir mi? ✈️🚽 #bilgidozu #shorts",
       "score": 94,
-      "reason": "Akıllı telefon kullanıcılarının sıklıkla yaşadığı fiziksel bir duruma parmak basarak güçlü görsel ve merak unsuru yaratıyor.",
-      "duplicate_check": "Geçmişte ağlama, karanlıkta görme veya göz seğirmesi var ama ekran ışığı ve göz sulanması ilişkisi işlenmedi."
+      "reason": "Her uçuşta insanların aklına gelen absürt ama popüler bir korkuyu fiziksel gerçeklikle açıklar.",
+      "duplicate_check": "Geçmiş uçak detayları listesinde (penceredeki minik delik) tuvalet mekanizması yer almamaktadır."
     },
     {
-      "title": "Neden Kalabalık Bir Ortamda Sadece Kendi Adını Duysan Anında Başını Çevirirsin? 👥👂 #bilgidozu #shorts",
+      "title": "Parfüm Sıkınca Neden Bir Süre Sonra Kendi Kokunu Alamazsın? 🌸👃 #bilgidozu #shorts",
       "score": 93,
-      "reason": "Beynin 'Kokteyl Partisi Etkisi' adı verilen inanılmaz süzgeç mekanizmasını güçlü bir merakla sunuyor.",
-      "duplicate_check": "Geçmiş beyin hilelerinde boşluk, ses kaydı ve kapı eşiği işlenmişti; isim odaklı işitsel seçicilik işlenmedi."
+      "reason": "Günlük hayatta herkesin yaşadığı duyusal yorulma (duyusal adaptasyon) olayını merkeze alır.",
+      "duplicate_check": "Geçmiş burun refleksleri (hapşırma, nöbetleşe çalışan delikler) başlıklarından tamamen farklı bir duyusal konudur."
+    },
+    {
+      "title": "Kedi ve Köpekler Siyah Beyaz mı Görür? Evcil Hayvanların Gerçek Renk Dünyası 🐶🐱 #bilgidozu #shorts",
+      "score": 92,
+      "reason": "Herkesin merak ettiği evcil hayvan algısını net bilimsel gerçeklerle açıklar, güçlü görselleştirme sunar.",
+      "duplicate_check": "Geçmiş hayvan özelliklerinden (kargalar, filler, geckolar vb.) tamamen farklı bir tür ve duyu konusudur."
+    },
+    {
+      "title": "Neden Limon Görünce Bile Ağzımız Sulanır? Beynin Görsel Refleks Oyunu 🍋💦 #bilgidozu #shorts",
+      "score": 92,
+      "reason": "İzleyicinin video esnasında kendi tükürük bezlerini harekete geçirecek kadar güçlü somut bir deneyim sunar.",
+      "duplicate_check": "Geçmiş refleks başlıklarında (hapşırma, esneme, hıçkırık) limon ve tat alma refleksi bulunmamaktadır."
     }
   ]
 }
