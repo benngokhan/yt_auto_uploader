@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-08 12:30:13",
-  "generated_at_iso": "2026-11-08T12:30:13.988551+03:00",
+  "generated_at": "2026-11-08 12:52:33",
+  "generated_at_iso": "2026-11-08T12:52:33.217343+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -36,12 +36,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 1,
+    "ready_shorts": 0,
     "ready_longs": 1,
-    "total_ready": 2,
-    "days_of_stock": 1.0,
-    "next_short": "video_166.mp4",
-    "next_short_title": "Benzin Pompası Depo Dolunca Çipsiz ve Sensörsüz Nasıl Kendi Durur? ⛽ #bilgidozu #shorts",
+    "total_ready": 1,
+    "days_of_stock": 0.5,
+    "next_short": "video_167.mp4",
+    "next_short_title": "Efsanevi Şam Çeliği Kılıçların İçinden Karbon Nanotüp Çıktı! ⚔️ #bilgidozu #shorts",
     "next_long": "uzun_video_22.mp4",
     "next_long_title": "Tokken Neden Tatlı İsteriz? Beyindeki 'Tatlı Midesi' Şalterinin 2025 Bilimsel Kanıtı 🍰 #bilgidozu",
     "missing_covers": []
@@ -739,8 +739,8 @@
         "id": "1ulh13cnzYTaIlp1vehJ7lDrSsgjKyM_X",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 172939,
-        "modifiedTime": "2026-11-07T16:42:18.172Z"
+        "size": 172990,
+        "modifiedTime": "2026-11-08T09:52:31.178Z"
       },
       {
         "id": "1lEm4h79f6Q6Jzf4DsHXaVBPGEzgDpuHR",
@@ -1158,9 +1158,9 @@
       "file_name": "video_166.mp4",
       "number": 166,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Okulda Öğretilen Dil Tat Haritası Nasıl 100 Yıllık Çeviri Hatası Çıktı? 👅 #bilgidozu #shorts",
       "description": "Okulda yıllarca ezberletilen dilin ucu tatlıyı, arkası acıyı alır haritasının koca bir hata olduğunu biliyor muydun? Bin dokuz yüz birde Alman bilimci David Hänig dilin her yerinin tat aldığını, sadece ufak farklar olduğunu yazdı.\n\n📍 BÖLÜMLER\n00:00 Okulda öğretilen dil haritası — Tamamen yanlış çıktı!\n00:17 1942 grafik çevirisinde — Efsane nasıl doğdu?\n00:36 Tek saniyelik kanıt: — Dilinin ucuna kahve değdir!\n\n📊 Kaynaklar:\n• Nature (Chandrashekar et al., 2006) & Smithsonian Science\n• https://www.smithsonianmag.com/science-nature/neat-and-tidy-map-tastes-tongue-you-learned-school-all-wrong-180963407/\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #efsaneler #insanvücudu #bilim #tarih",
       "tags": [
