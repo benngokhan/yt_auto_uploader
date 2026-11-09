@@ -1,37 +1,37 @@
 {
-  "generated_at": "2026-11-08T04:10:27.852151+00:00",
+  "generated_at": "2026-11-09T04:17:31.067836+00:00",
   "used_count": 178,
   "method": "Drive yükleme tablosu + onay bekleyen metadata + Gemini anlamsal tekrar kontrolü + yerel benzerlik kapısı",
   "suggestions": [
     {
-      "title": "Sakız Yutunca Midede 7 Yıl Kalır Efsanesi Neden Tamamen Yalan? 🍬 #bilgidozu #shorts",
+      "title": "Kuşlar Yüksek Gerilim Hattındaki Elektrik Tellerine Konunca Neden Çarpılmaz? 🐦⚡ #bilgidozu #shorts",
+      "score": 96,
+      "reason": "Elektrik akımı ve potansiyel fark prensibini en popüler ve net fizik sorusuyla açıklar.",
+      "duplicate_check": "Geçmişte elektrikli yılan balığı ve yıldırım işlendi, kuşların tel üstündeki durumu daha önce yer almadı."
+    },
+    {
+      "title": "Toprak Kokusu Yağmur Yağdıktan Sonra Burnumuza Neden Bu Kadar Keskin ve Hızlı Gelir? 🌧️ #bilgidozu #shorts",
       "score": 95,
-      "reason": "Günlük hayatta sıkça bilinen ama yanlış olan bir miti somut sindirim bilimiyle çürütür, ilk saniyede merak uyandırır.",
-      "duplicate_check": "Geçmiş başlıklardaki sakız, sindirim veya mide asidi konularından tamamen farklıdır."
+      "reason": "Petrichor adı verilen doğa olayının moleküler yayılım hızını ve insan duyusunu tetikler.",
+      "duplicate_check": "Geçmişte koku-anı tuzağı işlendi ancak yağmur sonrası toprak kokusunun (petrichor) fiziksel yayılımı işlenmedi."
     },
     {
-      "title": "Uçak Tuvaletindeki Vakum Sistemi Seni Dışarı Çekebilir mi? ✈️🚽 #bilgidozu #shorts",
+      "title": "Uçak İniş Yaparken Kulaklarımız Neden Tıkanır ve Sakız Çiğnemek Bu Baskıyı Nasıl Çözer? ✈️🍬 #bilgidozu #shorts",
       "score": 94,
-      "reason": "Her uçuşta insanların aklına gelen absürt ama popüler bir korkuyu fiziksel gerçeklikle açıklar.",
-      "duplicate_check": "Geçmiş uçak detayları listesinde (penceredeki minik delik) tuvalet mekanizması yer almamaktadır."
+      "reason": "Uçak yolculuklarında milyonlarca kişinin yaşadığı fiziksel basınç değişimini anatomiyle bağlar.",
+      "duplicate_check": "Geçmişte uçak pencerelerindeki delik ve kulak tıkanması kısaca değinildi ancak detaylı basınç eşitleme mekanizması işlenmedi."
     },
     {
-      "title": "Parfüm Sıkınca Neden Bir Süre Sonra Kendi Kokunu Alamazsın? 🌸👃 #bilgidozu #shorts",
+      "title": "Neden Asansör Aşağı Hızla İnerken Miden Sanki Yukarıda Kalmış Gibi Havalanır? 🛗 #bilgidozu #shorts",
       "score": 93,
-      "reason": "Günlük hayatta herkesin yaşadığı duyusal yorulma (duyusal adaptasyon) olayını merkeze alır.",
-      "duplicate_check": "Geçmiş burun refleksleri (hapşırma, nöbetleşe çalışan delikler) başlıklarından tamamen farklı bir duyusal konudur."
+      "reason": "Fiziksel ivmelenme ile iç organların konum algısı arasındaki çatışmayı ilk saniyede canlandırır.",
+      "duplicate_check": "Geçmişte beyin sensörleri ve denge işlendi ancak asansör düşme hissi ve ivme ayrı olarak işlenmedi."
     },
     {
-      "title": "Kedi ve Köpekler Siyah Beyaz mı Görür? Evcil Hayvanların Gerçek Renk Dünyası 🐶🐱 #bilgidozu #shorts",
+      "title": "Çay Demlerken Su Neden Tek Bir Noktadan Değil de Tüm Yüzeyden Kaynamaya Başlar? 🫖 #bilgidozu #shorts",
       "score": 92,
-      "reason": "Herkesin merak ettiği evcil hayvan algısını net bilimsel gerçeklerle açıklar, güçlü görselleştirme sunar.",
-      "duplicate_check": "Geçmiş hayvan özelliklerinden (kargalar, filler, geckolar vb.) tamamen farklı bir tür ve duyu konusudur."
-    },
-    {
-      "title": "Neden Limon Görünce Bile Ağzımız Sulanır? Beynin Görsel Refleks Oyunu 🍋💦 #bilgidozu #shorts",
-      "score": 92,
-      "reason": "İzleyicinin video esnasında kendi tükürük bezlerini harekete geçirecek kadar güçlü somut bir deneyim sunar.",
-      "duplicate_check": "Geçmiş refleks başlıklarında (hapşırma, esneme, hıçkırık) limon ve tat alma refleksi bulunmamaktadır."
+      "reason": "Günlük hayatta sıkça karşılaşılan bir fizik olayını somut ve merak uyandırıcı bir soruyla ele alır.",
+      "duplicate_check": "Daha önce suyun kaldırma kuvveti, camın yapısı veya kimyasal reaksiyonlar işlendi ancak çay demleme ve kaynama noktası dinamikleri işlenmedi."
     }
   ]
 }
