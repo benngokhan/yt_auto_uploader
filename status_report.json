@@ -1,17 +1,17 @@
 {
-  "updated_at": "2026-11-09 13:05",
-  "updated_at_iso": "2026-11-09T13:05:05.498923+03:00",
+  "updated_at": "2026-11-09 20:11",
+  "updated_at_iso": "2026-11-09T20:11:08.112121+03:00",
   "overall_status": "ok",
   "overall_label": "Her şey çalışıyor",
   "summary": {
     "total_views": 48601,
-    "subscribers": 73,
-    "total_videos_published": 92,
-    "weekly_uploaded": 14,
+    "subscribers": 74,
+    "total_videos_published": 93,
+    "weekly_uploaded": 13,
     "total_comments": 32,
     "total_likes": 167,
     "failed_jobs": 0,
-    "stock_shorts": 8,
+    "stock_shorts": 7,
     "stock_long": 13
   },
   "workers": [
@@ -20,9 +20,9 @@
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-09 13:05",
-      "jobs_done": 92,
-      "last_action": "video_168.mp4 yayınlandı (https://youtu.be/jaXF4A5Erek)",
+      "updated_at": "2026-11-09 20:11",
+      "jobs_done": 93,
+      "last_action": "video_169.mp4 yayınlandı (https://youtu.be/edfxi8rEQVI)",
       "error_message": ""
     },
     {
@@ -30,9 +30,9 @@
       "name": "Kapak İşçisi (Drive Hazır Kapak -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-09 13:05",
-      "jobs_done": 92,
-      "last_action": "video_168.mp4 için hazır Drive kapağı uygulandı",
+      "updated_at": "2026-11-09 20:11",
+      "jobs_done": 93,
+      "last_action": "video_169.mp4 için hazır Drive kapağı uygulandı",
       "error_message": ""
     },
     {
@@ -40,9 +40,9 @@
       "name": "Yorumcu (Sabit Yorum İşçisi)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-09 13:05",
-      "jobs_done": 92,
-      "last_action": "video_168.mp4 altına ilk sabit yorum yazıldı",
+      "updated_at": "2026-11-09 20:11",
+      "jobs_done": 93,
+      "last_action": "video_169.mp4 altına ilk sabit yorum yazıldı",
       "error_message": ""
     },
     {
@@ -50,7 +50,7 @@
       "name": "Analitik çekici (YouTube API)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-09 13:05",
+      "updated_at": "2026-11-09 20:11",
       "jobs_done": 30,
       "last_action": "30 videonun gerçek görüntülenme ve yorum verisi güncellendi",
       "error_message": ""
@@ -72,7 +72,7 @@
       "title": "YouTube API günlük kotası",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-11-09 13:05",
+      "updated_at": "2026-11-09 20:11",
       "detail": "Günlük 10.000 birim kotası aktif ve yeterli."
     },
     {
@@ -80,26 +80,35 @@
       "title": "Google Drive ve Sheets bağlantısı",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-11-09 13:05",
-      "detail": "YOUTUBE_OTOMASYON klasörü ve CEO yükleme tablosu canlı bağlı (Stok: 8 Shorts, 13 Uzun)."
+      "updated_at": "2026-11-09 20:11",
+      "detail": "YOUTUBE_OTOMASYON klasörü ve CEO yükleme tablosu canlı bağlı (Stok: 7 Shorts, 13 Uzun)."
     },
     {
       "id": "comment_worker",
       "title": "Yorum ve kapak işçisi durumu",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-11-09 13:05",
+      "updated_at": "2026-11-09 20:11",
       "detail": "Kapak: Çalışıyor · Yorum: Çalışıyor"
     }
   ],
   "videos": [
     {
+      "id": "edfxi8rEQVI",
+      "url": "https://youtu.be/edfxi8rEQVI",
+      "title": "Gözlerin Açıkken Hapşırmak Neden İmkansız? Beynin O Salisede Ne Yapar? 🤧 #bilgidozu #shorts",
+      "publishedAt": "2026-11-09T17:10:49Z",
+      "views": 0,
+      "likes": 0,
+      "comments": 1
+    },
+    {
       "id": "jaXF4A5Erek",
       "url": "https://youtu.be/jaXF4A5Erek",
       "title": "Mikrodalga Fırın Camındaki Delikli Siyah Tel Neden Var? ⚡ #bilgidozu #shorts",
-      "publishedAt": "2026-11-09T10:04:53Z",
-      "views": 0,
-      "likes": 0,
+      "publishedAt": "2026-11-09T10:05:13Z",
+      "views": 37,
+      "likes": 2,
       "comments": 1
     },
     {
@@ -107,8 +116,8 @@
       "url": "https://youtu.be/HpSHy45_L6g",
       "title": "Efsanevi Şam Çeliği Kılıçların İçinden Karbon Nanotüp Çıktı! ⚔️ #bilgidozu #shorts",
       "publishedAt": "2026-11-08T16:41:54Z",
-      "views": 271,
-      "likes": 4,
+      "views": 310,
+      "likes": 8,
       "comments": 1
     },
     {
@@ -116,7 +125,7 @@
       "url": "https://youtu.be/0poEsgrpgIM",
       "title": "Benzin Pompası Depo Dolunca Çipsiz ve Sensörsüz Nasıl Kendi Durur? ⛽ #bilgidozu #shorts",
       "publishedAt": "2026-11-08T09:52:45Z",
-      "views": 497,
+      "views": 515,
       "likes": 8,
       "comments": 1
     },
@@ -125,7 +134,7 @@
       "url": "https://youtu.be/l6WhTkbP9yU",
       "title": "Mariana Çukuru Ne Kadar Derin? 🌊 #bilgidozu #shorts",
       "publishedAt": "2026-11-07T16:42:49Z",
-      "views": 1245,
+      "views": 1255,
       "likes": 20,
       "comments": 1
     },
@@ -134,7 +143,7 @@
       "url": "https://youtu.be/-9AQb4ZMLGE",
       "title": "Kaplanların Çizgileri Neden Her Birinde Farklıdır? 🐅 #bilgidozu #shorts",
       "publishedAt": "2026-11-07T09:52:30Z",
-      "views": 968,
+      "views": 969,
       "likes": 8,
       "comments": 1
     },
@@ -143,7 +152,7 @@
       "url": "https://youtu.be/WRLtRGqYpY8",
       "title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
       "publishedAt": "2026-11-06T10:08:09Z",
-      "views": 144,
+      "views": 147,
       "likes": 0,
       "comments": 1
     },
@@ -269,7 +278,7 @@
       "url": "https://youtu.be/QhqHWaVWLJY",
       "title": "Karanlıkta Gözümüz Gece Görüşünü Nasıl Açar? Korsan Bandı ve Rodopsin Sırrı 👁️ #bilgidozu",
       "publishedAt": "2026-10-30T10:10:51Z",
-      "views": 14,
+      "views": 16,
       "likes": 0,
       "comments": 1
     },
@@ -352,15 +361,6 @@
       "publishedAt": "2026-10-27T16:34:24Z",
       "views": 254,
       "likes": 3,
-      "comments": 1
-    },
-    {
-      "id": "8HI5KUWLQuM",
-      "url": "https://youtu.be/8HI5KUWLQuM",
-      "title": "Baldır Kasların Aslında İkinci Kalbin! Kanı Kalbe Nasıl Taşıyor? 🦵💪 #bilgidozu #shorts",
-      "publishedAt": "2026-10-27T07:48:17Z",
-      "views": 709,
-      "likes": 6,
       "comments": 1
     }
   ]
