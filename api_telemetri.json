@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-09T01:10:33+00:00",
+  "zaman": "2026-11-09T07:29:58+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -18,9 +18,9 @@
     {
       "ad": "OpenRouter",
       "durum": "ok",
-      "kalan": 50,
+      "kalan": 48,
       "limit": 50,
-      "kullanilan": 0,
+      "kullanilan": 2,
       "birim": "istek/gün (ücretsiz modeller)",
       "ucretsiz": true,
       "yenilenme": "günlük · gece 00:00 UTC · ücretsiz model hakkı",
@@ -32,8 +32,8 @@
       "ad": "Gemini",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1500,
-      "kullanilan": 0,
+      "kalan": 1499,
+      "kullanilan": 1,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 50,
       "yenilenme": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
@@ -43,8 +43,8 @@
       "ad": "Groq",
       "durum": "ok",
       "limit": 1000,
-      "kalan": 1000,
-      "kullanilan": 0,
+      "kalan": 999,
+      "kullanilan": 1,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 11,
       "yenilenme": "dakika + günlük token · günlük kısım gece 00:00 UTC",
@@ -70,10 +70,10 @@
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 456.9,
+      "actions_dakika": 442.6,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1543.1
+      "actions_kalan": 1557.4
     },
     {
       "ad": "Google Drive",
@@ -436,6 +436,10 @@
     },
     {
       "zaman": "2026-11-09T01:10:33+00:00",
+      "elevenlabs_kalan": 10000
+    },
+    {
+      "zaman": "2026-11-09T07:29:58+00:00",
       "elevenlabs_kalan": 10000
     }
   ]
