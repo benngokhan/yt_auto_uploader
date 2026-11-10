@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-10 16:56:34",
-  "generated_at_iso": "2026-11-10T16:56:34.507409+03:00",
+  "generated_at": "2026-11-10 17:40:19",
+  "generated_at_iso": "2026-11-10T17:40:19.111886+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -14,21 +14,16 @@
   },
   "schedule_rules": {
     "daily_slots_tr": [
-      "12:30",
       "19:30"
     ],
     "prewarm_tr": [
-      "12:12",
       "19:12"
     ],
     "watchdog_tr": [
-      "12:50",
-      "13:00",
       "19:50",
       "20:00"
     ],
-    "friday_1230": "long",
-    "friday_1930": "short",
+    "friday_1930": "long",
     "other_days": "short",
     "min_shorts_number": 155,
     "min_long_number": 8,
