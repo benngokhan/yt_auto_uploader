@@ -1,14 +1,5 @@
 #!/usr/bin/env python3
-"""Identify publication slots so a delayed cron and its rescue cannot both publish.
-
-Schedule (Turkey Time, UTC+03):
-- Monday, Tuesday, Wednesday, Thursday, Saturday, Sunday:
-  - 12:30 TR (09:30 UTC) -> Shorts (short)
-  - 19:30 TR (16:30 UTC) -> Shorts (short)
-- Friday (weekday == 4):
-  - 12:30 TR (09:30 UTC) -> Long Video (long)
-  - 19:30 TR (16:30 UTC) -> Shorts (short)
-"""
+"""Günde tek yayın slotunu korur: 19:30 TR; Cuma uzun, diğer günler Shorts."""
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import os
@@ -17,21 +8,12 @@ import sys
 
 UTC = timezone.utc
 SCHEDULES = {
-    "12 9 * * *": (9, 30, None, "auto_noon"),
-    "30 9 * * *": (9, 30, None, "auto_noon"),
-    "12 16 * * *": (16, 30, None, "short"),
-    "30 16 * * *": (16, 30, None, "short"),
+    "12 16 * * *": (16, 30, None, "auto_evening"),
+    "30 16 * * *": (16, 30, None, "auto_evening"),
 }
 WATCHDOGS = {
-    "50 9 * * *": ("30 9 * * *", "erken"),
-    "0 10 * * *": ("30 9 * * *", "tescil"),
     "50 16 * * *": ("30 16 * * *", "erken"),
     "0 17 * * *": ("30 16 * * *", "tescil"),
-    # Legacy aliases kept for compatibility
-    "05 10 * * *": ("30 9 * * *", "erken"),
-    "15 10 * * *": ("30 9 * * *", "tescil"),
-    "05 17 * * *": ("30 16 * * *", "erken"),
-    "15 17 * * *": ("30 16 * * *", "tescil"),
 }
 KEY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}Z$")
 
@@ -45,10 +27,8 @@ def _utc(now):
 
 
 def _slot_kind_for_stamp(stamp: datetime) -> str:
-    if (stamp.hour, stamp.minute) == (9, 30):
-        return "long" if stamp.weekday() == 4 else "short"
     if (stamp.hour, stamp.minute) == (16, 30):
-        return "short"
+        return "long" if stamp.weekday() == 4 else "short"
     raise ValueError("Not a configured publication slot")
 
 
@@ -63,7 +43,7 @@ def scheduled_slot(schedule, now=None):
         candidate -= timedelta(days=(candidate.weekday() - weekday) % 7)
     if candidate > current + timedelta(minutes=25):
         candidate -= timedelta(days=7 if weekday is not None else 1)
-    kind = _slot_kind_for_stamp(candidate) if raw_kind == "auto_noon" else raw_kind
+    kind = _slot_kind_for_stamp(candidate) if raw_kind == "auto_evening" else raw_kind
     return candidate.strftime("%Y-%m-%dT%H:%MZ"), kind
 
 
