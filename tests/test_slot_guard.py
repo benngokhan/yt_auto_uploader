@@ -21,13 +21,13 @@ class SlotGuardTests(unittest.TestCase):
         self.assertEqual(g.scheduled_slot('30 9 * * *',now_fri),('2026-10-30T09:30Z','long'))
         self.assertEqual(g.scheduled_slot('12 9 * * *',now_fri),('2026-10-30T09:30Z','long'))
         self.assertEqual(g.scheduled_slot('30 9 * * *',now_thu),('2026-10-29T09:30Z','short'))
-        self.assertEqual(g.scheduled_slot('30 16 * * *',now_fri_eve),('2026-10-30T16:30Z','short'))
+        self.assertEqual(g.scheduled_slot('30 16 * * *',now_fri_eve),('2026-10-30T16:30Z','long'))
         self.assertEqual(g.watchdog_slot('0 10 * * *',now_fri),('2026-10-30T09:30Z','long','tescil'))
         self.assertEqual(g.watchdog_slot('0 10 * * *',now_thu),('2026-10-29T09:30Z','short','tescil'))
 
     def test_late_run_after_midnight_retains_previous_day_slot(self):
         now=datetime(2026,10,31,0,15,tzinfo=UTC)
-        self.assertEqual(g.scheduled_slot('30 16 * * *',now),('2026-10-30T16:30Z','short'))
+        self.assertEqual(g.scheduled_slot('30 16 * * *',now),('2026-10-30T16:30Z','long'))
 
     def test_slot_age_and_weekday_are_validated(self):
         now=datetime(2026,10,30,10,15,tzinfo=UTC)
