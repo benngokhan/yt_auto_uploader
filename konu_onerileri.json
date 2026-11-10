@@ -1,37 +1,37 @@
 {
-  "generated_at": "2026-11-09T04:17:31.067836+00:00",
+  "generated_at": "2026-11-10T04:08:31.691489+00:00",
   "used_count": 178,
   "method": "Drive yükleme tablosu + onay bekleyen metadata + Gemini anlamsal tekrar kontrolü + yerel benzerlik kapısı",
   "suggestions": [
     {
-      "title": "Kuşlar Yüksek Gerilim Hattındaki Elektrik Tellerine Konunca Neden Çarpılmaz? 🐦⚡ #bilgidozu #shorts",
-      "score": 96,
-      "reason": "Elektrik akımı ve potansiyel fark prensibini en popüler ve net fizik sorusuyla açıklar.",
-      "duplicate_check": "Geçmişte elektrikli yılan balığı ve yıldırım işlendi, kuşların tel üstündeki durumu daha önce yer almadı."
-    },
-    {
-      "title": "Toprak Kokusu Yağmur Yağdıktan Sonra Burnumuza Neden Bu Kadar Keskin ve Hızlı Gelir? 🌧️ #bilgidozu #shorts",
+      "title": "Neden Kendi Sesimizi Kayıtta Dinleyince Yabancı Gelir? Kafatasının Fiziksel Sırrı! 🎙️ #bilgidozu #shorts",
       "score": 95,
-      "reason": "Petrichor adı verilen doğa olayının moleküler yayılım hızını ve insan duyusunu tetikler.",
-      "duplicate_check": "Geçmişte koku-anı tuzağı işlendi ancak yağmur sonrası toprak kokusunun (petrichor) fiziksel yayılımı işlenmedi."
+      "reason": "Daha önce işlenen ses algısı konularından farklı olarak doğrudan kafatası kemiği yoluyla iletilen frekansların ses tellerimizdeki etkisini ve kemik iletim mekanizmasını inceler.",
+      "duplicate_check": "Geçmişteki 'Ses Kaydındaki Sesin Sana Neden Bambaşka Geliyor' konusundan farklı olarak, mekanik kemik iletimi ve frekans değişimi odaklıdır."
     },
     {
-      "title": "Uçak İniş Yaparken Kulaklarımız Neden Tıkanır ve Sakız Çiğnemek Bu Baskıyı Nasıl Çözer? ✈️🍬 #bilgidozu #shorts",
+      "title": "Ayna Karşısında Kendi Göz bebeklerinin Yerini Değiştirdiğini Neden Asla Göremezsin? 👁️🪞 #bilgidozu #shorts",
+      "score": 95,
+      "reason": "İzleyicinin hemen denemek isteyeceği, kendi göz hareketlerinin körlüğünü test eden interaktif bir beyin tuzağı sunar.",
+      "duplicate_check": "Geçmişteki kör nokta veya göz seğirmesi konularından farklı olarak sakatlanan optik tarama (saccadic masking) üzerinedir."
+    },
+    {
+      "title": "Yalnızken Duyduğun O Hafif Uğultu veya Çınlama Neden Asla Kesilmez? 🧠🔊 #bilgidozu #shorts",
       "score": 94,
-      "reason": "Uçak yolculuklarında milyonlarca kişinin yaşadığı fiziksel basınç değişimini anatomiyle bağlar.",
-      "duplicate_check": "Geçmişte uçak pencerelerindeki delik ve kulak tıkanması kısaca değinildi ancak detaylı basınç eşitleme mekanizması işlenmedi."
+      "reason": "Herkesin deneyimlediği ancak adını koyamadığı 'kulak çınlaması ve sinir sistemi gürültüsü' olgusunu somut bir merak unsuruyla ele alır.",
+      "duplicate_check": "Geçmişteki uzay sesleri veya kulak tıkanması konularından farklı olarak sinirsel arka plan gürültüsünü inceler."
     },
     {
-      "title": "Neden Asansör Aşağı Hızla İnerken Miden Sanki Yukarıda Kalmış Gibi Havalanır? 🛗 #bilgidozu #shorts",
+      "title": "Islak Tişört Neden Kuru Halinden Belli Oranda Daha Koyu Renk Görünür? 👕💧 #bilgidozu #shorts",
+      "score": 94,
+      "reason": "Her gün gözümüzün önünde olan basit ama optik fiziğe dayanan bir olayın arkasındaki ışık hapsolma sırrını verir.",
+      "duplicate_check": "Geçmişteki su berraklığı, buz kayganlığı veya ışık kırılması konularından tamamen farklı bir optik konudur."
+    },
+    {
+      "title": "Karanlıkta Yürürken Ayak Serçe Parmağımızı Neden Sürekli Mobilyaya Çarparız? 🦶💥 #bilgidozu #shorts",
       "score": 93,
-      "reason": "Fiziksel ivmelenme ile iç organların konum algısı arasındaki çatışmayı ilk saniyede canlandırır.",
-      "duplicate_check": "Geçmişte beyin sensörleri ve denge işlendi ancak asansör düşme hissi ve ivme ayrı olarak işlenmedi."
-    },
-    {
-      "title": "Çay Demlerken Su Neden Tek Bir Noktadan Değil de Tüm Yüzeyden Kaynamaya Başlar? 🫖 #bilgidozu #shorts",
-      "score": 92,
-      "reason": "Günlük hayatta sıkça karşılaşılan bir fizik olayını somut ve merak uyandırıcı bir soruyla ele alır.",
-      "duplicate_check": "Daha önce suyun kaldırma kuvveti, camın yapısı veya kimyasal reaksiyonlar işlendi ancak çay demleme ve kaynama noktası dinamikleri işlenmedi."
+      "reason": "Herkesin başına gelen evrensel ve komik bir sakarlığı nörolojik ve anatomik bir soruyla açıklar.",
+      "duplicate_check": "Geçmişteki acı, uyuşma veya refleks konularının hiçbirinde ayak serçe parmağının sinir haritası işlenmemiştir."
     }
   ]
 }
