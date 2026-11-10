@@ -36,7 +36,7 @@ def yt_archive(y):
    m=re.fullmatch(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?',ds.get(vid,''));sec=(int(m.group(1)or 0)*3600+int(m.group(2)or 0)*60+int(m.group(3)or 0)) if m else 0;out.append({'id':vid,'title':title,'duration':sec})
  return out
 def main():
- d,y=clients();shorts=d.files().list(q=f"'{CANDIDATE_FOLDER}' in parents and trashed=false",fields='files(id,name,shortcutDetails)',pageSize=1000).execute()['files'];archive=yt_archive(y);results=[]
+ d,y=clients(); raw=json.loads(Path('youtube_arsiv_adaylari.json').read_text()); shorts=[{'name':x['name'],'shortcutDetails':{'targetId':x['target_id']}} for x in raw]; archive=yt_archive(y);results=[]
  with tempfile.TemporaryDirectory() as td:
   td=Path(td);ytcache={}
   for idx,s in enumerate(shorts,1):
