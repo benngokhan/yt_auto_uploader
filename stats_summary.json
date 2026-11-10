@@ -1,24 +1,19 @@
 {
- "total": 23516,
- "day_gain": 13,
- "updated": 10,
+ "total": 23526,
+ "day_gain": 10,
+ "updated": 6,
  "baseline_count": 0,
  "compared_count": 48,
  "unavailable_count": 4,
  "dry_run": false,
  "top": [
   {
-   "delta": 2,
+   "delta": 3,
    "title": "İlk Yudum Su Daha Kana Karışmadan Susuzluğunu Nasıl Anında K",
    "file": "video_152.mp4"
   },
   {
-   "delta": 2,
-   "title": "Sabah Uyandığında Boyun Geceye Göre Neden 2 Santim Daha Uzun",
-   "file": "video_150.mp4"
-  },
-  {
-   "delta": 2,
+   "delta": 3,
    "title": "Karanlıkta Gözümüz Gece Görüşünü Nasıl Açar? Korsan Bandı ve",
    "file": "uzun_video_17.mp4"
   },
@@ -26,6 +21,11 @@
    "delta": 1,
    "title": "Üçgen ve Açı Kelimelerini Atatürk'ün Bizzat Türettiğini Bili",
    "file": "video_157.mp4"
+  },
+  {
+   "delta": 1,
+   "title": "Utandığında Neden Sadece Yüzün ve Kulakların Kızarır? 😳 #bil",
+   "file": "video_100.mp4"
   },
   {
    "delta": 1,
