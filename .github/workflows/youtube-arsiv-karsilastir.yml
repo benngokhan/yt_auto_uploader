@@ -1,0 +1,37 @@
+name: Yayınlanmamış videoları YouTube arşiviyle karşılaştır
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  karsilastir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - run: pip install -q google-api-python-client google-auth opencv-python-headless yt-dlp
+      - name: Drive adaylarını YouTube kanal arşiviyle karşılaştır
+        env:
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          CANDIDATE_FOLDER: 1jtwZ1mOpiNgBIo1yD3ScYVhRJfPlrx0Q
+        run: python youtube_arsiv_karsilastir.py
+      - name: Raporu kaydet
+        if: always()
+        run: |
+          test -f youtube_arsiv_karsilastirma.json || exit 1
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add youtube_arsiv_karsilastirma.json
+          git diff --cached --quiet || git commit -m 'YouTube arşiv karşılaştırmasını güncelle [skip ci]'
+          git pull --rebase --autostash origin main
+          git push
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: youtube-arsiv-karsilastirma
+          path: youtube_arsiv_karsilastirma.json
+          if-no-files-found: warn
