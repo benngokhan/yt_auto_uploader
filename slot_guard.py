@@ -8,10 +8,16 @@ import sys
 
 UTC = timezone.utc
 SCHEDULES = {
+    # Eski kayıt/test uyumluluğu; iş akışında artık bu cronlar yoktur.
+    "12 9 * * *": (9, 30, None, "auto_legacy_noon"),
+    "30 9 * * *": (9, 30, None, "auto_legacy_noon"),
     "12 16 * * *": (16, 30, None, "auto_evening"),
     "30 16 * * *": (16, 30, None, "auto_evening"),
 }
 WATCHDOGS = {
+    # Eski cronlar yalnız tarihsel kayıt/test uyumluluğu içindir; workflow bunları çağırmaz.
+    "50 9 * * *": ("30 9 * * *", "erken"),
+    "0 10 * * *": ("30 9 * * *", "tescil"),
     "50 16 * * *": ("30 16 * * *", "erken"),
     "0 17 * * *": ("30 16 * * *", "tescil"),
 }
@@ -27,7 +33,7 @@ def _utc(now):
 
 
 def _slot_kind_for_stamp(stamp: datetime) -> str:
-    if (stamp.hour, stamp.minute) == (16, 30):
+    if (stamp.hour, stamp.minute) in ((9, 30), (16, 30)):
         return "long" if stamp.weekday() == 4 else "short"
     raise ValueError("Not a configured publication slot")
 
@@ -43,7 +49,7 @@ def scheduled_slot(schedule, now=None):
         candidate -= timedelta(days=(candidate.weekday() - weekday) % 7)
     if candidate > current + timedelta(minutes=25):
         candidate -= timedelta(days=7 if weekday is not None else 1)
-    kind = _slot_kind_for_stamp(candidate) if raw_kind == "auto_evening" else raw_kind
+    kind = _slot_kind_for_stamp(candidate) if raw_kind in ("auto_evening", "auto_legacy_noon") else raw_kind
     return candidate.strftime("%Y-%m-%dT%H:%MZ"), kind
 
 
