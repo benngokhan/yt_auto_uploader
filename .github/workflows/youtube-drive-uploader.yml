@@ -26,13 +26,10 @@ on:
         type: string
         default: ""
   schedule:
-    # Türkiye (UTC+03): Her gün 12:30 ve 19:30 (2 slot).
-    # Cuma 12:30 Uzun Video + 19:30 Shorts; diğer günler 12:30 Shorts + 19:30 Shorts.
-    # GitHub Actions cron kuyruğu gecikmesini önlemek için erken ısınma (:12) + tam saat (:30) tetikleyicileri:
-    - cron: "12 9 * * *"   # 12:12 Türkiye ısınma (12:30 slotu için kuyruk gecikmesi önleyici)
-    - cron: "30 9 * * *"   # 12:30 Türkiye — Ana Slot (Cuma Uzun Video, diğer günler Shorts)
-    - cron: "12 16 * * *"  # 19:12 Türkiye ısınma (19:30 slotu için kuyruk gecikmesi önleyici)
-    - cron: "30 16 * * *"  # 19:30 Türkiye — Ana Slot (Her gün Shorts)
+    # Türkiye (UTC+03): Günde tek yayın, 19:30.
+    # Cuma 19:30 Uzun Video; diğer günler 19:30 Shorts.
+    - cron: "12 16 * * *"  # 19:12 Türkiye erken ısınma
+    - cron: "30 16 * * *"  # 19:30 Türkiye ana slot
 
 permissions:
   actions: read
