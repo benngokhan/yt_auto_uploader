@@ -1,14 +1,10 @@
 name: Slot Watchdog
 # DEAD-MAN-SWITCH v3 (Seçenek A — 20/30 dk): video slotundan GECİKİRSE Telegram alarm + otomatik kurtarma.
-#   12:50 TR (slot+20, erken) : uploaded.txt'de slot YAYIN damgası yoksa ALARM
-#   13:00 TR (slot+30, tescil): hala yoksa ALARM + run hic baslamadiysa OTOMATIK KURTARMA
-#   19:50 / 20:00 TR: 19:30 Shorts slotu için erken uyarı ve otomatik kurtarma.
-# Cuma 12:30 slotu Uzun Video, diğer tüm 12:30 ve 19:30 slotları Shorts olarak denetlenir.
+#   19:50 / 20:00 TR: 19:30 tek yayın slotu için uyarı ve otomatik kurtarma.
+# Cuma 19:30 Uzun Video, diğer günler 19:30 Shorts denetlenir.
 
 on:
   schedule:
-    - cron: "50 9 * * *"   # 12:50 TR -> 12:30 slotu (erken uyarı)
-    - cron: "0 10 * * *"   # 13:00 TR -> 12:30 slotu (tescil + otomatik kurtarma)
     - cron: "50 16 * * *"  # 19:50 TR -> 19:30 slotu (erken uyarı)
     - cron: "0 17 * * *"   # 20:00 TR -> 19:30 slotu (tescil + otomatik kurtarma)
   workflow_dispatch: {}
