@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-10T07:12:20+00:00",
+  "zaman": "2026-11-10T13:04:55+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -18,9 +18,9 @@
     {
       "ad": "OpenRouter",
       "durum": "ok",
-      "kalan": 48,
+      "kalan": 46,
       "limit": 50,
-      "kullanilan": 2,
+      "kullanilan": 4,
       "birim": "istek/gün (ücretsiz modeller)",
       "ucretsiz": true,
       "yenilenme": "günlük · gece 00:00 UTC · ücretsiz model hakkı",
@@ -32,8 +32,8 @@
       "ad": "Gemini",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1499,
-      "kullanilan": 1,
+      "kalan": 1498,
+      "kullanilan": 2,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 50,
       "yenilenme": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
@@ -43,8 +43,8 @@
       "ad": "Groq",
       "durum": "ok",
       "limit": 1000,
-      "kalan": 999,
-      "kullanilan": 1,
+      "kalan": 998,
+      "kullanilan": 2,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 11,
       "yenilenme": "dakika + günlük token · günlük kısım gece 00:00 UTC",
@@ -70,10 +70,10 @@
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 368.0,
+      "actions_dakika": 362.1,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1632.0
+      "actions_kalan": 1637.9
     },
     {
       "ad": "Google Drive",
@@ -109,7 +109,7 @@
         },
         {
           "ad": "CEO / Tablolar",
-          "boyut": 384459683,
+          "boyut": 384460842,
           "dosya": 47,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
@@ -153,9 +153,9 @@
           "boyut": 42831080
         }
       ],
-      "drive_gorunen": 2552307154,
+      "drive_gorunen": 2552308313,
       "kendi_dosyalar": 2095852910,
-      "paylasilan": 456454244,
+      "paylasilan": 456455403,
       "disalan": 3544476744,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
@@ -164,11 +164,11 @@
     {
       "ad": "YouTube Data API",
       "durum": "ok",
-      "kalan": 10000,
+      "kalan": 8300,
       "limit": 10000,
-      "kullanilan": 0,
+      "kullanilan": 1700,
       "birim": "birim (tahmini)",
-      "bugun_yukleme": 0,
+      "bugun_yukleme": 1,
       "yenilenme": "günlük · gece 00:00 Pasifik (TR 10:00) sıfırlanır",
       "not_": "gerçek kota API'de yok; yükleme ≈ 1700 birim sayıldı"
     }
@@ -456,6 +456,10 @@
     },
     {
       "zaman": "2026-11-10T07:12:20+00:00",
+      "elevenlabs_kalan": 10000
+    },
+    {
+      "zaman": "2026-11-10T13:04:55+00:00",
       "elevenlabs_kalan": 10000
     }
   ]
