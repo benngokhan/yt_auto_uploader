@@ -53,8 +53,9 @@ jobs:
 
       - name: FFmpeg
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg
+          command -v ffmpeg
+          command -v ffprobe
+          ffmpeg -version | head -1
 
       - name: Bağımlılıklar (XTTS-v2 CPU)
         run: |
