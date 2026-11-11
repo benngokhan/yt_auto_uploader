@@ -181,15 +181,35 @@ def yayin_bilgisi_uret(konu: str, sahneler: list[dict]) -> dict:
     key=os.getenv("GEMINI_API_KEY","").strip()
     if text is None and key:
         try:
+            import time
             with urllib.request.urlopen("https://generativelanguage.googleapis.com/v1beta/models?key="+key,timeout=60) as r:models=json.load(r).get("models",[])
             usable=[m["name"].split("/",1)[-1] for m in models if "generateContent" in m.get("supportedGenerationMethods",[]) and "flash" in m.get("name","").lower() and not any(x in m.get("name","").lower() for x in ("tts","image","live","omni"))]
             model=sorted(usable,key=lambda x:(("preview" not in x),x),reverse=True)[0]
             body={"contents":[{"parts":[{"text":prompt}]}],"generationConfig":{"responseMimeType":"application/json","temperature":0.5}}
-            req=urllib.request.Request(f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}",data=json.dumps(body).encode(),headers={"Content-Type":"application/json"})
-            with urllib.request.urlopen(req,timeout=120) as r:data=json.load(r)
-            text=data["candidates"][0]["content"]["parts"][0]["text"]
+            son=None
+            for bekle in (0,5,15,30):
+                if bekle: time.sleep(bekle)
+                try:
+                    req=urllib.request.Request(f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}",data=json.dumps(body).encode(),headers={"Content-Type":"application/json"})
+                    with urllib.request.urlopen(req,timeout=120) as r:data=json.load(r)
+                    text=data["candidates"][0]["content"]["parts"][0]["text"]
+                    break
+                except urllib.error.HTTPError as e:
+                    son=e
+                    if e.code not in (429,500,502,503,504): raise
+            if text is None and son: raise son
         except Exception as e: errors.append("gemini:"+repr(e))
-    if text is None: raise SystemExit("Yayın bilgisi üretilemedi: "+" | ".join(errors))
+    if text is None:
+        # Metadata servisi geçici olarak kapalı olsa bile tamamlanmış MP4'ü kaybetme.
+        temiz = re.sub(r"\s+", " ", konu).strip()
+        etiket_kelimeler = [x.lower() for x in re.findall(r"[A-Za-zÇĞİÖŞÜçğıöşü]{4,}", temiz)[:8]]
+        return {"baslik": temiz[:67].rstrip(" ?!.,") + "?",
+                "aciklama": anlatim + "\n\nBu kısa videoda " + temiz.lower() + " konusunu açıklıyoruz.",
+                "hashtag": "#bilgidozu #shorts #bilim",
+                "etiketler": ", ".join(dict.fromkeys(etiket_kelimeler + ["bilgi dozu","bilim","shorts"])),
+                "sabit_yorum": temiz.rstrip(" ?!.,") + " hakkında daha önce bunu fark etmiş miydiniz? 🧠",
+                "kategori": "Bilim ve Teknoloji", "konu_ozeti": temiz,
+                "metadata_notu": "LLM metadata servisi geçici erişilemedi; güvenli konu tabanlı yedek kullanıldı."}
     m=re.search(r"\{.*\}",text,re.S);out=json.loads(m.group(0) if m else text)
     gerekli=["baslik","aciklama","hashtag","etiketler","sabit_yorum","kategori","konu_ozeti"]
     if any(not str(out.get(k,"")).strip() for k in gerekli): raise SystemExit("Yayın bilgisi eksik üretildi.")
