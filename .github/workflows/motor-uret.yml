@@ -178,6 +178,7 @@ jobs:
           PY2
           )
           META=$(find motor/cikti -name yayin_bilgisi.json | head -1)
+          if [ -z "$META" ] || [ ! -f "$META" ]; then echo "Metadata yok; Telegram gönderimi güvenli biçimde atlandı."; exit 0; fi
           BASLIK=$(jq -r '.baslik // "—"' "$META")
           CAPTION=$(printf '🎬 YENİ VİDEO · ONAY BEKLİYOR\n\nBaşlık: %s\nKonu: %s\nSes: Gemini doğal erkek\nSüre: %s sn · Boyut: %s\n\nYayın bilgileri ve işlem düğmeleri aşağıdaki mesajdadır.' "$BASLIK" "$KONU" "$SURE" "$BOYUT")
           if [ ${#kapaklar[@]} -gt 0 ]; then
