@@ -1,17 +1,17 @@
 {
-  "updated_at": "2026-11-10 19:55",
-  "updated_at_iso": "2026-11-10T19:55:07.502992+03:00",
+  "updated_at": "2026-11-11 19:58",
+  "updated_at_iso": "2026-11-11T19:58:34.536260+03:00",
   "overall_status": "ok",
   "overall_label": "Her şey çalışıyor",
   "summary": {
-    "total_views": 49434,
+    "total_views": 50343,
     "subscribers": 76,
-    "total_videos_published": 95,
-    "weekly_uploaded": 14,
-    "total_comments": 32,
-    "total_likes": 186,
+    "total_videos_published": 96,
+    "weekly_uploaded": 12,
+    "total_comments": 33,
+    "total_likes": 211,
     "failed_jobs": 0,
-    "stock_shorts": 5,
+    "stock_shorts": 4,
     "stock_long": 13
   },
   "workers": [
@@ -20,9 +20,9 @@
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-10 19:55",
-      "jobs_done": 95,
-      "last_action": "video_171.mp4 yayınlandı (https://youtu.be/mWlIdAEN5qA)",
+      "updated_at": "2026-11-11 19:58",
+      "jobs_done": 96,
+      "last_action": "video_172.mp4 yayınlandı (https://youtu.be/6nN5hQkkHWs)",
       "error_message": ""
     },
     {
@@ -30,9 +30,9 @@
       "name": "Kapak İşçisi (Drive Hazır Kapak -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-10 19:55",
-      "jobs_done": 95,
-      "last_action": "video_171.mp4 için hazır Drive kapağı uygulandı",
+      "updated_at": "2026-11-11 19:58",
+      "jobs_done": 96,
+      "last_action": "video_172.mp4 için hazır Drive kapağı uygulandı",
       "error_message": ""
     },
     {
@@ -40,9 +40,9 @@
       "name": "Yorumcu (Sabit Yorum İşçisi)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-10 19:55",
-      "jobs_done": 95,
-      "last_action": "video_171.mp4 altına ilk sabit yorum yazıldı",
+      "updated_at": "2026-11-11 19:58",
+      "jobs_done": 96,
+      "last_action": "video_172.mp4 altına ilk sabit yorum yazıldı",
       "error_message": ""
     },
     {
@@ -50,7 +50,7 @@
       "name": "Analitik çekici (YouTube API)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-10 19:55",
+      "updated_at": "2026-11-11 19:58",
       "jobs_done": 30,
       "last_action": "30 videonun gerçek görüntülenme ve yorum verisi güncellendi",
       "error_message": ""
@@ -72,7 +72,7 @@
       "title": "YouTube API günlük kotası",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-11-10 19:55",
+      "updated_at": "2026-11-11 19:58",
       "detail": "Günlük 10.000 birim kotası aktif ve yeterli."
     },
     {
@@ -80,34 +80,43 @@
       "title": "Google Drive ve Sheets bağlantısı",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-11-10 19:55",
-      "detail": "YOUTUBE_OTOMASYON klasörü ve CEO yükleme tablosu canlı bağlı (Stok: 5 Shorts, 13 Uzun)."
+      "updated_at": "2026-11-11 19:58",
+      "detail": "YOUTUBE_OTOMASYON klasörü ve CEO yükleme tablosu canlı bağlı (Stok: 4 Shorts, 13 Uzun)."
     },
     {
       "id": "comment_worker",
       "title": "Yorum ve kapak işçisi durumu",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-11-10 19:55",
+      "updated_at": "2026-11-11 19:58",
       "detail": "Kapak: Çalışıyor · Yorum: Çalışıyor"
     }
   ],
   "videos": [
     {
-      "id": "mWlIdAEN5qA",
-      "url": "https://youtu.be/mWlIdAEN5qA",
-      "title": "Elektrikli Yılan Balığı 860 Volt Elektrik Üretirken Kendini Neden Çarpmaz? ⚡ #bilgidozu #shorts",
-      "publishedAt": "2026-11-10T16:54:55Z",
+      "id": "6nN5hQkkHWs",
+      "url": "https://youtu.be/6nN5hQkkHWs",
+      "title": "Yürüyen Merdiven Kenarındaki Fırçalar Ayakkabı Silmek İçin Değil! 👟 #bilgidozu #shorts",
+      "publishedAt": "2026-11-11T16:58:21Z",
       "views": 0,
       "likes": 0,
       "comments": 1
+    },
+    {
+      "id": "mWlIdAEN5qA",
+      "url": "https://youtu.be/mWlIdAEN5qA",
+      "title": "Elektrikli Yılan Balığı 860 Volt Elektrik Üretirken Kendini Neden Çarpmaz? ⚡ #bilgidozu #shorts",
+      "publishedAt": "2026-11-10T16:55:22Z",
+      "views": 395,
+      "likes": 18,
+      "comments": 2
     },
     {
       "id": "vJW-L_tAeTo",
       "url": "https://youtu.be/vJW-L_tAeTo",
       "title": "Paskalya Adası'ndaki 80 Tonluk Dev Taş Heykeller Nasıl Yürütüldü? 🗿 #bilgidozu #shorts",
       "publishedAt": "2026-11-10T10:00:20Z",
-      "views": 4,
+      "views": 13,
       "likes": 0,
       "comments": 1
     },
@@ -116,8 +125,8 @@
       "url": "https://youtu.be/edfxi8rEQVI",
       "title": "Gözlerin Açıkken Hapşırmak Neden İmkansız? Beynin O Salisede Ne Yapar? 🤧 #bilgidozu #shorts",
       "publishedAt": "2026-11-09T17:11:23Z",
-      "views": 399,
-      "likes": 12,
+      "views": 658,
+      "likes": 18,
       "comments": 1
     },
     {
@@ -125,8 +134,8 @@
       "url": "https://youtu.be/jaXF4A5Erek",
       "title": "Mikrodalga Fırın Camındaki Delikli Siyah Tel Neden Var? ⚡ #bilgidozu #shorts",
       "publishedAt": "2026-11-09T10:05:13Z",
-      "views": 277,
-      "likes": 8,
+      "views": 399,
+      "likes": 11,
       "comments": 1
     },
     {
@@ -134,7 +143,7 @@
       "url": "https://youtu.be/HpSHy45_L6g",
       "title": "Efsanevi Şam Çeliği Kılıçların İçinden Karbon Nanotüp Çıktı! ⚔️ #bilgidozu #shorts",
       "publishedAt": "2026-11-08T16:41:54Z",
-      "views": 423,
+      "views": 428,
       "likes": 9,
       "comments": 1
     },
@@ -143,7 +152,7 @@
       "url": "https://youtu.be/0poEsgrpgIM",
       "title": "Benzin Pompası Depo Dolunca Çipsiz ve Sensörsüz Nasıl Kendi Durur? ⛽ #bilgidozu #shorts",
       "publishedAt": "2026-11-08T09:52:45Z",
-      "views": 648,
+      "views": 667,
       "likes": 13,
       "comments": 1
     },
@@ -152,7 +161,7 @@
       "url": "https://youtu.be/l6WhTkbP9yU",
       "title": "Mariana Çukuru Ne Kadar Derin? 🌊 #bilgidozu #shorts",
       "publishedAt": "2026-11-07T16:42:49Z",
-      "views": 1265,
+      "views": 1271,
       "likes": 20,
       "comments": 1
     },
@@ -161,7 +170,7 @@
       "url": "https://youtu.be/-9AQb4ZMLGE",
       "title": "Kaplanların Çizgileri Neden Her Birinde Farklıdır? 🐅 #bilgidozu #shorts",
       "publishedAt": "2026-11-07T09:52:30Z",
-      "views": 969,
+      "views": 967,
       "likes": 8,
       "comments": 1
     },
@@ -170,8 +179,8 @@
       "url": "https://youtu.be/WRLtRGqYpY8",
       "title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
       "publishedAt": "2026-11-06T10:08:09Z",
-      "views": 150,
-      "likes": 0,
+      "views": 156,
+      "likes": 1,
       "comments": 1
     },
     {
@@ -179,7 +188,7 @@
       "url": "https://youtu.be/m1O6pNJvPwQ",
       "title": "Üzgün Olmasan Bile Her 5 Dakikada Bir Neden Fark Etmeden İç Çekersin? 🫁 #bilgidozu #shorts",
       "publishedAt": "2026-11-05T17:13:46Z",
-      "views": 497,
+      "views": 500,
       "likes": 4,
       "comments": 1
     },
@@ -188,7 +197,7 @@
       "url": "https://youtu.be/DFOAE6foZ8E",
       "title": "Çok Tuzlu Çekirdek Yediğinde Dudakların Neden Kuruyup Büzüşür? 🧂 #bilgidozu #shorts",
       "publishedAt": "2026-11-05T10:10:07Z",
-      "views": 433,
+      "views": 434,
       "likes": 4,
       "comments": 1
     },
@@ -206,7 +215,7 @@
       "url": "https://youtu.be/P4ReB0TGUwk",
       "title": "Gece Yatakta Tek Ayağını Yorgandan Çıkarınca Neden Hemen Uykun Gelir? 🦶 #bilgidozu #shorts",
       "publishedAt": "2026-11-04T10:08:48Z",
-      "views": 1355,
+      "views": 1357,
       "likes": 28,
       "comments": 3
     },
@@ -215,7 +224,7 @@
       "url": "https://youtu.be/YtvsarKc75s",
       "title": "Aynı Kelimeyi 20 Kez Söyleyince Neden Anlamı Bir Anda Silinir? 🧠 #bilgidozu #shorts",
       "publishedAt": "2026-11-03T16:58:28Z",
-      "views": 367,
+      "views": 371,
       "likes": 5,
       "comments": 1
     },
@@ -233,7 +242,7 @@
       "url": "https://youtu.be/KfHoxTt2y60",
       "title": "Havuç Gece Görüşünü Güçlendirir Efsanesi Nasıl Gizli Radar Oyunu Çıktı? 🥕 #bilgidozu #shorts",
       "publishedAt": "2026-11-02T17:05:23Z",
-      "views": 1028,
+      "views": 1029,
       "likes": 7,
       "comments": 1
     },
@@ -269,7 +278,7 @@
       "url": "https://youtu.be/ALzLcnPSZtY",
       "title": "İlk Yudum Su Daha Kana Karışmadan Susuzluğunu Nasıl Anında Keser? 💧 #bilgidozu #shorts",
       "publishedAt": "2026-10-31T17:00:48Z",
-      "views": 181,
+      "views": 182,
       "likes": 7,
       "comments": 1
     },
@@ -296,7 +305,7 @@
       "url": "https://youtu.be/QhqHWaVWLJY",
       "title": "Karanlıkta Gözümüz Gece Görüşünü Nasıl Açar? Korsan Bandı ve Rodopsin Sırrı 👁️ #bilgidozu",
       "publishedAt": "2026-10-30T10:10:51Z",
-      "views": 16,
+      "views": 19,
       "likes": 0,
       "comments": 1
     },
@@ -341,7 +350,7 @@
       "url": "https://youtu.be/0vGKrBpJh0Q",
       "title": "Sevdiğin Birine Bakınca Göz Bebeğin Neden Otomatik Büyür? 👀 #bilgidozu #shorts",
       "publishedAt": "2026-10-28T11:07:39Z",
-      "views": 146,
+      "views": 147,
       "likes": 2,
       "comments": 1
     },
@@ -352,15 +361,6 @@
       "publishedAt": "2026-10-28T07:58:42Z",
       "views": 130,
       "likes": 2,
-      "comments": 1
-    },
-    {
-      "id": "LGXmOwTtGOw",
-      "url": "https://youtu.be/LGXmOwTtGOw",
-      "title": "Güneşe Dönünce Hapşırıyor musun? Bu Bir Refleks: ACHOO! ☀️🤧 #bilgidozu #shorts",
-      "publishedAt": "2026-10-27T22:00:54Z",
-      "views": 148,
-      "likes": 3,
       "comments": 1
     }
   ]
