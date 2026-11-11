@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-11T00:29:51+00:00",
+  "zaman": "2026-11-11T06:49:57+00:00",
   "anahtar_durumu": "ok",
   "tier": "free",
   "durum": "free",
@@ -9,7 +9,7 @@
   "yuzde_kalan": 100.0,
   "reset_unix": 1796620024,
   "reset_iso": "2026-12-07T05:07:04+00:00",
-  "reset_gun": 26,
+  "reset_gun": 25,
   "para_birimi": "usd",
   "klonlama": {
     "instant": false,
@@ -197,6 +197,11 @@
     },
     {
       "zaman": "2026-11-11T00:29:51+00:00",
+      "kalan": 10000,
+      "kullanilan": 0
+    },
+    {
+      "zaman": "2026-11-11T06:49:57+00:00",
       "kalan": 10000,
       "kullanilan": 0
     }
