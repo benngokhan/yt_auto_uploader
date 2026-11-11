@@ -53,9 +53,21 @@ jobs:
 
       - name: FFmpeg
         run: |
-          command -v ffmpeg
-          command -v ffprobe
-          ffmpeg -version | head -1
+          if command -v ffmpeg >/dev/null 2>&1 && command -v ffprobe >/dev/null 2>&1; then
+            ffmpeg -version | head -1
+            exit 0
+          fi
+          for deneme in 1 2 3 4; do
+            echo "FFmpeg kurulum denemesi $deneme/4"
+            if sudo apt-get -o Acquire::Retries=4 update -qq && \
+               sudo apt-get -o Acquire::Retries=4 install -y -qq --fix-missing ffmpeg; then
+              command -v ffmpeg && command -v ffprobe && exit 0
+            fi
+            sudo rm -rf /var/lib/apt/lists/partial/* || true
+            sleep $((deneme * 12))
+          done
+          echo "FFmpeg kurulamadı"
+          exit 1
 
       - name: Bağımlılıklar (XTTS-v2 CPU)
         run: |
