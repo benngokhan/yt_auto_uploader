@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-11-12 00:16:42",
-  "generated_at_iso": "2026-11-12T00:16:42.931528+03:00",
+  "generated_at": "2026-11-12 01:22:58",
+  "generated_at_iso": "2026-11-12T01:22:58.797290+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
-    "table_file_id": "1ulh13cnzYTaIlp1vehJ7lDrSsgjKyM_X",
+    "table_file_id": "",
     "shorts_video": "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR",
     "shorts_cover": "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR",
     "long_video": "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR",
@@ -35,8 +35,8 @@
     "ready_longs": 1,
     "total_ready": 1,
     "days_of_stock": 0.5,
-    "next_short": "video_173.mp4",
-    "next_short_title": "Güneş Bir Saniyeliğine Sönseydi Ne Olurdu? ☀️ #bilgidozu #shorts",
+    "next_short": null,
+    "next_short_title": "",
     "next_long": "uzun_video_22.mp4",
     "next_long_title": "Tokken Neden Tatlı İsteriz? Beyindeki 'Tatlı Midesi' Şalterinin 2025 Bilimsel Kanıtı 🍰 #bilgidozu",
     "missing_covers": []
