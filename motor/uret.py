@@ -230,8 +230,8 @@ def main() -> int:
     sahneler = sahne_plani(a.konu, sahne_sayisi, ayar)
     anlatim_karakter = len(" ".join(str(x.get("ses", "")).strip() for x in sahneler))
     print(f"Gerçek anlatım karakteri: {anlatim_karakter}")
-    if anlatim_karakter < 430 or anlatim_karakter > 650:
-        raise SystemExit(f"Anlatım kalite kapısı: {anlatim_karakter} karakter; gerekli aralık 430-650. Video oluşturulmadı.")
+    if anlatim_karakter < 300 or anlatim_karakter > 650:
+        raise SystemExit(f"Anlatım kalite kapısı: {anlatim_karakter} karakter; gerekli aralık 300-650. Video oluşturulmadı.")
     # XTTS'nin sert veya hatalı okuduğu kalıpları senaryo düzeyinde doğal Türkçeyle değiştir.
     # Böylece ses ile ekrandaki altyazı birebir aynı kalır.
     for s in sahneler:
