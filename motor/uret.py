@@ -89,8 +89,9 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
         "\"ıslak tutuş\" yerine \"wet wrinkled fingertips\" gibi. Fotoğraflanabilir bir şey yaz; "
         "yazı/logo/tabela içeren sahne istemeyin. Ana konu arı/petek ise mum, su damlası gibi yalnızca benzetmeyi gösteren konu dışı görsel YASAK; ana nesne her sorguda geçsin.\n"
         "- vurgular: o sahnenin altyazısında sarı boyanacak 1-3 kelime\n"
-        "Selamlama ve 'abone olun' YASAK. İlk sahnenin sesi tek soru ve ≤6 kelime olsun. "
-        "Son sahne yumuşak ve doğal bir cümleyle bitsin. 'Bakacağız' kelimesini ve sert slogan tonunu kullanma; gerekiyorsa 'Bir sonraki videoda bunu inceleyeceğiz.' de."
+        "Selamlama ve 'abone olun' YASAK. İlk sahnenin sesi tek soru ve 5-8 kelime olsun. "
+        "Toplam anlatım boşluklar dahil 430-560 Türkçe karakter olmalı; ilk sahne hariç her sahne 110-160 karakter olmalı. "
+        "Cümleler doğal, bilgi yoğun ve sesli okumada toplam 38-42 saniyeye uygun olmalı. Son sahne yumuşak ve doğal bir cümleyle bitsin. 'Bakacağız' kelimesini ve sert slogan tonunu kullanma; gerekiyorsa 'Bir sonraki videoda bunu inceleyeceğiz.' de."
     )
 
     def _cagir(url, govde, basliklar):
@@ -214,6 +215,10 @@ def main() -> int:
     re_ = motor_hazirla(ayar)
 
     sahneler = sahne_plani(a.konu, sahne_sayisi, ayar)
+    anlatim_karakter = len(" ".join(str(x.get("ses", "")).strip() for x in sahneler))
+    print(f"Gerçek anlatım karakteri: {anlatim_karakter}")
+    if anlatim_karakter < 430 or anlatim_karakter > 650:
+        raise SystemExit(f"Anlatım kalite kapısı: {anlatim_karakter} karakter; gerekli aralık 430-650. Video oluşturulmadı.")
     # XTTS'nin sert veya hatalı okuduğu kalıpları senaryo düzeyinde doğal Türkçeyle değiştir.
     # Böylece ses ile ekrandaki altyazı birebir aynı kalır.
     for s in sahneler:
