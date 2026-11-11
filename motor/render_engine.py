@@ -491,16 +491,14 @@ def render_video_master(
     TOTAL_FRAMES = int(round(TOTAL_DUR * FPS))
 
     # Motion presets cycling cleanly across scenes
+    # Belirgin fakat yumuşak sinematik kamera: mikro titreme yok.
     motion_presets = [
-        ((1.00, 1.14), (0.0, 0.0),   (22.0, -22.0)),
-        ((1.00, 1.13), (-22.0, 22.0),(12.0, -12.0)),
-        ((1.01, 1.15), (0.0, 0.0),   (18.0, -18.0)),
-        ((1.00, 1.13), (18.0, -18.0),(20.0, -20.0)),
-        ((1.00, 1.12), (-16.0, 16.0),(-18.0, 18.0)),
-        ((1.01, 1.13), (14.0, -14.0),(18.0, -18.0)),
-        ((1.00, 1.14), (-20.0, 20.0),(14.0, -14.0)),
-        ((1.01, 1.13), (16.0, -16.0),(-16.0, 16.0)),
-        ((1.01, 1.12), (0.0, 0.0),   (16.0, -16.0)),
+        ((1.00, 1.22), (-18.0, 18.0), (34.0, -34.0)),
+        ((1.02, 1.20), (-38.0, 32.0),(18.0, -20.0)),
+        ((1.00, 1.23), (24.0, -24.0),(28.0, -30.0)),
+        ((1.03, 1.21), (34.0, -34.0),(24.0, -26.0)),
+        ((1.00, 1.19), (-32.0, 32.0),(-24.0, 24.0)),
+        ((1.02, 1.21), (28.0, -28.0),(30.0, -30.0)),
     ]
 
     # Top & bottom legibility scrim
@@ -607,6 +605,12 @@ def render_video_master(
 
     last_sm = scenes_meta[-1]
 
+    # Lens vignette and a slow warm light sweep add depth without static overlays.
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    nx = (xx - W * 0.5) / (W * 0.72)
+    ny = (yy - H * 0.48) / (H * 0.78)
+    vignette = np.clip(1.04 - 0.24 * (nx * nx + ny * ny), 0.78, 1.04)[..., None]
+
     for f_idx in range(TOTAL_FRAMES):
         t = f_idx / float(FPS)
         active_idx = N - 1
@@ -634,6 +638,13 @@ def render_video_master(
             pe = sm_prv["scene_end"] + half_cd
             frame_prv = render_kb(active_idx - 1, (t - ps) / max(0.1, pe - ps))
             frame = cv2.addWeighted(frame_prv, 1.0 - alpha_cd, frame, alpha_cd, 0.0)
+
+        # Smooth cinematic lens treatment: edge depth + moving amber key light.
+        frame = np.clip(frame.astype(np.float32) * vignette, 0, 255)
+        scene_p = max(0.0, min(1.0, (t - sm_cur["scene_start"]) / max(0.1, sm_cur["scene_end"] - sm_cur["scene_start"])))
+        light_x = W * (-0.20 + 1.40 * scene_p)
+        light = np.exp(-((xx - light_x) / (W * 0.32)) ** 2)[..., None] * 0.075
+        frame = np.clip(frame + light * np.array([18.0, 38.0, 58.0], dtype=np.float32), 0, 255).astype(np.uint8)
 
         frame[:top_h] = ((frame[:top_h].astype(np.uint16) * scrim_top_u16) >> 8).astype(np.uint8)
         frame[H - bot_h :] = ((frame[H - bot_h :].astype(np.uint16) * scrim_bot_u16) >> 8).astype(np.uint8)
