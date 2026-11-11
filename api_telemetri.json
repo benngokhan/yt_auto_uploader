@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-10T18:56:58+00:00",
+  "zaman": "2026-11-11T01:07:30+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -18,9 +18,9 @@
     {
       "ad": "OpenRouter",
       "durum": "ok",
-      "kalan": 44,
+      "kalan": 50,
       "limit": 50,
-      "kullanilan": 6,
+      "kullanilan": 0,
       "birim": "istek/gün (ücretsiz modeller)",
       "ucretsiz": true,
       "yenilenme": "günlük · gece 00:00 UTC · ücretsiz model hakkı",
@@ -32,8 +32,8 @@
       "ad": "Gemini",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1497,
-      "kullanilan": 3,
+      "kalan": 1500,
+      "kullanilan": 0,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 50,
       "yenilenme": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
@@ -43,8 +43,8 @@
       "ad": "Groq",
       "durum": "ok",
       "limit": 1000,
-      "kalan": 997,
-      "kullanilan": 3,
+      "kalan": 1000,
+      "kullanilan": 0,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 11,
       "yenilenme": "dakika + günlük token · günlük kısım gece 00:00 UTC",
@@ -70,10 +70,10 @@
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 357.8,
+      "actions_dakika": 346.0,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1642.2
+      "actions_kalan": 1654.0
     },
     {
       "ad": "Google Drive",
@@ -164,11 +164,11 @@
     {
       "ad": "YouTube Data API",
       "durum": "ok",
-      "kalan": 6600,
+      "kalan": 10000,
       "limit": 10000,
-      "kullanilan": 3400,
+      "kullanilan": 0,
       "birim": "birim (tahmini)",
-      "bugun_yukleme": 2,
+      "bugun_yukleme": 0,
       "yenilenme": "günlük · gece 00:00 Pasifik (TR 10:00) sıfırlanır",
       "not_": "gerçek kota API'de yok; yükleme ≈ 1700 birim sayıldı"
     }
@@ -222,10 +222,6 @@
     "hata": 0
   },
   "gecmis": [
-    {
-      "zaman": "2026-11-02T12:50:22+00:00",
-      "elevenlabs_kalan": null
-    },
     {
       "zaman": "2026-11-02T12:51:31+00:00",
       "elevenlabs_kalan": null
@@ -460,6 +456,10 @@
     },
     {
       "zaman": "2026-11-10T18:56:58+00:00",
+      "elevenlabs_kalan": 10000
+    },
+    {
+      "zaman": "2026-11-11T01:07:30+00:00",
       "elevenlabs_kalan": 10000
     }
   ]
