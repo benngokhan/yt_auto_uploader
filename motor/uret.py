@@ -95,11 +95,24 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
     )
 
     def _cagir(url, govde, basliklar):
+        import time, urllib.error
         veri = json.dumps(govde).encode()
-        istek = urllib.request.Request(url, data=veri, method="POST",
-                                       headers={"Content-Type": "application/json", **basliklar})
-        with urllib.request.urlopen(istek, timeout=120) as y:
-            return json.loads(y.read().decode())
+        son_hata = None
+        for bekle in (0, 4, 12, 25):
+            if bekle: time.sleep(bekle)
+            try:
+                istek = urllib.request.Request(url, data=veri, method="POST",
+                                               headers={"Content-Type": "application/json", **basliklar})
+                with urllib.request.urlopen(istek, timeout=120) as y:
+                    return json.loads(y.read().decode())
+            except urllib.error.HTTPError as e:
+                son_hata = e
+                # 401/403 geçersiz veya yetkisiz anahtardır; tekrar bekleme.
+                if e.code in (400, 401, 403, 404): raise
+                if e.code not in (429, 500, 502, 503, 504): raise
+            except Exception as e:
+                son_hata = e
+        raise son_hata
 
     def _ayikla(metin):
         import re
@@ -111,14 +124,14 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
     if os.getenv("GROQ_API_KEY"):
         denemeler.append(lambda: _ayikla(_cagir(
             "https://api.groq.com/openai/v1/chat/completions",
-            {"model": os.getenv("MOTOR_LLM_MODEL", "llama-3.3-70b-versatile"),
+            {"model": os.getenv("GROQ_LLM_MODEL", "llama-3.3-70b-versatile"),
              "temperature": 0.7,
              "messages": [{"role": "system", "content": SAHNE_SISTEM},
                           {"role": "user", "content": istem}]},
             {"Authorization": f"Bearer {os.environ['GROQ_API_KEY']}"},
         )["choices"][0]["message"]["content"]))
     if os.getenv("GEMINI_API_KEY"):
-        model = os.getenv("MOTOR_LLM_MODEL", "").strip()
+        model = os.getenv("GEMINI_LLM_MODEL", "").strip()
         if not model or model.startswith("llama-") or model == "gemini-3.6-flash":
             try:
                 with urllib.request.urlopen("https://generativelanguage.googleapis.com/v1beta/models?key=" + os.environ["GEMINI_API_KEY"], timeout=60) as y:
