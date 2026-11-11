@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-11T07:18:11+00:00",
+  "zaman": "2026-11-11T13:12:45+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -18,9 +18,9 @@
     {
       "ad": "OpenRouter",
       "durum": "ok",
-      "kalan": 48,
+      "kalan": 46,
       "limit": 50,
-      "kullanilan": 2,
+      "kullanilan": 4,
       "birim": "istek/gün (ücretsiz modeller)",
       "ucretsiz": true,
       "yenilenme": "günlük · gece 00:00 UTC · ücretsiz model hakkı",
@@ -32,8 +32,8 @@
       "ad": "Gemini",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1499,
-      "kullanilan": 1,
+      "kalan": 1498,
+      "kullanilan": 2,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 50,
       "yenilenme": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
@@ -43,8 +43,8 @@
       "ad": "Groq",
       "durum": "ok",
       "limit": 1000,
-      "kalan": 999,
-      "kullanilan": 1,
+      "kalan": 998,
+      "kullanilan": 2,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 11,
       "yenilenme": "dakika + günlük token · günlük kısım gece 00:00 UTC",
@@ -64,16 +64,16 @@
     {
       "ad": "GitHub",
       "durum": "ok",
-      "kalan": 5000,
+      "kalan": 4999,
       "limit": 5000,
-      "kullanilan": 0,
+      "kullanilan": 1,
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 335.6,
+      "actions_dakika": 318.8,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1664.4
+      "actions_kalan": 1681.2
     },
     {
       "ad": "Google Drive",
@@ -109,7 +109,7 @@
         },
         {
           "ad": "CEO / Tablolar",
-          "boyut": 384460883,
+          "boyut": 384460695,
           "dosya": 47,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
@@ -153,9 +153,9 @@
           "boyut": 42831080
         }
       ],
-      "drive_gorunen": 2552308354,
+      "drive_gorunen": 2552308166,
       "kendi_dosyalar": 2095852910,
-      "paylasilan": 456455444,
+      "paylasilan": 456455256,
       "disalan": 3544476744,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
@@ -222,10 +222,6 @@
     "hata": 0
   },
   "gecmis": [
-    {
-      "zaman": "2026-11-02T13:33:26+00:00",
-      "elevenlabs_kalan": null
-    },
     {
       "zaman": "2026-11-02T13:34:30+00:00",
       "elevenlabs_kalan": null
@@ -460,6 +456,10 @@
     },
     {
       "zaman": "2026-11-11T07:18:11+00:00",
+      "elevenlabs_kalan": 10000
+    },
+    {
+      "zaman": "2026-11-11T13:12:45+00:00",
       "elevenlabs_kalan": 10000
     }
   ]
