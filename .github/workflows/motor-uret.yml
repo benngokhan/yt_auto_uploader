@@ -69,7 +69,7 @@ jobs:
           echo "FFmpeg kurulamadı"
           exit 1
 
-      - name: Bağımlılıklar (XTTS-v2 CPU)
+      - name: Bağımlılıklar (MİRA v2.2 + Charon)
         run: |
           SAGLAYICI=$(python -c "import json; print(json.load(open('motor/ayarlar.json')).get('ses',{}).get('saglayici',''))" 2>/dev/null || echo "")
           if [ "$SAGLAYICI" = "xtts" ] || [ "$SAGLAYICI" = "xtts_v2" ] || [ "$SAGLAYICI" = "coqui_xtts" ]; then

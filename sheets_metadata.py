@@ -124,14 +124,14 @@ def classify_doz_disi_subcat(raw_cat: str = "", title: str = "") -> str:
 
 def decide_daily_column(now_tr: Optional[datetime] = None) -> str:
     """
-    Strateji Masası Haftalık Sıralama Kuralı (26.10.2026):
-    - Cuma (weekday==4)                        -> 'uzun' (haftada 1)
-    - Pazar (weekday==6)                       -> 'doz_disi' (haftada 1, etiketli)
-    - Pzt, Sal, Çar, Per, Cmt (haftada 5 gün) -> 'beden_beyin'
+    Haftalık Sıralama Kuralı (12.11.2026 güncellemesi — yalnızca Shorts):
+    - Pazar (weekday==6)                   -> 'doz_disi' (haftada 1, etiketli)
+    - Diğer tüm günler (Cuma dahil Shorts) -> 'beden_beyin'
     """
     tr_tz = timezone(timedelta(hours=3))
     dt = now_tr.astimezone(tr_tz) if now_tr else datetime.now(tr_tz)
-    if dt.weekday() == 4:
+    cutover_tr = datetime(2026, 11, 12, 0, 0, tzinfo=tr_tz)
+    if dt < cutover_tr and dt.weekday() == 4:
         return "uzun"
     if dt.weekday() == 6:
         return "doz_disi"
@@ -139,13 +139,11 @@ def decide_daily_column(now_tr: Optional[datetime] = None) -> str:
 
 
 def decide_prime_time_video_type(now_tr: Optional[datetime] = None) -> str:
-    """Her gün 12:30 ve 19:30'da yayın yapılır:
-    - Cuma (weekday==4) 12:30 slotu (saat < 16) -> 'long' (Uzun Video)
-    - Cuma 19:30 ve diğer tüm günler 12:30 / 19:30 -> 'short' (Kısa Video)
-    """
+    """12.11.2026 itibarıyla uzun video kaldırıldı; tüm günlerde yalnızca 'short' yayınlanır."""
     tr_tz = timezone(timedelta(hours=3))
     dt = now_tr.astimezone(tr_tz) if now_tr else datetime.now(tr_tz)
-    if dt.weekday() == 4 and dt.hour < 16:
+    cutover_tr = datetime(2026, 11, 12, 0, 0, tzinfo=tr_tz)
+    if dt < cutover_tr and dt.weekday() == 4 and dt.hour < 16:
         return "long"
     return "short"
 

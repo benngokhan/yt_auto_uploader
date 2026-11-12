@@ -28,6 +28,12 @@ from pathlib import Path
 KOK = Path(__file__).resolve().parent.parent          # repo kökü
 MOTOR = KOK / "motor"
 VARSAYILAN_AYAR = MOTOR / "ayarlar.json"
+sys.path.insert(0, str(KOK))
+sys.path.insert(0, str(MOTOR))
+try:
+    import kota_sayac  # noqa: F401
+except Exception:
+    pass
 
 
 # ----------------------------------------------------------------- yardımcı
@@ -703,16 +709,29 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
                    check=True, env=env)
 
     cikti = vdir / "video.mp4"
-    kapak = vdir / "kapak.jpg"
     if not cikti.exists():
         raise SystemExit("v2.2 motoru video üretmedi.")
+
+    metadata = yayin_bilgisi_uret(a.konu, sahneler)
+    (calisma / "yayin_bilgisi.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
+    print("Yayın bilgileri hazır")
 
     onay_dir = calisma / "onay_bekleyen"
     onay_dir.mkdir(parents=True, exist_ok=True)
     hedef_mp4 = onay_dir / "final.mp4"
     hedef_kapak = onay_dir / "kapak.jpg"
     shutil.copyfile(cikti, hedef_mp4)
-    shutil.copyfile(kapak, hedef_kapak)
+
+    # Standart Bilgi Dozu dikey kapak şablonu (kapak_176..196 ile birebir uyumlu)
+    import kapak as kapak_mod
+    kapak_bilgi = kapak_mod.kapak_metni_hazirla(a.konu, sahneler, metadata)
+    kapak_mod.kapak_uret(
+        parallelar[0],
+        hedef_kapak,
+        satirlar=kapak_bilgi["satirlar"],
+        kategori=kapak_bilgi["kategori"],
+        alt_aciklama=kapak_bilgi["alt_aciklama"],
+    )
 
     # Geçici klasörleri temizle ki Drive/Telegram glob araması tek MP4 ve tek kapak bulsun
     shutil.rmtree(vdir, ignore_errors=True)
@@ -721,11 +740,7 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     cfg_yolu.unlink(missing_ok=True)
 
     print(f"Video hazır: {hedef_mp4}")
-    print(f"Kapak hazır: {hedef_kapak}")
-
-    metadata = yayin_bilgisi_uret(a.konu, sahneler)
-    (calisma / "yayin_bilgisi.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
-    print("Yayın bilgileri hazır")
+    print(f"Kapak hazır (standart şablon): {hedef_kapak} -> {kapak_bilgi['satirlar']}")
 
     if a.kuru:
         print(f"KURU KOŞU TAMAMLANDI: {hedef_mp4} (Drive/Telegram adımı atlanır)")
@@ -735,13 +750,17 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
 
 
 def yayin_bilgisi_uret(konu: str, sahneler: list[dict]) -> dict:
-    """Onay kartı ve Excel için eksiksiz YouTube yayın metadatası üretir."""
+    """Onay kartı, standart kapak ve Excel için eksiksiz YouTube yayın metadatası üretir."""
     import urllib.request, urllib.error, re
     anlatim = " ".join(str(x.get("ses", "")) for x in sahneler)
     prompt = (f"Konu: {konu}\nAnlatım: {anlatim}\nBilgi Dozu YouTube Shorts için yalnız JSON döndür: "
               '{"baslik":"70 karakteri geçmeyen merak uyandırıcı başlık","aciklama":"2 kısa paragraf, doğrulanmamış iddia yok",'
               '"hashtag":"3-5 hashtag","etiketler":"virgülle 8-12 arama etiketi","sabit_yorum":"doğal, konuya özel tek soru ve emoji",'
-              '"kategori":"kategori","konu_ozeti":"tek cümle"}. Abartılı garanti, sahte bilgi ve genel/geçici metin kullanma.')
+              '"kategori":"kategori","konu_ozeti":"tek cümle",'
+              '"kapak_satirlari":["1. SATIR (<=14 harf)","2. SATIR (<=14 harf)","3. VURUCU SATIR? (<=14 harf)"],'
+              '"kapak_kategori":"NÖROBİLİM veya İNSAN & BİLİM veya FİZİK & BİLİM veya DOĞA & BİLİM veya UZAY & EVREN veya TARİH & BİLİM",'
+              '"kapak_alt":"en fazla 90 karakterlik tek cümle mekanizma özeti"}. '
+              'Abartılı garanti, sahte bilgi ve genel/geçici metin kullanma.')
     text=None; errors=[]
     groq=os.getenv("GROQ_API_KEY","").strip()
     _ua="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36"

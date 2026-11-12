@@ -254,8 +254,10 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
                    if str(f.get("name", "")).lower().startswith("uzun_video_")
                    or str(f.get("name", "")).lower().startswith("long_video_")]
     _tum_kapaklar = _tekil(shorts_covers + long_covers)
-    shorts_covers = _tum_kapaklar
-    long_covers = _tum_kapaklar
+    shorts_covers = [f for f in _tum_kapaklar
+                     if not str(f.get("name", "")).lower().startswith(("uzun_kapak", "kapak_uzun", "long_"))]
+    long_covers = [f for f in _tum_kapaklar
+                   if str(f.get("name", "")).lower().startswith(("uzun_kapak", "kapak_uzun", "long_"))]
     ceo_files = _list_folder_files(drive, CEO_FOLDER_ID) if drive else []
 
     # Fallback to existing telemetry drive inventory if running offline
@@ -398,10 +400,12 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
     if next_long is None and ready_long_queue:
         next_long = {"name": ready_long_queue[0]["file_name"], "title": ready_long_queue[0]["title"], "row": ready_long_queue[0]["row"]}
 
-    # Read ISCILER & UYARILAR from workbook
+    # Read ISCILER & UYARILAR from workbook (baslik.xlsx birincil kaynak)
     isciler_rows = []
     uyarilar_rows = []
-    wb_path = BASE_DIR / "bilgidozu_yukleme_tablosu.xlsx"
+    wb_path = BASE_DIR / "baslik.xlsx"
+    if not wb_path.exists():
+        wb_path = BASE_DIR / "bilgidozu_yukleme_tablosu.xlsx"
     if wb_path.exists():
         wb = openpyxl.load_workbook(wb_path, data_only=True)
         for sname in ("ISCILER", "İŞÇİLER"):
@@ -485,8 +489,9 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
             "daily_slots_tr": ["19:30"],
             "prewarm_tr": ["19:12"],
             "watchdog_tr": ["19:50", "20:00"],
-            "friday_1930": "long",
+            "friday_1930": "short",
             "other_days": "short",
+            "shorts_only": True,
             "min_shorts_number": MIN_SHORTS_NUMBER,
             "min_long_number": MIN_LONG_NUMBER,
             "cover_fallback_generation": False,
@@ -494,14 +499,14 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
         },
         "queue_summary": {
             "ready_shorts": len(ready_shorts_queue),
-            "ready_longs": len(ready_long_queue),
-            "total_ready": len(ready_shorts_queue) + len(ready_long_queue),
-            "days_of_stock": round((len(ready_shorts_queue) + len(ready_long_queue)) / 2.0, 1),
+            "ready_longs": 0,
+            "total_ready": len(ready_shorts_queue),
+            "days_of_stock": len(ready_shorts_queue),
             "next_short": next_short["name"] if next_short else None,
             "next_short_title": next_short.get("title", "") if next_short else "",
-            "next_long": next_long["name"] if next_long else None,
-            "next_long_title": next_long.get("title", "") if next_long else "",
-            "missing_covers": missing_covers,
+            "next_long": None,
+            "next_long_title": "",
+            "missing_covers": [m for m in missing_covers if not m.lower().startswith("uzun_")],
         },
         "drive_inventory": {
             "shorts_videos": shorts_videos,

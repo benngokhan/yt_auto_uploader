@@ -7,6 +7,8 @@ import re
 import sys
 
 UTC = timezone.utc
+# 12 Kasım 2026 itibarıyla uzun video üretimi/yayını sonlandırıldı; her gün Shorts yayınlanır.
+SHORTS_ONLY_CUTOVER = datetime(2026, 11, 12, 0, 0, tzinfo=UTC)
 SCHEDULES = {
     # Eski kayıt/test uyumluluğu; iş akışında artık bu cronlar yoktur.
     "12 9 * * *": (9, 30, None, "auto_legacy_noon"),
@@ -34,7 +36,9 @@ def _utc(now):
 
 def _slot_kind_for_stamp(stamp: datetime) -> str:
     if (stamp.hour, stamp.minute) in ((9, 30), (16, 30)):
-        return "long" if stamp.weekday() == 4 else "short"
+        if stamp < SHORTS_ONLY_CUTOVER and stamp.weekday() == 4:
+            return "long"
+        return "short"
     raise ValueError("Not a configured publication slot")
 
 

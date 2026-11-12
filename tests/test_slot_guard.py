@@ -25,6 +25,11 @@ class SlotGuardTests(unittest.TestCase):
         self.assertEqual(g.watchdog_slot('0 10 * * *',now_fri),('2026-10-30T09:30Z','long','tescil'))
         self.assertEqual(g.watchdog_slot('0 10 * * *',now_thu),('2026-10-29T09:30Z','short','tescil'))
 
+    def test_friday_after_shorts_only_cutover_publishes_short(self):
+        now_fri_new=datetime(2026,11,13,16,40,tzinfo=UTC)
+        self.assertEqual(g.scheduled_slot('30 16 * * *',now_fri_new),('2026-11-13T16:30Z','short'))
+        self.assertEqual(g.watchdog_slot('0 17 * * *',now_fri_new),('2026-11-13T16:30Z','short','tescil'))
+
     def test_late_run_after_midnight_retains_previous_day_slot(self):
         now=datetime(2026,10,31,0,15,tzinfo=UTC)
         self.assertEqual(g.scheduled_slot('30 16 * * *',now),('2026-10-30T16:30Z','long'))
