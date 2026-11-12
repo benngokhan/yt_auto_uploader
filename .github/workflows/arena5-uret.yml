@@ -11,37 +11,10 @@ permissions:
   contents: write
 
 jobs:
-  hazirla:
-    name: "1) Charon Ses + 35 Özel Görsel Hazırla"
+  render:
+    name: "1) Render (video_${{ matrix.num }})"
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: pip
-      - name: FFmpeg
-        run: command -v ffmpeg >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
-      - name: Bağımlılıklar
-        run: |
-          pip install -q -r requirements-motor.txt openpyxl
-          python motor/varlik_hazirla.py
-      - name: 5 Bölüm Charon Ses + Özel Görselleri Aç
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python motor/arena5_pipeline.py prepare --out /tmp/arena5_assets
-      - uses: actions/upload-artifact@v4
-        with:
-          name: arena5-assets
-          path: /tmp/arena5_assets/
-          retention-days: 2
-
-  render:
-    name: "2) Render (video_${{ matrix.num }})"
-    needs: hazirla
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
     strategy:
       fail-fast: true
       matrix:
@@ -58,11 +31,7 @@ jobs:
         run: |
           pip install -q -r requirements-motor.txt openpyxl
           python motor/varlik_hazirla.py
-      - uses: actions/download-artifact@v4
-        with:
-          name: arena5-assets
-          path: /tmp/arena5_assets
-      - name: Render video_${{ matrix.num }}.mp4
+      - name: Render video_${{ matrix.num }}.mp4 (Charon Ses + 7 Özel Sahne)
         run: python motor/arena5_pipeline.py render --assets /tmp/arena5_assets --out /tmp/arena5_out_${{ matrix.num }} --num ${{ matrix.num }}
       - uses: actions/upload-artifact@v4
         with:
@@ -71,7 +40,7 @@ jobs:
           retention-days: 5
 
   kuyruk_5gun:
-    name: "3) Drive 5 Günlük Kuyruğa Yerleştir (177..181)"
+    name: "2) Drive 5 Günlük Kuyruğa Yerleştir (177..181)"
     needs: render
     runs-on: ubuntu-latest
     timeout-minutes: 20

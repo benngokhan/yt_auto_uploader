@@ -44,7 +44,7 @@ EPISODES_5DAY: list[dict] = [
         "num": 177,
         "file_name": "video_177.mp4",
         "cover_name": "kapak_177.jpg",
-        "music_theme": "teknoloji_kesif",
+        "music_theme": "tarih_teknoloji",
         "cover_lines": ["ŞARJ ADAPTÖRÜNÜN", "İÇİNDE NE OLUYOR?"],
         "yt_title": "Telefonu Şarja Takınca Adaptörün İçinde Aslında Ne Oluyor? 🔌⚡ #bilgidozu #shorts",
         "category": "Fizik ve Mühendislik",
@@ -110,7 +110,7 @@ EPISODES_5DAY: list[dict] = [
         "num": 179,
         "file_name": "video_179.mp4",
         "cover_name": "kapak_179.jpg",
-        "music_theme": "teknoloji_kesif",
+        "music_theme": "tarih_teknoloji",
         "cover_lines": ["BIÇAĞIN ÇİZEMEDİĞİ", "CAMI KUM ÇİZER!"],
         "yt_title": "Telefon Ekranını Bıçak Çizemezken Cebindeki Kum Tanesi Nasıl Çizer? 📱💎 #bilgidozu #shorts",
         "category": "Fizik ve Malzeme Bilimi",
@@ -176,7 +176,7 @@ EPISODES_5DAY: list[dict] = [
         "num": 181,
         "file_name": "video_181.mp4",
         "cover_name": "kapak_181.jpg",
-        "music_theme": "doga_kesif",
+        "music_theme": "gunluk_bilim",
         "cover_lines": ["KIZGIN TAVADA SU", "NEDEN BİLYE OLUR?"],
         "yt_title": "Kızgın Tavaya Düşen Su Neden Buharlaşmaz da Bilye Gibi Kayar? 🔥💧 #bilgidozu #shorts",
         "category": "Fizik ve Termodinamik",
@@ -536,6 +536,10 @@ def _apply_7scene_pattern_interrupt(timing_path: Path, headlines: list[dict]) ->
 
 def render_one_episode(assets_dir: Path, out_dir: Path, num: int) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
+    if not (assets_dir / f"vo_{num}.wav").exists():
+        assets_dir.mkdir(parents=True, exist_ok=True)
+        with tarfile.open(MOTOR_DIR / "_arena5_assets.tar.gz", "r:gz") as tf:
+            tf.extractall(assets_dir)
     ep = next(e for e in EPISODES_5DAY if e["num"] == num)
     print(f"\n=== ARENA BESPOKE RENDER: video_{num}.mp4 ===", flush=True)
     work = out_dir / f"work_{num}"
@@ -596,7 +600,7 @@ def render_one_episode(assets_dir: Path, out_dir: Path, num: int) -> None:
         "cover_name": ep["cover_name"],
         "duration_sec": round(dur_total, 2),
         "cta_start": round(float(tl_data["cta_start"]), 2),
-        "first_word_start": round(float(tl_data["words"][0]["start"]), 2),
+        "first_word_start": round(float(tl_data.get("sentence_spans", [[0.14]])[0][0]), 2),
         "cut1_sec": cut1,
         "size_mb": round(final_mp4.stat().st_size / 1048576.0, 2),
         "lufs": round(float(lufs_val), 2),
