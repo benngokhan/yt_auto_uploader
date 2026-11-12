@@ -1,18 +1,18 @@
 {
-  "updated_at": "2026-11-11 19:58",
-  "updated_at_iso": "2026-11-11T19:58:34.536260+03:00",
+  "updated_at": "2026-11-12 20:04",
+  "updated_at_iso": "2026-11-12T20:04:36.313984+03:00",
   "overall_status": "ok",
   "overall_label": "Her şey çalışıyor",
   "summary": {
-    "total_views": 50343,
-    "subscribers": 76,
-    "total_videos_published": 96,
+    "total_views": 51391,
+    "subscribers": 77,
+    "total_videos_published": 97,
     "weekly_uploaded": 12,
     "total_comments": 33,
-    "total_likes": 211,
+    "total_likes": 224,
     "failed_jobs": 0,
-    "stock_shorts": 4,
-    "stock_long": 13
+    "stock_shorts": 20,
+    "stock_long": 0
   },
   "workers": [
     {
@@ -20,9 +20,9 @@
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-11 19:58",
-      "jobs_done": 96,
-      "last_action": "video_172.mp4 yayınlandı (https://youtu.be/6nN5hQkkHWs)",
+      "updated_at": "2026-11-12 20:04",
+      "jobs_done": 97,
+      "last_action": "video_176.mp4 yayınlandı (https://youtu.be/-uxclTUbFro)",
       "error_message": ""
     },
     {
@@ -30,9 +30,9 @@
       "name": "Kapak İşçisi (Drive Hazır Kapak -> YouTube)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-11 19:58",
-      "jobs_done": 96,
-      "last_action": "video_172.mp4 için hazır Drive kapağı uygulandı",
+      "updated_at": "2026-11-12 20:04",
+      "jobs_done": 97,
+      "last_action": "video_176.mp4 için hazır Drive kapağı uygulandı",
       "error_message": ""
     },
     {
@@ -40,9 +40,9 @@
       "name": "Yorumcu (Sabit Yorum İşçisi)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-11 19:58",
-      "jobs_done": 96,
-      "last_action": "video_172.mp4 altına ilk sabit yorum yazıldı",
+      "updated_at": "2026-11-12 20:04",
+      "jobs_done": 97,
+      "last_action": "video_176.mp4 altına ilk sabit yorum yazıldı",
       "error_message": ""
     },
     {
@@ -50,7 +50,7 @@
       "name": "Analitik çekici (YouTube API)",
       "status": "ok",
       "status_text": "Çalışıyor",
-      "updated_at": "2026-11-11 19:58",
+      "updated_at": "2026-11-12 20:04",
       "jobs_done": 30,
       "last_action": "30 videonun gerçek görüntülenme ve yorum verisi güncellendi",
       "error_message": ""
@@ -72,7 +72,7 @@
       "title": "YouTube API günlük kotası",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-11-11 19:58",
+      "updated_at": "2026-11-12 20:04",
       "detail": "Günlük 10.000 birim kotası aktif ve yeterli."
     },
     {
@@ -80,26 +80,35 @@
       "title": "Google Drive ve Sheets bağlantısı",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-11-11 19:58",
-      "detail": "YOUTUBE_OTOMASYON klasörü ve CEO yükleme tablosu canlı bağlı (Stok: 4 Shorts, 13 Uzun)."
+      "updated_at": "2026-11-12 20:04",
+      "detail": "YOUTUBE_OTOMASYON klasörü ve CEO yükleme tablosu canlı bağlı (Stok: 20 Shorts, 0 Uzun)."
     },
     {
       "id": "comment_worker",
       "title": "Yorum ve kapak işçisi durumu",
       "status": "ok",
       "status_text": "Sorunsuz",
-      "updated_at": "2026-11-11 19:58",
+      "updated_at": "2026-11-12 20:04",
       "detail": "Kapak: Çalışıyor · Yorum: Çalışıyor"
     }
   ],
   "videos": [
     {
+      "id": "-uxclTUbFro",
+      "url": "https://youtu.be/-uxclTUbFro",
+      "title": "Asansör Koparsa Yere Çarpmadan Zıplamak Seni Kurtarır mı? 🛗⚡ #bilgidozu #shorts",
+      "publishedAt": "2026-11-12T17:04:25Z",
+      "views": 0,
+      "likes": 0,
+      "comments": 1
+    },
+    {
       "id": "6nN5hQkkHWs",
       "url": "https://youtu.be/6nN5hQkkHWs",
       "title": "Yürüyen Merdiven Kenarındaki Fırçalar Ayakkabı Silmek İçin Değil! 👟 #bilgidozu #shorts",
-      "publishedAt": "2026-11-11T16:58:21Z",
-      "views": 0,
-      "likes": 0,
+      "publishedAt": "2026-11-11T16:58:48Z",
+      "views": 134,
+      "likes": 4,
       "comments": 1
     },
     {
@@ -107,8 +116,8 @@
       "url": "https://youtu.be/mWlIdAEN5qA",
       "title": "Elektrikli Yılan Balığı 860 Volt Elektrik Üretirken Kendini Neden Çarpmaz? ⚡ #bilgidozu #shorts",
       "publishedAt": "2026-11-10T16:55:22Z",
-      "views": 395,
-      "likes": 18,
+      "views": 895,
+      "likes": 24,
       "comments": 2
     },
     {
@@ -116,7 +125,7 @@
       "url": "https://youtu.be/vJW-L_tAeTo",
       "title": "Paskalya Adası'ndaki 80 Tonluk Dev Taş Heykeller Nasıl Yürütüldü? 🗿 #bilgidozu #shorts",
       "publishedAt": "2026-11-10T10:00:20Z",
-      "views": 13,
+      "views": 25,
       "likes": 0,
       "comments": 1
     },
@@ -125,8 +134,8 @@
       "url": "https://youtu.be/edfxi8rEQVI",
       "title": "Gözlerin Açıkken Hapşırmak Neden İmkansız? Beynin O Salisede Ne Yapar? 🤧 #bilgidozu #shorts",
       "publishedAt": "2026-11-09T17:11:23Z",
-      "views": 658,
-      "likes": 18,
+      "views": 712,
+      "likes": 19,
       "comments": 1
     },
     {
@@ -134,8 +143,8 @@
       "url": "https://youtu.be/jaXF4A5Erek",
       "title": "Mikrodalga Fırın Camındaki Delikli Siyah Tel Neden Var? ⚡ #bilgidozu #shorts",
       "publishedAt": "2026-11-09T10:05:13Z",
-      "views": 399,
-      "likes": 11,
+      "views": 403,
+      "likes": 12,
       "comments": 1
     },
     {
@@ -143,7 +152,7 @@
       "url": "https://youtu.be/HpSHy45_L6g",
       "title": "Efsanevi Şam Çeliği Kılıçların İçinden Karbon Nanotüp Çıktı! ⚔️ #bilgidozu #shorts",
       "publishedAt": "2026-11-08T16:41:54Z",
-      "views": 428,
+      "views": 430,
       "likes": 9,
       "comments": 1
     },
@@ -152,7 +161,7 @@
       "url": "https://youtu.be/0poEsgrpgIM",
       "title": "Benzin Pompası Depo Dolunca Çipsiz ve Sensörsüz Nasıl Kendi Durur? ⛽ #bilgidozu #shorts",
       "publishedAt": "2026-11-08T09:52:45Z",
-      "views": 667,
+      "views": 682,
       "likes": 13,
       "comments": 1
     },
@@ -161,7 +170,7 @@
       "url": "https://youtu.be/l6WhTkbP9yU",
       "title": "Mariana Çukuru Ne Kadar Derin? 🌊 #bilgidozu #shorts",
       "publishedAt": "2026-11-07T16:42:49Z",
-      "views": 1271,
+      "views": 1276,
       "likes": 20,
       "comments": 1
     },
@@ -170,8 +179,8 @@
       "url": "https://youtu.be/-9AQb4ZMLGE",
       "title": "Kaplanların Çizgileri Neden Her Birinde Farklıdır? 🐅 #bilgidozu #shorts",
       "publishedAt": "2026-11-07T09:52:30Z",
-      "views": 967,
-      "likes": 8,
+      "views": 969,
+      "likes": 9,
       "comments": 1
     },
     {
@@ -179,7 +188,7 @@
       "url": "https://youtu.be/WRLtRGqYpY8",
       "title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
       "publishedAt": "2026-11-06T10:08:09Z",
-      "views": 156,
+      "views": 157,
       "likes": 1,
       "comments": 1
     },
@@ -188,8 +197,8 @@
       "url": "https://youtu.be/m1O6pNJvPwQ",
       "title": "Üzgün Olmasan Bile Her 5 Dakikada Bir Neden Fark Etmeden İç Çekersin? 🫁 #bilgidozu #shorts",
       "publishedAt": "2026-11-05T17:13:46Z",
-      "views": 500,
-      "likes": 4,
+      "views": 503,
+      "likes": 5,
       "comments": 1
     },
     {
@@ -197,8 +206,8 @@
       "url": "https://youtu.be/DFOAE6foZ8E",
       "title": "Çok Tuzlu Çekirdek Yediğinde Dudakların Neden Kuruyup Büzüşür? 🧂 #bilgidozu #shorts",
       "publishedAt": "2026-11-05T10:10:07Z",
-      "views": 434,
-      "likes": 4,
+      "views": 438,
+      "likes": 5,
       "comments": 1
     },
     {
@@ -206,7 +215,7 @@
       "url": "https://youtu.be/YaQm-1T0fxA",
       "title": "Saate İlk Baktığın Saniye Neden Donmuş Gibi Daha Uzun Sürer? ⏱️ #bilgidozu #shorts",
       "publishedAt": "2026-11-04T16:58:32Z",
-      "views": 132,
+      "views": 134,
       "likes": 2,
       "comments": 1
     },
@@ -215,7 +224,7 @@
       "url": "https://youtu.be/P4ReB0TGUwk",
       "title": "Gece Yatakta Tek Ayağını Yorgandan Çıkarınca Neden Hemen Uykun Gelir? 🦶 #bilgidozu #shorts",
       "publishedAt": "2026-11-04T10:08:48Z",
-      "views": 1357,
+      "views": 1361,
       "likes": 28,
       "comments": 3
     },
@@ -224,7 +233,7 @@
       "url": "https://youtu.be/YtvsarKc75s",
       "title": "Aynı Kelimeyi 20 Kez Söyleyince Neden Anlamı Bir Anda Silinir? 🧠 #bilgidozu #shorts",
       "publishedAt": "2026-11-03T16:58:28Z",
-      "views": 371,
+      "views": 372,
       "likes": 5,
       "comments": 1
     },
@@ -269,7 +278,7 @@
       "url": "https://youtu.be/UiqMegJbkJ8",
       "title": "Spordan Ertesi Gün Çıkan Kas Ağrısının Sebebi Laktik Asit Değilmiş! 💪 #bilgidozu #shorts",
       "publishedAt": "2026-11-01T10:08:41Z",
-      "views": 403,
+      "views": 404,
       "likes": 5,
       "comments": 1
     },
@@ -278,7 +287,7 @@
       "url": "https://youtu.be/ALzLcnPSZtY",
       "title": "İlk Yudum Su Daha Kana Karışmadan Susuzluğunu Nasıl Anında Keser? 💧 #bilgidozu #shorts",
       "publishedAt": "2026-10-31T17:00:48Z",
-      "views": 182,
+      "views": 183,
       "likes": 7,
       "comments": 1
     },
@@ -287,7 +296,7 @@
       "url": "https://youtu.be/8UCQK5YKWxM",
       "title": "Odaya Girince Buraya Neden Gelmiştim Diye Unutmanın Bilimsel Sırrı! 🚪 #bilgidozu #shorts",
       "publishedAt": "2026-10-31T10:26:25Z",
-      "views": 86,
+      "views": 87,
       "likes": 1,
       "comments": 1
     },
@@ -296,7 +305,7 @@
       "url": "https://youtu.be/GA6Etnh6OEs",
       "title": "Sabah Uyandığında Boyun Geceye Göre Neden 2 Santim Daha Uzun Çıkar? 📏 #bilgidozu #shorts",
       "publishedAt": "2026-10-30T17:09:59Z",
-      "views": 623,
+      "views": 624,
       "likes": 10,
       "comments": 1
     },
@@ -314,7 +323,7 @@
       "url": "https://youtu.be/aat1STZfbps",
       "title": "Kendi Sesini Kayıtta Dinleyince Neden Tuhaf Gelir? 🎙️ #bilgidozu #shorts",
       "publishedAt": "2026-10-29T18:11:21Z",
-      "views": 177,
+      "views": 178,
       "likes": 3,
       "comments": 1
     },
@@ -323,7 +332,7 @@
       "url": "https://youtu.be/t2lphcITKXs",
       "title": "Üçgen ve Açı Kelimelerini Atatürk'ün Bizzat Türettiğini Biliyor muydun? 🇹🇷 #bilgidozu #shorts",
       "publishedAt": "2026-10-29T16:30:30Z",
-      "views": 77,
+      "views": 78,
       "likes": 1,
       "comments": 1
     },
@@ -332,7 +341,7 @@
       "url": "https://youtu.be/Bn5vzNjsnWo",
       "title": "Vücudundaki Hücrelerin Yarısından Fazlası Aslında Bakteri! 🦠 #bilgidozu #shorts",
       "publishedAt": "2026-10-28T18:10:28Z",
-      "views": 221,
+      "views": 222,
       "likes": 3,
       "comments": 1
     },
@@ -341,7 +350,7 @@
       "url": "https://youtu.be/j8J7rqtyyFg",
       "title": "Utandığında Neden Sadece Yüzün ve Kulakların Kızarır? 😳 #bilgidozu #shorts",
       "publishedAt": "2026-10-28T16:37:53Z",
-      "views": 526,
+      "views": 527,
       "likes": 3,
       "comments": 1
     },
@@ -350,16 +359,7 @@
       "url": "https://youtu.be/0vGKrBpJh0Q",
       "title": "Sevdiğin Birine Bakınca Göz Bebeğin Neden Otomatik Büyür? 👀 #bilgidozu #shorts",
       "publishedAt": "2026-10-28T11:07:39Z",
-      "views": 147,
-      "likes": 2,
-      "comments": 1
-    },
-    {
-      "id": "7DG1etjQlR4",
-      "url": "https://youtu.be/7DG1etjQlR4",
-      "title": "Voynich El Yazması: 600 Yıldır Kimsenin Okuyamadığı Şifreli Kitap! 📜 #bilgidozu #shorts",
-      "publishedAt": "2026-10-28T07:58:42Z",
-      "views": 130,
+      "views": 148,
       "likes": 2,
       "comments": 1
     }

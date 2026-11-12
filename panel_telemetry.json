@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-12 19:47:10",
-  "generated_at_iso": "2026-11-12T19:47:10.099035+03:00",
+  "generated_at": "2026-11-12 20:04:40",
+  "generated_at_iso": "2026-11-12T20:04:40.949979+03:00",
   "folders": {
     "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
     "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
@@ -32,12 +32,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 21,
+    "ready_shorts": 20,
     "ready_longs": 0,
-    "total_ready": 21,
-    "days_of_stock": 21,
-    "next_short": "video_176.mp4",
-    "next_short_title": "Asansör Koparsa Yere Çarpmadan Zıplamak Seni Kurtarır mı? 🛗⚡ #bilgidozu #shorts",
+    "total_ready": 20,
+    "days_of_stock": 20,
+    "next_short": "video_177.mp4",
+    "next_short_title": "Deniz Kabuğunu Kulağına Tutunca Duyduğun Ses Aslında Ne? 🐚👂 #bilgidozu #shorts",
     "next_long": null,
     "next_long_title": "",
     "missing_covers": []
@@ -348,8 +348,8 @@
         "id": "1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo",
         "name": "baslik.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 105739,
-        "modifiedTime": "2026-11-12T13:30:49.115Z"
+        "size": 102387,
+        "modifiedTime": "2026-11-12T17:04:38.822Z"
       },
       {
         "id": "1YjYzlPGzBlkFCH6baStgv1DOOdttaFzU",
@@ -1085,9 +1085,9 @@
       "file_name": "video_176.mp4",
       "number": 176,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Asansör Koparsa Yere Çarpmadan Zıplamak Seni Kurtarır mı? 🛗⚡ #bilgidozu #shorts",
       "description": "💬 Dürüst olalım: Asansör bir anda düşmeye başlasa panikten zıplar mıydın yoksa MIT'nin dediği gibi sırtüstü yere mi uzanırdın? 😄🛗 Yoruma yaz! 👇\n\nAsansörün halatı kopsa ve yere çarpmadan tam bir saniye önce bütün gücünle zıplasan kurtulur musun? On katlı bir binada düşen kabin saatte yaklaşık 80 km hıza ulaşır; en güçlü zıplayışın ise bu hızı yalnızca 3–4 km/s azaltır. Üstelik çarpma anında vücut ağırlığın 10 katına çıktığı için ayakta durmak bacaklara taşıyamayacağı bir yük bindirir. MIT Biyomedikal Mühendisliği Merkezi araştırmacılarına göre en doğru hamle, kabinin tam ortasına sırtüstü dümdüz uzanıp başı ellerle koruyarak darbeyi tüm vücuda eşit yaymaktır.\n\n💬 Peki sen o an kabinin içinde olsan panikle zıplar mıydın yoksa yere uzanır mıydın? Yoruma yaz! 👇\n\n📚 Kaynak: MIT Center for Biomedical Engineering (Dr. Eliot H. Frank) • The New York Times Science\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #fizik #bilim #hayattakalma",
       "tags": [
@@ -1104,7 +1104,7 @@
       ],
       "category_name": "Fizik ve Mühendislik",
       "pinned_comment": "Dürüst olalım: Asansör bir anda düşmeye başlasa panikten zıplar mıydın yoksa MIT'nin dediği gibi sırtüstü yere mi uzanırdın? 😄🛗 Yoruma yaz! 👇",
-      "youtube_url": "",
+      "youtube_url": "https://youtu.be/-uxclTUbFro",
       "has_drive_video": true,
       "drive_video_id": "18-J3fVWkBwaV2xktsX7fsKsv7tornP5g",
       "drive_video_size_mb": 11.74,
@@ -2509,10 +2509,10 @@
       "row": 2,
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-12 16:30",
+      "updated_at": "2026-11-12 20:04",
       "error_message": "",
-      "jobs_done": 72,
-      "last_action": "active.sav81@gmail.com / Bilgi_Dozu_Yeni_Shorts / video kapak kuyruğuna bağlandı (Sıradaki: video_176.mp4)"
+      "jobs_done": 97,
+      "last_action": "video_176.mp4 yayınlandı (https://youtu.be/-uxclTUbFro)"
     },
     {
       "row": 3,
@@ -2558,6 +2558,33 @@
       "error_message": "",
       "jobs_done": 54,
       "last_action": "Onaylanan videolar doğrudan active.sav81@gmail.com kuyruğuna ve baslik.xlsx'e yazılır"
+    },
+    {
+      "row": 8,
+      "name": "Kapak İşçisi (Drive Hazır Kapak -> YouTube)",
+      "status": "Çalışıyor",
+      "updated_at": "2026-11-12 20:04",
+      "error_message": "",
+      "jobs_done": 97,
+      "last_action": "video_176.mp4 için hazır Drive kapağı uygulandı"
+    },
+    {
+      "row": 9,
+      "name": "Yorumcu (Sabit Yorum İşçisi)",
+      "status": "Çalışıyor",
+      "updated_at": "2026-11-12 20:04",
+      "error_message": "",
+      "jobs_done": 97,
+      "last_action": "video_176.mp4 altına ilk sabit yorum yazıldı"
+    },
+    {
+      "row": 10,
+      "name": "Analitik çekici (YouTube API)",
+      "status": "Çalışıyor",
+      "updated_at": "2026-11-12 20:04",
+      "error_message": "",
+      "jobs_done": 30,
+      "last_action": "30 videonun gerçek görüntülenme ve yorum verisi güncellendi"
     }
   ],
   "uyarilar": [
