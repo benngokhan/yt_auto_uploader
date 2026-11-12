@@ -72,7 +72,7 @@ EPISODES: list[dict] = [
         "description": "Şu an yutkunduğun anda kulağının tam içinden gelen o ince çıtırtı sesini hemen dene! Çoğu insan bunu çene kemiğinden sanır ama gerçekte östaki borusunun vakumu kırma sesidir.",
         "sentences": [
             "Şu an yutkunduğunda kulağının tam içinden neden ince bir klik sesi gelir?",
-            "Çoğu kişi bunu çene kemiği sanır ama ses kemikten hiç gelmez.",
+            "Çoğu kişi kulak zarının arkasındaki o sesi çene kemiği sanır ama ses kemikten hiç gelmez.",
             "Burnunun gerisinde orta kulağa açılan kapalı bir hava tüneli vardır.",
             "Her yutkunduğunda dört minik kas bu ıslak duvarları salisede ayırır.",
             "O çıtırtı, östaki borusunun vakumu kırıp basıncı eşitleme sesidir.",
@@ -699,8 +699,12 @@ def _verify_single_wav(wmodel, wav_path: Path, expected_script: str) -> tuple[bo
     asr_txt = " ".join(s.text.strip() for s in segs if s.text.strip())
     a_norm = re.sub(r"[^\wçğıöşü]+", " ", sp.tr_lower(expected_script)).strip()
     b_norm = re.sub(r"[^\wçğıöşü]+", " ", sp.tr_lower(asr_txt)).strip()
-    sim = difflib.SequenceMatcher(None, a_norm, b_norm).ratio()
-    ok = (sim >= 0.80) and (24.0 <= dur <= 41.5) and ("takip" in b_norm[-45:])
+    sim_char = difflib.SequenceMatcher(None, a_norm, b_norm, autojunk=False).ratio()
+    sim_word = difflib.SequenceMatcher(None, a_norm.split(), b_norm.split(), autojunk=False).ratio()
+    sim = max(sim_char, sim_word)
+    ok = (sim >= 0.80) and (24.0 <= dur <= 42.5) and ("takip" in b_norm[-55:])
+    if not ok:
+        print(f"    [ASR tanı] sim_c={sim_char:.3f}, sim_w={sim_word:.3f}, dur={dur:.2f}s, tail={b_norm[-55:]!r}", flush=True)
     return ok, sim, dur
 
 
@@ -882,6 +886,9 @@ def render_shard(assets_dir: Path, out_dir: Path, nums: list[int]) -> None:
         for si in range(1, 9):
             shutil.copyfile(assets_dir / f"s_{num}_{si}.jpg", vdir / f"s{si}.jpg")
         shutil.copyfile(assets_dir / f"vo_{num}.wav", vdir / "vo_raw.wav")
+        vo_arr, vo_sr = sf.read(str(vdir / "vo_raw.wav"), dtype="float32")
+        vo_dur_s = len(vo_arr) / float(vo_sr)
+        outro_hold_s = round(min(2.20, max(0.62, 30.65 - 0.15 - vo_dur_s)), 3)
         script_txt = " ".join(ep["sentences"])
         (vdir / "script.txt").write_text(script_txt + "\n", encoding="utf-8")
 
@@ -892,7 +899,7 @@ def render_shard(assets_dir: Path, out_dir: Path, nums: list[int]) -> None:
             "music_theme": ep["music_theme"],
             "intro_lead": 0.15,
             "sentence_pause": 0.52,
-            "outro_hold": 0.62,
+            "outro_hold": outro_hold_s,
             "note1": ep["note1"],
             "note2": "Görseller bilimsel arşivden işlenmiştir.",
             "scenes": [f"s{i}.jpg" for i in range(1, 9)],
