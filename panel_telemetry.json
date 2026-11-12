@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-11-12 15:16:30",
-  "generated_at_iso": "2026-11-12T15:16:30.586318+03:00",
+  "generated_at": "2026-11-12 16:37:43",
+  "generated_at_iso": "2026-11-12T16:37:43.673557+03:00",
   "folders": {
-    "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
-    "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
-    "table_file_id": "17nS-VEILQ72k7NKEbYcnji90p1G5UbZZ",
-    "shorts_video": "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR",
-    "shorts_cover": "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR",
-    "long_video": "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR",
-    "long_cover": "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR",
-    "retention_folder": "1LyZBIc52OzaGZBaq8yXODcseZ0wilsrs",
-    "retention_report": "1-04hX_5htkheIkCe-W-56bu4zBkfXOvT"
+    "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
+    "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
+    "table_file_id": "1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo",
+    "shorts_video": "1GK-yImpb09445uXfTUbIl7l6AfNM4BOb",
+    "shorts_cover": "1GK-yImpb09445uXfTUbIl7l6AfNM4BOb",
+    "long_video": "1GK-yImpb09445uXfTUbIl7l6AfNM4BOb",
+    "long_cover": "1GK-yImpb09445uXfTUbIl7l6AfNM4BOb",
+    "retention_folder": "1gwtRBik2Dpvdz1VRaosBx9wokqT53Dzk",
+    "retention_report": "1EjCcuxkwdxRYTlQ60OLPWbo6CQWnh_cO"
   },
   "schedule_rules": {
     "daily_slots_tr": [
@@ -31,12 +31,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 24,
+    "ready_shorts": 21,
     "ready_longs": 0,
-    "total_ready": 24,
-    "days_of_stock": 12.0,
-    "next_short": "video_173.mp4",
-    "next_short_title": "Güneş Bir Saniyeliğine Sönseydi Ne Olurdu? ☀️ #bilgidozu #shorts",
+    "total_ready": 21,
+    "days_of_stock": 10.5,
+    "next_short": "video_176.mp4",
+    "next_short_title": "Asansör Koparsa Yere Çarpmadan Zıplamak Seni Kurtarır mı? 🛗⚡ #bilgidozu #shorts",
     "next_long": null,
     "next_long_title": "",
     "missing_covers": []
@@ -44,822 +44,549 @@
   "drive_inventory": {
     "shorts_videos": [
       {
-        "id": "1rlJGXzkPRgGAxOUZ6F7idMhIQI1_gwij",
-        "name": "video_165.mp4",
-        "mimeType": "video/mp4",
-        "size": 34089114,
-        "modifiedTime": "2026-11-07T03:02:40.680Z"
-      },
-      {
-        "id": "1Me32hP9ITYUFFeLSdHrE3pOLy7ED8skR",
-        "name": "video_166.mp4",
-        "mimeType": "video/mp4",
-        "size": 20379776,
-        "modifiedTime": "2026-11-07T13:46:13.925Z"
-      },
-      {
-        "id": "1Kpy8u2lOvwamvaFwW2MXNTqA76Smvf4i",
-        "name": "video_167.mp4",
-        "mimeType": "video/mp4",
-        "size": 24507033,
-        "modifiedTime": "2026-11-07T13:46:13.919Z"
-      },
-      {
-        "id": "1IO3p5a3742keI6u6_0geShgaQNlmseG0",
-        "name": "video_168.mp4",
-        "mimeType": "video/mp4",
-        "size": 26291984,
-        "modifiedTime": "2026-11-07T13:46:13.927Z"
-      },
-      {
-        "id": "18NDNFUII6IfI6-kSGGJC1pNygWgIFtsB",
-        "name": "video_169.mp4",
-        "mimeType": "video/mp4",
-        "size": 22171684,
-        "modifiedTime": "2026-11-07T13:46:14.203Z"
-      },
-      {
-        "id": "17czxfO63HEWKjC_RDFy1i7ztyFFNa2K9",
-        "name": "video_170.mp4",
-        "mimeType": "video/mp4",
-        "size": 27881190,
-        "modifiedTime": "2026-11-07T13:46:13.912Z"
-      },
-      {
-        "id": "1dSMVFJzrWqMtuRQwELF9RD1pDD5h_GFr",
-        "name": "video_171.mp4",
-        "mimeType": "video/mp4",
-        "size": 22230683,
-        "modifiedTime": "2026-11-07T13:46:14.119Z"
-      },
-      {
-        "id": "1uenxAEdlpHYl-OL7MvAN9luKbO711uH5",
-        "name": "video_172.mp4",
-        "mimeType": "video/mp4",
-        "size": 19634071,
-        "modifiedTime": "2026-11-07T13:46:13.899Z"
-      },
-      {
-        "id": "1B29wk44IWhyc6BUH7-7vKd6ctaN3rW-M",
-        "name": "video_173.mp4",
-        "mimeType": "video/mp4",
-        "size": 25099907,
-        "modifiedTime": "2026-11-07T13:46:14.107Z"
-      },
-      {
-        "id": "1z8q9Aj2wCDGmkAikBvOicP8ZhtBMLhxF",
-        "name": "video_174.mp4",
-        "mimeType": "video/mp4",
-        "size": 18489994,
-        "modifiedTime": "2026-11-07T13:46:14.150Z"
-      },
-      {
-        "id": "1EalOn2FqjDBdPD-dQ8uEn2qwj9z1QCbe",
-        "name": "video_175.mp4",
-        "mimeType": "video/mp4",
-        "size": 19890037,
-        "modifiedTime": "2026-11-07T13:46:14.145Z"
-      },
-      {
-        "id": "1qBBJOilRUKzxBL-PL0i3b7kXUcCX2YpR",
+        "id": "18-J3fVWkBwaV2xktsX7fsKsv7tornP5g",
         "name": "video_176.mp4",
         "mimeType": "video/mp4",
         "size": 12314464,
-        "modifiedTime": "2026-11-11T20:26:06.379Z"
+        "modifiedTime": "2026-11-11T17:32:44.854Z"
       },
       {
-        "id": "1gfHZIy6h4ycHGKEQzdQ2a9cZ1cMPa2Vo",
+        "id": "1BASkZQ5R3roeLI5Jqb4XfTmlQlFPVe7f",
         "name": "video_177.mp4",
         "mimeType": "video/mp4",
         "size": 7270384,
-        "modifiedTime": "2026-11-11T20:26:04.720Z"
+        "modifiedTime": "2026-11-11T18:27:36.560Z"
       },
       {
-        "id": "1mrmCUY4S0tOsu7zxeoVNWH3qA5LKavwX",
+        "id": "1TvxdBa8TGcUtod9Ftd1Xx2f2PcekEo2Q",
         "name": "video_178.mp4",
         "mimeType": "video/mp4",
         "size": 9879976,
-        "modifiedTime": "2026-11-11T20:26:05.209Z"
+        "modifiedTime": "2026-11-11T18:27:39.373Z"
       },
       {
-        "id": "1mpHs9QlSgQbuIsaUJV4cP93UDRc9k40D",
+        "id": "1CwkWthE0k3weo3V0HlChVyod39YHDQBI",
         "name": "video_179.mp4",
         "mimeType": "video/mp4",
         "size": 7372503,
-        "modifiedTime": "2026-11-11T20:26:06.262Z"
+        "modifiedTime": "2026-11-11T18:27:40.744Z"
       },
       {
-        "id": "1dUWvFHpsmJngJhyBmmlzzB4TmejgLB1_",
+        "id": "1HzWJJKzy0pDmRHoAxUHb2HZf-K8EVgLg",
         "name": "video_180.mp4",
         "mimeType": "video/mp4",
         "size": 9429498,
-        "modifiedTime": "2026-11-11T20:26:04.439Z"
+        "modifiedTime": "2026-11-11T18:27:43.771Z"
       },
       {
-        "id": "1kTqJ1sHXTaHUKJokaINm8iQqJBzLLZ0V",
+        "id": "1-uBG47--VyVlCSKQX_zFMff_CEaQ5w-F",
         "name": "video_181.mp4",
         "mimeType": "video/mp4",
         "size": 10051959,
-        "modifiedTime": "2026-11-11T20:26:04.142Z"
+        "modifiedTime": "2026-11-11T18:27:45.793Z"
       },
       {
-        "id": "1ElqqsPEJscRBiTaYvm0MnrjlISaVbh3q",
+        "id": "1C93OeL5GtPKT3ZS8Bzr1JYEs8dRkC67m",
         "name": "video_182.mp4",
         "mimeType": "video/mp4",
         "size": 10663998,
-        "modifiedTime": "2026-11-11T20:26:05.769Z"
+        "modifiedTime": "2026-11-11T18:28:27.532Z"
       },
       {
-        "id": "1Vb1RItadtc94rwG92Q7gSPc3ntya_VJL",
+        "id": "1-vcsL3kAXiThtm7ljDWNwJhoGNSdM5ed",
         "name": "video_183.mp4",
         "mimeType": "video/mp4",
         "size": 10691430,
-        "modifiedTime": "2026-11-11T20:26:04.267Z"
+        "modifiedTime": "2026-11-11T18:28:29.762Z"
       },
       {
-        "id": "1HdpSgGegxEzl6MspDsx7Oqnz4yjW1_66",
+        "id": "142xo04Jd9UmOuLZZ8yLjA1vxVPqcjoUb",
         "name": "video_184.mp4",
         "mimeType": "video/mp4",
         "size": 7756578,
-        "modifiedTime": "2026-11-11T20:26:06.503Z"
+        "modifiedTime": "2026-11-11T18:28:31.339Z"
       },
       {
-        "id": "1d-rWefzPJDOTr8optVT8zC1lTQbKJpJz",
+        "id": "1SOw3vPFPocKGomlkTgVpPkhbmP5pQYkq",
         "name": "video_185.mp4",
         "mimeType": "video/mp4",
         "size": 9520283,
-        "modifiedTime": "2026-11-11T20:26:05.573Z"
+        "modifiedTime": "2026-11-11T18:28:34.388Z"
       },
       {
-        "id": "1NffCSIFncyOtesonAhJg47y7l05o87qi",
+        "id": "1-iVia4AxVU6PVL07iUwK0uWuVrrd4n5O",
         "name": "video_186.mp4",
         "mimeType": "video/mp4",
         "size": 9572140,
-        "modifiedTime": "2026-11-11T20:26:05.870Z"
+        "modifiedTime": "2026-11-11T18:28:36.425Z"
       },
       {
-        "id": "1b75xuwTHtR0ozsrGz8CLg2N9mieDFZSD",
+        "id": "11pZ9Ax8ETy0YPERsTOuc9JBIsSh0V4t7",
         "name": "video_187.mp4",
         "mimeType": "video/mp4",
         "size": 13813916,
-        "modifiedTime": "2026-11-12T08:36:36.456Z"
+        "modifiedTime": "2026-11-12T08:13:34.527Z"
       },
       {
-        "id": "1SNQ9uKvejTS4zR_tpH1BOtwDWvzEthNK",
+        "id": "1Q_tsoJMWDy-KhEORpqyL9KH6K8PQRtvu",
         "name": "video_188.mp4",
         "mimeType": "video/mp4",
         "size": 6518015,
-        "modifiedTime": "2026-11-12T08:36:36.949Z"
+        "modifiedTime": "2026-11-12T08:13:34.611Z"
       },
       {
-        "id": "15jmrSLBPu_fvMlDl_y9iSnR-Coz5jbIl",
+        "id": "1_9iGcskiR6fijNci3_BlbaMOXxsAxK7G",
         "name": "video_189.mp4",
         "mimeType": "video/mp4",
         "size": 7924778,
-        "modifiedTime": "2026-11-12T08:36:36.324Z"
+        "modifiedTime": "2026-11-12T08:13:36.133Z"
       },
       {
-        "id": "19NwsgHyNWof_fDydAiQfxoWQ6Ah0V5ef",
+        "id": "1GaGPIfzK6RaKM42lZYyqFnDPve2459Tp",
         "name": "video_190.mp4",
         "mimeType": "video/mp4",
         "size": 9491174,
-        "modifiedTime": "2026-11-12T08:36:36.214Z"
+        "modifiedTime": "2026-11-12T08:13:36.971Z"
       },
       {
-        "id": "1luYCFzAhru4vidzTD1qQTx748to-0Kgj",
+        "id": "1W3c_AhaxJLrsNSexgW1gXMobWXRNFbCj",
         "name": "video_191.mp4",
         "mimeType": "video/mp4",
         "size": 8260013,
-        "modifiedTime": "2026-11-12T08:36:36.045Z"
+        "modifiedTime": "2026-11-12T08:13:37.933Z"
       },
       {
-        "id": "1YESu-xxTuNUfb6Ih88yfyvbT9z5DSy9R",
+        "id": "14IO7RwAAlG17hyxU1S1CJcxtX-i_T7c5",
         "name": "video_192.mp4",
         "mimeType": "video/mp4",
         "size": 9692974,
-        "modifiedTime": "2026-11-12T08:36:35.969Z"
+        "modifiedTime": "2026-11-12T08:13:39.263Z"
       },
       {
-        "id": "1sw2ZBClCTYvnmGJCPe1ZkrMV83yimJQn",
+        "id": "1bFAC-z1LaDr3DrFKvFyxHI7xgW4M3KGP",
         "name": "video_193.mp4",
         "mimeType": "video/mp4",
         "size": 8430163,
-        "modifiedTime": "2026-11-12T08:36:35.750Z"
+        "modifiedTime": "2026-11-12T08:13:39.653Z"
       },
       {
-        "id": "11QJekQX2Qx64Pc88LjZeuLyKidBKCfNq",
+        "id": "1TNH9HGLMWUUuvoNQFITDfctqgbI_bW7E",
         "name": "video_194.mp4",
         "mimeType": "video/mp4",
         "size": 9358774,
-        "modifiedTime": "2026-11-12T08:36:35.599Z"
+        "modifiedTime": "2026-11-12T08:13:41.724Z"
       },
       {
-        "id": "1nyrQ7uoRDBRhTpliJO5Yukj9vgApGdFr",
+        "id": "1fn-KMSgSmJYH0T1snMl7_uf_KyGKqsI6",
         "name": "video_195.mp4",
         "mimeType": "video/mp4",
         "size": 7383794,
-        "modifiedTime": "2026-11-12T08:36:35.493Z"
+        "modifiedTime": "2026-11-12T08:13:42.611Z"
       },
       {
-        "id": "1QU7IWq_KUwHQ0Lkse35LhZDP_AKKfEnq",
+        "id": "1x-46Y43MgvKZE1ZN6mMX1VClf79HYMI2",
         "name": "video_196.mp4",
         "mimeType": "video/mp4",
         "size": 12639000,
-        "modifiedTime": "2026-11-12T08:36:35.400Z"
+        "modifiedTime": "2026-11-12T08:13:43.931Z"
       }
     ],
     "shorts_covers": [
       {
-        "id": "1lecGAec31EmrMBVZKbeHy-40AI3auHay",
-        "name": "kapak_165.jpg",
-        "mimeType": "image/jpeg",
-        "size": 264403,
-        "modifiedTime": "2026-11-09T13:12:23.220Z"
-      },
-      {
-        "id": "1_T1DagfTMsg6W1rWyef_pWyZyQ4PF6ne",
-        "name": "kapak_166.jpg",
-        "mimeType": "image/jpeg",
-        "size": 280884,
-        "modifiedTime": "2026-11-09T13:14:03.158Z"
-      },
-      {
-        "id": "17pzKEOmCwjxYxoS80z708pcl320_oo21",
-        "name": "kapak_167.jpg",
-        "mimeType": "image/jpeg",
-        "size": 389301,
-        "modifiedTime": "2026-11-09T13:15:05.525Z"
-      },
-      {
-        "id": "1KnJ8ShwFoXf2WiUbtu78ddEeU11gMyrT",
-        "name": "kapak_168.jpg",
-        "mimeType": "image/jpeg",
-        "size": 467399,
-        "modifiedTime": "2026-11-09T13:13:08.458Z"
-      },
-      {
-        "id": "1Ga01UlGb0NpKaXDvpiPqiLv8aIPfr83f",
-        "name": "kapak_169.jpg",
-        "mimeType": "image/jpeg",
-        "size": 396806,
-        "modifiedTime": "2026-11-11T16:41:14.639Z"
-      },
-      {
-        "id": "1eLKfcXAFw_Zwz1gRnnhLOgDAH0hTz4Qu",
-        "name": "kapak_170.jpg",
-        "mimeType": "image/jpeg",
-        "size": 411569,
-        "modifiedTime": "2026-11-11T16:42:09.689Z"
-      },
-      {
-        "id": "1PaGdgMlrOIqqv_R7TREz5eY215lSSb9N",
-        "name": "kapak_171.jpg",
-        "mimeType": "image/jpeg",
-        "size": 457926,
-        "modifiedTime": "2026-11-07T13:46:13.655Z"
-      },
-      {
-        "id": "1A1ZQNOpu9YU3sIKhLs4GJ9pfpme8XBg5",
-        "name": "kapak_172.jpg",
-        "mimeType": "image/jpeg",
-        "size": 399392,
-        "modifiedTime": "2026-11-07T13:46:13.736Z"
-      },
-      {
-        "id": "1zuDzTaMFITQW4_r_ZMzuuvnGoCW7CHwQ",
-        "name": "kapak_173.jpg",
-        "mimeType": "image/jpeg",
-        "size": 384137,
-        "modifiedTime": "2026-11-07T13:46:13.918Z"
-      },
-      {
-        "id": "11XWdgQvfdkFFMykeU1EPTbcmiDloNbQb",
-        "name": "kapak_174.jpg",
-        "mimeType": "image/jpeg",
-        "size": 443085,
-        "modifiedTime": "2026-11-07T13:46:14.156Z"
-      },
-      {
-        "id": "1zUwD_-BqtP-fe4xToJzUJ6YTP9wbwgiS",
-        "name": "kapak_175.jpg",
-        "mimeType": "image/jpeg",
-        "size": 358870,
-        "modifiedTime": "2026-11-07T13:46:14.538Z"
-      },
-      {
-        "id": "19O7U003d7H4MlOQ1R59P6fGgC8nLP4iZ",
+        "id": "1rUuK0A8Y0B21IdMPuVObbaKzUUfiP-Ny",
         "name": "kapak_176.jpg",
         "mimeType": "image/jpeg",
         "size": 497113,
-        "modifiedTime": "2026-11-11T20:26:03.763Z"
+        "modifiedTime": "2026-11-11T17:32:34.405Z"
       },
       {
-        "id": "1Ii-PBUYh6IiDzURTCDY0flkevsJUjVRT",
+        "id": "1XMjl-lhQrvEqiOsIMA33gEcu1YDqXlOY",
         "name": "kapak_177.jpg",
         "mimeType": "image/jpeg",
         "size": 332217,
-        "modifiedTime": "2026-11-11T20:26:05.626Z"
+        "modifiedTime": "2026-11-11T18:27:36.186Z"
       },
       {
-        "id": "1xCJEFH0OBIspwD8qz832WcFq1Q1UBAYQ",
+        "id": "1KxrhYEgR1DlcF222MbRgCPm_Q6s0eTAd",
         "name": "kapak_178.jpg",
         "mimeType": "image/jpeg",
         "size": 387781,
-        "modifiedTime": "2026-11-11T20:26:03.890Z"
+        "modifiedTime": "2026-11-11T18:27:38.829Z"
       },
       {
-        "id": "1aCgKPLlFYDB9GCWyI1595Lm319muGRXc",
+        "id": "13QgOOd-y2_eTTGKMOVIxV01KZuU9RQ4O",
         "name": "kapak_179.jpg",
         "mimeType": "image/jpeg",
         "size": 299012,
-        "modifiedTime": "2026-11-11T20:26:06.159Z"
+        "modifiedTime": "2026-11-11T18:27:40.587Z"
       },
       {
-        "id": "1fBa_u1yxac7_B_z4EUYOtnu0gv6F3o1t",
+        "id": "1jbU3tVIbBQi9EOwo_SbLab-o68djLrAv",
         "name": "kapak_180.jpg",
         "mimeType": "image/jpeg",
         "size": 441808,
-        "modifiedTime": "2026-11-11T20:26:04.618Z"
+        "modifiedTime": "2026-11-11T18:27:43.232Z"
       },
       {
-        "id": "1CxDDheTfHIVJVYg39ly2RawN3TWkwDMP",
+        "id": "1ynRREXr89SPV8h0yzwBx4VKfL2bw3V7K",
         "name": "kapak_181.jpg",
         "mimeType": "image/jpeg",
         "size": 526174,
-        "modifiedTime": "2026-11-11T20:26:04.900Z"
+        "modifiedTime": "2026-11-11T18:27:45.163Z"
       },
       {
-        "id": "1FxnQrEomHkss5fv-e8eWaQGXIeHSrpdW",
+        "id": "1Yk385ywnmPJfwoTVnavYoT1WE4eBN_GC",
         "name": "kapak_182.jpg",
         "mimeType": "image/jpeg",
         "size": 300759,
-        "modifiedTime": "2026-11-11T20:26:03.999Z"
+        "modifiedTime": "2026-11-11T18:28:26.982Z"
       },
       {
-        "id": "1hUJaWaKUJUsWOMnHTgqkbhuhZ6tviC5g",
+        "id": "1hnhLyhe6rPpkckOgqHCeo5J73xP4mHGx",
         "name": "kapak_183.jpg",
         "mimeType": "image/jpeg",
         "size": 586239,
-        "modifiedTime": "2026-11-11T20:26:04.793Z"
+        "modifiedTime": "2026-11-11T18:28:29.648Z"
       },
       {
-        "id": "1kz-gf3cM7N9hK7oqFHE8oPLaUolJe8Jc",
+        "id": "1wP6qzrQiDViD1k14rLh3PlZ0HD5Cle-K",
         "name": "kapak_184.jpg",
         "mimeType": "image/jpeg",
         "size": 657519,
-        "modifiedTime": "2026-11-11T20:26:05.479Z"
+        "modifiedTime": "2026-11-11T18:28:31.475Z"
       },
       {
-        "id": "15mPIfgbn_XDNjJyZPMT97AVg6BR60Y0B",
+        "id": "1yRb8AhqffkCeP-1nmISXrx7_sq34alB3",
         "name": "kapak_185.jpg",
         "mimeType": "image/jpeg",
         "size": 283912,
-        "modifiedTime": "2026-11-11T20:26:04.333Z"
+        "modifiedTime": "2026-11-11T18:28:34.033Z"
       },
       {
-        "id": "1HieMd5T3v7kPxUt0NHTV42GvuDgEyDhP",
+        "id": "1Ur0FzuGMuH23eSnImlYcjB-yLdx8CDQL",
         "name": "kapak_186.jpg",
         "mimeType": "image/jpeg",
         "size": 463078,
-        "modifiedTime": "2026-11-11T20:26:04.059Z"
+        "modifiedTime": "2026-11-11T18:28:36.297Z"
       },
       {
-        "id": "1kSwRJb1Wv-VN6OJ_7ZUUliaccTiLms4i",
+        "id": "1jj8zlkqW6r0TezZ7Kkg5JJxrbbtGT5Ku",
         "name": "kapak_187.jpg",
         "mimeType": "image/jpeg",
         "size": 387018,
-        "modifiedTime": "2026-11-12T08:36:34.406Z"
+        "modifiedTime": "2026-11-12T08:13:59.464Z"
       },
       {
-        "id": "1pMP2kWiy1nlpruEHgXsAaAlIOh-Pg441",
+        "id": "1QFBBK_mnUxDkpzN4iqEFocLAOtyuvWI8",
         "name": "kapak_188.jpg",
         "mimeType": "image/jpeg",
         "size": 342285,
-        "modifiedTime": "2026-11-12T08:36:34.562Z"
+        "modifiedTime": "2026-11-12T08:14:01.265Z"
       },
       {
-        "id": "1RHtpxC64sqfWYkNZCv6zdXzkuckcBdNu",
+        "id": "10dyZN9ZBisxRTPlBKxQJsiP8sddHZJoL",
         "name": "kapak_189.jpg",
         "mimeType": "image/jpeg",
         "size": 354229,
-        "modifiedTime": "2026-11-12T08:36:34.700Z"
+        "modifiedTime": "2026-11-12T08:14:02.334Z"
       },
       {
-        "id": "1Uvcyeikm1oUQYnLKCbz4M8S_nkvItqSd",
+        "id": "1mnjeVpAMKu9RlPxrkseXNt_wsWvBa2F7",
         "name": "kapak_190.jpg",
         "mimeType": "image/jpeg",
         "size": 371538,
-        "modifiedTime": "2026-11-12T08:36:34.768Z"
+        "modifiedTime": "2026-11-12T08:14:03.636Z"
       },
       {
-        "id": "1pPw_Jb8o-pwFS_rz4IWWvo6cJUiPOlrD",
+        "id": "1Dlb1K50RAQLrJZhPeXY9dGJi80EsNikX",
         "name": "kapak_191.jpg",
         "mimeType": "image/jpeg",
         "size": 386456,
-        "modifiedTime": "2026-11-12T08:36:34.833Z"
+        "modifiedTime": "2026-11-12T08:14:04.904Z"
       },
       {
-        "id": "1VRLv0iH94gsl3ITfFdvvyni68wFtnIdx",
+        "id": "1Bubp5MsrFHzo5sEOt3pJF6l9tW1losuu",
         "name": "kapak_192.jpg",
         "mimeType": "image/jpeg",
         "size": 532112,
-        "modifiedTime": "2026-11-12T08:36:34.904Z"
+        "modifiedTime": "2026-11-12T08:14:06.176Z"
       },
       {
-        "id": "1Q8vgEIpMpjlNfwYiyvN0ybbZFIcexERK",
+        "id": "1qM0Ne2aiPem8J1e4UUVf7NVM8QGVkT5S",
         "name": "kapak_193.jpg",
         "mimeType": "image/jpeg",
         "size": 381461,
-        "modifiedTime": "2026-11-12T08:36:35.012Z"
+        "modifiedTime": "2026-11-12T08:14:07.494Z"
       },
       {
-        "id": "1LL1GNpX7-kqGVoTIyk_ljiWxZoxUtduQ",
+        "id": "1XkrgMHjLHDsuxEftk8W3AvUg_5JwSsLM",
         "name": "kapak_194.jpg",
         "mimeType": "image/jpeg",
         "size": 444775,
-        "modifiedTime": "2026-11-12T08:36:35.136Z"
+        "modifiedTime": "2026-11-12T08:14:08.645Z"
       },
       {
-        "id": "1EXcp0zAbaG5PoF6q8Ubhn-_Y_VSAdpjM",
+        "id": "1nxSA7vA9NgUxFAZw4xYESadsgiFPHukd",
         "name": "kapak_195.jpg",
         "mimeType": "image/jpeg",
         "size": 313726,
-        "modifiedTime": "2026-11-12T08:36:35.216Z"
+        "modifiedTime": "2026-11-12T08:14:10.218Z"
       },
       {
-        "id": "1IkhSAaR4d_Ex4D3kjymSg9fMG27lhMqj",
+        "id": "1um-S7NV4erqyS1fpiZ1jiDOHeEj5q_dw",
         "name": "kapak_196.jpg",
         "mimeType": "image/jpeg",
         "size": 562174,
-        "modifiedTime": "2026-11-12T08:36:35.296Z"
-      },
-      {
-        "id": "1wYiFRYO3ea4khqVDtGe67pCNksDgpIUk",
-        "name": "kapak_40.jpg",
-        "mimeType": "image/jpeg",
-        "size": 416691,
-        "modifiedTime": "2026-11-12T01:18:35.076Z"
-      },
-      {
-        "id": "1Ey7LkqT6GjEk-7AoimqQIXZ8gtdY-LJk",
-        "name": "kapak_41.jpg",
-        "mimeType": "image/jpeg",
-        "size": 827044,
-        "modifiedTime": "2026-11-12T01:29:23.459Z"
-      },
-      {
-        "id": "1DI3UOUDUHZwnBqSxKrcXTHyr23qNk8ii",
-        "name": "kapak_48.jpg",
-        "mimeType": "image/jpeg",
-        "size": 827044,
-        "modifiedTime": "2026-11-12T05:58:39.852Z"
+        "modifiedTime": "2026-11-12T08:14:11.651Z"
       }
     ],
     "long_videos": [],
     "long_covers": [
       {
-        "id": "1lecGAec31EmrMBVZKbeHy-40AI3auHay",
-        "name": "kapak_165.jpg",
-        "mimeType": "image/jpeg",
-        "size": 264403,
-        "modifiedTime": "2026-11-09T13:12:23.220Z"
-      },
-      {
-        "id": "1_T1DagfTMsg6W1rWyef_pWyZyQ4PF6ne",
-        "name": "kapak_166.jpg",
-        "mimeType": "image/jpeg",
-        "size": 280884,
-        "modifiedTime": "2026-11-09T13:14:03.158Z"
-      },
-      {
-        "id": "17pzKEOmCwjxYxoS80z708pcl320_oo21",
-        "name": "kapak_167.jpg",
-        "mimeType": "image/jpeg",
-        "size": 389301,
-        "modifiedTime": "2026-11-09T13:15:05.525Z"
-      },
-      {
-        "id": "1KnJ8ShwFoXf2WiUbtu78ddEeU11gMyrT",
-        "name": "kapak_168.jpg",
-        "mimeType": "image/jpeg",
-        "size": 467399,
-        "modifiedTime": "2026-11-09T13:13:08.458Z"
-      },
-      {
-        "id": "1Ga01UlGb0NpKaXDvpiPqiLv8aIPfr83f",
-        "name": "kapak_169.jpg",
-        "mimeType": "image/jpeg",
-        "size": 396806,
-        "modifiedTime": "2026-11-11T16:41:14.639Z"
-      },
-      {
-        "id": "1eLKfcXAFw_Zwz1gRnnhLOgDAH0hTz4Qu",
-        "name": "kapak_170.jpg",
-        "mimeType": "image/jpeg",
-        "size": 411569,
-        "modifiedTime": "2026-11-11T16:42:09.689Z"
-      },
-      {
-        "id": "1PaGdgMlrOIqqv_R7TREz5eY215lSSb9N",
-        "name": "kapak_171.jpg",
-        "mimeType": "image/jpeg",
-        "size": 457926,
-        "modifiedTime": "2026-11-07T13:46:13.655Z"
-      },
-      {
-        "id": "1A1ZQNOpu9YU3sIKhLs4GJ9pfpme8XBg5",
-        "name": "kapak_172.jpg",
-        "mimeType": "image/jpeg",
-        "size": 399392,
-        "modifiedTime": "2026-11-07T13:46:13.736Z"
-      },
-      {
-        "id": "1zuDzTaMFITQW4_r_ZMzuuvnGoCW7CHwQ",
-        "name": "kapak_173.jpg",
-        "mimeType": "image/jpeg",
-        "size": 384137,
-        "modifiedTime": "2026-11-07T13:46:13.918Z"
-      },
-      {
-        "id": "11XWdgQvfdkFFMykeU1EPTbcmiDloNbQb",
-        "name": "kapak_174.jpg",
-        "mimeType": "image/jpeg",
-        "size": 443085,
-        "modifiedTime": "2026-11-07T13:46:14.156Z"
-      },
-      {
-        "id": "1zUwD_-BqtP-fe4xToJzUJ6YTP9wbwgiS",
-        "name": "kapak_175.jpg",
-        "mimeType": "image/jpeg",
-        "size": 358870,
-        "modifiedTime": "2026-11-07T13:46:14.538Z"
-      },
-      {
-        "id": "19O7U003d7H4MlOQ1R59P6fGgC8nLP4iZ",
+        "id": "1rUuK0A8Y0B21IdMPuVObbaKzUUfiP-Ny",
         "name": "kapak_176.jpg",
         "mimeType": "image/jpeg",
         "size": 497113,
-        "modifiedTime": "2026-11-11T20:26:03.763Z"
+        "modifiedTime": "2026-11-11T17:32:34.405Z"
       },
       {
-        "id": "1Ii-PBUYh6IiDzURTCDY0flkevsJUjVRT",
+        "id": "1XMjl-lhQrvEqiOsIMA33gEcu1YDqXlOY",
         "name": "kapak_177.jpg",
         "mimeType": "image/jpeg",
         "size": 332217,
-        "modifiedTime": "2026-11-11T20:26:05.626Z"
+        "modifiedTime": "2026-11-11T18:27:36.186Z"
       },
       {
-        "id": "1xCJEFH0OBIspwD8qz832WcFq1Q1UBAYQ",
+        "id": "1KxrhYEgR1DlcF222MbRgCPm_Q6s0eTAd",
         "name": "kapak_178.jpg",
         "mimeType": "image/jpeg",
         "size": 387781,
-        "modifiedTime": "2026-11-11T20:26:03.890Z"
+        "modifiedTime": "2026-11-11T18:27:38.829Z"
       },
       {
-        "id": "1aCgKPLlFYDB9GCWyI1595Lm319muGRXc",
+        "id": "13QgOOd-y2_eTTGKMOVIxV01KZuU9RQ4O",
         "name": "kapak_179.jpg",
         "mimeType": "image/jpeg",
         "size": 299012,
-        "modifiedTime": "2026-11-11T20:26:06.159Z"
+        "modifiedTime": "2026-11-11T18:27:40.587Z"
       },
       {
-        "id": "1fBa_u1yxac7_B_z4EUYOtnu0gv6F3o1t",
+        "id": "1jbU3tVIbBQi9EOwo_SbLab-o68djLrAv",
         "name": "kapak_180.jpg",
         "mimeType": "image/jpeg",
         "size": 441808,
-        "modifiedTime": "2026-11-11T20:26:04.618Z"
+        "modifiedTime": "2026-11-11T18:27:43.232Z"
       },
       {
-        "id": "1CxDDheTfHIVJVYg39ly2RawN3TWkwDMP",
+        "id": "1ynRREXr89SPV8h0yzwBx4VKfL2bw3V7K",
         "name": "kapak_181.jpg",
         "mimeType": "image/jpeg",
         "size": 526174,
-        "modifiedTime": "2026-11-11T20:26:04.900Z"
+        "modifiedTime": "2026-11-11T18:27:45.163Z"
       },
       {
-        "id": "1FxnQrEomHkss5fv-e8eWaQGXIeHSrpdW",
+        "id": "1Yk385ywnmPJfwoTVnavYoT1WE4eBN_GC",
         "name": "kapak_182.jpg",
         "mimeType": "image/jpeg",
         "size": 300759,
-        "modifiedTime": "2026-11-11T20:26:03.999Z"
+        "modifiedTime": "2026-11-11T18:28:26.982Z"
       },
       {
-        "id": "1hUJaWaKUJUsWOMnHTgqkbhuhZ6tviC5g",
+        "id": "1hnhLyhe6rPpkckOgqHCeo5J73xP4mHGx",
         "name": "kapak_183.jpg",
         "mimeType": "image/jpeg",
         "size": 586239,
-        "modifiedTime": "2026-11-11T20:26:04.793Z"
+        "modifiedTime": "2026-11-11T18:28:29.648Z"
       },
       {
-        "id": "1kz-gf3cM7N9hK7oqFHE8oPLaUolJe8Jc",
+        "id": "1wP6qzrQiDViD1k14rLh3PlZ0HD5Cle-K",
         "name": "kapak_184.jpg",
         "mimeType": "image/jpeg",
         "size": 657519,
-        "modifiedTime": "2026-11-11T20:26:05.479Z"
+        "modifiedTime": "2026-11-11T18:28:31.475Z"
       },
       {
-        "id": "15mPIfgbn_XDNjJyZPMT97AVg6BR60Y0B",
+        "id": "1yRb8AhqffkCeP-1nmISXrx7_sq34alB3",
         "name": "kapak_185.jpg",
         "mimeType": "image/jpeg",
         "size": 283912,
-        "modifiedTime": "2026-11-11T20:26:04.333Z"
+        "modifiedTime": "2026-11-11T18:28:34.033Z"
       },
       {
-        "id": "1HieMd5T3v7kPxUt0NHTV42GvuDgEyDhP",
+        "id": "1Ur0FzuGMuH23eSnImlYcjB-yLdx8CDQL",
         "name": "kapak_186.jpg",
         "mimeType": "image/jpeg",
         "size": 463078,
-        "modifiedTime": "2026-11-11T20:26:04.059Z"
+        "modifiedTime": "2026-11-11T18:28:36.297Z"
       },
       {
-        "id": "1kSwRJb1Wv-VN6OJ_7ZUUliaccTiLms4i",
+        "id": "1jj8zlkqW6r0TezZ7Kkg5JJxrbbtGT5Ku",
         "name": "kapak_187.jpg",
         "mimeType": "image/jpeg",
         "size": 387018,
-        "modifiedTime": "2026-11-12T08:36:34.406Z"
+        "modifiedTime": "2026-11-12T08:13:59.464Z"
       },
       {
-        "id": "1pMP2kWiy1nlpruEHgXsAaAlIOh-Pg441",
+        "id": "1QFBBK_mnUxDkpzN4iqEFocLAOtyuvWI8",
         "name": "kapak_188.jpg",
         "mimeType": "image/jpeg",
         "size": 342285,
-        "modifiedTime": "2026-11-12T08:36:34.562Z"
+        "modifiedTime": "2026-11-12T08:14:01.265Z"
       },
       {
-        "id": "1RHtpxC64sqfWYkNZCv6zdXzkuckcBdNu",
+        "id": "10dyZN9ZBisxRTPlBKxQJsiP8sddHZJoL",
         "name": "kapak_189.jpg",
         "mimeType": "image/jpeg",
         "size": 354229,
-        "modifiedTime": "2026-11-12T08:36:34.700Z"
+        "modifiedTime": "2026-11-12T08:14:02.334Z"
       },
       {
-        "id": "1Uvcyeikm1oUQYnLKCbz4M8S_nkvItqSd",
+        "id": "1mnjeVpAMKu9RlPxrkseXNt_wsWvBa2F7",
         "name": "kapak_190.jpg",
         "mimeType": "image/jpeg",
         "size": 371538,
-        "modifiedTime": "2026-11-12T08:36:34.768Z"
+        "modifiedTime": "2026-11-12T08:14:03.636Z"
       },
       {
-        "id": "1pPw_Jb8o-pwFS_rz4IWWvo6cJUiPOlrD",
+        "id": "1Dlb1K50RAQLrJZhPeXY9dGJi80EsNikX",
         "name": "kapak_191.jpg",
         "mimeType": "image/jpeg",
         "size": 386456,
-        "modifiedTime": "2026-11-12T08:36:34.833Z"
+        "modifiedTime": "2026-11-12T08:14:04.904Z"
       },
       {
-        "id": "1VRLv0iH94gsl3ITfFdvvyni68wFtnIdx",
+        "id": "1Bubp5MsrFHzo5sEOt3pJF6l9tW1losuu",
         "name": "kapak_192.jpg",
         "mimeType": "image/jpeg",
         "size": 532112,
-        "modifiedTime": "2026-11-12T08:36:34.904Z"
+        "modifiedTime": "2026-11-12T08:14:06.176Z"
       },
       {
-        "id": "1Q8vgEIpMpjlNfwYiyvN0ybbZFIcexERK",
+        "id": "1qM0Ne2aiPem8J1e4UUVf7NVM8QGVkT5S",
         "name": "kapak_193.jpg",
         "mimeType": "image/jpeg",
         "size": 381461,
-        "modifiedTime": "2026-11-12T08:36:35.012Z"
+        "modifiedTime": "2026-11-12T08:14:07.494Z"
       },
       {
-        "id": "1LL1GNpX7-kqGVoTIyk_ljiWxZoxUtduQ",
+        "id": "1XkrgMHjLHDsuxEftk8W3AvUg_5JwSsLM",
         "name": "kapak_194.jpg",
         "mimeType": "image/jpeg",
         "size": 444775,
-        "modifiedTime": "2026-11-12T08:36:35.136Z"
+        "modifiedTime": "2026-11-12T08:14:08.645Z"
       },
       {
-        "id": "1EXcp0zAbaG5PoF6q8Ubhn-_Y_VSAdpjM",
+        "id": "1nxSA7vA9NgUxFAZw4xYESadsgiFPHukd",
         "name": "kapak_195.jpg",
         "mimeType": "image/jpeg",
         "size": 313726,
-        "modifiedTime": "2026-11-12T08:36:35.216Z"
+        "modifiedTime": "2026-11-12T08:14:10.218Z"
       },
       {
-        "id": "1IkhSAaR4d_Ex4D3kjymSg9fMG27lhMqj",
+        "id": "1um-S7NV4erqyS1fpiZ1jiDOHeEj5q_dw",
         "name": "kapak_196.jpg",
         "mimeType": "image/jpeg",
         "size": 562174,
-        "modifiedTime": "2026-11-12T08:36:35.296Z"
-      },
-      {
-        "id": "1wYiFRYO3ea4khqVDtGe67pCNksDgpIUk",
-        "name": "kapak_40.jpg",
-        "mimeType": "image/jpeg",
-        "size": 416691,
-        "modifiedTime": "2026-11-12T01:18:35.076Z"
-      },
-      {
-        "id": "1Ey7LkqT6GjEk-7AoimqQIXZ8gtdY-LJk",
-        "name": "kapak_41.jpg",
-        "mimeType": "image/jpeg",
-        "size": 827044,
-        "modifiedTime": "2026-11-12T01:29:23.459Z"
-      },
-      {
-        "id": "1DI3UOUDUHZwnBqSxKrcXTHyr23qNk8ii",
-        "name": "kapak_48.jpg",
-        "mimeType": "image/jpeg",
-        "size": 827044,
-        "modifiedTime": "2026-11-12T05:58:39.852Z"
+        "modifiedTime": "2026-11-12T08:14:11.651Z"
       }
     ],
     "ceo_files": [
       {
-        "id": "1N6yPInUu-KqLcoVIsuSzuz0LKrGFCQaS",
-        "name": "00_ZORUNLU_CEO_KURALLARI",
-        "mimeType": "application/vnd.google-apps.folder",
-        "size": 0,
-        "modifiedTime": "2026-11-06T09:26:19.973Z"
-      },
-      {
-        "id": "17nS-VEILQ72k7NKEbYcnji90p1G5UbZZ",
-        "name": "bilgidozu_yukleme_tablosu.xlsx",
+        "id": "1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo",
+        "name": "baslik.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 113704,
-        "modifiedTime": "2026-11-12T08:48:54.887Z"
+        "size": 105739,
+        "modifiedTime": "2026-11-12T13:30:49.115Z"
       },
       {
-        "id": "1ulh13cnzYTaIlp1vehJ7lDrSsgjKyM_X",
-        "name": "bilgidozu_yukleme_tablosu_HATALI_YEDEK.bak",
+        "id": "1YjYzlPGzBlkFCH6baStgv1DOOdttaFzU",
+        "name": "bilgi_dozu_panel_motor_v2.zip",
+        "mimeType": "application/zip",
+        "size": 2500392,
+        "modifiedTime": "2026-11-12T12:45:44.381Z"
+      },
+      {
+        "id": "1DGd6JkzI_jCFUTH5BKm5gMwiIxqNsh-4",
+        "name": "deneme6.mp4",
+        "mimeType": "video/mp4",
+        "size": 12833892,
+        "modifiedTime": "2026-11-12T06:52:38.605Z"
+      },
+      {
+        "id": "1RMBx9uYuGww9YJBPtQ7svwXNbuPiYhxn",
+        "name": "deneme7.mp4",
+        "mimeType": "video/mp4",
+        "size": 12862626,
+        "modifiedTime": "2026-11-12T07:22:24.173Z"
+      },
+      {
+        "id": "1Xcbbk0cwTHjHTAI6X-Y3ogEUhlQZeKdO",
+        "name": "deneme8.mp4",
+        "mimeType": "video/mp4",
+        "size": 13813916,
+        "modifiedTime": "2026-11-12T07:32:16.620Z"
+      },
+      {
+        "id": "1FLYFfGtwQIpCa-zj9lXTkBorNQ8OTpLw",
+        "name": "dikey_video_sablon.md",
+        "mimeType": "text/markdown",
+        "size": 11734,
+        "modifiedTime": "2026-11-12T00:44:28.048Z"
+      },
+      {
+        "id": "1UKxAn8lwn9YNLu6g3R28VKhoRN0Fn6FQ",
+        "name": "kapanis_deneme.mp4",
+        "mimeType": "video/mp4",
+        "size": 1219332,
+        "modifiedTime": "2026-11-12T12:15:13.418Z"
+      },
+      {
+        "id": "1p1PXBxjDyJm_R41LXWcLJjb06iBwZ_Ho",
+        "name": "kapanis_deneme2.mp4",
+        "mimeType": "video/mp4",
+        "size": 846512,
+        "modifiedTime": "2026-11-12T12:45:47.365Z"
+      },
+      {
+        "id": "188VUHzWmAbmOFlRH5OEQP6aekXiZX91i",
+        "name": "KONU KONTROL ET SONRA BASLIK LISTESINE YAZ",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 18,
-        "modifiedTime": "2026-11-11T22:18:19.804Z"
+        "size": 173165,
+        "modifiedTime": "2026-11-11T17:31:05.605Z"
       },
       {
-        "id": "1lEm4h79f6Q6Jzf4DsHXaVBPGEzgDpuHR",
-        "name": "CEO_VIDEO_KALITE_UYARISI_2026-11-06.md",
-        "mimeType": "text/markdown",
-        "size": 1627,
-        "modifiedTime": "2026-11-06T01:51:34.070Z"
-      },
-      {
-        "id": "1LathGn2Mn5Zn_1gf4JqqVz1WnaSm7NVN",
-        "name": "Kontrol",
+        "id": "1xyO_jNjbpghfR7CJ1P9DUvkzdb6eC0qf",
+        "name": "Onay_Bekleyen",
         "mimeType": "application/vnd.google-apps.folder",
         "size": 0,
-        "modifiedTime": "2026-11-02T13:58:08.486Z"
+        "modifiedTime": "2026-11-12T13:30:24.550Z"
       },
       {
-        "id": "1lKrhKOx9ywnhhA9xRkBGlhjxY8Ee9fg1",
-        "name": "Motor Üretim Paketleri",
+        "id": "1MAoYHD1amrHMa-KgAZ3a34BETmQYN5nB",
+        "name": "README_MIRA_v2.md",
+        "mimeType": "text/markdown",
+        "size": 4242,
+        "modifiedTime": "2026-11-12T08:51:24.936Z"
+      },
+      {
+        "id": "1gwtRBik2Dpvdz1VRaosBx9wokqT53Dzk",
+        "name": "Retansiyon",
         "mimeType": "application/vnd.google-apps.folder",
         "size": 0,
-        "modifiedTime": "2026-11-06T10:21:05.817Z"
+        "modifiedTime": "2026-11-12T13:30:25.616Z"
       },
       {
-        "id": "1qjbgO7iiNEm61tM9URDW2ORBwgBEOLbs",
-        "name": "MOTOR_CEVAPLARI.md",
-        "mimeType": "text/markdown",
-        "size": 13941,
-        "modifiedTime": "2026-11-03T07:46:50.236Z"
-      },
-      {
-        "id": "1LuTryXXLSW4aXZf6LfGIL7ciIbjnCSBT",
-        "name": "MOTOR_SORULARI.md",
-        "mimeType": "text/markdown",
-        "size": 6355,
-        "modifiedTime": "2026-11-03T07:39:31.071Z"
-      },
-      {
-        "id": "1N6mMUu3rEvCIie4o4XUWegPzFngMgHHM",
-        "name": "Onay Bekleyen Videolar",
+        "id": "1GK-yImpb09445uXfTUbIl7l6AfNM4BOb",
+        "name": "video kapak",
         "mimeType": "application/vnd.google-apps.folder",
         "size": 0,
-        "modifiedTime": "2026-11-12T00:56:19.824Z"
-      },
-      {
-        "id": "1LyZBIc52OzaGZBaq8yXODcseZ0wilsrs",
-        "name": "RETANSIYON_OZEL_RAPORLAR",
-        "mimeType": "application/vnd.google-apps.folder",
-        "size": 0,
-        "modifiedTime": "2026-11-01T22:59:58.786Z"
-      },
-      {
-        "id": "19EEmVW4U2TH0F07UDWW2Dp5DTp4AZ0t6",
-        "name": "senaryo_kurallari.md",
-        "mimeType": "text/markdown",
-        "size": 3567,
-        "modifiedTime": "2026-11-02T21:58:19.151Z"
-      },
-      {
-        "id": "1wSMluVJ0brXdEm9bnVylTXXD0g3o2RF6",
-        "name": "ses kural.md",
-        "mimeType": "text/markdown",
-        "size": 862,
-        "modifiedTime": "2026-11-02T09:13:22.906Z"
-      },
-      {
-        "id": "1Frqd8y7hx625G6uAdP_xKSxvXXZUSRYv",
-        "name": "Ses Örnekleri",
-        "mimeType": "application/vnd.google-apps.folder",
-        "size": 0,
-        "modifiedTime": "2026-11-03T09:45:12.974Z"
+        "modifiedTime": "2026-11-11T17:35:10.794Z"
       }
     ]
   },
   "active_queue": [
     {
-      "row": 154,
+      "row": 136,
       "file_name": "video_155.mp4",
       "number": 155,
       "type": "short",
@@ -890,7 +617,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 155,
+      "row": 137,
       "file_name": "video_156.mp4",
       "number": 156,
       "type": "short",
@@ -920,7 +647,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 144,
+      "row": 138,
       "file_name": "video_157.mp4",
       "number": 157,
       "type": "short",
@@ -952,7 +679,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 157,
+      "row": 139,
       "file_name": "video_158.mp4",
       "number": 158,
       "type": "short",
@@ -983,7 +710,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 158,
+      "row": 140,
       "file_name": "video_159.mp4",
       "number": 159,
       "type": "short",
@@ -1014,7 +741,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 159,
+      "row": 141,
       "file_name": "video_160.mp4",
       "number": 160,
       "type": "short",
@@ -1044,7 +771,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 161,
+      "row": 142,
       "file_name": "video_161.mp4",
       "number": 161,
       "type": "short",
@@ -1074,7 +801,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 162,
+      "row": 143,
       "file_name": "video_162.mp4",
       "number": 162,
       "type": "short",
@@ -1105,7 +832,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 163,
+      "row": 144,
       "file_name": "video_163.mp4",
       "number": 163,
       "type": "short",
@@ -1136,29 +863,28 @@
       "drive_cover_id": ""
     },
     {
-      "row": 165,
+      "row": 145,
       "file_name": "video_164.mp4",
       "number": 164,
       "type": "short",
       "status": "YÜKLENDİ",
       "is_ready": false,
       "is_published": true,
-      "title": "Kaplanların Çizgileri Neden Her Birinde Farklıdır? 🐅 #bilgidozu #shorts",
-      "description": "Kaplanların yalnızca tüyleri değil, derilerinin altındaki desenleri de çizgilidir. Üstelik bu çizgiler insan parmak izi gibi her kaplanda farklıdır. Ormanda ışık ve gölgeyi bölen desen, avına yaklaşırken kaplanın gövde hatlarını gizlemeye yardımcı olur.\n\n💬 Sence kaplanların en şaşırtıcı özelliği çizgileri mi, gücü mü? Yoruma yaz! 👇\n\n📚 Kaynak: Smithsonian’s National Zoo & Conservation Biology Institute — Tiger\n🎨 Görseller temsilîdir.\n#bilgidozu #shorts #kaplan #hayvanlar #doğa #bilim",
+      "title": "Tıka Basa Doysan Bile Tatlıya Neden Her Zaman Yer Açılır? 🍰 #bilgidozu #shorts",
+      "description": "Akşam yemeğinde tek lokma bile yiyemeyecek kadar doyduğun halde masaya tatlı geldiği an midende nasıl mucizevi yer açılır? Şaka sandığımız tatlı için ayrı mide sözü gerçek çıktı; Max Planck Enstitüsü bu gizli şalterin tam beyinde olduğunu kanıtladı.\n\n📍 BÖLÜMLER\n00:00 Tek lokma yiyemeyecekken — Tatlıya nasıl yer açılır?\n00:19 Tokluk nöronları yemekte — Artık doydun diyor!\n00:38 Atalarımızdan kalan — Hızlı enerji kodu!\n\n📊 Kaynaklar:\n• Max Planck Institute for Metabolism Research (Science, 2025)\n• https://www.mpg.de/24159607/0211-neur-dessert-stomach-emerges-in-the-brain-153735-x\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #beyin #tatlı #insanvücudu #bilim",
       "tags": [
-        "bilgi dozu",
-        "kaplan",
-        "kaplan çizgileri",
-        "kaplanların derisi",
-        "hayvanlar alemi",
-        "doğa",
-        "bilim",
+        "bilgidozu",
         "shorts",
-        "doz dışı"
+        "tokken neden tatlı isteriz",
+        "tatlı midesi gerçek mi",
+        "yemekten sonra tatlı krizi",
+        "beyin ve iştah",
+        "bilim",
+        "bilgi dozu"
       ],
-      "category_name": "Doğa ve Hayvanlar",
-      "pinned_comment": "Sence kaplanların en şaşırtıcı özelliği çizgileri mi, gücü mü? Yoruma yaz! 👇",
-      "youtube_url": "",
+      "category_name": "İnsan Vücudu ve Beyin",
+      "pinned_comment": "Yemekten sonra ne kadar tok olursan ol asla hayır diyemediğin o tatlı hangisi? Yoruma yaz! 👇",
+      "youtube_url": "https://youtu.be/-9AQb4ZMLGE",
       "has_drive_video": false,
       "drive_video_id": "",
       "drive_video_size_mb": 0,
@@ -1167,68 +893,69 @@
       "drive_cover_id": ""
     },
     {
-      "row": 166,
+      "row": 146,
       "file_name": "video_165.mp4",
       "number": 165,
       "type": "short",
       "status": "YÜKLENDİ",
       "is_ready": false,
       "is_published": true,
-      "title": "Mariana Çukuru Ne Kadar Derin? 🌊 #bilgidozu #shorts",
-      "description": "Mariana Çukuru’ndaki Challenger Deep, yaklaşık 10,9 kilometre derinliğiyle okyanusların bilinen en derin noktasıdır. Everest’i buraya bıraksaydık zirvesi hâlâ suyun altında kalırdı. Dipteki basınç, deniz seviyesindekinin yaklaşık bin katına ulaşır.\n\n💬 Böyle bir derinliğe inen denizaltıda olmayı ister miydin? Yoruma yaz! 👇\n\n📚 Kaynak: NOAA Ocean Exploration — Mariana Trench\n🎨 Görseller temsilîdir.\n#bilgidozu #shorts #marianaçukuru #okyanus #keşif #bilim",
+      "title": "Kuru Kum Dağılırken Yüzde 1 Su Kumdan Kaleyi Nasıl Taş Gibi Tutar? 🏰 #bilgidozu #shorts",
+      "description": "Sahilde kuru kum parmaklarının arasından su gibi akarken, biraz ıslattığında nasıl metrelerce yüksek kale gibi dimdik durur? Kuma az miktarda su eklediğinde su damlacıkları kum tanelerinin arasına yerleşip görünmez kapiler sıvı köprüleri kurar.\n\n📍 BÖLÜMLER\n00:00 Kuru kum akıp giderken — Islak kum nasıl taşlaşır?\n00:19 Yüzey gerilimi taneleri — Vantuz gibi çeker!\n00:38 Fazla su köprüyü yıkar: — Kale çamur olup çöker!\n\n📊 Kaynaklar:\n• Univ. of Amsterdam (Fall & Bonn, Nature Scientific Reports)\n• https://www.nature.com/articles/srep00549\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #fizik #doğa #keşif #bilim",
       "tags": [
-        "bilgi dozu",
-        "mariana çukuru",
-        "challenger deep",
-        "okyanusun en derin yeri",
-        "derin deniz",
-        "keşif",
-        "bilim",
+        "bilgidozu",
         "shorts",
+        "ıslak kum neden yapışır",
+        "kumdan kale fiziği",
+        "kapiler sıvı köprüsü",
+        "yüzey gerilimi",
+        "fizik bilimi",
+        "bilgi dozu",
         "doz dışı"
       ],
-      "category_name": "Okyanus ve Keşif",
-      "pinned_comment": "Böyle bir derinliğe inen denizaltıda olmayı ister miydin? Yoruma yaz! 👇",
+      "category_name": "Fizik ve Bilim",
+      "pinned_comment": "Sahilde kumdan kale yaparken senin de kulelerin fazla sudan çökmüş müydü? Yoruma yaz! 👇",
       "youtube_url": "https://youtu.be/l6WhTkbP9yU",
-      "has_drive_video": true,
-      "drive_video_id": "1rlJGXzkPRgGAxOUZ6F7idMhIQI1_gwij",
-      "drive_video_size_mb": 32.51,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_165.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1lecGAec31EmrMBVZKbeHy-40AI3auHay"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
-      "row": 167,
+      "row": 147,
       "file_name": "video_166.mp4",
       "number": 166,
       "type": "short",
       "status": "YÜKLENDİ",
       "is_ready": false,
       "is_published": true,
-      "title": "Benzin Pompası Depo Dolunca Çipsiz ve Sensörsüz Nasıl Kendi Durur? ⛽ #bilgidozu #shorts",
-      "description": "💬 Bunu daha önce duyanlar 1, ilk kez öğrenenler 2 yazsın! ⛽⚡\n\nBenzin istasyonlarındaki pompa tabancasının deponun tam dolduğunu içinde hiçbir kamera, çip veya elektrikli sensör olmadan nasıl anladığını biliyor muydun?\n\nBunu daha önce duyanlar 1, ilk kez öğrenenler 2 yazsın!\n\n📚 Kaynak: PEI / Venturi Automatic Shut-Off Nozzle\n🎨 Görseller temsilîdir (AI üretimi).\n#bilgidozu #shorts #fizik #mühendislik #bilim",
+      "title": "Okulda Öğretilen Dil Tat Haritası Nasıl 100 Yıllık Çeviri Hatası Çıktı? 👅 #bilgidozu #shorts",
+      "description": "Okulda yıllarca ezberletilen dilin ucu tatlıyı, arkası acıyı alır haritasının koca bir hata olduğunu biliyor muydun? Bin dokuz yüz birde Alman bilimci David Hänig dilin her yerinin tat aldığını, sadece ufak farklar olduğunu yazdı.\n\n📍 BÖLÜMLER\n00:00 Okulda öğretilen dil haritası — Tamamen yanlış çıktı!\n00:17 1942 grafik çevirisinde — Efsane nasıl doğdu?\n00:36 Tek saniyelik kanıt: — Dilinin ucuna kahve değdir!\n\n📊 Kaynaklar:\n• Nature (Chandrashekar et al., 2006) & Smithsonian Science\n• https://www.smithsonianmag.com/science-nature/neat-and-tidy-map-tastes-tongue-you-learned-school-all-wrong-180963407/\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #shorts #efsaneler #insanvücudu #bilim #tarih",
       "tags": [
-        "bilgi dozu",
-        "benzin pompası",
-        "venturi etkisi",
-        "fizik",
-        "mühendislik",
-        "günlük bilim",
+        "bilgidozu",
         "shorts",
+        "dil tat haritası yanlış mı",
+        "dilin ucu tatlı alır efsanesi",
+        "umami nedir",
+        "bilim efsaneleri",
+        "insan vücudu",
+        "bilgi dozu",
         "doz dışı"
       ],
-      "category_name": "Fizik ve Mühendislik",
-      "pinned_comment": "Bunu daha önce duyanlar 1, ilk kez öğrenenler 2 yazsın! ⛽⚡",
+      "category_name": "Bilim Tarihi ve Efsaneler",
+      "pinned_comment": "Okulda sana da 'dilin ucu tatlı, yanları ekşi alır' şeması çizdirilmiş miydi? Yoruma yaz! 👇",
       "youtube_url": "https://youtu.be/0poEsgrpgIM",
-      "has_drive_video": true,
-      "drive_video_id": "1Me32hP9ITYUFFeLSdHrE3pOLy7ED8skR",
-      "drive_video_size_mb": 19.44,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_166.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1_T1DagfTMsg6W1rWyef_pWyZyQ4PF6ne"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
-      "row": 168,
+      "row": 148,
       "file_name": "video_167.mp4",
       "number": 167,
       "type": "short",
@@ -1251,15 +978,15 @@
       "category_name": "Tarih ve Arkeoloji",
       "pinned_comment": "Bunu daha önce duyanlar 1, ilk kez öğrenenler 2 yazsın! ⚔️🔬",
       "youtube_url": "https://youtu.be/HpSHy45_L6g",
-      "has_drive_video": true,
-      "drive_video_id": "1Kpy8u2lOvwamvaFwW2MXNTqA76Smvf4i",
-      "drive_video_size_mb": 23.37,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_167.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "17pzKEOmCwjxYxoS80z708pcl320_oo21"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
-      "row": 169,
+      "row": 149,
       "file_name": "video_168.mp4",
       "number": 168,
       "type": "short",
@@ -1281,15 +1008,15 @@
       "category_name": "Fizik ve Mühendislik",
       "pinned_comment": "Bunu daha önce duyanlar 1, ilk kez öğrenenler 2 yazsın! ⚡🪟",
       "youtube_url": "https://youtu.be/jaXF4A5Erek",
-      "has_drive_video": true,
-      "drive_video_id": "1IO3p5a3742keI6u6_0geShgaQNlmseG0",
-      "drive_video_size_mb": 25.07,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_168.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1KnJ8ShwFoXf2WiUbtu78ddEeU11gMyrT"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
-      "row": 170,
+      "row": 150,
       "file_name": "video_169.mp4",
       "number": 169,
       "type": "short",
@@ -1310,15 +1037,15 @@
       "category_name": "Biyoloji ve Vücut",
       "pinned_comment": "Bunu daha önce duyanlar 1, ilk kez öğrenenler 2 yazsın! 🤧👁️",
       "youtube_url": "https://youtu.be/edfxi8rEQVI",
-      "has_drive_video": true,
-      "drive_video_id": "18NDNFUII6IfI6-kSGGJC1pNygWgIFtsB",
-      "drive_video_size_mb": 21.14,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_169.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1Ga01UlGb0NpKaXDvpiPqiLv8aIPfr83f"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
-      "row": 171,
+      "row": 151,
       "file_name": "video_170.mp4",
       "number": 170,
       "type": "short",
@@ -1340,15 +1067,15 @@
       "category_name": "Tarih ve Arkeoloji",
       "pinned_comment": "Bunu daha önce duyanlar 1, ilk kez öğrenenler 2 yazsın! 🗿🏛️",
       "youtube_url": "https://youtu.be/vJW-L_tAeTo",
-      "has_drive_video": true,
-      "drive_video_id": "17czxfO63HEWKjC_RDFy1i7ztyFFNa2K9",
-      "drive_video_size_mb": 26.59,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_170.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1eLKfcXAFw_Zwz1gRnnhLOgDAH0hTz4Qu"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
-      "row": 172,
+      "row": 152,
       "file_name": "video_171.mp4",
       "number": 171,
       "type": "short",
@@ -1369,16 +1096,16 @@
       ],
       "category_name": "Doğa ve Hayvanlar",
       "pinned_comment": "Bunu daha önce duyanlar 1, ilk kez öğrenenler 2 yazsın! ⚡🐍",
-      "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1dSMVFJzrWqMtuRQwELF9RD1pDD5h_GFr",
-      "drive_video_size_mb": 21.2,
+      "youtube_url": "https://youtu.be/mWlIdAEN5qA",
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_171.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1PaGdgMlrOIqqv_R7TREz5eY215lSSb9N"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
-      "row": 173,
+      "row": 153,
       "file_name": "video_172.mp4",
       "number": 172,
       "type": "short",
@@ -1398,22 +1125,22 @@
       ],
       "category_name": "Fizik ve Mühendislik",
       "pinned_comment": "Bunu daha önce duyanlar 1, ilk kez öğrenenler 2 yazsın! 👟⚠️",
-      "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1uenxAEdlpHYl-OL7MvAN9luKbO711uH5",
-      "drive_video_size_mb": 18.72,
+      "youtube_url": "https://youtu.be/6nN5hQkkHWs",
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_172.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1A1ZQNOpu9YU3sIKhLs4GJ9pfpme8XBg5"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
-      "row": 174,
+      "row": 154,
       "file_name": "video_173.mp4",
       "number": 173,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Güneş Bir Saniyeliğine Sönseydi Ne Olurdu? ☀️ #bilgidozu #shorts",
       "description": "Şu an başını kaldırıp gökyüzüne baktığında, Güneş'in hâlâ orada olduğundan gerçekten emin misin? Ya tam şu saniye sessizce söndüyse? İşin en ürpertici kısmı ne biliyor musun? Bunu tam sekiz dakika yirmi saniye boyunca ruhun bile duymayacak. Çünkü Güneş'ten çıkan son ışık gözüne ulaşana kadar gökyüzü masmavi kalır. Ama sekizinci dakikanın sonunda gökyüzü bir anda zifiri karanlığa gömülür ve Dünya yörüngeden kopup buzlu boşluğa savrulur. Peki sen o son sekiz dakikayı dışarıda gökyüzünü izleyerek mi geçirirdin, yoksa yeraltı sığınaklarına inerek mi? Yorumlarda buluşalım.\n\n💬 Peki böyle bir kırılma anında sen sekiz dakikalık son gün ışığını dışarıda izlemeyi mi seçerdin, yoksa doğrudan yeraltı sığınaklarına inmeyi mi? Yorumlarda buluşalım! 👇\n\n📚 Kaynak: NASA / Wikipedia — Sunlight (Işık Hızı ve Güneş Işığı Süresi): https://en.wikipedia.org/wiki/Sunlight\n🎨 Görseller temsilîdir (AI üretimi).\n#bilgidozu #shorts #uzay #bilim",
       "tags": [
@@ -1432,21 +1159,21 @@
       "category_name": "Uzay ve Astronomi",
       "pinned_comment": "Peki böyle bir kırılma anında sen sekiz dakikalık son gün ışığını dışarıda izlemeyi mi seçerdin, yoksa doğrudan yeraltı sığınaklarına inmeyi mi? Yorumlarda buluşalım! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1B29wk44IWhyc6BUH7-7vKd6ctaN3rW-M",
-      "drive_video_size_mb": 23.94,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_173.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1zuDzTaMFITQW4_r_ZMzuuvnGoCW7CHwQ"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
-      "row": 175,
+      "row": 155,
       "file_name": "video_174.mp4",
       "number": 174,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Uzayda Ağlarsan Gözyaşların Neden Yanağından Akmaz? 🧑 #bilgidozu #shorts",
       "description": "Uzayda tek başına süzülürken bir anda ağlamaya başlasan gözyaşlarının yanağından aşağı süzüleceğini mi sanıyorsun? Hiç de öyle olmaz. Dünya'da gözyaşını aşağı çeken şey yerçekimidir. Ama uzayın ağırlıksız boşluğunda, su moleküllerini birbirine kenetleyen yüzey gerilimi tek patron haline gelir. Gözünden çıkan her damla, akmak yerine göz pınarının tam üzerinde şeffaf, titreyen bir su küresine dönüşür ve sen bir bezle silene kadar yüzünden asla ayrılmaz. Peki sen yerçekimsiz ortamda yaşamayı deneyimlemek mi isterdin, yoksa ayağının yere bastığı Dünya'da kalmayı mı? Yorumlarda buluşalım.\n\n💬 Peki sen yerçekimsiz ortamda haftalarca yaşamayı deneyimlemek mi isterdin, yoksa ayağının sağlamca yere bastığı Dünya'da kalmayı mı? Yorumlarda buluşalım! 👇\n\n📚 Kaynak: CSA / Wikipedia — Surface Tension in Microgravity (Uzayda Yüzey Gerilimi): https://en.wikipedia.org/wiki/Surface_tension\n🎨 Görseller temsilîdir (AI üretimi).\n#bilgidozu #shorts #uzay #bilim",
       "tags": [
@@ -1465,21 +1192,21 @@
       "category_name": "Uzay ve Astronomi",
       "pinned_comment": "Peki sen yerçekimsiz ortamda haftalarca yaşamayı deneyimlemek mi isterdin, yoksa ayağının sağlamca yere bastığı Dünya'da kalmayı mı? Yorumlarda buluşalım! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1z8q9Aj2wCDGmkAikBvOicP8ZhtBMLhxF",
-      "drive_video_size_mb": 17.63,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_174.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "11XWdgQvfdkFFMykeU1EPTbcmiDloNbQb"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
-      "row": 176,
+      "row": 156,
       "file_name": "video_175.mp4",
       "number": 175,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Yüksek Bir Yerden Bakınca Beyin Neden 'Atla' Diye Fısıldar? 🧗 #bilgidozu #shorts",
       "description": "Yüksek bir balkonun ya da uçurumun kenarından aşağı baktığında içinde hiçbir kötü niyet yokken bile bir anda “Ya şimdi atlarsam” diye ürpertici bir düşünce geçti mi? Fransızların “boşluğun çağrısı” dediği bu durum aslında beyninin aşırı hızlı çalışan bir hayatta kalma alarmıdır. Beynin kenara yaklaştığında denge merkezine “Geri çekil, tehlikedesin” sinyali gönderir. Bilinçli zihnin ise bu ani geri çekilme refleksini sanki aşağı atlamak istemişim de kendimi zor tutmuşum gibi yanlış yorumlar. Peki sen yüksek bir yerden aşağı baktığında o ürpertiyi hissediyor musun, yoksa yüksekten hiç etkilenmeyenlerden misin? Yorumlarda buluşalım.\n\n💬 Peki sen yüksek bir yerden aşağı baktığında o ürpertiyi hissediyor musun, yoksa yüksekten hiç etkilenmeyenlerden misin? Yorumlarda buluşalım! 👇\n\n📚 Kaynak: Journal of Affective Disorders / Wikipedia — High Place Phenomenon (Boşluğun Çağrısı): https://en.wikipedia.org/wiki/The_imp_of_the_perverse\n🎨 Görseller temsilîdir (AI üretimi).\n#bilgidozu #shorts #nörobilim #insanbedeni #psikoloji #bilim",
       "tags": [
@@ -1493,15 +1220,15 @@
       "category_name": "Nörobilim ve İnsan Bedeni",
       "pinned_comment": "Peki sen yüksek bir yerden aşağı baktığında o ürpertiyi hissediyor musun, yoksa yüksekten hiç etkilenmeyenlerden misin? Yorumlarda buluşalım! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1EalOn2FqjDBdPD-dQ8uEn2qwj9z1QCbe",
-      "drive_video_size_mb": 18.97,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "kapak_175.jpg",
-      "has_drive_cover": true,
-      "drive_cover_id": "1zUwD_-BqtP-fe4xToJzUJ6YTP9wbwgiS"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     },
     {
-      "row": 178,
+      "row": 157,
       "file_name": "video_176.mp4",
       "number": 176,
       "type": "short",
@@ -1526,14 +1253,14 @@
       "pinned_comment": "Dürüst olalım: Asansör bir anda düşmeye başlasa panikten zıplar mıydın yoksa MIT'nin dediği gibi sırtüstü yere mi uzanırdın? 😄🛗 Yoruma yaz! 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1qBBJOilRUKzxBL-PL0i3b7kXUcCX2YpR",
+      "drive_video_id": "18-J3fVWkBwaV2xktsX7fsKsv7tornP5g",
       "drive_video_size_mb": 11.74,
       "expected_cover": "kapak_176.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "19O7U003d7H4MlOQ1R59P6fGgC8nLP4iZ"
+      "drive_cover_id": "1rUuK0A8Y0B21IdMPuVObbaKzUUfiP-Ny"
     },
     {
-      "row": 179,
+      "row": 158,
       "file_name": "video_177.mp4",
       "number": 177,
       "type": "short",
@@ -1559,14 +1286,14 @@
       "pinned_comment": "Dürüst olalım: Küçükken deniz kabuğunu kulağına dayayıp 'gerçekten denizin sesi geliyor!' diye heyecanlanmayan var mı? 😄🐚 Peki sen kan akışı efsanesine inanmış mıydın? 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1gfHZIy6h4ycHGKEQzdQ2a9cZ1cMPa2Vo",
+      "drive_video_id": "1BASkZQ5R3roeLI5Jqb4XfTmlQlFPVe7f",
       "drive_video_size_mb": 6.93,
       "expected_cover": "kapak_177.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1Ii-PBUYh6IiDzURTCDY0flkevsJUjVRT"
+      "drive_cover_id": "1XMjl-lhQrvEqiOsIMA33gEcu1YDqXlOY"
     },
     {
-      "row": 180,
+      "row": 159,
       "file_name": "video_178.mp4",
       "number": 178,
       "type": "short",
@@ -1591,14 +1318,14 @@
       "pinned_comment": "Kutup ayısının kürkünün şeffaf, derisinin ise simsiyah olduğunu ilk öğrendiğinde kaç yaşındaydın? 🐻‍❄️🖤 Yoruma yaz! 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1mrmCUY4S0tOsu7zxeoVNWH3qA5LKavwX",
+      "drive_video_id": "1TvxdBa8TGcUtod9Ftd1Xx2f2PcekEo2Q",
       "drive_video_size_mb": 9.42,
       "expected_cover": "kapak_178.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1xCJEFH0OBIspwD8qz832WcFq1Q1UBAYQ"
+      "drive_cover_id": "1KxrhYEgR1DlcF222MbRgCPm_Q6s0eTAd"
     },
     {
-      "row": 181,
+      "row": 160,
       "file_name": "video_179.mp4",
       "number": 179,
       "type": "short",
@@ -1622,14 +1349,14 @@
       "pinned_comment": "Havalimanında camdan dışarı bakarken 'neden uçakların hepsi beyaz?' diye hiç aklından geçmiş miydi? ✈️🤔 Gördüğün en ilginç uçak rengini yoruma yaz! 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1mpHs9QlSgQbuIsaUJV4cP93UDRc9k40D",
+      "drive_video_id": "1CwkWthE0k3weo3V0HlChVyod39YHDQBI",
       "drive_video_size_mb": 7.03,
       "expected_cover": "kapak_179.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1aCgKPLlFYDB9GCWyI1595Lm319muGRXc"
+      "drive_cover_id": "13QgOOd-y2_eTTGKMOVIxV01KZuU9RQ4O"
     },
     {
-      "row": 182,
+      "row": 161,
       "file_name": "video_180.mp4",
       "number": 180,
       "type": "short",
@@ -1654,14 +1381,14 @@
       "pinned_comment": "Bu videoyu gece geç saatte uykusuz izleyenler el kaldırsın! 🙋‍♂️😴 Sen bugün kaç saat uyudun? Yoruma yaz! 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1dUWvFHpsmJngJhyBmmlzzB4TmejgLB1_",
+      "drive_video_id": "1HzWJJKzy0pDmRHoAxUHb2HZf-K8EVgLg",
       "drive_video_size_mb": 8.99,
       "expected_cover": "kapak_180.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1fBa_u1yxac7_B_z4EUYOtnu0gv6F3o1t"
+      "drive_cover_id": "1jbU3tVIbBQi9EOwo_SbLab-o68djLrAv"
     },
     {
-      "row": 183,
+      "row": 162,
       "file_name": "video_181.mp4",
       "number": 181,
       "type": "short",
@@ -1686,14 +1413,14 @@
       "pinned_comment": "Yağmur yağdığında camı açıp o ilk toprak kokusunu içine çekenler burada mı? 🌧️🌱 Dünyanın en huzurlu kokusu sence ne? Yoruma yaz! 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1kTqJ1sHXTaHUKJokaINm8iQqJBzLLZ0V",
+      "drive_video_id": "1-uBG47--VyVlCSKQX_zFMff_CEaQ5w-F",
       "drive_video_size_mb": 9.59,
       "expected_cover": "kapak_181.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1CxDDheTfHIVJVYg39ly2RawN3TWkwDMP"
+      "drive_cover_id": "1ynRREXr89SPV8h0yzwBx4VKfL2bw3V7K"
     },
     {
-      "row": 184,
+      "row": 163,
       "file_name": "video_182.mp4",
       "number": 182,
       "type": "short",
@@ -1717,14 +1444,14 @@
       "pinned_comment": "Yoklama alıyoruz: İlkokulda eline kurşun kalem ucu batıp 'eyvah zehirleneceğim!' diye korkan veya avucunda hâlâ o gri nokta duran kimler var? 😄✏️👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1ElqqsPEJscRBiTaYvm0MnrjlISaVbh3q",
+      "drive_video_id": "1C93OeL5GtPKT3ZS8Bzr1JYEs8dRkC67m",
       "drive_video_size_mb": 10.17,
       "expected_cover": "kapak_182.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1FxnQrEomHkss5fv-e8eWaQGXIeHSrpdW"
+      "drive_cover_id": "1Yk385ywnmPJfwoTVnavYoT1WE4eBN_GC"
     },
     {
-      "row": 185,
+      "row": 164,
       "file_name": "video_183.mp4",
       "number": 183,
       "type": "short",
@@ -1748,14 +1475,14 @@
       "pinned_comment": "Etrafın uçsuz bucaksız suyla çevriliyken tek bir bardak içmenin bile vücudundan yarım bardak su çalması ne kadar ürkütücü değil mi? 🌊😳 Sen bunu biliyor muydun? 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1Vb1RItadtc94rwG92Q7gSPc3ntya_VJL",
+      "drive_video_id": "1-vcsL3kAXiThtm7ljDWNwJhoGNSdM5ed",
       "drive_video_size_mb": 10.2,
       "expected_cover": "kapak_183.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1hUJaWaKUJUsWOMnHTgqkbhuhZ6tviC5g"
+      "drive_cover_id": "1hnhLyhe6rPpkckOgqHCeo5J73xP4mHGx"
     },
     {
-      "row": 186,
+      "row": 165,
       "file_name": "video_184.mp4",
       "number": 184,
       "type": "short",
@@ -1778,14 +1505,14 @@
       "pinned_comment": "İtiraf zamanı: Kot pantolondaki o küçücük cebi sen ne için kullanıyorsun? Bozuk para mı, kulaklık kutusu mu, yoksa tamamen boş mu duruyor? 😄👖👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1HdpSgGegxEzl6MspDsx7Oqnz4yjW1_66",
+      "drive_video_id": "142xo04Jd9UmOuLZZ8yLjA1vxVPqcjoUb",
       "drive_video_size_mb": 7.4,
       "expected_cover": "kapak_184.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1kz-gf3cM7N9hK7oqFHE8oPLaUolJe8Jc"
+      "drive_cover_id": "1wP6qzrQiDViD1k14rLh3PlZ0HD5Cle-K"
     },
     {
-      "row": 187,
+      "row": 166,
       "file_name": "video_185.mp4",
       "number": 185,
       "type": "short",
@@ -1808,14 +1535,14 @@
       "pinned_comment": "Hepimize çocukken 'uyurgezeri sakın uyandırma!' denmişti değil mi? 🌙😲 Senin ailende veya arkadaşlarında yaşadığın en tuhaf uyurgezerlik anısı neydi? Yoruma yaz! 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1d-rWefzPJDOTr8optVT8zC1lTQbKJpJz",
+      "drive_video_id": "1SOw3vPFPocKGomlkTgVpPkhbmP5pQYkq",
       "drive_video_size_mb": 9.08,
       "expected_cover": "kapak_185.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "15mPIfgbn_XDNjJyZPMT97AVg6BR60Y0B"
+      "drive_cover_id": "1yRb8AhqffkCeP-1nmISXrx7_sq34alB3"
     },
     {
-      "row": 188,
+      "row": 167,
       "file_name": "video_186.mp4",
       "number": 186,
       "type": "short",
@@ -1838,14 +1565,14 @@
       "pinned_comment": "Yaz gecelerinin en büyük mücadelesi: Sineğin dünyayı bizden 4 kat hızlı (ağır çekimde!) görmesi haksızlık değil mi? 😄🪰 Taktik deneyenler sonucu yoruma yazsın! 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1NffCSIFncyOtesonAhJg47y7l05o87qi",
+      "drive_video_id": "1-iVia4AxVU6PVL07iUwK0uWuVrrd4n5O",
       "drive_video_size_mb": 9.13,
       "expected_cover": "kapak_186.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1HieMd5T3v7kPxUt0NHTV42GvuDgEyDhP"
+      "drive_cover_id": "1Ur0FzuGMuH23eSnImlYcjB-yLdx8CDQL"
     },
     {
-      "row": 189,
+      "row": 168,
       "file_name": "video_187.mp4",
       "number": 187,
       "type": "short",
@@ -1871,14 +1598,14 @@
       "pinned_comment": "Yıllarca elimizdeki o kokuyu bozuk paranın kiri sanmışız, meğer kendi derimizin kimyasal tepkimesiymiş! 🤯🪙 Bunu ilk duyduğunda sen de şaşırdın mı? Yoruma yaz! 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1b75xuwTHtR0ozsrGz8CLg2N9mieDFZSD",
+      "drive_video_id": "11pZ9Ax8ETy0YPERsTOuc9JBIsSh0V4t7",
       "drive_video_size_mb": 13.17,
       "expected_cover": "kapak_187.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1kSwRJb1Wv-VN6OJ_7ZUUliaccTiLms4i"
+      "drive_cover_id": "1jj8zlkqW6r0TezZ7Kkg5JJxrbbtGT5Ku"
     },
     {
-      "row": 190,
+      "row": 169,
       "file_name": "video_188.mp4",
       "number": 188,
       "type": "short",
@@ -1902,14 +1629,14 @@
       "pinned_comment": "İtiraf zamanı: Videoyu izlerken refleks olarak parmaklarını çıtlatan kaç kişiyiz? 😄🖐️ 'Çıtlatma kireçlenme yapar!' diyen birine bu videoyu gönder! 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1SNQ9uKvejTS4zR_tpH1BOtwDWvzEthNK",
+      "drive_video_id": "1Q_tsoJMWDy-KhEORpqyL9KH6K8PQRtvu",
       "drive_video_size_mb": 6.22,
       "expected_cover": "kapak_188.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1pMP2kWiy1nlpruEHgXsAaAlIOh-Pg441"
+      "drive_cover_id": "1QFBBK_mnUxDkpzN4iqEFocLAOtyuvWI8"
     },
     {
-      "row": 191,
+      "row": 170,
       "file_name": "video_189.mp4",
       "number": 189,
       "type": "short",
@@ -1917,7 +1644,7 @@
       "is_ready": true,
       "is_published": false,
       "title": "Dişini Fırçaladıktan Hemen Sonra Portakal Suyu Neden Zehir Gibi Acı Gelir? 🪥🍊 #bilgidozu #shorts",
-      "description": "💬 Çocukken sabah kahvaltıdan önce diş fırçalayıp o ilk yudum portakal suyunda hayatının şokunu yaşayanlar el kaldırsın! 🙋‍♂️🍊👇\n\nSabah dişini fırçaladıktan hemen sonra bir yudum portakal suyu içtiğinde ağzını buruşturan o zehir gibi acı tadın suçlusu nane aroması değildir! Asıl sorumlu, neredeyse her diş macununun köpürmesini sağlayan sodyum lauril sülfat (SLS) adlı yüzey aktif moleküldür. Amerikan Kimya Derneği araştırmalarına göre bu madde hem dilindeki tatlı algılayıcı reseptörleri geçici olarak kapatır, hem de acı tat tomurcuklarını örten koruyucu yağ tabakasını parçalar. Sonuçta portakal suyunun doğal şekerini hiç alamazken, içindeki sitrik asidi olduğundan katbekat acı hissedersin.\n\n💬 Sabah yanlışlıkla diş fırçalayıp üstüne meyve suyu içme hatasına sen de düştün mü? Yoruma yaz! 👇\n\n📚 Kaynak: American Chemical Society (Reactions) • Journal of Sensory Studies\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #kimya #bilim #günlükbilim #ilginçbilgiler",
+      "description": "💬 Çocukken sabah kahvaltıdan önce diş fırçalayıp o ilk yudum portakal suyunda hayatının şokunu yaşayanlar el kaldırsın! 🙋‍♂️🍊👇\n\nSabah dişini fırçaladıktan hemen sonra bir yudum portakal suyu içtiğinde ağzını buruşturan o zehir gibi acı tadın suçlusu nane aroması değildir! Asıl sorumlu, neredeyse her diş macununun köpürmesini sağlayan sodyum lauril sülfat (SLS) adlı yüzey aktif moleküldür. Amerikan Kimya Derneği araştırmalarına göre bu madde hem dilindeki tatlı algılayıcı reseptörleri geçici olarak kapatır, hem de acı tat tomurcuklarını örten koruyucu yağ tabakasını parçalar. Sonuçta portakal suyunun doğal şekerini hiç alamazken, içindeki sitrik asidi olduğundan katbekat acı hissedersin.\n\n💬 Sabah yanlışlıkla diş fırçalayıp üstüne meyve suyu içme hatasına sen de düştün mü? Yoruma yaz! 👇\n\n📚 Kaynak: American Chemical Society (Reactions) • Journal of Sensory Studies\n🎨 Görseller yapay zekâ canlandırmaları ve Wikimedia Commons lisanslı gerçek fotoğraflarla hazırlanmıştır.\n\n#bilgidozu #shorts #kimya #bilim #günlükbilim #ilginçbilgiler",
       "tags": [
         "bilgidozu",
         "diş fırçaladıktan sonra portakal suyu",
@@ -1932,14 +1659,14 @@
       "pinned_comment": "Çocukken sabah kahvaltıdan önce diş fırçalayıp o ilk yudum portakal suyunda hayatının şokunu yaşayanlar el kaldırsın! 🙋‍♂️🍊👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "15jmrSLBPu_fvMlDl_y9iSnR-Coz5jbIl",
+      "drive_video_id": "1_9iGcskiR6fijNci3_BlbaMOXxsAxK7G",
       "drive_video_size_mb": 7.56,
       "expected_cover": "kapak_189.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1RHtpxC64sqfWYkNZCv6zdXzkuckcBdNu"
+      "drive_cover_id": "10dyZN9ZBisxRTPlBKxQJsiP8sddHZJoL"
     },
     {
-      "row": 192,
+      "row": 171,
       "file_name": "video_190.mp4",
       "number": 190,
       "type": "short",
@@ -1947,7 +1674,7 @@
       "is_ready": true,
       "is_published": false,
       "title": "Dakikada 15 Kez Göz Kırpıyorsun Ama Dünya Neden Hiç Kararmıyor? 👁️🧠 #bilgidozu #shorts",
-      "description": "💬 Şu an bu yorumu okurken göz kırpma kontrolünü tamamen manuele aldığım için özür dilerim! 😄👁️ Kaç saniye kırpmadan durabildin? Yoruma yaz! 👇\n\nDakikada ortalama 15 kez göz kırpıyorsun; yani uyanık geçirdiğin her günün toplam 44 dakikasında gözlerin tamamen kapalı kalıyor! Odaya saniyenin onda biri kadar ışık kapatılıp açılsa anında fark edersin; peki kendi göz kapağın indiğinde dünya neden hiç kararmıyor? Londra Üniversitesi (UCL) ve UC Berkeley nörobilimcilerine göre beyin göz kırpma emrini gönderdiği salisede görsel merkezdeki kararma sinyalini aktif olarak susturur. Üstelik ön beyindeki hafıza devresi kapak inmeden hemen önceki son net kareyi ekranda dondurup iki görüntüyü kusursuzca birbirine diker.\n\n💬 Bu videoyu izlerken bir anda otomatik göz kırpman bozulup manuel kırpmaya başladın mı? Yoruma yaz! 👇\n\n📚 Kaynak: University College London (Current Biology) • UC Berkeley Vision Science (2017)\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #beyin #nörobilim #bilim #ilginçbilgiler",
+      "description": "💬 Şu an bu yorumu okurken göz kırpma kontrolünü tamamen manuele aldığım için özür dilerim! 😄👁️ Kaç saniye kırpmadan durabildin? Yoruma yaz! 👇\n\nDakikada ortalama 15 kez göz kırpıyorsun; yani uyanık geçirdiğin her günün toplam 44 dakikasında gözlerin tamamen kapalı kalıyor! Odaya saniyenin onda biri kadar ışık kapatılıp açılsa anında fark edersin; peki kendi göz kapağın indiğinde dünya neden hiç kararmıyor? Londra Üniversitesi (UCL) ve UC Berkeley nörobilimcilerine göre beyin göz kırpma emrini gönderdiği salisede görsel merkezdeki kararma sinyalini aktif olarak susturur. Üstelik ön beyindeki hafıza devresi kapak inmeden hemen önceki son net kareyi ekranda dondurup iki görüntüyü kusursuzca birbirine diker.\n\n💬 Bu videoyu izlerken bir anda otomatik göz kırpman bozulup manuel kırpmaya başladın mı? Yoruma yaz! 👇\n\n📚 Kaynak: University College London (Current Biology) • UC Berkeley Vision Science (2017)\n🎨 Görseller yapay zekâ canlandırmaları ve Wikimedia Commons lisanslı gerçek fotoğraflarla hazırlanmıştır.\n\n#bilgidozu #shorts #beyin #nörobilim #bilim #ilginçbilgiler",
       "tags": [
         "bilgidozu",
         "göz kırpınca neden karanlık görmeyiz",
@@ -1962,14 +1689,14 @@
       "pinned_comment": "Şu an bu yorumu okurken göz kırpma kontrolünü tamamen manuele aldığım için özür dilerim! 😄👁️ Kaç saniye kırpmadan durabildin? Yoruma yaz! 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "19NwsgHyNWof_fDydAiQfxoWQ6Ah0V5ef",
+      "drive_video_id": "1GaGPIfzK6RaKM42lZYyqFnDPve2459Tp",
       "drive_video_size_mb": 9.05,
       "expected_cover": "kapak_190.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1Uvcyeikm1oUQYnLKCbz4M8S_nkvItqSd"
+      "drive_cover_id": "1mnjeVpAMKu9RlPxrkseXNt_wsWvBa2F7"
     },
     {
-      "row": 193,
+      "row": 172,
       "file_name": "video_191.mp4",
       "number": 191,
       "type": "short",
@@ -1977,7 +1704,7 @@
       "is_ready": true,
       "is_published": false,
       "title": "Aynı Odada Sivrisinekler Neden Hep Aynı Kişiyi Seçip Isırır? 🦟🧬 #bilgidozu #shorts",
-      "description": "💬 Odada 5 kişi varken tek bir sivrisineğin gelip yine seni bulduğu o arkadaşını yoruma etiketle (ya da o kişi sensen el kaldır)! 🙋‍♂️🦟👇\n\nYaz gecesi aynı odada beş kişi otururken sivrisineklerin diğerlerine hiç dokunmayıp hep aynı kişiyi delik deşik etmesinin sebebi 'tatlı kan' değildir! Dişi sivrisinek önce 50 metre uzaktan nefesinle verdiğin karbondioksit bulutunu ve vücut ısını takip ederek hedefe yaklaşır. Rockefeller Üniversitesi'nin Cell dergisinde yayımlanan 3 yıllık araştırması asıl sırrı çözdü: Bazı insanların derisi normalden çok daha yüksek oranda karboksilik asit üretir. Ne yersen ye ya da hangi sabunu kullanırsan kullan değişmeyen bu genetik koku imzası, o kişiyi ömür boyu yürüyen bir sivrisinek mıknatısına dönüştürür.\n\n💬 Sizin evde veya arkadaş grubunda bütün sivrisinekleri üzerine çeken o 'seçilmiş kişi' sen misin? Yoruma yaz! 👇\n\n📚 Kaynak: Rockefeller University Vosshall Lab (Cell, 2022)\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #biyoloji #doğa #bilim #ilginçbilgiler",
+      "description": "💬 Odada 5 kişi varken tek bir sivrisineğin gelip yine seni bulduğu o arkadaşını yoruma etiketle (ya da o kişi sensen el kaldır)! 🙋‍♂️🦟👇\n\nYaz gecesi aynı odada beş kişi otururken sivrisineklerin diğerlerine hiç dokunmayıp hep aynı kişiyi delik deşik etmesinin sebebi 'tatlı kan' değildir! Dişi sivrisinek önce 50 metre uzaktan nefesinle verdiğin karbondioksit bulutunu ve vücut ısını takip ederek hedefe yaklaşır. Rockefeller Üniversitesi'nin Cell dergisinde yayımlanan 3 yıllık araştırması asıl sırrı çözdü: Bazı insanların derisi normalden çok daha yüksek oranda karboksilik asit üretir. Ne yersen ye ya da hangi sabunu kullanırsan kullan değişmeyen bu genetik koku imzası, o kişiyi ömür boyu yürüyen bir sivrisinek mıknatısına dönüştürür.\n\n💬 Sizin evde veya arkadaş grubunda bütün sivrisinekleri üzerine çeken o 'seçilmiş kişi' sen misin? Yoruma yaz! 👇\n\n📚 Kaynak: Rockefeller University Vosshall Lab (Cell, 2022)\n🎨 Görseller yapay zekâ canlandırmaları ve Wikimedia Commons lisanslı gerçek fotoğraflarla hazırlanmıştır.\n\n#bilgidozu #shorts #biyoloji #doğa #bilim #ilginçbilgiler",
       "tags": [
         "bilgidozu",
         "sivrisinekler neden hep beni ısırır",
@@ -1993,14 +1720,14 @@
       "pinned_comment": "Odada 5 kişi varken tek bir sivrisineğin gelip yine seni bulduğu o arkadaşını yoruma etiketle (ya da o kişi sensen el kaldır)! 🙋‍♂️🦟👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1luYCFzAhru4vidzTD1qQTx748to-0Kgj",
+      "drive_video_id": "1W3c_AhaxJLrsNSexgW1gXMobWXRNFbCj",
       "drive_video_size_mb": 7.88,
       "expected_cover": "kapak_191.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1pPw_Jb8o-pwFS_rz4IWWvo6cJUiPOlrD"
+      "drive_cover_id": "1Dlb1K50RAQLrJZhPeXY9dGJi80EsNikX"
     },
     {
-      "row": 194,
+      "row": 173,
       "file_name": "video_192.mp4",
       "number": 192,
       "type": "short",
@@ -2008,7 +1735,7 @@
       "is_ready": true,
       "is_published": false,
       "title": "Arabada Telefona Bakınca Midemiz Neden Bulanır? Beynin Zehirleniyorum Sanıyor! 🚗📱 #bilgidozu #shorts",
-      "description": "💬 Uzun yolda yan koltukta rahatça film izleyen insanlara özenen 'arka koltukta 1 dakikada midesi bulananlar kulübü' burada mı? 🚗🤢👇\n\nGiden bir arabada telefona veya kitaba yalnızca iki dakika baktığında midenin neden bir anda altüst olduğunu hiç düşündün mü? Virajlarda iç kulağındaki denge sıvısı çalkalanarak beynine 'hızla hareket ediyoruz' sinyali gönderir; sabit ekrana kilitlenen gözlerin ise 'hayır, hareketsiz duruyoruz' der. Cardiff Üniversitesi nörobilimcilerine göre milyonlarca yıllık evrimde göz ile iç kulağın birbiriyle çeliştiği tek doğal durum, halüsinasyon yaratan zehirli bir bitki yutulmasıdır! Beynin bu duyusal çatışmayı nörotoksin zehirlenmesi sanıp seni kurtarmak için mide bulantısı alarmını devreye sokar; ufuk çizgisine bakmak çelişkiyi anında bitirir.\n\n💬 Arabada arka koltukta telefona 30 saniye bile bakamayanlardan mısın, yoksa hiç etkilenmeyenlerden mi? Yoruma yaz! 👇\n\n📚 Kaynak: Cardiff University Neuroscience • NASA Vestibular & Motion Sickness Research\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #beyin #nörobilim #insanvücudu #bilim",
+      "description": "💬 Uzun yolda yan koltukta rahatça film izleyen insanlara özenen 'arka koltukta 1 dakikada midesi bulananlar kulübü' burada mı? 🚗🤢👇\n\nGiden bir arabada telefona veya kitaba yalnızca iki dakika baktığında midenin neden bir anda altüst olduğunu hiç düşündün mü? Virajlarda iç kulağındaki denge sıvısı çalkalanarak beynine 'hızla hareket ediyoruz' sinyali gönderir; sabit ekrana kilitlenen gözlerin ise 'hayır, hareketsiz duruyoruz' der. Cardiff Üniversitesi nörobilimcilerine göre milyonlarca yıllık evrimde göz ile iç kulağın birbiriyle çeliştiği tek doğal durum, halüsinasyon yaratan zehirli bir bitki yutulmasıdır! Beynin bu duyusal çatışmayı nörotoksin zehirlenmesi sanıp seni kurtarmak için mide bulantısı alarmını devreye sokar; ufuk çizgisine bakmak çelişkiyi anında bitirir.\n\n💬 Arabada arka koltukta telefona 30 saniye bile bakamayanlardan mısın, yoksa hiç etkilenmeyenlerden mi? Yoruma yaz! 👇\n\n📚 Kaynak: Cardiff University Neuroscience • NASA Vestibular & Motion Sickness Research\n🎨 Görseller yapay zekâ canlandırmaları ve Wikimedia Commons lisanslı gerçek fotoğraflarla hazırlanmıştır.\n\n#bilgidozu #shorts #beyin #nörobilim #insanvücudu #bilim",
       "tags": [
         "bilgidozu",
         "arabada telefona bakınca neden mide bulanır",
@@ -2023,14 +1750,14 @@
       "pinned_comment": "Uzun yolda yan koltukta rahatça film izleyen insanlara özenen 'arka koltukta 1 dakikada midesi bulananlar kulübü' burada mı? 🚗🤢👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1YESu-xxTuNUfb6Ih88yfyvbT9z5DSy9R",
+      "drive_video_id": "14IO7RwAAlG17hyxU1S1CJcxtX-i_T7c5",
       "drive_video_size_mb": 9.24,
       "expected_cover": "kapak_192.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1VRLv0iH94gsl3ITfFdvvyni68wFtnIdx"
+      "drive_cover_id": "1Bubp5MsrFHzo5sEOt3pJF6l9tW1losuu"
     },
     {
-      "row": 195,
+      "row": 174,
       "file_name": "video_193.mp4",
       "number": 193,
       "type": "short",
@@ -2038,7 +1765,7 @@
       "is_ready": true,
       "is_published": false,
       "title": "Yerde Yüzüne Bakmadığın Domates Suyu Uçakta Neden Çok Lezzetli Gelir? ✈️🍅 #bilgidozu #shorts",
-      "description": "💬 Yerde kapağını bile açmayıp 10.000 metrede hostesten domates suyu isteyenler kimler? 😄✈️🍅 Senin uçaktaki vazgeçilmezin ne? 👇\n\nNormal hayatında hiç domates suyu içmeyen milyonlarca insanın uçağa bindiği an domates suyu istemesinin arkasında şaşırtıcı bir nörobilim sırrı var! 10 bin metre irtifada çöl kadar kuruyan %12 kabin nemi ve düşük basınç koku alma duyunu zayıflatır. Cornell Üniversitesi'nin 85 desibellik uçak motoru uğultusunu simüle ettiği deneyde, yüksek gürültünün dildeki tatlı algısını %30 oranında körelttiği kanıtlandı! Ancak aynı motor uğultusu dildeki beşinci tat olan 'umami' reseptörlerini tam tersine keskinleştirir ve umami deposu domates suyunu gökyüzünde lezzet patlamasına dönüştürür.\n\n💬 Uçakta en sevdiğin içecek ne? Sen de gökyüzünde domates suyu içenlerden misin? Yoruma yaz! 👇\n\n📚 Kaynak: Cornell University Food Science (Journal of Experimental Psychology, 2015) • Fraunhofer Institute\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #havacılık #bilim #beyin #ilginçbilgiler",
+      "description": "💬 Yerde kapağını bile açmayıp 10.000 metrede hostesten domates suyu isteyenler kimler? 😄✈️🍅 Senin uçaktaki vazgeçilmezin ne? 👇\n\nNormal hayatında hiç domates suyu içmeyen milyonlarca insanın uçağa bindiği an domates suyu istemesinin arkasında şaşırtıcı bir nörobilim sırrı var! 10 bin metre irtifada çöl kadar kuruyan %12 kabin nemi ve düşük basınç koku alma duyunu zayıflatır. Cornell Üniversitesi'nin 85 desibellik uçak motoru uğultusunu simüle ettiği deneyde, yüksek gürültünün dildeki tatlı algısını %30 oranında körelttiği kanıtlandı! Ancak aynı motor uğultusu dildeki beşinci tat olan 'umami' reseptörlerini tam tersine keskinleştirir ve umami deposu domates suyunu gökyüzünde lezzet patlamasına dönüştürür.\n\n💬 Uçakta en sevdiğin içecek ne? Sen de gökyüzünde domates suyu içenlerden misin? Yoruma yaz! 👇\n\n📚 Kaynak: Cornell University Food Science (Journal of Experimental Psychology, 2015) • Fraunhofer Institute\n🎨 Görseller yapay zekâ canlandırmaları ve Wikimedia Commons lisanslı gerçek fotoğraflarla hazırlanmıştır.\n\n#bilgidozu #shorts #havacılık #bilim #beyin #ilginçbilgiler",
       "tags": [
         "bilgidozu",
         "uçakta domates suyu neden lezzetli",
@@ -2054,14 +1781,14 @@
       "pinned_comment": "Yerde kapağını bile açmayıp 10.000 metrede hostesten domates suyu isteyenler kimler? 😄✈️🍅 Senin uçaktaki vazgeçilmezin ne? 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1sw2ZBClCTYvnmGJCPe1ZkrMV83yimJQn",
+      "drive_video_id": "1bFAC-z1LaDr3DrFKvFyxHI7xgW4M3KGP",
       "drive_video_size_mb": 8.04,
       "expected_cover": "kapak_193.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1Q8vgEIpMpjlNfwYiyvN0ybbZFIcexERK"
+      "drive_cover_id": "1qM0Ne2aiPem8J1e4UUVf7NVM8QGVkT5S"
     },
     {
-      "row": 196,
+      "row": 175,
       "file_name": "video_194.mp4",
       "number": 194,
       "type": "short",
@@ -2069,7 +1796,7 @@
       "is_ready": true,
       "is_published": false,
       "title": "Orta Parmağını Kıvırıp Masaya Koyduğunda Yüzük Parmağın Neden Kilitlenir? 🖐️🔒 #bilgidozu #shorts",
-      "description": "💬 Videonun 5. saniyesinde elini masaya koyup yüzük parmağıyla inatlaşan herkes burada mı? 😂🖐️ Kaldırabilen çıktı mı? Yoruma yaz! 👇\n\nŞu an telefonu bırakmadan tek elinle deneyebileceğin inanılmaz bir anatomi testi var: Orta parmağını içeri kıvırıp elini masaya yasla! Başparmağını, işaret parmağını ve serçe parmağını masadan kolayca kaldırabilirsin ama yüzük parmağın masaya zamkla yapışmış gibi kilitlenir! El cerrahisi anatomisine göre diğer parmakların kendilerine ait bağımsız gerdirici kas kirişleri varken, yüzük parmağının tendonu orta parmakla çapraz bağlarla birbirine kenetlenmiştir. Orta parmak bükülü kaldığı sürece bu ortak tendon gevşeyemez ve beynin ne kadar emir verirse versin yüzük parmağı fiziksel olarak kalkamaz.\n\n💬 Hemen denedin değil mi? Yüzük parmağını 1 milimetre bile oynatabilen var mı? Yoruma yaz! 👇\n\n📚 Kaynak: Journal of Hand Surgery • Gray's Anatomy (Juncturae Tendinum Biomechanics)\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #anatomi #insanvücudu #bilim #deney",
+      "description": "💬 Videonun 5. saniyesinde elini masaya koyup yüzük parmağıyla inatlaşan herkes burada mı? 😂🖐️ Kaldırabilen çıktı mı? Yoruma yaz! 👇\n\nŞu an telefonu bırakmadan tek elinle deneyebileceğin inanılmaz bir anatomi testi var: Orta parmağını içeri kıvırıp elini masaya yasla! Başparmağını, işaret parmağını ve serçe parmağını masadan kolayca kaldırabilirsin ama yüzük parmağın masaya zamkla yapışmış gibi kilitlenir! El cerrahisi anatomisine göre diğer parmakların kendilerine ait bağımsız gerdirici kas kirişleri varken, yüzük parmağının tendonu orta parmakla çapraz bağlarla birbirine kenetlenmiştir. Orta parmak bükülü kaldığı sürece bu ortak tendon gevşeyemez ve beynin ne kadar emir verirse versin yüzük parmağı fiziksel olarak kalkamaz.\n\n💬 Hemen denedin değil mi? Yüzük parmağını 1 milimetre bile oynatabilen var mı? Yoruma yaz! 👇\n\n📚 Kaynak: Journal of Hand Surgery • Gray's Anatomy (Juncturae Tendinum Biomechanics)\n🎨 Görseller yapay zekâ canlandırmaları ve Wikimedia Commons lisanslı gerçek fotoğraflarla hazırlanmıştır.\n\n#bilgidozu #shorts #anatomi #insanvücudu #bilim #deney",
       "tags": [
         "bilgidozu",
         "yüzük parmağı neden kalkmaz",
@@ -2085,14 +1812,14 @@
       "pinned_comment": "Videonun 5. saniyesinde elini masaya koyup yüzük parmağıyla inatlaşan herkes burada mı? 😂🖐️ Kaldırabilen çıktı mı? Yoruma yaz! 👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "11QJekQX2Qx64Pc88LjZeuLyKidBKCfNq",
+      "drive_video_id": "1TNH9HGLMWUUuvoNQFITDfctqgbI_bW7E",
       "drive_video_size_mb": 8.93,
       "expected_cover": "kapak_194.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1LL1GNpX7-kqGVoTIyk_ljiWxZoxUtduQ"
+      "drive_cover_id": "1XkrgMHjLHDsuxEftk8W3AvUg_5JwSsLM"
     },
     {
-      "row": 197,
+      "row": 176,
       "file_name": "video_195.mp4",
       "number": 195,
       "type": "short",
@@ -2100,7 +1827,7 @@
       "is_ready": true,
       "is_published": false,
       "title": "Parmak Şıklattığında Çıkan Ses İki Parmağın Çarpışmasından Gelmiyor! 🫰⚡ #bilgidozu #shorts",
-      "description": "💬 Şu an yavaş çekimde parmağını şıklatıp orta parmağının avuç içine vurduğunu ilk kez fark eden kaç kişiyiz? 🤯🫰👇\n\nParmak şıklattığında duyduğun o keskin 'şıklama' sesinin başparmakla orta parmağın sürtünmesinden çıktığını sanıyorsan yanılıyorsun! Georgia Tech fizikçilerinin yüksek hızlı kameralarla çözdüğü mekaniğe göre deri sürtünmesi yalnızca enerjiyi yay gibi biriktiren bir mandal görevi görür. Orta parmak kurtulduğu an yalnızca 7 milisaniyede, profesyonel bir beyzbol atıcısının kolundan 3 kat daha yüksek açısal ivmeye ulaşarak insan vücudunun en hızlı hareketini yapar! Duyduğun o patlama sesi ise orta parmağın başparmağın kökündeki avuç içi etine çarpmasıyla oluşan şok dalgasıdır; parmağa kaygan eldiven veya yüksük takınca ses anında yok olur.\n\n💬 Bunu duyunca parmağını şıklatıp avuç içine çarpışını kontrol edenler kimler? Yoruma yaz! 👇\n\n📚 Kaynak: Georgia Institute of Technology (Journal of the Royal Society Interface, 2021)\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #fizik #insanvücudu #bilim #ilginçbilgiler",
+      "description": "💬 Şu an yavaş çekimde parmağını şıklatıp orta parmağının avuç içine vurduğunu ilk kez fark eden kaç kişiyiz? 🤯🫰👇\n\nParmak şıklattığında duyduğun o keskin 'şıklama' sesinin başparmakla orta parmağın sürtünmesinden çıktığını sanıyorsan yanılıyorsun! Georgia Tech fizikçilerinin yüksek hızlı kameralarla çözdüğü mekaniğe göre deri sürtünmesi yalnızca enerjiyi yay gibi biriktiren bir mandal görevi görür. Orta parmak kurtulduğu an yalnızca 7 milisaniyede, profesyonel bir beyzbol atıcısının kolundan 3 kat daha yüksek açısal ivmeye ulaşarak insan vücudunun en hızlı hareketini yapar! Duyduğun o patlama sesi ise orta parmağın başparmağın kökündeki avuç içi etine çarpmasıyla oluşan şok dalgasıdır; parmağa kaygan eldiven veya yüksük takınca ses anında yok olur.\n\n💬 Bunu duyunca parmağını şıklatıp avuç içine çarpışını kontrol edenler kimler? Yoruma yaz! 👇\n\n📚 Kaynak: Georgia Institute of Technology (Journal of the Royal Society Interface, 2021)\n🎨 Görseller yapay zekâ canlandırmaları ve Wikimedia Commons lisanslı gerçek fotoğraflarla hazırlanmıştır.\n\n#bilgidozu #shorts #fizik #insanvücudu #bilim #ilginçbilgiler",
       "tags": [
         "bilgidozu",
         "parmak şıklatma sesi nasıl çıkar",
@@ -2116,14 +1843,14 @@
       "pinned_comment": "Şu an yavaş çekimde parmağını şıklatıp orta parmağının avuç içine vurduğunu ilk kez fark eden kaç kişiyiz? 🤯🫰👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1nyrQ7uoRDBRhTpliJO5Yukj9vgApGdFr",
+      "drive_video_id": "1fn-KMSgSmJYH0T1snMl7_uf_KyGKqsI6",
       "drive_video_size_mb": 7.04,
       "expected_cover": "kapak_195.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1EXcp0zAbaG5PoF6q8Ubhn-_Y_VSAdpjM"
+      "drive_cover_id": "1nxSA7vA9NgUxFAZw4xYESadsgiFPHukd"
     },
     {
-      "row": 198,
+      "row": 177,
       "file_name": "video_196.mp4",
       "number": 196,
       "type": "short",
@@ -2131,7 +1858,7 @@
       "is_ready": true,
       "is_published": false,
       "title": "Vücut Ateşin 39 Dereceye Çıkmışken Neden Buz Kesmiş Gibi Titreyerek Üşürsün? 🤒🧊 #bilgidozu #shorts",
-      "description": "💬 Annenin alnına elini koyup 'yanıyorsun üstünü aç!' dediği, senin ise 'anne donuyorum battaniye ver!' dediğin o klasik an... 😅🤒👇\n\nHasta olduğunda alnın 39 derece ateşle cayır cayır yanarken neden iki kat yorganın altında dişlerin birbirine vuracak kadar üşürsün? Çünkü o an oda soğumamıştır; beynin sana kendi termostatıyla zekice bir oyun oynuyordur! Harvard Tıp Fakültesi fizyologlarına göre bağışıklık hücreleri virüsleri yavaşlatmak için beyindeki hipotalamus ısı merkezine 'hedef sıcaklığı 37'den 39,5 dereceye çıkar' emri gönderir. Yeni hedef 39,5 derece olunca beynin 38 derecelik sıcak vücudunu bile 'fazla soğuk' algılar; damarları büzüp kasları saniyede onlarca kez titreterek sıcaklığı hedefe tırmandırır.\n\n💬 Ateşlendiğinde 'üstümü örtün donuyorum!' diyenlerden misin? Yoruma yaz! 👇\n\n📚 Kaynak: Harvard Medical School • Guyton and Hall Textbook of Medical Physiology\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #tıp #sağlık #insanvücudu #bilim",
+      "description": "💬 Annenin alnına elini koyup 'yanıyorsun üstünü aç!' dediği, senin ise 'anne donuyorum battaniye ver!' dediğin o klasik an... 😅🤒👇\n\nHasta olduğunda alnın 39 derece ateşle cayır cayır yanarken neden iki kat yorganın altında dişlerin birbirine vuracak kadar üşürsün? Çünkü o an oda soğumamıştır; beynin sana kendi termostatıyla zekice bir oyun oynuyordur! Harvard Tıp Fakültesi fizyologlarına göre bağışıklık hücreleri virüsleri yavaşlatmak için beyindeki hipotalamus ısı merkezine 'hedef sıcaklığı 37'den 39,5 dereceye çıkar' emri gönderir. Yeni hedef 39,5 derece olunca beynin 38 derecelik sıcak vücudunu bile 'fazla soğuk' algılar; damarları büzüp kasları saniyede onlarca kez titreterek sıcaklığı hedefe tırmandırır.\n\n💬 Ateşlendiğinde 'üstümü örtün donuyorum!' diyenlerden misin? Yoruma yaz! 👇\n\n📚 Kaynak: Harvard Medical School • Guyton and Hall Textbook of Medical Physiology\n🎨 Görseller yapay zekâ canlandırmaları ve Wikimedia Commons lisanslı gerçek fotoğraflarla hazırlanmıştır.\n\n#bilgidozu #shorts #tıp #sağlık #insanvücudu #bilim",
       "tags": [
         "bilgidozu",
         "ateş çıkınca neden üşürüz",
@@ -2148,14 +1875,326 @@
       "pinned_comment": "Annenin alnına elini koyup 'yanıyorsun üstünü aç!' dediği, senin ise 'anne donuyorum battaniye ver!' dediğin o klasik an... 😅🤒👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1QU7IWq_KUwHQ0Lkse35LhZDP_AKKfEnq",
+      "drive_video_id": "1x-46Y43MgvKZE1ZN6mMX1VClf79HYMI2",
       "drive_video_size_mb": 12.05,
       "expected_cover": "kapak_196.jpg",
       "has_drive_cover": true,
-      "drive_cover_id": "1IkhSAaR4d_Ex4D3kjymSg9fMG27lhMqj"
+      "drive_cover_id": "1um-S7NV4erqyS1fpiZ1jiDOHeEj5q_dw"
     },
     {
-      "row": 64,
+      "row": 178,
+      "file_name": "video_197.mp4",
+      "number": 197,
+      "type": "short",
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
+      "title": "Alüminyum Folyonun Parlak ve Mat Yüzeyi Arasında Gerçekten Fark Var mı?   🪙✨ #bilgidozu #shorts",
+      "description": "💬 Yıllarca fırına tepsi koyarken 'dur yanlış sardın, parlak tarafı içe gelecekti!' diye boşuna mı tartışmışız?! 😂✨ Mutfak ekibine gönder! 👇\n\nMutfakta yıllardır bitmeyen o tartışmayı bugün bilimsel olarak kapatıyoruz: Alüminyum folyonun parlak yüzü mü içe gelmeli yoksa mat yüzü mü? Çoğu kişi parlak yüzeyin ısıyı içeri hapsettiğini, mat yüzeyin ise ısıyı dışarı verdiğini sanır; oysa fırında ikisi arasında pişirme farkı neredeyse sıfırdır! Üretim mühendisliğine göre alüminyum 0,016 milimetreye kadar inceltilirken tek kat çekilirse kağıt gibi yırtılır; bu yüzden fabrikadaki son dev çelik merdaneden iki kat üst üste geçirilir. Cilalı çelik silindire değen dış yüzeyler ayna gibi parlar, iki folyonun birbirine sürtündüğü iç yüzeyler ise mat kalır; ısı yansıtma farkı yalnızca yüzde 2'dir!\n\n💬 Sizin evde folyoyu sararken 'parlak tarafı içe gelsin!' kuralı var mıydı? Yoruma yaz! 👇\n\n📚 Kaynak: Reynolds Kitchens Metallurgy Engineering • Culinary Institute of America\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #mühendislik #mutfak #bilim #ilginçbilgiler",
+      "tags": [
+        "bilgidozu",
+        "alüminyum folyo hangi yüzü kullanılır",
+        "alüminyum folyo parlak mat farkı",
+        "mutfak efsaneleri",
+        "üretim mühendisliği",
+        "bilim",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Malzeme ve Üretim Mühendisliği",
+      "pinned_comment": "Yıllarca fırına tepsi koyarken 'dur yanlış sardın, parlak tarafı içe gelecekti!' diye boşuna mı tartışmışız?! 😂✨ Mutfak ekibine gönder! 👇",
+      "youtube_url": "",
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
+      "expected_cover": "kapak_197.jpg",
+      "has_drive_cover": false,
+      "drive_cover_id": ""
+    },
+    {
+      "row": 179,
+      "file_name": "video_198.mp4",
+      "number": 198,
+      "type": "short",
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
+      "title": "Asansörlerin İçine Ayna Konmasının Gerçek Sebebi Kıyafetine Bakman Değil! 🛗🪞 #bilgidozu #shorts",
+      "description": "💬 Motoru hızlandırmak yerine ayna takıp insan beynini oyalamak tarihin en zekice mühendislik hamlelerinden biri değil mi? 😄🛗🪞👇\n\nNeredeyse bindiğin her asansörün içinde neden mutlaka boydan boya ayna olduğunu hiç sorguladın mı? II. Dünya Savaşı'ndan sonra çok katlı gökdelenler hızla yükselince ofis çalışanları asansörlerin çok yavaş çıktığından şikâyet etmeye başladı. Motorları hızlandırmak milyonlarca dolara mal olacağı için mühendisler psikologların önerisiyle kabin duvarlarına ayna yerleştirdi ve şikâyetler bir gecede bıçak gibi kesildi! Çünkü insan beyni kendi yansımasıyla meşgul olduğunda zaman algısı hızlanır, klostrofobi hissi dağılır; üstelik tekerlekli sandalyeli yolcuların dönmeden kapıyı görmesini sağlar.\n\n💬 Dürüst olalım: Asansörde yalnız kaldığı an aynada saçını veya kıyafetini düzeltmeyen var mı? Yoruma yaz! 👇\n\n📚 Kaynak: Harvard Business School (David Maister, Psychology of Waiting Lines) • Otis Elevator Standards\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #psikoloji #mühendislik #bilim #ilginçbilgiler",
+      "tags": [
+        "bilgidozu",
+        "asansörde neden ayna var",
+        "asansör aynası ne işe yarar",
+        "bekleme psikolojisi",
+        "gökdelen mühendisliği",
+        "psikoloji",
+        "bilim",
+        "shorts"
+      ],
+      "category_name": "Mühendislik ve Davranış Psikolojisi",
+      "pinned_comment": "Motoru hızlandırmak yerine ayna takıp insan beynini oyalamak tarihin en zekice mühendislik hamlelerinden biri değil mi? 😄🛗🪞👇",
+      "youtube_url": "",
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
+      "expected_cover": "kapak_198.jpg",
+      "has_drive_cover": false,
+      "drive_cover_id": ""
+    },
+    {
+      "row": 180,
+      "file_name": "video_199.mp4",
+      "number": 199,
+      "type": "short",
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
+      "title": "Bozuk Paraların Kenarı Neden Tırtıklıdır? Isaac Newton'un Hırsız Tuzağı! 🪙🕵️‍♂️ #bilgidozu #shorts",
+      "description": "💬 Adam hem yerçekimi yasasını ve kalkülüsü buluyor, hem de boş zamanında darphanenin başına geçip kalpazanlığı bitiriyor! 🤯🪙👇\n\nCebindeki madeni paraların kenarındaki o incecik tırtıkları parmaklarınla mutlaka hissetmişsindir; peki bunu yerçekimini bulan fizikçi Isaac Newton'un yaygınlaştırdığını biliyor muydun? 17. yüzyılda paralar gerçek altın ve gümüşten basıldığı için dolandırıcılar her paranın düz kenarından milimetrik metal kazıyıp eriterek servet kazanıyordu! 1696 yılında İngiliz Kraliyet Darphanesi'nin başına geçen Isaac Newton, paraların kenarına makineli çarklarla 100'den fazla hassas tırtık basma kuralını getirdi. Böylece kenarı törpülenen bir para tek bakışta kendini ele verdi; bugün paralar altın olmasa da hem sahteciliğe karşı hem de görme engellilerin parayı tanıması için bu standart sürüyor.\n\n💬 Isaac Newton'un fizik dışında darphane müdürlüğü yapıp kalpazan avladığını daha önce duymuş muydun? Yoruma yaz! 👇\n\n📚 Kaynak: The Royal Mint Museum UK (Great Recoinage of 1696, Sir Isaac Newton)\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #tarih #bilim #newton #ilginçbilgiler",
+      "tags": [
+        "bilgidozu",
+        "bozuk paraların kenarı neden tırtıklı",
+        "madeni para tırtıkları ne işe yarar",
+        "isaac newton darphane",
+        "tarih",
+        "bilim",
+        "ilginç bilgiler",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Bilim Tarihi ve Mühendislik",
+      "pinned_comment": "Adam hem yerçekimi yasasını ve kalkülüsü buluyor, hem de boş zamanında darphanenin başına geçip kalpazanlığı bitiriyor! 🤯🪙👇",
+      "youtube_url": "",
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
+      "expected_cover": "kapak_199.jpg",
+      "has_drive_cover": false,
+      "drive_cover_id": ""
+    },
+    {
+      "row": 181,
+      "file_name": "video_200.mp4",
+      "number": 200,
+      "type": "short",
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
+      "title": "Kediler Yalnızca Mutluyken Değil, Yaralandıklarında da Neden Mırıldar? 🐈🔊 #bilgidozu #shorts",
+      "description": "💬 Kedilerin 7/24 yanında taşıdığı yerleşik fizik tedavi cihazıyla gezmesi şaka mı?! 😻🔊 Evinde kedi olanlar kedisinin adını yoruma yazsın! 👇\n\nKedilerin yalnızca başı okşandığında ve keyfi yerindeyken mırıldadığını sanıyorsan doğanın en gizemli iyileşme mekanizmasını kaçırıyorsun! Veterinerler doğum yapan, korkan, hatta ağır kırık geçiren kedilerin bile aralıksız mırıldadığını fark edip bu sesin akustik frekansını ölçtü. Amerikan Akustik Derneği araştırmalarına göre ev kedisinden çitaya kadar kedigiller tam 25 ile 150 Hertz aralığında kesintisiz mekanik titreşim üretir! Bu aralık, modern tıpta kırık kemiklerin kaynamasını hızlandıran ve kas-tendon ödemini çözen ultrasonik fizik tedavi frekansıyla birebir aynıdır; yani kedi kendi kendini onarır.\n\n💬 Kedinin yanına uzanıp o mırıltıyı dinlerken senin de stresinin azaldığını hissediyor musun? Yoruma yaz! 👇\n\n📚 Kaynak: Journal of the Acoustical Society of America (von Muggenthaler, 2001) • Scientific American\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #kediler #hayvanlar #biyoloji #bilim",
+      "tags": [
+        "bilgidozu",
+        "kediler neden mırıldar",
+        "kedi mırıltısı frekansı",
+        "kedi mırıltısı kemik iyileştirir mi",
+        "25 150 hz",
+        "biyoloji",
+        "hayvanlar",
+        "bilim",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Biyoakustik ve Veterinerlik",
+      "pinned_comment": "Kedilerin 7/24 yanında taşıdığı yerleşik fizik tedavi cihazıyla gezmesi şaka mı?! 😻🔊 Evinde kedi olanlar kedisinin adını yoruma yazsın! 👇",
+      "youtube_url": "",
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
+      "expected_cover": "kapak_200.jpg",
+      "has_drive_cover": false,
+      "drive_cover_id": ""
+    },
+    {
+      "row": 182,
+      "file_name": "video_201.mp4",
+      "number": 201,
+      "type": "short",
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
+      "title": "Ağaçkakan Saniyede 20 Kez Ağaca Vurup Neden Beyin Sarsıntısı Geçirmez? 🐦🪵 #bilgidozu #shorts",
+      "description": "💬 1.200 G kuvvetle günde 12.000 kez kafa atıp baş ağrısı bile çekmemek... Doğanın mühendisliği karşısında şapka çıkarılır! 🤯🐦👇\n\nBir insanı anında bayıltmaya 100 G kuvvetindeki darbe yeterken, ağaçkakan gagasını ağaca saniyede 20 kez tam 1.200 G ivmeyle çarpar! Günde 12 bin çekiç darbesi vuran bu kuşun beyni neden dağılmıyor? Yıllarca kafatasının sünger gibi darbeyi emdiği sanılıyordu ama yüksek hızlı analizler gerçeğin daha zekice olduğunu gösterdi! Current Biology'de yayımlanan biyomekanik çalışmaya göre süngerimsi kemik darbeyi emseydi gaga ağacı delemezdi; asıl koruma ağaçkakanın beyninin kafatasına sıvı boşluğu kalmadan sımsıkı oturması ve küçük ölçek fiziğidir. Üstelik çenesinden çıkıp kafatasının arkasını emniyet kemeri gibi çepeçevre saran uzun dil kemiği (hyoid) her vuruşta kafayı sabitleyip sarsıntıyı önler!\n\n💬 Ağaçkakanın dil kemiğinin kafatasının etrafını emniyet kemeri gibi sardığını ilk kez mi duydun? Yoruma yaz! 👇\n\n📚 Kaynak: University of Antwerp (Current Biology, 2022) • UC Davis Ophthalmology & Biomechanics\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #doğa #biyoloji #hayvanlar #bilim",
+      "tags": [
+        "bilgidozu",
+        "ağaçkakan neden beyin sarsıntısı geçirmez",
+        "ağaçkakan 1200 g",
+        "ağaçkakan dili kafatası",
+        "biyomekanik",
+        "doğa",
+        "hayvanlar",
+        "bilim",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Biyoloji ve Biyomekanik",
+      "pinned_comment": "1.200 G kuvvetle günde 12.000 kez kafa atıp baş ağrısı bile çekmemek... Doğanın mühendisliği karşısında şapka çıkarılır! 🤯🐦👇",
+      "youtube_url": "",
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
+      "expected_cover": "kapak_201.jpg",
+      "has_drive_cover": false,
+      "drive_cover_id": ""
+    },
+    {
+      "row": 183,
+      "file_name": "video_202.mp4",
+      "number": 202,
+      "type": "short",
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
+      "title": "Yazın Kızgın Asfaltta Gördüğün Su Birikintisi Yaklaşınca Neden Kaybolur? 🛣️☀️ #bilgidozu #shorts",
+      "description": "💬 Çocukluğumun en büyük gizemi çözüldü: Meğer asfalttaki su birikintisi değil, yere bükülen gökyüzünü izliyormuşuz! 🛣️☀️👇\n\nYazın uzun yolda giderken ilerideki asfaltın üzerinde parlayan o net su birikintisinin yanına vardığın an neden buhar olmuş gibi kaybolduğunu hiç merak ettin mi? Çünkü yolda tek bir damla bile su yoktur; gördüğün şey su değil, yola inmiş gökyüzünün kendisidir! Güneş siyah asfaltı 60 derecenin üzerine çıkardığında hemen üstündeki birkaç santimetrelik hava tabakası aşırı ısınıp üstteki serin havadan çok daha az yoğun hale gelir. Gökyüzünden aşağı inen mavi ışık ışınları bu sıcak hava sınırına çarptığında yere değmeden yukarı doğru kavis çizerek gözüne bükülür ve beynin parlak gökyüzü yansımasını 'ıslak yol' olarak yorumlar!\n\n💬 Çocukken arabada 'ileride yol ıslak!' deyip yaklaşınca kaybolmasına şaşıranlar burada mı? Yoruma yaz! 👇\n\n📚 Kaynak: NASA Atmospheric Optics • American Journal of Physics (Inferior Mirage)\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #fizik #optik #bilim #ilginçbilgiler",
+      "tags": [
+        "bilgidozu",
+        "sıcak asfaltta su görüntüsü",
+        "yoldaki serap nasıl oluşur",
+        "alt serap nedir",
+        "ışığın kırılması",
+        "optik",
+        "fizik",
+        "bilim",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Optik ve Atmosfer Fiziği",
+      "pinned_comment": "Çocukluğumun en büyük gizemi çözüldü: Meğer asfalttaki su birikintisi değil, yere bükülen gökyüzünü izliyormuşuz! 🛣️☀️👇",
+      "youtube_url": "",
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
+      "expected_cover": "kapak_202.jpg",
+      "has_drive_cover": false,
+      "drive_cover_id": ""
+    },
+    {
+      "row": 184,
+      "file_name": "video_203.mp4",
+      "number": 203,
+      "type": "short",
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
+      "title": "Yerden Yarım Yay Gördüğün Gökkuşağı Uçaktan Bakınca Neden Tam Çemberdir? 🌈✈️ #bilgidozu #shorts",
+      "description": "💬 Yıllarca gökkuşağının ucunda hazine var diye anlatıldı, meğer ucu bile yokmuş çünkü tam çembermiş! 🤯🌈👇\n\nHayatımız boyunca gökkuşağını hep yarım bir köprü gibi çizdik ama gerçekte yarım gökkuşağı diye bir şey yoktur; her gökkuşağı kusursuz bir tam dairedir! Arkanı güneşe dönüp yağmur perdesine baktığında, milyonlarca su damlası ışığı kırıp tam 42 derecelik sabit bir koni açısıyla gözüne geri yansıtır. Bir koninin tabanı her zaman tam çember olduğu için gökkuşağının alt yarısı da aslında oradadır; ancak yerde dururken ufuk çizgisi ve yeryüzü o alt yarının yağmur damlalarını keser! Yüksek bir uçaktan veya gökdelenin tepesinden güneşi arkana alarak yağmur bulutuna baktığında, gökkuşağını havada asılı tam bir halka olarak çıplak gözle görebilirsin.\n\n💬 Daha önce uçaktan veya dağ zirvesinden tam daire gökkuşağı gören şanslı kişiler var mı? Yoruma yaz! 👇\n\n📚 Kaynak: UCAR Center for Science Education • Royal Meteorological Society\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #doğa #fizik #gökkuşağı #bilim",
+      "tags": [
+        "bilgidozu",
+        "gökkuşağı aslında yuvarlak mı",
+        "tam daire gökkuşağı",
+        "uçaktan gökkuşağı nasıl görünür",
+        "42 derece ışık kırılması",
+        "optik",
+        "fizik",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Atmosfer Fiziği ve Optik",
+      "pinned_comment": "Yıllarca gökkuşağının ucunda hazine var diye anlatıldı, meğer ucu bile yokmuş çünkü tam çembermiş! 🤯🌈👇",
+      "youtube_url": "",
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
+      "expected_cover": "kapak_203.jpg",
+      "has_drive_cover": false,
+      "drive_cover_id": ""
+    },
+    {
+      "row": 185,
+      "file_name": "video_204.mp4",
+      "number": 204,
+      "type": "short",
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
+      "title": "Golf Toplarının Üzerinde Neden 300'den Fazla Küçük Çukur Vardır? ⛳💨 #bilgidozu #shorts",
+      "description": "💬 Eskimiş ve darbe almış topların yepyeni pürüzsüz toplardan 2 kat uzağa gitmesi fiziğin en güzel sürprizlerinden biri! ⛳💨👇\n\nAerodinamik mantığına göre pürüzsüz ve kaygan bir topun havayı daha kolay yarıp çok daha uzağa gitmesi gerekir değil mi? Gerçek tam tersi! Tamamen pürüzsüz bir golf topuna aynı güçle vurduğunda, üzerinde 300 ile 500 arası çukur bulunan standart bir topun yarısı kadar bile uzağa gidemez! Akışkanlar mekaniğine göre düz topun etrafından kayan hava erkenden kopup topun arkasında onu geriye çeken dev bir vakum boşluğu bırakır. Yüzeydeki minik çukurlar ise topu saran ince bir türbülanslı hava zırhı yaratarak akışı yüzeye yapıştırır, arka vakumu küçültür ve hava direncini yarı yarıya düşürür!\n\n💬 İlk golfçülerin eskimiş ve çizilmiş topların yeni toplardan daha uzağa gittiğini tesadüfen fark ettiğini biliyor muydun? Yoruma yaz! 👇\n\n📚 Kaynak: United States Golf Association (USGA) Test Center • Scientific American\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #fizik #aerodinamik #mühendislik #bilim",
+      "tags": [
+        "bilgidozu",
+        "golf topu neden çukurludur",
+        "golf topu aerodinamik",
+        "pürüzsüz golf topu neden gitmez",
+        "akışkanlar mekaniği",
+        "fizik",
+        "bilim",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Aerodinamik ve Akışkanlar Fiziği",
+      "pinned_comment": "Eskimiş ve darbe almış topların yepyeni pürüzsüz toplardan 2 kat uzağa gitmesi fiziğin en güzel sürprizlerinden biri! ⛳💨👇",
+      "youtube_url": "",
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
+      "expected_cover": "kapak_204.jpg",
+      "has_drive_cover": false,
+      "drive_cover_id": ""
+    },
+    {
+      "row": 186,
+      "file_name": "video_205.mp4",
+      "number": 205,
+      "type": "short",
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
+      "title": "Mısır Tanesi Tencerede Neden Patlar? İçindeki 9 Barlık Buhar Bombası! 🍿💥 #bilgidozu #shorts",
+      "description": "💬 Tenceredeki her bir mısır tanesinin 9 barlık minyatür düdüklü tencere gibi patlaması... 🍿💥 Tuzlu mu tatlı mı, senin favorin hangisi? 👇\n\nSıradan buğday veya pirinç kavrulunca yalnızca kararırken, cin mısırı tanesi tencerede neden bembeyaz bir bulut gibi patlayıp havaya zıplar? Fransa École Polytechnique fizikçilerinin saniyede 2.900 kare çeken kameralarla çözdüğü sır, mısırın zırh gibi su geçirmez dış kabuğunda ve içindeki %14 su damlasında gizli! Sıcaklık 180 dereceye ulaştığında içerideki su buharlaşmak ister ama çıkamaz; basınç araba lastiğinin 4 katına yani 9 bara fırlayıp nişastayı erimiş jele çevirir. Kabuk yarıldığı milisaniyede nişasta 'bacak' gibi dışarı fırlayıp mısırı takla attırır; duyduğun 'pop' sesi ise kabuk kırılmasından değil, boşalan su buharının yankısından çıkar!\n\n💬 Film izlerken tuzlu patlamış mısır mı yoksa karamelli mi? Tarafını yoruma yaz! 👇\n\n📚 Kaynak: École Polytechnique & CNRS France (Journal of the Royal Society Interface, 2015)\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #fizik #günlükbilim #mısır #bilim",
+      "tags": [
+        "bilgidozu",
+        "mısır neden patlar",
+        "patlamış mısır bilimi",
+        "180 derece 9 bar mısır",
+        "mısır patlama sesi nereden gelir",
+        "fizik",
+        "bilim",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Termodinamik ve Akustik",
+      "pinned_comment": "Tenceredeki her bir mısır tanesinin 9 barlık minyatür düdüklü tencere gibi patlaması... 🍿💥 Tuzlu mu tatlı mı, senin favorin hangisi? 👇",
+      "youtube_url": "",
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
+      "expected_cover": "kapak_205.jpg",
+      "has_drive_cover": false,
+      "drive_cover_id": ""
+    },
+    {
+      "row": 187,
+      "file_name": "video_206.mp4",
+      "number": 206,
+      "type": "short",
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
+      "title": "Tenis Toplarının Üzeri Neden Pürüzsüz Değil de Tüylü Üretilir? 🎾⚡ #bilgidozu #shorts",
+      "description": "💬 Meğer o tüyler süs için değil, saatte 200 km hızla gelen topu frenleyen aerodinamik paraşütmüş! 🤯🎾👇\n\nFutboldan basketbola bütün toplar pürüzsüz veya deriyken, tenis toplarının üzerinin neden halı gibi sarı keçe tüylerle kaplı olduğunu hiç düşündün mü? Eğer tenis topu tüysüz kauçuktan üretilseydi, servis atışları saatte 260 kilometreyi aşan kontrolsüz birer mermiye dönüşür ve raket tellerinden sekip tribüne uçardı! Uluslararası Tenis Federasyonu aerodinamik testlerine göre o ince keçe tüyler topun arkasında kontrollü hava sürtünmesi yaratarak hızı insan refleksinin yakalayabileceği seviyeye frenler. Aynı zamanda tüyler havayı pençe gibi kavrayıp topa falso (Magnus etkisi) kazandırır ve topun son anda çizginin içine sertçe dalmasını sağlar!\n\n💬 Yeni açılmış tenis topu kutusunun o kendine has kokusunu sevenler burada mı? Yoruma yaz! 👇\n\n📚 Kaynak: International Tennis Federation (ITF Technical Centre) • Sports Engineering\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #mühendislik #spor #fizik #bilim",
+      "tags": [
+        "bilgidozu",
+        "tenis topu neden tüylüdür",
+        "tenis topu keçesi ne işe yarar",
+        "magnus etkisi",
+        "spor mühendisliği",
+        "aerodinamik",
+        "fizik",
+        "bilim",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Aerodinamik ve Spor Mühendisliği",
+      "pinned_comment": "Meğer o tüyler süs için değil, saatte 200 km hızla gelen topu frenleyen aerodinamik paraşütmüş! 🤯🎾👇",
+      "youtube_url": "",
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
+      "expected_cover": "kapak_206.jpg",
+      "has_drive_cover": false,
+      "drive_cover_id": ""
+    },
+    {
+      "row": 194,
       "file_name": "uzun_video_8.mp4",
       "number": 8,
       "type": "long",
@@ -2186,7 +2225,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 65,
+      "row": 195,
       "file_name": "uzun_video_9.mp4",
       "number": 9,
       "type": "long",
@@ -2217,7 +2256,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 66,
+      "row": 196,
       "file_name": "uzun_video_10.mp4",
       "number": 10,
       "type": "long",
@@ -2249,7 +2288,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 67,
+      "row": 197,
       "file_name": "uzun_video_11.mp4",
       "number": 11,
       "type": "long",
@@ -2280,7 +2319,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 68,
+      "row": 198,
       "file_name": "uzun_video_12.mp4",
       "number": 12,
       "type": "long",
@@ -2312,7 +2351,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 69,
+      "row": 199,
       "file_name": "uzun_video_13.mp4",
       "number": 13,
       "type": "long",
@@ -2342,7 +2381,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 135,
+      "row": 200,
       "file_name": "uzun_video_14.mp4",
       "number": 14,
       "type": "long",
@@ -2374,7 +2413,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 139,
+      "row": 201,
       "file_name": "uzun_video_15.mp4",
       "number": 15,
       "type": "long",
@@ -2404,7 +2443,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 143,
+      "row": 202,
       "file_name": "uzun_video_16.mp4",
       "number": 16,
       "type": "long",
@@ -2435,7 +2474,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 148,
+      "row": 203,
       "file_name": "uzun_video_17.mp4",
       "number": 17,
       "type": "long",
@@ -2464,7 +2503,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 152,
+      "row": 204,
       "file_name": "uzun_video_18.mp4",
       "number": 18,
       "type": "long",
@@ -2494,7 +2533,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 156,
+      "row": 205,
       "file_name": "uzun_video_19.mp4",
       "number": 19,
       "type": "long",
@@ -2523,7 +2562,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 160,
+      "row": 206,
       "file_name": "uzun_video_20.mp4",
       "number": 20,
       "type": "long",
@@ -2553,7 +2592,7 @@
       "drive_cover_id": ""
     },
     {
-      "row": 164,
+      "row": 207,
       "file_name": "uzun_video_21.mp4",
       "number": 21,
       "type": "long",
@@ -2583,13 +2622,13 @@
       "drive_cover_id": ""
     },
     {
-      "row": 177,
+      "row": 208,
       "file_name": "uzun_video_22.mp4",
       "number": 22,
       "type": "long",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Tokken Neden Tatlı İsteriz? Beyindeki 'Tatlı Midesi' Şalterinin 2025 Bilimsel Kanıtı 🍰 #bilgidozu",
       "description": "Akşam yemeğinde tek lokma bile yiyemeyecek kadar doyduğun halde masaya tatlı geldiği an midende nasıl mucizevi yer açılır? Tatlı krizinin arkasındaki ikinci büyük güç Oxford Üniversitesi'nden Edmund Rolls'un tanımladığı duyusal özgül tokluktur. Beynin tek tip tuzlu yemekten sıkıldığında miden tam dolmasa bile o tada karşı fren yapar; fakat önüne bambaşka koku ve dokuda tatlı bir tabak geldiğinde iştah sayacı sıfırlanır.\n\n📍 BÖLÜMLER\n00:00 Tek lokma yiyemeyecekken — Tatlıya nasıl yer açılır?\n00:18 Tokluk nöronları yemekte — Artık doydun diyor!\n00:36 Atalarımızdan kalan — Hızlı enerji kodu!\n01:06 Daha ilk lokmadan önce — Görmek bile şalteri açar!\n01:28 Tatlı krizini kandıran — 15 dakika kuralı!\n01:51 15 dakika kuralını dene! — Yoruma yaz & abone ol!\n\n📊 Kaynaklar:\n• Max Planck Institute (Minère et al., Science 2025) & Oxford University\n• https://www.mpg.de/24159607/0211-neur-dessert-stomach-emerges-in-the-brain-153735-x\n\n🖼️ Görseller temsilîdir (AI bilimsel canlandırma).\n\nDaha fazla bilgi dozu için takip etmeyi unutma! 🔔\n#bilgidozu #beyin #beslenme #insanvücudu #bilim",
       "tags": [
@@ -2617,78 +2656,78 @@
       "row": 2,
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-01 19:59",
+      "updated_at": "2026-11-12 16:30",
       "error_message": "",
-      "jobs_done": 57,
-      "last_action": "video_154.mp4 yayınlandı (https://youtu.be/DDdoh5PRoQQ)"
+      "jobs_done": 72,
+      "last_action": "active.sav81@gmail.com / Bilgi_Dozu_Yeni_Shorts / video kapak kuyruğuna bağlandı (Sıradaki: video_176.mp4)"
     },
     {
       "row": 3,
       "name": "Kapak İşçisi (Drive -> YouTube)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-01 19:59",
+      "updated_at": "2026-11-12 16:30",
       "error_message": "",
-      "jobs_done": 57,
-      "last_action": "Hazır kapak eşleşmesi aktif (otomatik kapak üretimi kapalı)"
+      "jobs_done": 72,
+      "last_action": "video kapak klasöründeki kapak_176..196.jpg hazır eşleşmesi aktif"
     },
     {
       "row": 4,
       "name": "Yorum İşçisi (Sabit Yorum)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-01 19:59",
+      "updated_at": "2026-11-12 16:30",
       "error_message": "",
-      "jobs_done": 57,
-      "last_action": "video_154.mp4 sabit yorumu otomatik yazıldı"
+      "jobs_done": 72,
+      "last_action": "baslik.xlsx sabit yorum sütunu bağlı"
     },
     {
       "row": 5,
-      "name": "Slot Bekçisi (Watchdog)",
+      "name": "Panel Telemetri İşçisi (30 Dk)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-01 20:42",
+      "updated_at": "2026-11-12 16:30",
       "error_message": "",
-      "jobs_done": 12,
-      "last_action": "12:30 ve 19:30 slotları için +20/+30 dk kontrol aktif"
+      "jobs_done": 302,
+      "last_action": "active.sav81@gmail.com klasörleri ve baslik.xlsx senkronize"
     },
     {
       "row": 6,
-      "name": "Telegram Bildirim İşçisi",
+      "name": "Slot Bekçisi (Watchdog)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-01 19:59",
+      "updated_at": "2026-11-12 16:30",
       "error_message": "",
-      "jobs_done": 57,
-      "last_action": "video_154.mp4 yayın kartı gönderildi"
+      "jobs_done": 25,
+      "last_action": "19:30 TR ana slot koruması aktif"
     },
     {
       "row": 7,
-      "name": "Instagram / TikTok Çapraz Paylaşım",
-      "status": "Pasif",
-      "updated_at": "2026-11-01 03:41",
+      "name": "Telegram Bildirim & Onay İşçisi",
+      "status": "Çalışıyor",
+      "updated_at": "2026-11-12 16:30",
       "error_message": "",
-      "jobs_done": 0,
-      "last_action": "Kullanıcı isteğiyle pasif durumda"
+      "jobs_done": 54,
+      "last_action": "Onaylanan videolar doğrudan active.sav81@gmail.com kuyruğuna ve baslik.xlsx'e yazılır"
     }
   ],
   "uyarilar": [
     {
       "row": 2,
-      "title": "YouTube API Günlük Kotası",
+      "title": "Google Drive Tek Hesap Kilidi",
       "status": "Sorunsuz",
       "updated_at": "Yeşil",
-      "detail": "2026-10-24 14:24"
+      "detail": "2026-11-12 16:30"
     },
     {
       "row": 3,
-      "title": "Google Drive & Sheets Senkronu",
+      "title": "YouTube API Günlük Kotası",
       "status": "Sorunsuz",
       "updated_at": "Yeşil",
-      "detail": "2026-10-24 14:24"
+      "detail": "2026-11-12 16:30"
     },
     {
       "row": 4,
-      "title": "Yorum & Kapak İşçisi (force-ssl)",
+      "title": "Stok Durumu (video_176..196)",
       "status": "Sorunsuz",
       "updated_at": "Yeşil",
-      "detail": "2026-10-24 14:24"
+      "detail": "2026-11-12 16:30"
     }
   ],
   "retention": {
