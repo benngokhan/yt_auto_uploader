@@ -3,3 +3,5 @@ opencv-python-headless>=4.9
 Pillow>=10.0
 faster-whisper>=1.2.0
 soundfile>=0.12
+# Şablon v2.0 motoru (motor/shorts_pipeline.py) ffmpeg yolunu buradan çözer
+imageio-ffmpeg>=0.4.9
