@@ -218,6 +218,37 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
     shorts_covers = _list_folder_files(drive, SHORTS_COVER_FOLDER_ID) if drive else []
     long_videos = _list_folder_files(drive, LONG_VIDEO_FOLDER_ID) if drive else []
     long_covers = _list_folder_files(drive, LONG_COVER_FOLDER_ID) if drive else []
+
+    # Bu kurulumda tüm klasör kimlikleri aynı klasörü gösteriyor (karışık klasör).
+    # Dosyaları türüne göre ayır: resimler kapak, mp4'ler video. Böylece
+    # kapak_N.jpg yanlışlıkla "video" sayılmıyor ve kapak eşleşmesi çalışıyor.
+    def _ayir(video_list, cover_list):
+        _v = [f for f in video_list
+              if not str(f.get("mimeType", "")).startswith("image/")
+              and not str(f.get("name", "")).lower().startswith(("kapak", "uzun_kapak", "short_kapak", "kapak_uzun"))]
+        _c = [f for f in cover_list
+              if str(f.get("mimeType", "")).startswith("image/")
+              or str(f.get("name", "")).lower().startswith(("kapak", "uzun_kapak", "short_kapak", "kapak_uzun"))]
+        return _v, _c
+
+    def _tekil(lst):
+        _g, _s = [], set()
+        for f in lst:
+            _k = str(f.get("id") or f.get("name"))
+            if _k not in _s:
+                _s.add(_k); _g.append(f)
+        return _g
+
+    shorts_videos, shorts_covers = _ayir(shorts_videos, shorts_covers)
+    long_videos, long_covers = _ayir(long_videos, long_covers)
+    # Aynı klasör olduğu için iki liste aynı; tekilleştir.
+    shorts_videos = _tekil(shorts_videos)
+    long_videos = [f for f in _tekil(long_videos)
+                   if str(f.get("name", "")).lower().startswith("uzun_video_")
+                   or str(f.get("name", "")).lower().startswith("long_video_")]
+    _tum_kapaklar = _tekil(shorts_covers + long_covers)
+    shorts_covers = _tum_kapaklar
+    long_covers = _tum_kapaklar
     ceo_files = _list_folder_files(drive, CEO_FOLDER_ID) if drive else []
 
     # Fallback to existing telemetry drive inventory if running offline
@@ -311,11 +342,12 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
         pass
 
     _var = {x["file_name"].lower() for x in queue_items}
+    _eklenen = set(_var)  # aynı video iki kez eklenmesin (shorts ve long klasörü aynı olabiliyor)
     for _map, _uzun, _esik in ((shorts_video_map, False, MIN_SHORTS_NUMBER),
                                (long_video_map, True, MIN_LONG_NUMBER)):
         _covers = long_cover_map if _uzun else shorts_cover_map
         for ad, vf in list(_map.items()):
-            if ad in _var or not ad.endswith(".mp4"):
+            if ad in _var or ad in _eklenen or not ad.endswith(".mp4"):
                 continue
             n = _num(ad)
             if n is None or n < _esik:
@@ -323,6 +355,7 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
             yayinda = (ad in done_ids or ad in _yayin_adlari
                        or ad in {k.lower() for k in KNOWN_PUBLISHED_NAMES})
             kapak, c_file = pick_cover(_covers, n, _uzun)
+            _eklenen.add(ad)
             queue_items.append({
                 "row": None,
                 "file_name": ad,
