@@ -218,13 +218,13 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
     model_adi = ses.get("model", "gemini-2.5-flash-preview-tts")
     tarz = ses.get(
         "tarz",
-        "Sakin, tane tane ve çok net diksiyonlu bir erkek belgesel anlatıcısı gibi konuş. "
-        "Asla hızlı okuma ve acele etme; her kelimeyi, ekleri ve sessiz harfleri eksiksiz, "
-        "pürüzsüz ve anlaşılır telaffuz et. Virgüllerde kısa, cümle sonlarında doğal nefes payı bırak.",
+        "Doğal, dengeli, akıcı ve çok net diksiyonlu bir erkek bilim anlatıcısı gibi konuş. "
+        "Ne acele et ne de fazla ağırlaş; orta-canlı bir belgesel temposunda her kelimeyi, "
+        "ekleri ve sessiz harfleri tane tane, pürüzsüz telaffuz et.",
     )
-    # Cümleleri ayrı paragraflara böl ki model tek nefeste hızlanmadan her cümlede doğal es versin
+    # Tek satır sonu (\n) ile cümleleri ayır: doğal yarım saniye es verir, 2 saniyelik aşırı boşluk bırakmaz
     cumleler = [s.strip() for s in re.split(r"(?<=[.!?])\s+", metin.strip()) if s.strip()]
-    cumle_blok = "\n\n".join(cumleler) if cumleler else metin.strip()
+    cumle_blok = "\n".join(cumleler) if cumleler else metin.strip()
     prompt = f"Türkçe konuş. {tarz}\n\nMetin:\n{cumle_blok}"
     govde = {
         "contents": [{"parts": [{"text": prompt}]}],
@@ -264,14 +264,47 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
         raise SesHatasi(f"Gemini doğal ses üretimi başarısız: {str(son_hata)[:180]}") from son_hata
 
     ham_yol = cikti.with_suffix(".ham24k.wav")
+    pcm = np.frombuffer(raw, dtype="<i2").astype(np.float32) / 32768.0
+
+    # Gemini cümle aralarında 0.55 sn'den uzun ölü sessizlik bıraktıysa konuşmaya dokunmadan 0.50 sn'ye daralt
+    f_len = 480  # 20 ms @ 24 kHz
+    nf = len(pcm) // f_len
+    if nf > 10:
+        f_blok = pcm[: nf * f_len].reshape(nf, f_len)
+        f_rms = np.sqrt(np.mean(f_blok * f_blok, axis=1) + 1e-12)
+        sessiz_mi = f_rms < (10.0 ** (-44.0 / 20.0))
+        parcalar: list[np.ndarray] = []
+        i_f = 0
+        while i_f < nf:
+            if not sessiz_mi[i_f]:
+                j_f = i_f + 1
+                while j_f < nf and not sessiz_mi[j_f]:
+                    j_f += 1
+                parcalar.append(pcm[i_f * f_len : j_f * f_len])
+                i_f = j_f
+            else:
+                j_f = i_f + 1
+                while j_f < nf and sessiz_mi[j_f]:
+                    j_f += 1
+                run_f = j_f - i_f
+                if run_f > 26:  # > 0.52 sn saf sessizlik -> baştan 13 + sondan 13 çerçeve (0.52 sn) koru
+                    parcalar.append(pcm[i_f * f_len : (i_f + 13) * f_len])
+                    parcalar.append(pcm[(j_f - 13) * f_len : j_f * f_len])
+                else:
+                    parcalar.append(pcm[i_f * f_len : j_f * f_len])
+                i_f = j_f
+        if nf * f_len < len(pcm):
+            parcalar.append(pcm[nf * f_len :])
+        pcm = np.concatenate(parcalar)
+
+    pcm_i16 = np.clip(pcm * 32767.0, -32768, 32767).astype("<i2")
     with wave.open(str(ham_yol), "wb") as w:
         w.setnchannels(1)
         w.setsampwidth(2)
         w.setframerate(24000)
-        w.writeframes(raw)
+        w.writeframes(pcm_i16.tobytes())
 
-    # Aktif konuşma hızını ölç (boşluklar hariç krk/sn) ve hızlıysa pürüzsüz atempo + 3.3 kHz diksiyon netlik EQ uygula
-    pcm = np.frombuffer(raw, dtype="<i2").astype(np.float32) / 32768.0
+    # Aktif konuşma hızını ölç ve iki üretimin tam ortasına (~0.94x / ~15.5-15.8 krk/sn aktif) dengele
     ham_sure = len(pcm) / 24000.0
     pencere = 1200  # 50 ms @ 24 kHz
     n_pen = len(pcm) // pencere
@@ -284,12 +317,14 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
 
     temiz_metin = " ".join(metin.split())
     aktif_hiz = len(temiz_metin) / aktif_sn
-    hedef_hiz = float(ses.get("hedef_aktif_krk_sn", 13.7))
-    min_atempo = float(ses.get("min_atempo", 0.88))
+    hedef_hiz = float(ses.get("hedef_aktif_krk_sn", 15.5))
+    min_atempo = float(ses.get("min_atempo", 0.93))
     max_atempo = float(ses.get("max_atempo", 0.96))
 
     if aktif_hiz > hedef_hiz:
         atempo = max(min_atempo, min(max_atempo, round(hedef_hiz / aktif_hiz, 3)))
+    elif aktif_hiz > 14.5:
+        atempo = 0.945
     else:
         atempo = 1.0
 

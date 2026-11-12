@@ -12,12 +12,12 @@
     "dil": "tr",
     "referans_drive_id": "1c1lstH03Kkf4pzvHVu5vavDJ_xDigxNQ",
     "referans_yolu": "ref_095.wav",
-    "islem": "Onaylı doğal Gemini Charon; tane tane belgesel diksiyonu + adaptif tempo tavanı + 3.3kHz netlik EQ",
+    "islem": "Onaylı doğal Gemini Charon; dengeli orta tempo (~0.94x / ~15.8 krk/sn aktif, ~13.1 krk/sn genel) + 3.3kHz netlik EQ",
     "fallback": false,
-    "hedef_aktif_krk_sn": 13.7,
-    "min_atempo": 0.88,
+    "hedef_aktif_krk_sn": 15.5,
+    "min_atempo": 0.93,
     "max_atempo": 0.96,
-    "tarz": "Sakin, tane tane ve çok net diksiyonlu bir erkek belgesel anlatıcısı gibi konuş. Asla hızlı okuma ve acele etme; her kelimeyi, ekleri ve sessiz harfleri eksiksiz, pürüzsüz ve anlaşılır telaffuz et. Virgüllerde kısa, cümle sonlarında doğal nefes payı bırak. Ağırbaşlı, sıcak ve anlaşılır bir tempoda anlat.",
+    "tarz": "Doğal, dengeli, akıcı ve çok net diksiyonlu bir erkek bilim anlatıcısı gibi konuş. Ne acele et ne de fazla ağırlaş; orta-canlı bir belgesel temposunda her kelimeyi, ekleri ve sessiz harfleri tane tane, pürüzsüz telaffuz et. Cümle aralarında doğal ve kıvamında yarım saniyelik nefes ver.",
     "tek_istek": true
   },
   "gorsel": {

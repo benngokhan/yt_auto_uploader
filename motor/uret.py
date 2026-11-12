@@ -683,12 +683,12 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     sahneler = sahne_plani_v2(a.konu, sahne_sayisi, ayar)
     anlatim = " ".join(str(x["ses"]).strip() for x in sahneler)
     print(f"Anlatım (ilk): {len(anlatim)} karakter / {len(sahneler)} cümle")
-    # Tane tane okuma ile 39-45 sn hedefi için CTA dahil ideal metin 415-485 karakterdir
-    if len(anlatim) < 405 and len(sahneler) >= 2:
+    # Dengeli orta tempo (~13.1 krk/sn genel akış) ile 39-44 sn video için ideal metin 480-545 karakterdir
+    if len(anlatim) < 485 and len(sahneler) >= 2:
         kapanis_cta = "Daha fazla Bilgi Dozu için takip et!"
         son_ham = str(sahneler[-1]["ses"]).replace(kapanis_cta, "").strip()
         sahneler[-1]["ses"] = son_ham
-        _anlatimi_uzat(a.konu, sahneler, hedef_toplam=405)
+        _anlatimi_uzat(a.konu, sahneler, hedef_toplam=475)
         son_yeni = str(sahneler[-1]["ses"]).rstrip()
         if son_yeni and son_yeni[-1] not in ".!?":
             son_yeni += "."
@@ -748,7 +748,7 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
                             for s in sahneler],
         "cover_lines": [sahneler[0]["baslik1"], sahneler[0]["baslik2"]],
         "music_theme": ayar.get("music_theme", "gunluk_bilim"),
-        "intro_lead": 1.45, "sentence_pause": 0.68, "outro_hold": 1.45,
+        "intro_lead": 1.45, "sentence_pause": 0.54, "outro_hold": 1.45,
         "note1": konu_kaynak,
         "note2": "Görseller bilimsel arşivden işlenmiştir.",
         "scenes": [f"s{i}.jpg" for i in range(1, len(sahneler) + 1)],
