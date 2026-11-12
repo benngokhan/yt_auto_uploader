@@ -184,7 +184,7 @@ def sinematik_isle(img: Image.Image) -> Image.Image:
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
 
     # Teal-amber: gölgeler soğuk (mavi-yeşil), ışıklar sıcak.
-    parlaklik = a.mean(axis=2, keepdims=True)
+    parlaklik = a.mean(axis=2)          # (h, w) — kanal boyutu OLMAMALI
     golge = np.clip(1.0 - parlaklik * 1.4, 0.0, 1.0)
     isik = np.clip(parlaklik * 1.4 - 0.35, 0.0, 1.0)
     r = r + 0.11 * isik - 0.04 * golge
