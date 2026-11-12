@@ -353,17 +353,19 @@ def _anlatimi_uzat(konu: str, sahneler: list, hedef_toplam: int = 620) -> int:
 # (resolve_scene_headlines) gelir: video_187..196 standardıyla aynı çıktı.
 PROMPT_V2 = (
     "Konu: {konu}\n\n"
-    "Bir YouTube Shorts için Türkçe seslendirme metni yaz. Kurallar:\n"
-    "- TAM {n} cümle yaz. Her cümle tek satır, sonda nokta/soru işareti olsun.\n"
-    "- Toplam 72-86 kelime, 38-45 saniye seslendirme.\n"
-    "- 1. cümle: KANCA. Merak uyandıran soru veya şaşırtıcı iddia.\n"
-    "- 2. cümle: PROBLEM/DURUM, tek cümle.\n"
-    "- 3-{son}: BİLİMSEL AÇIKLAMA. Her cümlede TEK ana bilgi ve mümkünse TEK somut sayı. "
-    "Uydurma sayı YASAK, sadece kaynaklı gerçek değer.\n"
-    "- Son cümle: net sonuç + izleyiciyi düşündüren kısa soru.\n"
+    "Bir YouTube Shorts için Türkçe bilimsel seslendirme metni ve 2 satırlık kapak başlığı yaz. Kurallar:\n"
+    "- TAM {n} cümle yaz. Her cümle tek satır, sonda nokta veya soru işareti olsun.\n"
+    "- Toplam 80-92 kelime (yaklaşık 540-630 karakter) olsun ki seslendirme 39-44 saniye sürsün.\n"
+    "- 1. cümle: KANCA. Merak uyandıran soru veya şaşırtıcı bilimsel gerçek.\n"
+    "- 2. cümle: PROBLEM/DURUM, yaygın yanılgıyı yıkan tek cümle.\n"
+    "- 3-{son}: BİLİMSEL AÇIKLAMA. Her cümlede TEK somut mekanizma ve mümkünse TEK gerçek bilimsel sayı "
+    "(uydurma sayı YASAK, yalnızca doğrulanmış gerçek değer).\n"
+    "- Son cümle: net özet sonuç + izleyiciyi hemen denemeye/düşünmeye çağıran kısa soru.\n"
     "- Selamlama, 'abone olun', 'takip et' YASAK (motor kendi ekler).\n"
     "- Kısaltma, parantez, üç nokta kullanma. Sesli okunduğunda doğal aksın.\n"
-    "Yalnız JSON döndür: {{\"cumleler\": [\"cümle 1\", \"cümle 2\", ...]}}"
+    "- 'kapak_baslik': TAM 2 elemanlı dizi; her satır TAM BÜYÜK HARF, 10-18 karakter arası, kelime ortasından KESİLMEZ "
+    "(ör. [\"PARMAK ŞIKLATINCA\", \"SES NEREDEN ÇIKAR?\"]).\n"
+    "Yalnız JSON döndür: {{\"kapak_baslik\": [\"SATIR 1\", \"SATIR 2\"], \"cumleler\": [\"cümle 1\", \"cümle 2\", ...]}}"
 )
 
 
@@ -503,6 +505,32 @@ def _llm_json(istem: str, ayar: dict, sistem: str | None = None) -> dict:
     return {}
 
 
+def _konu_iki_satir(konu: str, llm_kapak: list | None = None) -> tuple[str, str]:
+    """Konuyu kelime ortasından ASLA bölmeden <=20 karakterlik 2 vurucu satıra ayırır."""
+    if isinstance(llm_kapak, list) and len(llm_kapak) >= 2:
+        s1 = tr_upper(str(llm_kapak[0]).strip())
+        s2 = tr_upper(str(llm_kapak[1]).strip())
+        if 3 <= len(s1) <= 20 and 3 <= len(s2) <= 20:
+            return s1, s2
+    kelimeler = [tr_upper(k) for k in str(konu or "").split() if k.strip()]
+    satir1, satir2 = [], []
+    for k in kelimeler:
+        aday1 = " ".join(satir1 + [k])
+        if not satir2 and len(aday1) <= 19:
+            satir1.append(k)
+        else:
+            aday2 = " ".join(satir2 + [k])
+            if len(aday2) <= 19:
+                satir2.append(k)
+            else:
+                break
+    if not satir1 and kelimeler:
+        satir1 = [kelimeler[0][:19]]
+    if not satir2:
+        satir2 = [kelimeler[1][:19]] if len(kelimeler) > 1 else ["GERÇEĞİ"]
+    return " ".join(satir1), " ".join(satir2)
+
+
 def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
     """Şablon v2.2: LLM yalnız cümleleri yazar, sonuna Saf 3D Kapanış CTA cümlesi eklenir.
 
@@ -535,13 +563,16 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
         raise SystemExit(f"v2 sahne planı: LLM yeterli cümle vermedi ({len(cumleler)}); video üretilmedi.")
     cumleler = cumleler[:n]
 
-    cfg = {"title": [[tr_upper(konu[:20]), "g"], [tr_upper(konu[20:40])]]}
+    k_l1, k_l2 = _konu_iki_satir(konu, veri.get("kapak_baslik"))
+    cfg = {"title": [[k_l1, "g"], [k_l2]]}
     try:
         basliklar = _sp.resolve_scene_headlines(cfg, cumleler, len(cumleler))
     except Exception as h:
         print(f"Başlık çözümleyici uyarısı: {type(h).__name__}; yedek başlık kullanılıyor")
-        basliklar = [{"icon": "!", "line1": tr_upper(c.split()[0] if c.split() else ""), "line2": "BİLİM"}
-                     for c in cumleler]
+        basliklar = [{"icon": "!", "line1": k_l1, "line2": k_l2}] + [
+            {"icon": "!", "line1": tr_upper(c.split()[0] if c.split() else ""), "line2": "BİLİM"}
+            for c in cumleler[1:]
+        ]
 
     # Saf 3D Kapanış Ekranı (v2.2): başlıklar saf cümlelerden çözüldükten SONRA son sahneye sabit CTA eklenir;
     # "Daha fazla Bilgi Dozu..." başlar başlamaz ekran kararır ve tam "takip et!" dendiğinde fare tıklar.
@@ -552,7 +583,7 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
             son_c += "?"
         cumleler[-1] = f"{son_c} {kapanis_cta}"
 
-    print(f"Şablon v2.2 planı: {len(cumleler)} cümle (+ Saf 3D Kapanış CTA), başlıklar motor çözümleyicisinden")
+    print(f"Şablon v2.2 planı: {len(cumleler)} cümle (+ Saf 3D Kapanış CTA), kapak=[{k_l1} / {k_l2}]")
     return [{"ses": c,
              "baslik1": b.get("line1", ""),
              "baslik2": b.get("line2", ""),
@@ -572,11 +603,11 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[str],
     istem = (
         f"Konu: {konu}\n\n"
         f"Cümleler:\n{numarali}\n\n"
-        f"Yukarıdaki {n} Türkçe cümlenin her biri için Pixabay stok fotoğraf aramasında kesin sonuç verecek "
-        f"2-4 kelimelik SOMUT İNGİLİZCE nesne araması yaz.\n"
-        "Kurallar: Sadece fotoğraflanabilir somut nesne (ör. \"human hand fingers\", \"sound wave water\", "
-        "\"honeybee hive\", \"human brain scan\", \"night alarm clock\"). Soyut mecaz, sıfat, yazı/tabela YASAK.\n"
-        f"Yalnız JSON döndür: {{\"aramalar\": [\"arama 1\", ...], \"yedekler\": [\"ana nesne 1\", \"ana nesne 2\", \"ana nesne 3\"]}}. "
+        f"Yukarıdaki {n} Türkçe cümlenin her biri için Pixabay stok fotoğraf aramasında tam isabetli sonuç verecek "
+        f"2-3 kelimelik SOMUT İNGİLİZCE İSİM (NOUN) araması yaz.\n"
+        "Kurallar: Sıfat ve fiil ('fast moving', 'close up', 'snapping') KULLANMA; sadece doğrudan fotoğraflanan somut nesne "
+        "(ör. \"human hand\", \"palm fingers\", \"sound wave\", \"acoustic speaker\", \"ear anatomy\", \"honeybee hive\", \"brain scan\").\n"
+        f"Yalnız JSON döndür: {{\"aramalar\": [\"nesne 1\", ...], \"yedekler\": [\"ana nesne 1\", \"ana nesne 2\", \"ana nesne 3\"]}}. "
         f"\"aramalar\" dizisi TAM {n} elemanlı olacak."
     )
     veri = _llm_json(istem, ayar, _LLM_SISTEM)
@@ -634,7 +665,7 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         ayar,
     )
     parallelar = gorsel_uret.sahneler_icin_gorseller(
-        [{"gorsel": ar, "gorsel_anahtar": " ".join(ar.split()[:2]), "ses": s["ses"]}
+        [{"gorsel": ar, "gorsel_anahtar": ar, "ses": s["ses"]}
          for s, ar in zip(sahneler, aramalar)],
         gorsel_klasoru, yedek_sorgular=yedekler)
     if len(parallelar) < len(sahneler):
@@ -650,7 +681,7 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     (vdir / "script.txt").write_text(anlatim + "\n", encoding="utf-8")
 
     cfg = {
-        "title": [[tr_upper(a.konu[:20]), "g"], [tr_upper(a.konu[20:40])]],
+        "title": [[sahneler[0]["baslik1"], "g"], [sahneler[0]["baslik2"]]],
         "scene_headlines": [{"icon": s.get("ikon", "!"), "line1": s["baslik1"], "line2": s["baslik2"]}
                             for s in sahneler],
         "cover_lines": [sahneler[0]["baslik1"], sahneler[0]["baslik2"]],

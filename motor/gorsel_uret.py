@@ -155,9 +155,10 @@ _SUS_KELIMELER = {
 # fotoğraflarına otomatik "person/people/man/woman" etiketi eklediği için o kelimeler yalnızca
 # sorgu insan vücudu içermiyorsa yasaklanır.
 _YASAK_ETIKET_KESIN = {
-    "portrait", "model", "hanói", "hanoi", "vietnamese", "selfie", "smile",
-    "fashion", "makeup", "tea", "coffee", "drink", "cup", "wine", "beer",
+    "portrait", "model", "girl", "boy", "beauty", "glamour", "hanói", "hanoi", "vietnamese",
+    "selfie", "smile", "fashion", "makeup", "tea", "coffee", "drink", "cup", "wine", "beer",
     "food", "dish", "car", "motorcycle", "wedding", "couple", "bikini", "lingerie",
+    "cleaner", "vacuuming", "cleaning", "delivery", "cardboard", "trolley", "subway", "businessman",
 }
 _INSAN_ANATOMI = {
     "hand", "hands", "finger", "fingers", "thumb", "palm", "skin", "eye", "eyes",
