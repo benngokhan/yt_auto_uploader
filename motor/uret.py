@@ -243,47 +243,26 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
     raise SystemExit("Sahne planı üretilemedi: tüm LLM sağlayıcıları başarısız.")
 
 
-def _uzat(konu: str, istem: str, sahneler: list, mevcut_karakter: int) -> str:
-    """Anlatım 300 karakterin altındaysa LLM'e açıkça uzatma isteği gönderir.
-    Sadece ikinci bir tur; başarısız olursa çağıran karar verir."""
-    import urllib.request, urllib.error, json as _j
+def _tek_sahne_uzat(konu: str, ses_metni: str, hedef: int = 165) -> str:
+    """Tek bir sahne cümlesini hedef karakter sayısına genişletir.
+
+    Tüm anlatımı tek istekte uzatmak güvenilir değildi (LLM yine kısa yazıyordu).
+    Sahne sahne genişletmek hem kesin hem de sahne başına ~9-10 sn hedefini korur.
+    """
+    import urllib.request, json as _j
 
     _ua = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
            "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
-    mevcut = " ".join(str(x.get("ses", "")) for x in sahneler)
-    if not istem:
-        istem = (f"Konu: {konu}\nBilgi Dozu YouTube Shorts için sahne planı üret. "
-                 f"Video 4 sahne olacak, toplam anlatım 38-42 saniye. "
-                 f"Her sahne sesli okunacak doğal Türkçe cümle içersin.")
-    istek_metni = (
-        f"{istem}\n\nÖNEMLİ: Önceki deneme çok kısaydı ({mevcut_karakter} karakter ≈ "
-        f"{mevcut_karakter/15.8:.1f} saniye). Hedef 38-42 saniye, yani yaklaşık 620-680 KARAKTER.\n"
-        f"Aşağıdaki anlatımı 4 sahneye bölerek genişlet. Her sahne için daha fazla açıklama, "
-        f"somut sayı/örnek ve merak uyandıran detay ekle. Anlamı bozma, uydurma bilgi ekleme.\n\n"
-        f"Mevcut anlatım:\n{mevcut}")
+    istek = (f"Konu: {konu}\n"
+             f"Aşağıdaki Türkçe anlatım cümlesi çok kısa. Aynı bilgiyi koruyarak "
+             f"{hedef-8}-{hedef+10} karakterlik TEK bir doğal cümle yaz. "
+             f"Somut bir ayrıntı, sayı veya örnek ekle. Uydurma bilgi yok, selamlama yok. "
+             f"Yalnızca cümleyi döndür, tırnak/açıklama ekleme.\n\nCümle: {ses_metni}")
 
-    def _dene_groq():
-        k = os.getenv("GROQ_API_KEY", "").strip()
-        if not k:
-            raise RuntimeError("groq yok")
-        govde = {"model": groq_model(),
-                 "temperature": 0.8,
-                 "response_format": {"type": "json_object"},
-                 "messages": [{"role": "system", "content": SAHNE_SISTEM},
-                              {"role": "user", "content": istek_metni}]}
-        r = urllib.request.Request("https://api.groq.com/openai/v1/chat/completions",
-                                   data=_j.dumps(govde).encode(), method="POST",
-                                   headers={"Content-Type": "application/json",
-                                            "User-Agent": _ua, "Accept": "application/json",
-                                            "Authorization": f"Bearer {k}"})
-        with urllib.request.urlopen(r, timeout=120) as y:
-            return _j.loads(y.read().decode())["choices"][0]["message"]["content"]
-
-    def _dene_gemini():
+    def _gemini():
         k = os.getenv("GEMINI_API_KEY", "").strip()
         if not k:
             raise RuntimeError("gemini yok")
-        import re as _re
         with urllib.request.urlopen(
             "https://generativelanguage.googleapis.com/v1beta/models?key=" + k, timeout=60) as y:
             modeller = _j.load(y).get("models", [])
@@ -294,38 +273,60 @@ def _uzat(konu: str, istem: str, sahneler: list, mevcut_karakter: int) -> str:
         if not uygun:
             raise RuntimeError("gemini model yok")
         model = sorted(uygun, key=lambda x: (("preview" not in x), x), reverse=True)[0]
-        govde = {"systemInstruction": {"parts": [{"text": SAHNE_SISTEM}]},
-                 "contents": [{"role": "user", "parts": [{"text": istek_metni}]}],
-                 "generationConfig": {"responseMimeType": "application/json", "temperature": 0.8}}
+        govde = {"contents": [{"role": "user", "parts": [{"text": istek}]}],
+                 "generationConfig": {"temperature": 0.75, "maxOutputTokens": 2048}}
         r = urllib.request.Request(
             f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={k}",
             data=_j.dumps(govde).encode(), method="POST",
             headers={"Content-Type": "application/json", "User-Agent": _ua})
-        with urllib.request.urlopen(r, timeout=180) as y:
+        with urllib.request.urlopen(r, timeout=120) as y:
             ham = _j.loads(y.read().decode())
-        # Yanıt kesilirse (MAX_TOKENS) veya JSON yarım gelirse açık hata ver.
         aday = (ham.get("candidates") or [{}])[0]
-        parcalar = (aday.get("content") or {}).get("parts") or []
-        metin = "".join(p.get("text", "") for p in parcalar).strip()
-        if not metin:
-            raise RuntimeError(f"gemini boş yanıt ({aday.get('finishReason')})")
-        return metin
+        return "".join(p.get("text", "") for p in (aday.get("content") or {}).get("parts") or []).strip()
 
-    for dene in (_dene_gemini, _dene_groq):
+    def _groq():
+        k = os.getenv("GROQ_API_KEY", "").strip()
+        if not k:
+            raise RuntimeError("groq yok")
+        govde = {"model": groq_model(), "temperature": 0.75,
+                 "messages": [{"role": "user", "content": istek}]}
+        r = urllib.request.Request("https://api.groq.com/openai/v1/chat/completions",
+                                   data=_j.dumps(govde).encode(), method="POST",
+                                   headers={"Content-Type": "application/json", "User-Agent": _ua,
+                                            "Authorization": f"Bearer {k}"})
+        with urllib.request.urlopen(r, timeout=120) as y:
+            return _j.loads(y.read().decode())["choices"][0]["message"]["content"].strip()
+
+    for dene in (_gemini, _groq):
         try:
-            metin = dene()
-            import re as _re
-            m = _re.search(r"\{.*\}", metin, _re.S)
-            veri = _j.loads(m.group(0)) if m else {}
-            yeni_sahneler = veri.get("sahneler") or []
-            yeni = " ".join(str(x.get("ses", "")) for x in yeni_sahneler)
-            if len(yeni) >= 560:
-                sahneler.clear()
-                sahneler.extend(yeni_sahneler)
-                return yeni
+            metin = " ".join(dene().replace("\n", " ").split())
+            metin = metin.strip('"\' ')
+            if len(metin) >= 110:
+                return metin
         except Exception as h:
-            print(f"uzatma ({dene.__name__}): {type(h).__name__}")
-    raise RuntimeError("anlatım uzatılamadı")
+            print(f"  sahne uzatma ({dene.__name__}): {type(h).__name__}")
+    return ses_metni
+
+
+def _anlatimi_uzat(konu: str, sahneler: list, hedef_toplam: int = 620) -> int:
+    """Her sahneyi ayrı ayrı genişletir; toplam hedefe ulaşana kadar dener."""
+    import math
+    for tur in range(3):
+        toplam = len(" ".join(str(x.get("ses", "")) for x in sahneler))
+        if toplam >= hedef_toplam:
+            break
+        eksik = hedef_toplam - toplam
+        for s in sahneler:
+            mevcut = len(str(s.get("ses", "")))
+            pay = max(0, eksik // max(1, len(sahneler)))
+            hedef = min(190, max(140, mevcut + pay))
+            if mevcut < hedef - 5:
+                yeni = _tek_sahne_uzat(konu, str(s.get("ses", "")), hedef)
+                if len(yeni) > mevcut:
+                    s["ses"] = yeni
+        print(f"  uzatma turu {tur+1}: "
+              f"{len(' '.join(str(x.get('ses','')) for x in sahneler))} karakter")
+    return len(" ".join(str(x.get("ses", "")) for x in sahneler))
 
 
 def yayin_bilgisi_uret(konu: str, sahneler: list[dict]) -> dict:
@@ -420,15 +421,14 @@ def main() -> int:
     anlatim_karakter = len(" ".join(str(x.get("ses", "")).strip() for x in sahneler))
     print(f"Gerçek anlatım karakteri: {anlatim_karakter}")
     # Kalite kapısı: yalnız KISA anlatım video üretimini engeller.
-    # Uzun anlatım kısaltılmaz; sadece uyarı yazılır (650 karakter ≈ 42 sn, üstü kırpılmıyor).
+    # Az yazdıysa sahne sahne otomatik genişletilir (hedef 38-42 sn ≈ 620-700 karakter).
     if anlatim_karakter < 560:
-        # Otomatik kurtarma: LLM kısa yazdıysa 2. turda açıkça uzat iste.
         try:
-            anlatim = _uzat(a.konu, "", sahneler, anlatim_karakter)
-            anlatim_karakter = len(anlatim)
+            anlatim_karakter = _anlatimi_uzat(a.konu, sahneler, 620)
             print(f"Anlatım uzatıldı: {anlatim_karakter} karakter")
         except Exception as _ue:
             print(f"Uzatma denemesi başarısız: {type(_ue).__name__}")
+        if anlatim_karakter < 560:
             raise SystemExit(f"Anlatım kalite kapısı: {anlatim_karakter} karakter; en az 560 gerekli. Video oluşturulmadı.")
     if anlatim_karakter > 760:
         print(f"UYARI: anlatım uzun ({anlatim_karakter} karakter ≈ {anlatim_karakter/15.4:.0f} sn). Video yine üretilir.")
