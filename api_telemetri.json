@@ -1,12 +1,12 @@
 {
-  "zaman": "2026-11-12T14:43:22+00:00",
+  "zaman": "2026-11-12T18:59:06+00:00",
   "servisler": [
     {
       "ad": "Pexels",
       "durum": "ok",
-      "kalan": 24987,
+      "kalan": 24855,
       "limit": 25000,
-      "kullanilan": 13,
+      "kullanilan": 145,
       "birim": "istek/ay",
       "reset_iso": "2026-12-12T13:51:48+00:00",
       "yenilenme": "aylık kota · saatlik 200 istek penceresi",
@@ -16,8 +16,8 @@
       "ad": "Gemini · Charon",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1433,
-      "kullanilan": 67,
+      "kalan": 1442,
+      "kullanilan": 58,
       "birim": "istek/gün",
       "model_sayisi": 50,
       "yenilenme": "günlük · her gün TR 10:00 (00:00 Pasifik) sıfırlanır",
@@ -31,7 +31,7 @@
       "kullanilan": 1,
       "birim": "istek/gün",
       "yenilenme": "günlük kota · her gece 00:00 UTC sıfırlanır",
-      "not_": "Hızlı senaryo ve başlık motoru (Model: openai/gpt-oss-20b"
+      "not_": "Hızlı senaryo ve başlık motoru (Model: openai/gpt-oss-120b"
     },
     {
       "ad": "Pixabay (Yedek)",
@@ -46,9 +46,9 @@
     {
       "ad": "Google Drive",
       "durum": "ok",
-      "kalan": 3843064319,
+      "kalan": 3775388342,
       "limit": 16106127360,
-      "kullanilan": 12263063041,
+      "kullanilan": 12330739018,
       "birim": "bayt",
       "kirilim": [
         {
@@ -59,13 +59,13 @@
         },
         {
           "ad": "Ana Klasör & baslik.xlsx (Bilgi_Dozu_Yeni_Shorts)",
-          "boyut": 268082388,
+          "boyut": 262907456,
           "dosya": 56,
           "sahip": "active.sav81@gmail.com, galtundal81@gmail.com"
         },
         {
           "ad": "Onay Bekleyenler (Onay_Bekleyen)",
-          "boyut": 16779500,
+          "boyut": 11607920,
           "dosya": 3,
           "sahip": "galtundal81@gmail.com"
         }
@@ -77,29 +77,29 @@
     {
       "ad": "YouTube Data API",
       "durum": "ok",
-      "kalan": 10000,
+      "kalan": 8300,
       "limit": 10000,
-      "kullanilan": 0,
+      "kullanilan": 1700,
       "birim": "birim/gün",
-      "bugun_yukleme": 0,
+      "bugun_yukleme": 1,
       "yenilenme": "günlük · her gün TR 10:00 sıfırlanır",
       "not_": "Her Shorts yüklemesi ≈ 1700 birim (günde ~5 yükleme kapasitesi)"
     },
     {
       "ad": "GitHub Actions",
       "durum": "ok",
-      "kalan": 1614.1,
+      "kalan": 1561.6,
       "limit": 2000,
-      "kullanilan": 385.9,
+      "kullanilan": 438.4,
       "birim": "dk/ay",
-      "actions_dakika": 385.9,
+      "actions_dakika": 438.4,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1614.1,
-      "api_kalan": 4993,
+      "actions_kalan": 1561.6,
+      "api_kalan": 4998,
       "api_limit": 5000,
       "yenilenme": "aylık 2.000 dk ücretsiz · her ayın 1'inde sıfırlanır",
-      "not_": "Bu ay 500 iş akışı koştu · Saatlik API: 4993/5000"
+      "not_": "Bu ay 500 iş akışı koştu · Saatlik API: 4998/5000"
     },
     {
       "ad": "Telegram Bot",
