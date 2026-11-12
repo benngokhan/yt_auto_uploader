@@ -105,7 +105,7 @@ jobs:
         if: always()
         env:
           GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
-          ONAY_KLASOR: ${{ vars.MOTOR_ONAY_KLASOR || '1N6mMUu3rEvCIie4o4XUWegPzFngMgHHM' }}
+          ONAY_KLASOR: ${{ vars.MOTOR_ONAY_KLASOR || '1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR' }}
           RUN_NO: ${{ github.run_number }}
         run: |
           shopt -s globstar nullglob
@@ -142,10 +142,15 @@ jobs:
               else:
                   ad, mime = f"ONAY_{os.environ.get('RUN_NO','0')}_{Path(d).name}", "video/mp4"
               medya = MediaFileUpload(d, mimetype=mime, resumable=True)
-              sonuc = drive.files().create(
-                  body={"name": ad, "parents": [os.environ["ONAY_KLASOR"]]},
-                  media_body=medya, fields="id,name,webViewLink").execute()
-              print("DRIVE:", sonuc.get("webViewLink"))
+              try:
+                  sonuc = drive.files().create(
+                      body={"name": ad, "parents": [os.environ["ONAY_KLASOR"]]},
+                      media_body=medya, fields="id,name,webViewLink").execute()
+                  print("DRIVE:", sonuc.get("webViewLink"))
+              except Exception as ye:
+                  print(f"UYARI: {ad} Drive'a konamadi: {type(ye).__name__}: {str(ye)[:160]}")
+                  print("Klasor erisimi yok. GOOGLE_TOKEN_JSON hesabi bu klasoru goremiyor olabilir.")
+                  print(f"Klasor kimligi: {os.environ['ONAY_KLASOR']}")
           PY
 
       - name: Telegram'a onay kartını gönder
