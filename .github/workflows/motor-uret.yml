@@ -140,7 +140,7 @@ jobs:
           try:
               eski_q = (
                   f"'{os.environ['ONAY_KLASOR']}' in parents and trashed = false and "
-                  "(name contains '_55' or name contains '_57' or name contains '_58')"
+                  "(name contains '_55' or name contains '_57' or name contains '_58' or name contains '_59')"
               )
               for ef in drive.files().list(q=eski_q, fields="files(id,name)").execute().get("files", []):
                   try:

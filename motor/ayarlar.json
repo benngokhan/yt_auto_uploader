@@ -14,9 +14,9 @@
     "referans_yolu": "ref_095.wav",
     "islem": "Onaylı doğal Gemini Charon; tane tane belgesel diksiyonu + adaptif tempo tavanı + 3.3kHz netlik EQ",
     "fallback": false,
-    "hedef_aktif_krk_sn": 13.3,
+    "hedef_aktif_krk_sn": 13.7,
     "min_atempo": 0.88,
-    "max_atempo": 0.95,
+    "max_atempo": 0.96,
     "tarz": "Sakin, tane tane ve çok net diksiyonlu bir erkek belgesel anlatıcısı gibi konuş. Asla hızlı okuma ve acele etme; her kelimeyi, ekleri ve sessiz harfleri eksiksiz, pürüzsüz ve anlaşılır telaffuz et. Virgüllerde kısa, cümle sonlarında doğal nefes payı bırak. Ağırbaşlı, sıcak ve anlaşılır bir tempoda anlat.",
     "tek_istek": true
   },

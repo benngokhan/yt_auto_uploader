@@ -683,12 +683,12 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     sahneler = sahne_plani_v2(a.konu, sahne_sayisi, ayar)
     anlatim = " ".join(str(x["ses"]).strip() for x in sahneler)
     print(f"Anlatım (ilk): {len(anlatim)} karakter / {len(sahneler)} cümle")
-    # Tane tane okuma ile 38-44 sn hedefi için CTA dahil ideal metin 460-535 karakterdir (video_196: 485 krk)
-    if len(anlatim) < 455 and len(sahneler) >= 2:
+    # Tane tane okuma ile 39-45 sn hedefi için CTA dahil ideal metin 415-485 karakterdir
+    if len(anlatim) < 405 and len(sahneler) >= 2:
         kapanis_cta = "Daha fazla Bilgi Dozu için takip et!"
         son_ham = str(sahneler[-1]["ses"]).replace(kapanis_cta, "").strip()
         sahneler[-1]["ses"] = son_ham
-        _anlatimi_uzat(a.konu, sahneler, hedef_toplam=455)
+        _anlatimi_uzat(a.konu, sahneler, hedef_toplam=405)
         son_yeni = str(sahneler[-1]["ses"]).rstrip()
         if son_yeni and son_yeni[-1] not in ".!?":
             son_yeni += "."

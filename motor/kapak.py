@@ -94,7 +94,7 @@ def _temiz_kelimeler(metin: str) -> list[str]:
 def uc_satir_baslik(baslik_veya_satirlar: str | list[str]) -> list[str]:
     """Başlığı kelime bölmeden dengeli 3 büyük harf satırına ayırır (1-2 beyaz, 3 sarı)."""
     if isinstance(baslik_veya_satirlar, list):
-        ham = [re.sub(r"\s+", " ", tr_upper(x)).strip() for x in baslik_veya_satirlar if str(x or "").strip()]
+        ham = [" ".join(_temiz_kelimeler(x)) for x in baslik_veya_satirlar if " ".join(_temiz_kelimeler(x))]
         if 2 <= len(ham) <= 3 and all(len(s) <= 18 for s in ham):
             return ham
 

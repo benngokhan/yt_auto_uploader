@@ -116,7 +116,11 @@ def N_(s: str) -> str:
 
 
 def tr_upper(s: str) -> str:
-    return N_(s).replace("i", "İ").replace("ı", "I").upper()
+    temiz = "".join(
+        ch if (unicodedata.category(ch).startswith(("L", "N")) or ch in " .,!?:;'%+-/()•") else " "
+        for ch in N_(s)
+    )
+    return re.sub(r"\s+", " ", temiz).strip().replace("i", "İ").replace("ı", "I").upper()
 
 
 def tr_lower(s: str) -> str:

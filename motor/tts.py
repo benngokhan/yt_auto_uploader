@@ -284,14 +284,12 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
 
     temiz_metin = " ".join(metin.split())
     aktif_hiz = len(temiz_metin) / aktif_sn
-    hedef_hiz = float(ses.get("hedef_aktif_krk_sn", 13.3))
+    hedef_hiz = float(ses.get("hedef_aktif_krk_sn", 13.7))
     min_atempo = float(ses.get("min_atempo", 0.88))
-    max_atempo = float(ses.get("max_atempo", 0.95))
+    max_atempo = float(ses.get("max_atempo", 0.96))
 
     if aktif_hiz > hedef_hiz:
         atempo = max(min_atempo, min(max_atempo, round(hedef_hiz / aktif_hiz, 3)))
-    elif aktif_hiz > 11.8:
-        atempo = max_atempo
     else:
         atempo = 1.0
 
