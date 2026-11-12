@@ -293,6 +293,54 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
             "drive_cover_id": c_file["id"] if c_file else "",
         })
 
+    # ── Drive'da olup TABLODA OLMAYAN videolar da sayılır ─────────────────
+    # Tablo kayması (satır BEKLEMEDE kalmış / hiç eklenmemiş) stoğu 0
+    # gösteriyordu. Gerçek kaynak: Drive'daki dosya + uploaded.txt.
+    def _num(ad):
+        m = re.match(r"^(?:uzun_)?video_(\d+)\.mp4$", ad, re.IGNORECASE)
+        return int(m.group(1)) if m else None
+
+    _yayin_adlari = set()
+    try:
+        for _l in (BASE_DIR / "uploaded.txt").read_text(encoding="utf-8").splitlines():
+            for _p in _l.split("|"):
+                _p = _p.strip().lower()
+                if _p.endswith(".mp4"):
+                    _yayin_adlari.add(_p)
+    except Exception:
+        pass
+
+    _var = {x["file_name"].lower() for x in queue_items}
+    for _map, _uzun, _esik in ((shorts_video_map, False, MIN_SHORTS_NUMBER),
+                               (long_video_map, True, MIN_LONG_NUMBER)):
+        _covers = long_cover_map if _uzun else shorts_cover_map
+        for ad, vf in list(_map.items()):
+            if ad in _var or not ad.endswith(".mp4"):
+                continue
+            n = _num(ad)
+            if n is None or n < _esik:
+                continue
+            yayinda = (ad in done_ids or ad in _yayin_adlari
+                       or ad in {k.lower() for k in KNOWN_PUBLISHED_NAMES})
+            kapak, c_file = pick_cover(_covers, n, _uzun)
+            queue_items.append({
+                "row": None,
+                "file_name": ad,
+                "number": n,
+                "type": "long" if _uzun else "short",
+                "status": "YÜKLENDİ" if yayinda else "TABLO DIŞI",
+                "is_ready": (not yayinda) and (c_file is not None),
+                "is_published": yayinda,
+                "title": "", "description": "", "tags": [], "category_name": "",
+                "pinned_comment": "", "youtube_url": "",
+                "has_drive_video": True,
+                "drive_video_id": vf["id"],
+                "drive_video_size_mb": round(vf["size"] / (1024 * 1024), 2) if vf.get("size") else 0,
+                "expected_cover": kapak,
+                "has_drive_cover": c_file is not None,
+                "drive_cover_id": c_file["id"] if c_file else "",
+            })
+
     queue_items.sort(key=lambda x: (0 if x["type"] == "short" else 1, x["number"]))
 
     ready_shorts_queue = [x for x in queue_items if x["type"] == "short" and x["is_ready"] and x["has_drive_video"]]
