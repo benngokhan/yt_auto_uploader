@@ -104,9 +104,9 @@ DARK_TEXT = BTN_TXT
 PURE_WHITE = WHITE
 
 DEFAULT_INTRO_LEAD = 1.45
-DEFAULT_SENT_PAUSE = 0.62
+DEFAULT_SENT_PAUSE = 0.68
 DEFAULT_OUTRO_HOLD = endcard_v2.OUTRO_HOLD_SEC
-DUCK_FLOOR = 0.165
+DUCK_FLOOR = 0.135
 TARGET_LUFS = -14.2
 
 
@@ -972,8 +972,16 @@ def _try_whisper_words(spaced_wav: str, script_words: list[str]) -> list[dict] |
                         "-i", spaced_wav, "-ar", "16000", "-ac", "1", "-c:a", "pcm_s16le", tmp16], check=True)
         sig16, _ = read_wav_mono(tmp16)
         os.unlink(tmp16)
-        model_name = os.environ.get("MIRA_WHISPER_MODEL", "base")
-        model = WhisperModel(model_name, device="cpu", compute_type="int8", cpu_threads=2)
+        preferred = os.environ.get("MIRA_WHISPER_MODEL", "small")
+        model = None
+        for m_cand in dict.fromkeys([preferred, "base"]):
+            try:
+                model = WhisperModel(m_cand, device="cpu", compute_type="int8", cpu_threads=4)
+                break
+            except Exception:
+                continue
+        if model is None:
+            return None
         segs, _ = model.transcribe(sig16.astype(np.float32), language="tr", word_timestamps=True, vad_filter=False)
         asr_words = []
         for seg in segs:
@@ -1096,76 +1104,137 @@ def stage_timing(vdir_arg: str, explicit_cfg_path: str | None = None):
         x_raw, fr = read_wav_mono(vo_final)
 
     dur_raw = len(x_raw) / float(fr)
-    sils, _ = ff_silences(vo_final, noise_db=-35.0, min_dur=0.13)
-
-    spans, prev = [], 0.0
-    for s, e in sils:
-        if s - prev > 0.18:
-            spans.append((prev, s))
-        prev = e
-    if dur_raw - prev > 0.18:
-        spans.append((prev, dur_raw))
-    if not spans:
-        spans = [(0.0, dur_raw)]
-
     sents = [s.strip() for s in re.split(r"(?<=[.!?])\s+", script) if s.strip()]
     if not sents:
         sents = [script]
-    sent_raw_spans = _align_sentences_to_spans(sents, spans)
 
     intro_lead = float(cfg.get("intro_lead", DEFAULT_INTRO_LEAD))
     pause_target = float(cfg.get("sentence_pause", DEFAULT_SENT_PAUSE))
     outro_hold = float(cfg.get("outro_hold", DEFAULT_OUTRO_HOLD))
 
-    fade_n = int(0.012 * fr)
-    pieces = [np.zeros(int(round(intro_lead * fr)), dtype=np.float64)]
-    spaced_sent_spans = []
-    cursor_samples = len(pieces[0])
-
-    cut_points = [max(0, int(round((sent_raw_spans[0][0] - 0.03) * fr)))]
-    for idx in range(len(sent_raw_spans) - 1):
-        end_cur = sent_raw_spans[idx][1]
-        start_nxt = sent_raw_spans[idx + 1][0]
-        mid = 0.5 * (end_cur + start_nxt)
-        cut_points.append(min(len(x_raw), max(cut_points[-1], int(round(mid * fr)))))
-    cut_points.append(min(len(x_raw), int(round((sent_raw_spans[-1][1] + 0.05) * fr))))
-
-    for si in range(len(sents)):
-        s_smp, e_smp = cut_points[si], cut_points[si + 1]
-        seg = x_raw[s_smp:e_smp].copy()
-        if len(seg) > fade_n * 3:
-            seg[:fade_n] *= np.linspace(0.0, 1.0, fade_n)
-            seg[-fade_n:] *= np.linspace(1.0, 0.0, fade_n)
-        t_start = cursor_samples / float(fr)
-        pieces.append(seg)
-        cursor_samples += len(seg)
-        t_end = cursor_samples / float(fr)
-        spaced_sent_spans.append((t_start, t_end))
-
-        if si < len(sents) - 1:
-            natural_tail = max(0.0, (e_smp / float(fr)) - sent_raw_spans[si][1])
-            natural_head_next = max(0.0, sent_raw_spans[si + 1][0] - (e_smp / float(fr)))
-            extra_pause = max(0.18, pause_target - (natural_tail + natural_head_next))
-            p_smp = int(round(extra_pause * fr))
-            pieces.append(np.zeros(p_smp, dtype=np.float64))
-            cursor_samples += p_smp
-
-    pieces.append(np.zeros(int(round(outro_hold * fr)), dtype=np.float64))
-    vo_spaced = np.concatenate(pieces)
-    spaced_path = os.path.join(work_dir, "vo_spaced.wav")
-    write_wav_mono(spaced_path, vo_spaced, fr)
-    total_dur = round(len(vo_spaced) / float(fr), 2)
-
     all_script_words = [w for s in sents for w in s.split()]
-    whisper_mapped = _try_whisper_words(spaced_path, all_script_words)
+    raw_whisper = _try_whisper_words(vo_final, all_script_words)
 
     tokens_flat: list[dict] = []
-    if whisper_mapped and len(whisper_mapped) == len(all_script_words):
+    spaced_sent_spans: list[tuple[float, float]] = []
+
+    if raw_whisper and len(raw_whisper) == len(all_script_words):
+        # render_batch_187_196.py yöntemi: kelimeleri ASLA kesmeden yalnızca cümle sonu doğal sessizlik ortasına nefes ekle
+        sent_word_ranges: list[tuple[int, int]] = []
+        wc = 0
+        for s in sents:
+            k = len(s.split())
+            sent_word_ranges.append((wc, wc + k - 1))
+            wc += k
+
+        pauses: list[tuple[int, float]] = [(0, intro_lead)]
+        xf = int(0.006 * fr)
+        for si in range(len(sent_word_ranges) - 1):
+            _, w_end_idx = sent_word_ranges[si]
+            w_nxt_idx, _ = sent_word_ranges[si + 1]
+            t_e = float(raw_whisper[w_end_idx]["e"])
+            t_n = float(raw_whisper[w_nxt_idx]["s"])
+            if t_n > t_e + 0.03:
+                i_a = max(0, min(len(x_raw) - 1, int(round(t_e * fr))))
+                i_b = max(i_a + 1, min(len(x_raw), int(round(t_n * fr))))
+                # Sessizlik aralığındaki en düşük enerjili noktadan böl (sessiz harfleri asla kesmez)
+                win_q = max(64, int(0.012 * fr))
+                if i_b - i_a > win_q * 2:
+                    env_seg = np.convolve(np.abs(x_raw[i_a:i_b]), np.ones(win_q) / win_q, mode="valid")
+                    cut_smp = i_a + win_q // 2 + int(np.argmin(env_seg))
+                else:
+                    cut_smp = (i_a + i_b) // 2
+                gap = t_n - t_e
+                add_s = max(0.0, min(0.48, pause_target - gap))
+                if add_s >= 0.05:
+                    pauses.append((cut_smp, round(add_s, 3)))
+
+        pieces: list[np.ndarray] = []
+        prev_smp = 0
+        for cut_smp, add_s in pauses:
+            if cut_smp > prev_smp:
+                seg = x_raw[prev_smp:cut_smp].copy()
+                if len(seg) > 2 * xf and prev_smp > 0:
+                    seg[:xf] *= np.linspace(0.0, 1.0, xf)
+                if len(seg) > 2 * xf:
+                    seg[-xf:] *= np.linspace(1.0, 0.0, xf)
+                pieces.append(seg)
+                prev_smp = cut_smp
+            pieces.append(np.zeros(int(round(add_s * fr)), dtype=np.float64))
+
+        tail_seg = x_raw[prev_smp:].copy()
+        if len(tail_seg) > 2 * xf and prev_smp > 0:
+            tail_seg[:xf] *= np.linspace(0.0, 1.0, xf)
+        pieces.append(tail_seg)
+        pieces.append(np.zeros(int(round(outro_hold * fr)), dtype=np.float64))
+
+        vo_spaced = np.concatenate(pieces)
+        spaced_path = os.path.join(work_dir, "vo_spaced.wav")
+        write_wav_mono(spaced_path, vo_spaced, fr)
+        total_dur = round(len(vo_spaced) / float(fr), 2)
+
+        def _map_t(t_orig: float) -> float:
+            smp_orig = t_orig * fr
+            sh = 0.0
+            for c_smp, a_s in pauses:
+                if smp_orig >= c_smp:
+                    sh += a_s
+            return t_orig + sh
+
         tokens_flat = [
-            {"text": N_(x["w"]), "start": round(float(x["s"]), 3), "end": round(float(x["e"]), 3)}
-            for x in whisper_mapped
+            {"text": N_(x["w"]), "start": round(_map_t(float(x["s"])), 3), "end": round(_map_t(float(x["e"])), 3)}
+            for x in raw_whisper
         ]
+        for w_a, w_b in sent_word_ranges:
+            spaced_sent_spans.append((tokens_flat[w_a]["start"], tokens_flat[w_b]["end"]))
     else:
+        # Yedek yol (Whisper yoksa): -43 dB eşiğiyle sessiz harfleri koruyarak hizala
+        sils, _ = ff_silences(vo_final, noise_db=-43.0, min_dur=0.18)
+        spans, prev = [], 0.0
+        for s, e in sils:
+            if s - prev > 0.18:
+                spans.append((prev, s))
+            prev = e
+        if dur_raw - prev > 0.18:
+            spans.append((prev, dur_raw))
+        if not spans:
+            spans = [(0.0, dur_raw)]
+        sent_raw_spans = _align_sentences_to_spans(sents, spans)
+
+        fade_n = int(0.008 * fr)
+        pieces = [np.zeros(int(round(intro_lead * fr)), dtype=np.float64)]
+        cursor_samples = len(pieces[0])
+        cut_points = [max(0, int(round((sent_raw_spans[0][0] - 0.06) * fr)))]
+        for idx in range(len(sent_raw_spans) - 1):
+            mid = 0.5 * (sent_raw_spans[idx][1] + sent_raw_spans[idx + 1][0])
+            cut_points.append(min(len(x_raw), max(cut_points[-1], int(round(mid * fr)))))
+        cut_points.append(min(len(x_raw), int(round((sent_raw_spans[-1][1] + 0.08) * fr))))
+
+        for si in range(len(sents)):
+            s_smp, e_smp = cut_points[si], cut_points[si + 1]
+            seg = x_raw[s_smp:e_smp].copy()
+            if len(seg) > fade_n * 3:
+                seg[:fade_n] *= np.linspace(0.0, 1.0, fade_n)
+                seg[-fade_n:] *= np.linspace(1.0, 0.0, fade_n)
+            t_start = cursor_samples / float(fr)
+            pieces.append(seg)
+            cursor_samples += len(seg)
+            t_end = cursor_samples / float(fr)
+            spaced_sent_spans.append((t_start, t_end))
+            if si < len(sents) - 1:
+                natural_tail = max(0.0, (e_smp / float(fr)) - sent_raw_spans[si][1])
+                natural_head_next = max(0.0, sent_raw_spans[si + 1][0] - (e_smp / float(fr)))
+                extra_pause = max(0.18, pause_target - (natural_tail + natural_head_next))
+                p_smp = int(round(extra_pause * fr))
+                pieces.append(np.zeros(p_smp, dtype=np.float64))
+                cursor_samples += p_smp
+
+        pieces.append(np.zeros(int(round(outro_hold * fr)), dtype=np.float64))
+        vo_spaced = np.concatenate(pieces)
+        spaced_path = os.path.join(work_dir, "vo_spaced.wav")
+        write_wav_mono(spaced_path, vo_spaced, fr)
+        total_dur = round(len(vo_spaced) / float(fr), 2)
+
         for s, (st_s, en_s) in zip(sents, spaced_sent_spans):
             ws = s.split()
             weights = [_syllable_weight(w) for w in ws]
@@ -1464,14 +1533,19 @@ def build_mix(work_dir: str, tl: dict, cfg: dict | None = None) -> str:
 
     speech_only = np.zeros(target_n, dtype=np.float64)
     for tk in tokens:
-        a = max(0, int((float(tk["start"]) - 0.030) * SR))
-        b = min(target_n, int((float(tk["end"]) + 0.035) * SR))
+        a = max(0, int((float(tk["start"]) - 0.045) * SR))
+        b = min(target_n, int((float(tk["end"]) + 0.060) * SR))
         speech_only[a:b] = 1.0
 
-    k_gate = np.hanning(int(0.020 * SR) * 2 + 1)
-    k_gate /= np.sum(k_gate)
-    gate_env = np.convolve(speech_only, k_gate, mode="same") if np.any(speech_only) else np.ones(target_n, dtype=np.float64)
-    v_clean = vo_mono * gate_env
+    # Kelime sonu sessiz harflerini ASLA kırpma: yalnız ilk konuşma öncesi ve son konuşma sonrası dijital sıfırla
+    v_clean = vo_mono.copy()
+    if tokens:
+        head_zero = max(0, int((float(tokens[0]["start"]) - 0.14) * SR))
+        tail_zero = min(target_n, int((float(tokens[-1]["end"]) + 0.22) * SR))
+        if head_zero > 0:
+            v_clean[:head_zero] = 0.0
+        if tail_zero < target_n:
+            v_clean[tail_zero:] = 0.0
 
     active_samples = v_clean[np.abs(v_clean) > 0.012]
     sp_rms_val = float(np.sqrt(np.mean(active_samples ** 2)) + 1e-9) if len(active_samples) > 100 else 0.16
@@ -1514,8 +1588,8 @@ def build_mix(work_dir: str, tl: dict, cfg: dict | None = None) -> str:
     theme_key = str((cfg or {}).get("music_theme") or "gunluk_bilim")
     shift = THEME_ROOT_SHIFTS.get(theme_key, 0)
     mL_bright, mR_bright = synthesize_bilgidozu_jenerik(total_dur, sr=SR, semitone_shift=shift)
-    mL_warm = one_pole_lowpass(mL_bright, cutoff_hz=850.0, sr=SR) * 1.15
-    mR_warm = one_pole_lowpass(mR_bright, cutoff_hz=850.0, sr=SR) * 1.15
+    mL_warm = one_pole_lowpass(mL_bright, cutoff_hz=720.0, sr=SR) * 1.10
+    mR_warm = one_pole_lowpass(mR_bright, cutoff_hz=720.0, sr=SR) * 1.10
     mL_ducked = (mL_warm * (1.0 - bright_mix) + mL_bright * bright_mix) * duck_curve
     mR_ducked = (mR_warm * (1.0 - bright_mix) + mR_bright * bright_mix) * duck_curve
 

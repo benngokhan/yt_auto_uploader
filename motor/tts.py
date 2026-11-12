@@ -207,15 +207,25 @@ def _xtts(metin: str, cikti: Path, ayar: dict) -> None:
 
 
 def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
-    """Onaylı doğal Gemini erkek anlatıcı; pilotla aynı ham 24 kHz PCM çıkışı (429/5xx akıllı retry destekli)."""
-    import time, urllib.error, wave
+    """Onaylı doğal Gemini erkek anlatıcı (Charon); tane tane belgesel diksiyonu + adaptif hız tavanı + netlik EQ."""
+    import re, shutil, time, urllib.error, wave
+    import numpy as np
+
     anahtar = os.getenv("GEMINI_API_KEY", "").strip()
     if not anahtar:
         raise SesHatasi("GEMINI_API_KEY yok — doğal ses üretimi durduruldu.")
     ses = ayar.get("ses", {})
     model_adi = ses.get("model", "gemini-2.5-flash-preview-tts")
-    tarz = ses.get("tarz", "Sıcak, merak uyandıran ve doğal bir erkek bilim anlatıcısı gibi anlat. Kağıttan okur gibi monoton olma. Soruda hafifçe yüksel; şaşırtıcı bilgileri doğal biçimde vurgula. Enerjik ol ama bağırma. Cümle aralarını kısa ve akıcı tut.")
-    prompt = f"Türkçe konuş. {tarz} Metin: {metin}"
+    tarz = ses.get(
+        "tarz",
+        "Sakin, tane tane ve çok net diksiyonlu bir erkek belgesel anlatıcısı gibi konuş. "
+        "Asla hızlı okuma ve acele etme; her kelimeyi, ekleri ve sessiz harfleri eksiksiz, "
+        "pürüzsüz ve anlaşılır telaffuz et. Virgüllerde kısa, cümle sonlarında doğal nefes payı bırak.",
+    )
+    # Cümleleri ayrı paragraflara böl ki model tek nefeste hızlanmadan her cümlede doğal es versin
+    cumleler = [s.strip() for s in re.split(r"(?<=[.!?])\s+", metin.strip()) if s.strip()]
+    cumle_blok = "\n\n".join(cumleler) if cumleler else metin.strip()
+    prompt = f"Türkçe konuş. {tarz}\n\nMetin:\n{cumle_blok}"
     govde = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -226,6 +236,7 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
     veri_bytes = json.dumps(govde).encode()
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_adi}:generateContent?key={anahtar}"
     son_hata: Exception | None = None
+    raw: bytes | None = None
     for deneme, bekle in enumerate((0, 12, 25, 45), start=1):
         if bekle:
             print(f"  Gemini TTS geçici yoğunluk, {bekle} sn beklenip tekrar deneniyor ({deneme}/4)...")
@@ -235,12 +246,7 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
             with urllib.request.urlopen(istek, timeout=180) as y:
                 veri = json.loads(y.read().decode())
             raw = base64.b64decode(veri["candidates"][0]["content"]["parts"][0]["inlineData"]["data"])
-            with wave.open(str(cikti), "wb") as w:
-                w.setnchannels(1)
-                w.setsampwidth(2)
-                w.setframerate(24000)
-                w.writeframes(raw)
-            return
+            break
         except urllib.error.HTTPError as e:
             detay = ""
             try:
@@ -252,8 +258,81 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
                 break
         except Exception as e:
             son_hata = e
-    cikti.unlink(missing_ok=True)
-    raise SesHatasi(f"Gemini doğal ses üretimi başarısız: {str(son_hata)[:180]}") from son_hata
+
+    if not raw:
+        cikti.unlink(missing_ok=True)
+        raise SesHatasi(f"Gemini doğal ses üretimi başarısız: {str(son_hata)[:180]}") from son_hata
+
+    ham_yol = cikti.with_suffix(".ham24k.wav")
+    with wave.open(str(ham_yol), "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(24000)
+        w.writeframes(raw)
+
+    # Aktif konuşma hızını ölç (boşluklar hariç krk/sn) ve hızlıysa pürüzsüz atempo + 3.3 kHz diksiyon netlik EQ uygula
+    pcm = np.frombuffer(raw, dtype="<i2").astype(np.float32) / 32768.0
+    ham_sure = len(pcm) / 24000.0
+    pencere = 1200  # 50 ms @ 24 kHz
+    n_pen = len(pcm) // pencere
+    if n_pen > 4:
+        blok = pcm[: n_pen * pencere].reshape(n_pen, pencere)
+        rms = np.sqrt(np.mean(blok * blok, axis=1) + 1e-12)
+        aktif_sn = max(1.0, float(np.sum(rms > (10.0 ** (-41.0 / 20.0)))) * 0.050)
+    else:
+        aktif_sn = max(1.0, ham_sure)
+
+    temiz_metin = " ".join(metin.split())
+    aktif_hiz = len(temiz_metin) / aktif_sn
+    hedef_hiz = float(ses.get("hedef_aktif_krk_sn", 13.3))
+    min_atempo = float(ses.get("min_atempo", 0.88))
+    max_atempo = float(ses.get("max_atempo", 0.95))
+
+    if aktif_hiz > hedef_hiz:
+        atempo = max(min_atempo, min(max_atempo, round(hedef_hiz / aktif_hiz, 3)))
+    elif aktif_hiz > 11.8:
+        atempo = max_atempo
+    else:
+        atempo = 1.0
+
+    ffmpeg_bin = shutil.which("ffmpeg")
+    if not ffmpeg_bin:
+        try:
+            import imageio_ffmpeg
+            ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
+        except Exception:
+            ffmpeg_bin = None
+
+    if ffmpeg_bin:
+        zincir = [
+            "highpass=f=75",
+            "equalizer=f=280:t=q:width=1.2:g=-1.2",
+            "equalizer=f=3300:t=q:width=1.1:g=1.8",
+        ]
+        if atempo < 0.995:
+            zincir.append(f"atempo={atempo:.3f}")
+        try:
+            subprocess.run(
+                [
+                    ffmpeg_bin, "-y", "-hide_banner", "-loglevel", "error",
+                    "-i", str(ham_yol), "-af", ",".join(zincir),
+                    "-ar", "48000", "-ac", "1", "-c:a", "pcm_s16le", str(cikti),
+                ],
+                check=True,
+                timeout=120,
+            )
+            ham_yol.unlink(missing_ok=True)
+            yeni_x, yeni_sr = sf.read(str(cikti), dtype="float32")
+            yeni_sure = len(yeni_x) / float(yeni_sr)
+            print(
+                f"  [Diksiyon] ham={ham_sure:.2f}s (aktif {aktif_sn:.2f}s, {aktif_hiz:.1f} krk/sn) "
+                f"-> atempo={atempo:.3f}, yeni={yeni_sure:.2f}s"
+            )
+            return
+        except Exception as e:
+            print(f"  [Diksiyon] FFmpeg işleme atlandı ({e}); ham WAV korunuyor.")
+
+    ham_yol.replace(cikti)
 
 def _edge_tts(metin: str, cikti: Path, ayar: dict) -> None:
     """Ücretsiz Ahmet Neural; uzun nokta boşluklarını yaklaşık 0,40 sn ile sınırlar."""

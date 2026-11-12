@@ -361,16 +361,17 @@ def _anlatimi_uzat(konu: str, sahneler: list, hedef_toplam: int = 620) -> int:
 # ── ŞABLON v2.2 (sablon_v2 / video_196 Birebir Master Şablon) ───────────────
 PROMPT_V2 = (
     "Konu: {konu}\n\n"
-    "Bilgi Dozu YouTube Shorts için Türkçe bilimsel seslendirme metni, her sahnenin 2 satırlık vurucu üst başlığı ve gerçek bilimsel kaynağını yaz. Kurallar:\n"
-    "- TAM {n} cümle yaz. Her cümle 12-16 kelimeden oluşan (80-95 karakterlik), bilgi dolu tek bir cümle olsun; 5-7 kelimelik kısa cümleler YASAK!\n"
-    "- SÜRE KURALI (ÇOK KRİTİK): {n} cümlenin toplam uzunluğu KESİNLİKLE 560-650 karakter (85-98 kelime) olmalı ki seslendirme + kapanış 39-44 saniye sürsün.\n"
-    "- 1. cümle: KANCA (12-15 kelime). Merak uyandıran soru veya şaşırtıcı bilimsel gerçek.\n"
-    "- 2. cümle: PROBLEM/DURUM (12-16 kelime), yaygın yanılgıyı yıkan doyurucu tek cümle.\n"
-    "- 3-{son}: BİLİMSEL AÇIKLAMA (her biri 13-16 kelime). Her cümlede TEK somut mekanizma ve mümkünse TEK gerçek bilimsel sayı "
+    "Bilgi Dozu YouTube Shorts için TANE TANE, YAVAŞ VE ÇOK ANLAŞILIR okunacak Türkçe bilimsel seslendirme metni, her sahnenin 2 satırlık vurucu üst başlığı ve gerçek bilimsel kaynağını yaz. Kurallar:\n"
+    "- TAM {n} cümle yaz. Her cümle 8-12 kelimeden oluşan (58-74 karakterlik), sade ve duru tek bir cümle olsun!\n"
+    "- HIZ VE DİKSİYON KURALI (ÇOK KRİTİK): Anlatıcının acele etmeden, tane tane okuyabilmesi için {n} cümlenin toplam uzunluğu KESİNLİKLE 430-505 karakter (58-68 kelime) arasında olsun (530 karakteri ASLA geçme!).\n"
+    "- KELİME SEÇİMİ KURALI (ÇOK KRİTİK): Tekerleme gibi zor telaffuz edilen ağır akademik/yabancı kelimeler ('fotoreseptörlerdeki', 'rodopsinin', 'rejenerasyonu', 'biyolüminesans', 'nörotransmitterlerin', 'indirger') YASAK! Bunların yerine kulağın tek seferde şıp diye anlayacağı günlük, sade Türkçe karşılıklar kullan ('gözdeki ışık hücreleri', 'gece görüş boyası', 'yenilenmesi', 'sıfıra düşürür'). Kelimelere üst üste uzun ekler yığma; doğal nefes yerlerine virgül koy.\n"
+    "- 1. cümle: KANCA (8-11 kelime). Merak uyandıran net soru.\n"
+    "- 2. cümle: PROBLEM/DURUM (9-12 kelime), yaygın yanılgıyı yıkan sade cümle.\n"
+    "- 3-{son}: BİLİMSEL AÇIKLAMA (her biri 9-12 kelime). Her cümlede TEK somut mekanizma ve mümkünse TEK gerçek bilimsel sayı "
     "(uydurma sayı YASAK, yalnızca doğrulanmış gerçek değer).\n"
-    "- Son cümle (11-15 kelime): net bilimsel özet sonuç + izleyiciyi hemen denemeye/düşünmeye çağıran kısa soru.\n"
+    "- Son cümle (8-11 kelime): net özet sonuç + izleyiciyi düşünmeye çağıran kısa soru.\n"
     "- Selamlama, 'abone olun', 'takip et' YASAK (motor kendi ekler).\n"
-    "- Kısaltma, parantez, üç nokta kullanma. Sesli okunduğunda doğal aksın.\n"
+    "- Kısaltma, parantez, üç nokta kullanma. Sesli okunduğunda doğal ve rahat aksın.\n"
     "- 'sahne_basliklari': TAM {n} elemanlı dizi. Her cümle için dilbilgisi düzgün, vurucu 2 satır TAM BÜYÜK HARF başlık (her satır EN FAZLA 18 karakter, kelime ortasından bölünmez) ve anlamına uygun ikon ('?', '▼', '⚡', '▲', '!', '✔'). Örnek: "
     "{{\"ikon\":\"?\",\"satir1\":\"ATEŞİN VARKEN\",\"satir2\":\"NEDEN ÜŞÜRSÜN?\"}}, "
     "{{\"ikon\":\"⚡\",\"satir1\":\"BEYNİN TERMOSTAT\",\"satir2\":\"OYUNU OYNUYOR!\"}}.\n"
@@ -682,12 +683,12 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     sahneler = sahne_plani_v2(a.konu, sahne_sayisi, ayar)
     anlatim = " ".join(str(x["ses"]).strip() for x in sahneler)
     print(f"Anlatım (ilk): {len(anlatim)} karakter / {len(sahneler)} cümle")
-    # 38-44 sn video hedefi için CTA dahil toplam metin en az ~575 karakter olmalı
-    if len(anlatim) < 575 and len(sahneler) >= 2:
+    # Tane tane okuma ile 38-44 sn hedefi için CTA dahil ideal metin 460-535 karakterdir (video_196: 485 krk)
+    if len(anlatim) < 455 and len(sahneler) >= 2:
         kapanis_cta = "Daha fazla Bilgi Dozu için takip et!"
         son_ham = str(sahneler[-1]["ses"]).replace(kapanis_cta, "").strip()
         sahneler[-1]["ses"] = son_ham
-        _anlatimi_uzat(a.konu, sahneler, hedef_toplam=565)
+        _anlatimi_uzat(a.konu, sahneler, hedef_toplam=455)
         son_yeni = str(sahneler[-1]["ses"]).rstrip()
         if son_yeni and son_yeni[-1] not in ".!?":
             son_yeni += "."
@@ -747,7 +748,7 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
                             for s in sahneler],
         "cover_lines": [sahneler[0]["baslik1"], sahneler[0]["baslik2"]],
         "music_theme": ayar.get("music_theme", "gunluk_bilim"),
-        "intro_lead": 1.45, "sentence_pause": 0.62, "outro_hold": 1.45,
+        "intro_lead": 1.45, "sentence_pause": 0.68, "outro_hold": 1.45,
         "note1": konu_kaynak,
         "note2": "Görseller bilimsel arşivden işlenmiştir.",
         "scenes": [f"s{i}.jpg" for i in range(1, len(sahneler) + 1)],

@@ -12,9 +12,12 @@
     "dil": "tr",
     "referans_drive_id": "1c1lstH03Kkf4pzvHVu5vavDJ_xDigxNQ",
     "referans_yolu": "ref_095.wav",
-    "islem": "Onaylı doğal Gemini pilotu; ham 24kHz PCM; ek ton/hız filtresi yok",
+    "islem": "Onaylı doğal Gemini Charon; tane tane belgesel diksiyonu + adaptif tempo tavanı + 3.3kHz netlik EQ",
     "fallback": false,
-    "tarz": "Sıcak, merak uyandıran ve doğal bir erkek bilim anlatıcısı gibi anlat. Kağıttan okur gibi monoton olma. Soruda hafifçe yüksel; şaşırtıcı bilgileri doğal biçimde vurgula. Enerjik ol ama bağırma. Cümle aralarını kısa ve akıcı tut.",
+    "hedef_aktif_krk_sn": 13.3,
+    "min_atempo": 0.88,
+    "max_atempo": 0.95,
+    "tarz": "Sakin, tane tane ve çok net diksiyonlu bir erkek belgesel anlatıcısı gibi konuş. Asla hızlı okuma ve acele etme; her kelimeyi, ekleri ve sessiz harfleri eksiksiz, pürüzsüz ve anlaşılır telaffuz et. Virgüllerde kısa, cümle sonlarında doğal nefes payı bırak. Ağırbaşlı, sıcak ve anlaşılır bir tempoda anlat.",
     "tek_istek": true
   },
   "gorsel": {
