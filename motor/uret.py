@@ -128,9 +128,29 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
     # sağlayıcı zinciri: groq -> gemini -> openrouter (mpt_uret ile aynı mantık)
     denemeler = []
     if os.getenv("GROQ_API_KEY"):
+        # GROQ_LLM_MODEL yanlış/eski ise 404 geliyordu; canlı model listesinden doğrula.
+        _groq_model = os.getenv("GROQ_LLM_MODEL", "").strip()
+        if _groq_model:
+            try:
+                _gr = urllib.request.Request(
+                    "https://api.groq.com/openai/v1/models",
+                    headers={"Authorization": f"Bearer {os.environ['GROQ_API_KEY']}",
+                             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36"})
+                with urllib.request.urlopen(_gr, timeout=45) as _gy:
+                    _canli = [m["id"] for m in json.load(_gy).get("data", [])]
+                if _groq_model not in _canli:
+                    _tercih = [m for m in _canli if "llama-3.3-70b" in m] or \
+                              [m for m in _canli if "llama" in m and "guard" not in m] or _canli
+                    if _tercih:
+                        print(f"UYARI: GROQ_LLM_MODEL '{_groq_model}' geçersiz, '{_tercih[0]}' kullanılacak.")
+                        _groq_model = _tercih[0]
+            except Exception as _ge:
+                print(f"Groq model listesi alınamadı: {type(_ge).__name__}")
+        if not _groq_model:
+            _groq_model = "llama-3.3-70b-versatile"
         denemeler.append(lambda: _ayikla(_cagir(
             "https://api.groq.com/openai/v1/chat/completions",
-            {"model": os.getenv("GROQ_LLM_MODEL", "llama-3.3-70b-versatile"),
+            {"model": _groq_model,
              "temperature": 0.7,
              "messages": [{"role": "system", "content": SAHNE_SISTEM},
                           {"role": "user", "content": istem}]},
@@ -347,7 +367,9 @@ def main() -> int:
     sahneler = sahne_plani(a.konu, sahne_sayisi, ayar)
     anlatim_karakter = len(" ".join(str(x.get("ses", "")).strip() for x in sahneler))
     print(f"Gerçek anlatım karakteri: {anlatim_karakter}")
-    if anlatim_karakter < 300 or anlatim_karakter > 650:
+    # Kalite kapısı: yalnız KISA anlatım video üretimini engeller.
+    # Uzun anlatım kısaltılmaz; sadece uyarı yazılır (650 karakter ≈ 42 sn, üstü kırpılmıyor).
+    if anlatim_karakter < 300:
         # Otomatik kurtarma: LLM kısa yazdıysa 2. turda açıkça uzat iste.
         try:
             anlatim = _uzat(a.konu, "", sahneler, anlatim_karakter)
@@ -355,7 +377,9 @@ def main() -> int:
             print(f"Anlatım uzatıldı: {anlatim_karakter} karakter")
         except Exception as _ue:
             print(f"Uzatma denemesi başarısız: {type(_ue).__name__}")
-            raise SystemExit(f"Anlatım kalite kapısı: {anlatim_karakter} karakter; gerekli aralık 300-650. Video oluşturulmadı.")
+            raise SystemExit(f"Anlatım kalite kapısı: {anlatim_karakter} karakter; en az 300 gerekli. Video oluşturulmadı.")
+    if anlatim_karakter > 650:
+        print(f"UYARI: anlatım uzun ({anlatim_karakter} karakter ≈ {anlatim_karakter/15.4:.0f} sn). Video yine üretilir.")
     # XTTS'nin sert veya hatalı okuduğu kalıpları senaryo düzeyinde doğal Türkçeyle değiştir.
     # Böylece ses ile ekrandaki altyazı birebir aynı kalır.
     for s in sahneler:
