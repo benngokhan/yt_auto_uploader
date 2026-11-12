@@ -46,7 +46,12 @@ def _puanla(hit: dict, sorgu: str) -> float:
     puan += min(4.0, (hit.get("imageWidth", 0) * hit.get("imageHeight", 0)) / 6_000_000)
     puan += min(3.0, (hit.get("likes", 0) + hit.get("downloads", 0) / 50.0) / 100.0)
     if hit.get("imageHeight", 0) > hit.get("imageWidth", 0):
+        puan += 3.0
+    if (hit.get("imageWidth", 0) >= 1080 and hit.get("imageHeight", 0) >= 1440):
         puan += 2.0
+    # Fotoğraf türü şartlarını geçemeyen (illüstrasyon/vektör) sonuçları ele
+    if str(hit.get("type", "photo")) != "photo":
+        puan -= 20.0
     return puan
 
 
@@ -63,6 +68,7 @@ def pixabay_ara(sorgu: str, anahtar: str, adet: int = 60) -> list[dict]:
         "order": "popular",
         "per_page": str(min(adet, 200)),
         "lang": "en",
+        "order": "popular",
     }
     sonuclar: dict[int, dict] = {}
     for ek in ({"orientation": "vertical", "min_width": 1400, "min_height": 1400},
@@ -81,27 +87,70 @@ def pixabay_ara(sorgu: str, anahtar: str, adet: int = 60) -> list[dict]:
 
 
 def _sorgu_adaylari(sahne: dict, yedek: list[str], ana_konu: str) -> list[str]:
-    """Genel stok yerine ana konu + sahne ayrıntısını birlikte arar."""
-    detay = str(sahne.get("gorsel") or "").strip()
-    anchor = str(ana_konu or "").strip()
-    adaylar = []
-    if anchor and detay:
-        adaylar += [f"{anchor} {detay}", f"{anchor} macro {detay}",
-                    f"{anchor} close up {detay}", f"{anchor} nature documentary"]
-    if detay:
-        adaylar += [detay, f"{detay} macro photography", f"{detay} close up"]
-    adaylar += yedek
-    # "science laboratory" gibi konu dışı genel kaçış YOK.
-    return list(dict.fromkeys(" ".join(a.split()) for a in adaylar if a and a.strip()))
+    """Sahnenin somut nesnesini arayan, kelime tekrarı yapmayan sorgular.
+
+    Eski sürüm aynı kelimeleri iki kez ekliyordu ("person waking up before alarm
+    clock person waking up before alarm clock") ve Pixabay alakasız sonuç
+    döndürüyordu. Artık: kısa ve öz sorgu önce, süsleyici kelimeler sonra.
+    """
+    def _temiz(x: str) -> str:
+        return " ".join(str(x or "").replace(",", " ").split())
+
+    detay = _temiz(sahne.get("gorsel"))
+    anahtar = _temiz(sahne.get("gorsel_anahtar") or "")
+    anchor = _temiz(ana_konu)
+
+    # Sahnenin kendi ana nesnesi varsa onu kullan; yoksa ilk sahnenin nesnesi.
+    cekirdek = anahtar or detay
+    adaylar: list[str] = []
+    if cekirdek:
+        adaylar.append(cekirdek)                      # en yalın, en isabetli
+    if cekirdek and anchor and cekirdek.lower()[:20] not in anchor.lower():
+        adaylar.append(f"{cekirdek} {anchor}")
+    if detay and detay != cekirdek:
+        adaylar.append(detay)
+    adaylar += [_temiz(y) for y in yedek if _temiz(y)]
+
+    # Kelime tekrarını at, kısa sorguyu öne al.
+    gorulen: set[str] = set()
+    sonuc: list[str] = []
+    for a in adaylar:
+        anahtar_kelime = " ".join(sorted({k.lower() for k in a.split()}))
+        if not anahtar_kelime or anahtar_kelime in gorulen:
+            continue
+        gorulen.add(anahtar_kelime)
+        sonuc.append(a)
+    return sorted(sonuc, key=lambda x: len(x.split()))[:6]
+
+
+# Fotoğrafçılık/süsleme kelimeleri — alaka ölçümünde sayılmaz.
+_SUS_KELIMELER = {
+    "macro", "close", "closeup", "photography", "photo", "documentary",
+    "cinematic", "shot", "view", "style", "light", "lighting", "nature",
+    "background", "wallpaper", "beautiful", "abstract", "concept",
+}
+
+
+def _kelimeler(metin: str) -> set[str]:
+    import re
+    return {k for k in re.split(r"[^\wçğıöşü]+", str(metin or "").lower())
+            if len(k) >= 3 and k not in _SUS_KELIMELER}
 
 
 def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str) -> bool:
-    """Etiketler sorgunun ana nesnesini taşımıyorsa görseli reddet."""
-    tags = {t.strip().lower() for t in str(hit.get("tags", "")).split(",") if t.strip()}
-    tag_words = set(" ".join(tags).replace("-", " ").split())
-    q_words = {w.lower() for w in (ana_konu + " " + sorgu).replace("-", " ").split()
-               if len(w) >= 4 and w.lower() not in {"macro", "close", "photography", "documentary", "nature"}}
-    return bool(q_words & tag_words) and _puanla(hit, sorgu) >= 10.0
+    """Görselin etiketleri sahnenin ana nesnesini taşıyor mu?
+
+    Kural: sahne sorgusunun çekirdek kelimelerinden EN AZ BİRİ etiketlerde
+    geçmeli VE puan eşiği aşılmalı. Eski sürüm ana konu + sorgu kelimelerini
+    birleştirip çok katı davranıyordu; artık sahnenin kendi nesnesine bakıyor.
+    """
+    etiketler = _kelimeler(hit.get("tags", ""))
+    if not etiketler:
+        return False
+    sahne_kelime = _kelimeler(sorgu)
+    cekirdek = sorted(sahne_kelime)[:4] or sorted(_kelimeler(ana_konu))[:4]
+    ortak = len(set(cekirdek) & etiketler)
+    return ortak >= 1 and _puanla(hit, sorgu) >= 6.0
 
 
 def dikey_kirp(img: Image.Image) -> Image.Image:
@@ -117,6 +166,55 @@ def dikey_kirp(img: Image.Image) -> Image.Image:
         ust = (boy - yeni_boy) // 2
         img = img.crop((0, ust, en, ust + yeni_boy))
     return img.resize(HEDEF, Image.LANCZOS)
+
+
+def sinematik_isle(img: Image.Image) -> Image.Image:
+    """Ham stok fotoğrafı sinematik görünüme çevirir.
+
+    Yapılanlar: teal-amber renk düzenlemesi, kontrast, doygunluk, kenar
+    karartma (vignette), hafif film greni ve keskinleştirme. Render motoru
+    ayrıca kendi katmanını uyguluyor; buradaki işlem ham görselin "stok
+    fotoğraf" gibi düz görünmesini engeller.
+    """
+    from PIL import ImageEnhance, ImageFilter
+    import numpy as np
+
+    im = img.convert("RGB")
+    a = np.asarray(im).astype(np.float32) / 255.0
+    r, g, b = a[..., 0], a[..., 1], a[..., 2]
+
+    # Teal-amber: gölgeler soğuk (mavi-yeşil), ışıklar sıcak.
+    parlaklik = a.mean(axis=2, keepdims=True)
+    golge = np.clip(1.0 - parlaklik * 1.4, 0.0, 1.0)
+    isik = np.clip(parlaklik * 1.4 - 0.35, 0.0, 1.0)
+    r = r + 0.11 * isik - 0.04 * golge
+    g = g + 0.02 * isik + 0.01 * golge
+    b = b + 0.12 * golge - 0.05 * isik
+    a = np.stack([r, g, b], axis=2)
+
+    # Kontrast + filmik S eğrisi
+    a = np.clip((a - 0.5) * 1.16 + 0.5, 0.0, 1.0)
+    a = np.clip(a + 0.045 * np.sin((a - 0.5) * 3.1), 0.0, 1.0)
+
+    out = Image.fromarray((a * 255.0).astype(np.uint8))
+
+    # Doygunluk ve keskinlik
+    out = ImageEnhance.Color(out).enhance(1.14)
+    out = ImageEnhance.Contrast(out).enhance(1.06)
+    out = out.filter(ImageFilter.UnsharpMask(radius=2.0, percent=115, threshold=3))
+
+    # Kenar karartma (vignette)
+    w, h = out.size
+    yy, xx = np.mgrid[0:h, 0:w]
+    nx = (xx - w / 2) / (w / 2)
+    ny = (yy - h / 2) / (h / 2)
+    vig = np.clip(1.06 - 0.26 * (nx * nx + ny * ny), 0.72, 1.06)[..., None]
+    arr = np.clip(np.asarray(out).astype(np.float32) * vig, 0, 255)
+
+    # Hafif film greni
+    rng = np.random.default_rng(20261112)
+    arr = np.clip(arr + rng.normal(0.0, 3.4, arr.shape), 0, 255)
+    return Image.fromarray(arr.astype(np.uint8))
 
 
 def _indir(url: str, hedef: Path) -> None:
@@ -155,12 +253,12 @@ def sahneler_icin_gorseller(sahneler: list[dict], klasor: Path,
 
         sorgu, hit = secim
         ham = klasor / f"ham_{i:02d}.jpg"
-        _indir(hit["largeImageURL"], ham)
+        _indir(hit.get("fullHDURL") or hit["largeImageURL"], ham)
         kullanilan.add(hit["id"])
 
         png = klasor / f"sahne_{i:02d}.png"
         with Image.open(ham) as im:
-            dikey_kirp(im.convert("RGB")).save(png)
+            sinematik_isle(dikey_kirp(im.convert("RGB"))).save(png, quality=95)
         yollar.append(png)
         print(f"  görsel {i}: pixabay#{hit['id']} / sorgu={sorgu!r} / etiket={str(hit.get('tags'))[:60]}")
     return yollar
