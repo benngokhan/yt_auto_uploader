@@ -1,0 +1,94 @@
+{
+  "marka": "BİLGİ DOZU",
+  "sablon_surumu": "2.0 (Onaylı Master v2 — deneme8 / video_187..196 standardı)",
+  "format": {
+    "cozunurluk": "1080x1920",
+    "fps": 30,
+    "sure_hedef": "38-45 sn",
+    "sahne_sayisi": "6-7 sahne (eski 2 sahneli taslaklarla geriye uyumlu)"
+  },
+  "motorda_sabit": "Tüm koordinat, tipografi, 3D buton ve auto-ducking kuralları shorts_pipeline.py içine gömülüdür.",
+  "renkler": {
+    "ana_sari_vurgu": "#E3F424",
+    "ust_ilerleme_cubugu": "#D9F326",
+    "rozet_3d_alt_golge": "#9AA90D",
+    "beyaz": "#FFFFFF",
+    "rozet_ve_buton_metni": "#0F1215",
+    "kaynak_acik_gri": "#E8ECEF",
+    "not_ikincil_gri": "#A7B0B8",
+    "kapanis_alt_zemin": "#0A0C10"
+  },
+  "fontlar": {
+    "baslik_altyazi_rozet_buton_imza": "Poppins-Bold (fonts/poppins/Poppins-Bold.ttf)",
+    "kaynak_satiri": "Poppins-SemiBold 23px",
+    "uyari_satiri": "Poppins-Regular 20px",
+    "kapak_basligi": "Anton-Regular (fonts/poppins/Anton-Regular.ttf)",
+    "KRITIK": "layout_engine=ImageFont.Layout.BASIC ZORUNLU (Türkçe İ/ı/ş/ğ/ü/ö/ç glif koruması)"
+  },
+  "yerlesim_px_1080x1920": {
+    "ilerleme_cubugu": {
+      "x0": 79,
+      "x1": 1043,
+      "y0": 48,
+      "y1": 56,
+      "stil": "#D9F326 yumuşak glow dolgulu"
+    },
+    "etiket_3d_rozet": {
+      "metin": "BİLGİ DOZU",
+      "x": 77,
+      "y": 80,
+      "boyut": "214x59",
+      "stil": "3D kabartmalı #E3F424 kutu + #9AA90D alt gölge + üst parlama"
+    },
+    "dinamik_sahne_basligi": {
+      "ikon_merkez_x": 108,
+      "ikon_merkez_y": 356,
+      "metin_x": 162,
+      "y_araligi": "286..430",
+      "kurallar": [
+        "Her sahnede o anki cümleye göre değişir",
+        "TAM BÜYÜK HARF, en fazla 2 satır, satır başı <=20 karakter, kelime ortasından bölünmez",
+        "1. satır #FFFFFF beyaz, 2. satır #E3F424 sarı",
+        "Solunda anlam eşleşmeli sarı vektör ikon: ? (soru), ▼ (mit yıkımı), ⚡ (deney/hız/enerji), ▲ (artış/rekor), ! (vurucu gerçek), ✔ (çözüm/kanıt)"
+      ]
+    },
+    "karaoke_altyazi": {
+      "y_araligi": "1131..1270",
+      "font_boyutu": 52,
+      "max_genislik": 930,
+      "max_satir": 2,
+      "stil": "Ekrana girdiği anda TÜM kelimeler %100 net beyaz (#FFFFFF); SADECE o an okunan TEK kelime #E3F424 sarı (+2px mikro kalkış). Önceki kelimeler sarıda kalmaz, gelecek kelimeler grileşmez."
+    },
+    "kapanis_takip_et_butonu": {
+      "merkez_x": 540,
+      "merkez_y": 1350,
+      "boyut": "228x64",
+      "konum_kurali": "'takip et!' altyazısının hemen altında, hiçbir yazıyla çakışmaz",
+      "animasyon_ve_ses": "Yaylı pop-in + 0.34sn'de fiziksel 3D basılma + genişleyen sarı halka dalgası + diyagonal parlama + senkron pop/click SFX + ~1.45sn kapanış tutuşu"
+    },
+    "alt_bilgi_ve_imza": {
+      "kaynak_y": 1751,
+      "temsili_not_y": 1784,
+      "imza_y": 1828,
+      "imza_bicimi": "BİLGİ (#FFFFFF) + DOZU (#E3F424)"
+    }
+  },
+  "ses_mimarisi_v2": {
+    "tts": "voice-02 — kilitli tok erkek anlatıcı sesi (F0 ~101.3 Hz, narration)",
+    "acilis_jenerik_intro": "0.00 - 1.45 sn tam ses Bilgi Dozu jenerik müziği (~ -15 dBFS, konuşmasız)",
+    "cumle_arasi_nefes": "Her cümle arasında ~0.62 sn doğal es (müzik hafifçe nefes alır, kelimeler asla hızlandırılmaz/kesilmez)",
+    "auto_ducking": "Konuşma başlamadan 50ms önce devreye girer (70ms attack / 140ms release), müziği -15.6 dB (0.165x) kısar ve 850 Hz LPF uygular",
+    "kapanis_outro": "Son kelimeden sonra +1.45 sn müzik tekrar yükselir ve son 0.45 sn'de temizce sönümlenir",
+    "mastering": "Sabit lineer -14.2 LUFS kalibrasyon + -1.0 dBTP tavan (tek geçişli loudnorm AGC kullanılmaz)"
+  },
+  "qc_esigi": {
+    "sure": [30, 60],
+    "hedef_sure": [38, 45],
+    "LUFS_hedef": -14.2,
+    "LUFS_min": -25,
+    "LRA_min": 2,
+    "ducking_min_db": 10.0,
+    "stream": ["Audio", "Video"],
+    "yonelim": "dikey (1080x1920)"
+  }
+}
