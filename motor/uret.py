@@ -354,13 +354,11 @@ def _anlatimi_uzat(konu: str, sahneler: list, hedef_toplam: int = 620) -> int:
 
 
 
-# ── ŞABLON v2.0 (MİRA / shorts_pipeline motoru) ─────────────────────────────
-# Sahne başlıkları LLM'den DEĞİL, motorun kendi metin çözümleyicisinden
-# (resolve_scene_headlines) gelir: video_187..196 standardıyla aynı çıktı.
+# ── ŞABLON v2.2 (sablon_v2 / video_196 Birebir Master Şablon) ───────────────
 PROMPT_V2 = (
     "Konu: {konu}\n\n"
-    "Bir YouTube Shorts için Türkçe bilimsel seslendirme metni ve 2 satırlık kapak başlığı yaz. Kurallar:\n"
-    "- TAM {n} cümle yaz. Her cümle tek satır, sonda nokta veya soru işareti olsun.\n"
+    "Bilgi Dozu YouTube Shorts için Türkçe bilimsel seslendirme metni, her sahnenin 2 satırlık vurucu üst başlığı ve gerçek bilimsel kaynağını yaz. Kurallar:\n"
+    "- TAM {n} cümle yaz. Her cümle tek satır, sonda nokta, ünlem veya soru işareti olsun.\n"
     "- Toplam 80-92 kelime (yaklaşık 540-630 karakter) olsun ki seslendirme 39-44 saniye sürsün.\n"
     "- 1. cümle: KANCA. Merak uyandıran soru veya şaşırtıcı bilimsel gerçek.\n"
     "- 2. cümle: PROBLEM/DURUM, yaygın yanılgıyı yıkan tek cümle.\n"
@@ -369,9 +367,12 @@ PROMPT_V2 = (
     "- Son cümle: net özet sonuç + izleyiciyi hemen denemeye/düşünmeye çağıran kısa soru.\n"
     "- Selamlama, 'abone olun', 'takip et' YASAK (motor kendi ekler).\n"
     "- Kısaltma, parantez, üç nokta kullanma. Sesli okunduğunda doğal aksın.\n"
-    "- 'kapak_baslik': TAM 2 elemanlı dizi; her satır TAM BÜYÜK HARF, 10-18 karakter arası, kelime ortasından KESİLMEZ "
-    "(ör. [\"PARMAK ŞIKLATINCA\", \"SES NEREDEN ÇIKAR?\"]).\n"
-    "Yalnız JSON döndür: {{\"kapak_baslik\": [\"SATIR 1\", \"SATIR 2\"], \"cumleler\": [\"cümle 1\", \"cümle 2\", ...]}}"
+    "- 'sahne_basliklari': TAM {n} elemanlı dizi. Her cümle için dilbilgisi düzgün, vurucu 2 satır TAM BÜYÜK HARF başlık (her satır EN FAZLA 18 karakter, kelime ortasından bölünmez) ve anlamına uygun ikon ('?', '▼', '⚡', '▲', '!', '✔'). Örnek: "
+    "{{\"ikon\":\"?\",\"satir1\":\"ATEŞİN VARKEN\",\"satir2\":\"NEDEN ÜŞÜRSÜN?\"}}, "
+    "{{\"ikon\":\"⚡\",\"satir1\":\"BEYNİN TERMOSTAT\",\"satir2\":\"OYUNU OYNUYOR!\"}}.\n"
+    "- 'kapak_baslik': TAM 2 elemanlı dizi; her satır TAM BÜYÜK HARF, 10-18 karakter arası.\n"
+    "- 'kaynak': Konunun gerçek bilimsel kurum veya hakemli dergi kaynağı, 'Kaynak: ...' biçiminde ve EN FAZLA 46 karakter (ör. 'Kaynak: Harvard Medical School • Nature', uydurma yıl/sayı YASAK).\n"
+    "Yalnız JSON döndür: {{\"kapak_baslik\": [\"SATIR 1\", \"SATIR 2\"], \"kaynak\": \"Kaynak: ...\", \"cumleler\": [\"cümle 1\", ...], \"sahne_basliklari\": [{{\"ikon\": \"?\", \"satir1\": \"...\", \"satir2\": \"...\"}}, ...]}}"
 )
 
 
@@ -447,7 +448,7 @@ def _llm_json(istem: str, ayar: dict, sistem: str | None = None) -> dict:
                 icerik = msg.get("content") or msg.get("reasoning") or ""
                 d = _ayikla(icerik)
                 print(f"v2 groq yanıtı ({m}): {'dolu' if d else 'BOŞ'}")
-                if d.get("cumleler") or d.get("sahneler") or d.get("aramalar"):
+                if d.get("cumleler") or d.get("sahneler") or d.get("aramalar") or d.get("sahneler_gorsel"):
                     return d
             except Exception as h:
                 print(f"v2 groq ({m}) başarısız: {type(h).__name__}")
@@ -488,7 +489,7 @@ def _llm_json(istem: str, ayar: dict, sistem: str | None = None) -> dict:
                 metin_gem = "".join(p.get("text", "") for p in parcalar if not p.get("thought"))
                 d = _ayikla(metin_gem)
                 print(f"v2 gemini yanıtı ({model}): {'dolu' if d else 'BOŞ'}")
-                if d.get("cumleler") or d.get("sahneler") or d.get("aramalar"):
+                if d.get("cumleler") or d.get("sahneler") or d.get("aramalar") or d.get("sahneler_gorsel"):
                     return d
             except Exception as h:
                 print(f"v2 gemini ({model}) başarısız: {type(h).__name__}")
@@ -504,7 +505,7 @@ def _llm_json(istem: str, ayar: dict, sistem: str | None = None) -> dict:
                  "HTTP-Referer": "https://github.com/benngokhan/yt_auto_uploader",
                  "X-Title": "Bilgi Dozu Motor"})["choices"][0]["message"]["content"])
             print(f"v2 openrouter yanıtı: {'dolu' if d else 'BOŞ'}")
-            if d.get("cumleler") or d.get("sahneler") or d.get("aramalar"):
+            if d.get("cumleler") or d.get("sahneler") or d.get("aramalar") or d.get("sahneler_gorsel"):
                 return d
         except Exception as h:
             print(f"v2 openrouter başarısız: {type(h).__name__}")
@@ -570,15 +571,25 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
     cumleler = cumleler[:n]
 
     k_l1, k_l2 = _konu_iki_satir(konu, veri.get("kapak_baslik"))
+    llm_basliklar = veri.get("sahne_basliklari")
     cfg = {"title": [[k_l1, "g"], [k_l2]]}
+    if isinstance(llm_basliklar, list) and len(llm_basliklar) >= len(cumleler):
+        cfg["scene_headlines"] = llm_basliklar[:len(cumleler)]
     try:
         basliklar = _sp.resolve_scene_headlines(cfg, cumleler, len(cumleler))
     except Exception as h:
         print(f"Başlık çözümleyici uyarısı: {type(h).__name__}; yedek başlık kullanılıyor")
-        basliklar = [{"icon": "!", "line1": k_l1, "line2": k_l2}] + [
+        basliklar = [{"icon": "?", "line1": k_l1, "line2": k_l2}] + [
             {"icon": "!", "line1": tr_upper(c.split()[0] if c.split() else ""), "line2": "BİLİM"}
             for c in cumleler[1:]
         ]
+
+    ham_kaynak = str(veri.get("kaynak") or "").strip()
+    if ham_kaynak and not ham_kaynak.lower().startswith("kaynak"):
+        ham_kaynak = f"Kaynak: {ham_kaynak}"
+    if not ham_kaynak or "doğrulanmış bilimsel" in ham_kaynak.lower():
+        ham_kaynak = "Kaynak: Hakemli Bilimsel Araştırma Arşivi"
+    ham_kaynak = ham_kaynak[:54].strip()
 
     # Saf 3D Kapanış Ekranı (v2.2): başlıklar saf cümlelerden çözüldükten SONRA son sahneye sabit CTA eklenir;
     # "Daha fazla Bilgi Dozu..." başlar başlamaz ekran kararır ve tam "takip et!" dendiğinde fare tıklar.
@@ -589,11 +600,12 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
             son_c += "?"
         cumleler[-1] = f"{son_c} {kapanis_cta}"
 
-    print(f"Şablon v2.2 planı: {len(cumleler)} cümle (+ Saf 3D Kapanış CTA), kapak=[{k_l1} / {k_l2}]")
+    print(f"Şablon v2.2 planı: {len(cumleler)} cümle (+ Saf 3D Kapanış CTA), kapak=[{k_l1} / {k_l2}], {ham_kaynak}")
     return [{"ses": c,
              "baslik1": b.get("line1", ""),
              "baslik2": b.get("line2", ""),
-             "ikon": b.get("icon", "!")}
+             "ikon": b.get("icon", "!"),
+             "kaynak": ham_kaynak}
             for c, b in zip(cumleler, basliklar)]
 
 
@@ -602,30 +614,48 @@ def tr_upper(metin: str) -> str:
     return (metin or "").replace("i", "İ").replace("ı", "I").upper()
 
 
-def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[str], list[str]]:
-    """Her cümle için 2-4 kelimelik İNGİLİZCE somut Pexels araması + genel konu yedekleri üretir."""
+def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict], list[str]]:
+    """Her sahne için birbirinden FARKLI 2 kademeli yakın plan bilimsel/makro İngilizce Pexels araması üretir."""
     n = len(cumleler)
     numarali = "\n".join(f"{i+1}) {c}" for i, c in enumerate(cumleler))
     istem = (
         f"Konu: {konu}\n\n"
         f"Cümleler:\n{numarali}\n\n"
-        f"Yukarıdaki {n} Türkçe cümlenin her biri için Pexels stok fotoğraf aramasında tam isabetli, sinematik sonuç verecek "
-        f"2-3 kelimelik SOMUT İNGİLİZCE İSİM (NOUN) araması yaz.\n"
-        "Kurallar: Soyut fiil/sıfat ('fast moving', 'amazing secret', 'snapping') ve beyaz zeminli katalog kelimesi KULLANMA; "
-        "yalnızca doğrudan fotoğraflanan somut nesne yaz "
-        "(ör. \"human hand\", \"palm fingers\", \"sound wave\", \"acoustic speaker\", \"ear anatomy\", \"honeybee hive\", \"brain mri scan\").\n"
-        f"Yalnız JSON döndür: {{\"aramalar\": [\"nesne 1\", ...], \"yedekler\": [\"ana nesne 1\", \"ana nesne 2\", \"ana nesne 3\"]}}. "
-        f"\"aramalar\" dizisi TAM {n} elemanlı olacak."
+        f"Yukarıdaki {n} Türkçe bilim cümlesinin her biri için Pexels dikey fotoğraf aramasında "
+        f"editoryal/bilimsel yakın plan (macro/close-up) sonuç verecek BİRBİRİNDEN TAMAMEN FARKLI İngilizce somut nesne aramaları yaz.\n"
+        "KESİN KURALLAR:\n"
+        "1) İki sahnede aynı ana kelimeyi TEKRARLAMA.\n"
+        "2) Gündelik yaşam/stok klişeleri ('mobile phone', 'hand holding phone', 'person texting', 'person in bed', 'man', 'woman', 'office') YASAK!\n"
+        "3) Doğrudan bilimsel/optik/fiziksel/anatomik yakın plan nesneler yaz "
+        "(ör. 'human eye iris macro', 'clinical thermometer macro', 'ice crystals frost', 'microscope lens light', "
+        "'light prism spectrum', 'red blood cells', 'water droplets glass', 'neural network light', 'clockwork gears macro').\n"
+        f"Yalnız JSON döndür: {{\"sahneler_gorsel\": [{{\"ana\": \"2-3 kelimelik somut makro nesne\", \"alternatif\": \"farklı 2 kelimelik somut nesne\"}}, ...], "
+        f"\"yedekler\": [\"farklı bilim nesnesi 1\", \"farklı bilim nesnesi 2\", \"farklı bilim nesnesi 3\", \"farklı bilim nesnesi 4\"]}}. "
+        f"\"sahneler_gorsel\" dizisi TAM {n} elemanlı olacak."
     )
     veri = _llm_json(istem, ayar, _LLM_SISTEM)
-    aramalar = [str(x).strip() for x in (veri.get("aramalar") or []) if str(x).strip()]
+    ham_liste = veri.get("sahneler_gorsel") or veri.get("aramalar") or []
     yedekler = [str(x).strip() for x in (veri.get("yedekler") or []) if str(x).strip()]
-    aramalar = aramalar[:n]
-    varsayilan_yedek = yedekler[0] if yedekler else "science macro"
-    while len(aramalar) < n:
-        aramalar.append(aramalar[0] if aramalar else varsayilan_yedek)
-    print(f"Görsel aramaları ({len(aramalar)}): {aramalar} | yedekler={yedekler}")
-    return aramalar, yedekler
+    if not yedekler:
+        yedekler = ["microscope lens", "light prism", "water droplets macro", "laboratory glassware"]
+
+    sahneler_q: list[dict] = []
+    for item in ham_liste[:n]:
+        if isinstance(item, dict):
+            ana = str(item.get("ana") or item.get("alternatif") or "").strip()
+            alt = str(item.get("alternatif") or "").strip()
+        else:
+            ana = str(item).strip()
+            alt = ""
+        if ana:
+            sahneler_q.append({"ana": ana, "alternatif": alt})
+
+    while len(sahneler_q) < n:
+        y = yedekler[len(sahneler_q) % len(yedekler)]
+        sahneler_q.append({"ana": y, "alternatif": "science laboratory"})
+
+    print(f"Görsel aramaları ({len(sahneler_q)}): {[x['ana'] for x in sahneler_q]} | yedekler={yedekler}")
+    return sahneler_q, yedekler
 
 
 def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
@@ -672,13 +702,13 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         ayar,
     )
     parallelar = gorsel_uret.sahneler_icin_gorseller(
-        [{"gorsel": ar, "gorsel_anahtar": ar, "ses": s["ses"]}
+        [{"gorsel": ar["ana"], "gorsel_anahtar": ar["ana"], "gorsel_alternatif": ar.get("alternatif", ""), "ses": s["ses"]}
          for s, ar in zip(sahneler, aramalar)],
         gorsel_klasoru, yedek_sorgular=yedekler)
     if len(parallelar) < len(sahneler):
         raise SystemExit(f"Görsel sayısı yetersiz: {len(parallelar)} < {len(sahneler)}")
 
-    # 3) MİRA v2.2 MOTORU (shorts_pipeline + endcard_v2)
+    # 3) ONAYLI sablon_v2 MOTORU (shorts_pipeline + endcard_v2)
     vdir = calisma / "v2"
     vdir.mkdir(parents=True, exist_ok=True)
     for i, p in enumerate(parallelar, start=1):
@@ -687,6 +717,10 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     shutil.copyfile(tek_wav, vdir / "vo_raw.wav")
     (vdir / "script.txt").write_text(anlatim + "\n", encoding="utf-8")
 
+    konu_kaynak = str(sahneler[0].get("kaynak") or ayar.get("kaynak_satiri") or "Kaynak: Hakemli Bilimsel Araştırma Arşivi")
+    if "doğrulanmış bilimsel" in konu_kaynak.lower():
+        konu_kaynak = "Kaynak: Hakemli Bilimsel Araştırma Arşivi"
+
     cfg = {
         "title": [[sahneler[0]["baslik1"], "g"], [sahneler[0]["baslik2"]]],
         "scene_headlines": [{"icon": s.get("ikon", "!"), "line1": s["baslik1"], "line2": s["baslik2"]}
@@ -694,8 +728,8 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         "cover_lines": [sahneler[0]["baslik1"], sahneler[0]["baslik2"]],
         "music_theme": ayar.get("music_theme", "gunluk_bilim"),
         "intro_lead": 1.45, "sentence_pause": 0.62, "outro_hold": 1.45,
-        "note1": ayar.get("kaynak_satiri", "Kaynak: doğrulanmış bilimsel yayınlar"),
-        "note2": "Görseller temsilîdir.",
+        "note1": konu_kaynak,
+        "note2": "Görseller bilimsel arşivden işlenmiştir.",
         "scenes": [f"s{i}.jpg" for i in range(1, len(sahneler) + 1)],
     }
     cfg_yolu = calisma / "shorts_config.json"

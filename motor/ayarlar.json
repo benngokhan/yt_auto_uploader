@@ -36,11 +36,11 @@
   "kararlar": {
     "sure": "38-42 sn (kullanıcı: 3 Kasım 2026)",
     "ses": "Onaylı Gemini Charon doğal erkek anlatıcı; Ahmet Neural yedekte korunur; otomatik fallback yok",
-    "gorsel": "Pexels dikey (portrait) küratörlü fotoğraf (birincil) + Pixabay yedek + anti-ham piksel filtresi + koyu teal-amber sinematik işleme",
+    "gorsel": "Pexels dikey (portrait) küratörlü editoryal/makro fotoğraf (birincil) + Pixabay yedek + anti-ham piksel filtresi + doğal sablon_v2 işleme",
     "akis": "Her video elle onaylı; otomatik yayın yok",
-    "sablon": "v2.2 motoru: 7 sahne, dinamik başlık + sarı ikon, tek kelime karaoke, saf 3D kapanış ekranı ('Daha fazla Bilgi Dozu...' cümlesinde kararır, 'takip et!' anında fare tıklar, sıfır çubuk/kaynak), jenerik intro + auto-ducking",
+    "sablon": "sablon_v2 (video_187..196 birebir): 7 sahne, ortalı 64px 2 satır başlık + satır içi sarı semantik rozet, ortalı 50px tek kelime karaoke, saf 3D kapanış ekranı, 116 BPM Dm9 jenerik + auto-ducking",
     "ses_tek_istek": "Tüm cümleler TEK Gemini isteğinde okunur (4 ayrı istek 4 farklı ton üretiyordu)"
   },
   "sahneler_sablon": true,
-  "sablon_surumu": "2.2 (MIRA master v2.2 — shorts_pipeline.py + endcard_v2.py)"
+  "sablon_surumu": "2.2-sablon_v2 (video_187..196 master — shorts_pipeline.py + endcard_v2.py)"
 }

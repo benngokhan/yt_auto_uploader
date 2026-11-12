@@ -136,6 +136,21 @@ jobs:
               creds.refresh(Request())
           drive = build("drive", "v3", credentials=creds)
 
+          # Eski hatalı şablonla üretilmiş ONAY_55 kalıntılarını temizle
+          try:
+              eski_q = (
+                  f"'{os.environ['ONAY_KLASOR']}' in parents and trashed = false and "
+                  "(name = 'ONAY_55_final.mp4' or name = 'kapak_55.jpg' or name = 'YAYIN_BILGISI_55.json')"
+              )
+              for ef in drive.files().list(q=eski_q, fields="files(id,name)").execute().get("files", []):
+                  try:
+                      drive.files().update(fileId=ef["id"], body={"trashed": True}).execute()
+                      print("ESKİ KALINTI SİLİNDİ:", ef["name"], ef["id"])
+                  except Exception as se:
+                      print("Eski dosya silme uyarısı:", ef["name"], se)
+          except Exception as le:
+              print("Eski kalıntı tarama uyarısı:", le)
+
           dosyalar = sorted(set(glob.glob("motor/cikti/**/*.mp4", recursive=True))
                             | set(glob.glob("motor/cikti/**/kapak.jpg", recursive=True))
                             | set(glob.glob("motor/cikti/**/ses_onay.wav", recursive=True))

@@ -98,12 +98,13 @@ _SUS_KELIMELER = {
     "vertical", "selective", "focus", "high", "resolution",
 }
 
-# Video konusundan bağımsız, ASLA istenmeyen görsel türleri + ham katalog/vektör/yazı terimleri.
+# Video konusundan bağımsız, ASLA istenmeyen görsel türleri + ham katalog/vektör/yazı/gündelik stok terimleri.
 _YASAK_ETIKET_KESIN = {
     "portrait", "model", "girl", "boy", "beauty", "glamour", "hanói", "hanoi", "vietnamese",
     "selfie", "smile", "fashion", "makeup", "tea", "coffee", "drink", "cup", "wine", "beer",
     "food", "dish", "car", "motorcycle", "wedding", "couple", "bikini", "lingerie",
     "cleaner", "vacuuming", "cleaning", "delivery", "cardboard", "trolley", "subway", "businessman",
+    "businesswoman", "texting", "denim", "jeans", "casual", "influencer", "blogger", "outfit", "streetwear",
     "isolated", "cutout", "mockup", "template", "banner", "poster", "signboard", "watermark",
     "collage", "infographic", "diagram", "cartoon", "vector", "illustration", "sketch", "drawing",
     "clipart", "mannequin", "shopping", "sale", "discount",
@@ -116,6 +117,11 @@ _YASAK_IFADELER = (
     "copy space",
     "text space",
 )
+_BILIM_MAKRO_BONUS = {
+    "macro", "closeup", "microscope", "laboratory", "science", "scientific", "optical",
+    "lens", "anatomy", "iris", "pupil", "crystal", "droplet", "droplets", "prism",
+    "laser", "medical", "thermometer", "molecular", "neuron", "glowing", "frost",
+}
 _INSAN_ANATOMI = {
     "hand", "hands", "finger", "fingers", "thumb", "palm", "skin", "eye", "eyes",
     "brain", "ear", "ears", "heart", "blood", "muscle", "bone", "skeleton", "sleep",
@@ -167,13 +173,24 @@ def _puanla(hit: dict, sorgu: str) -> float:
     if min(w, h) >= 1080 and max(w, h) >= 1600:
         puan += 2.5
 
+    # Makro / bilimsel editoryal fotoğraf bonusu
+    if etiketler & _BILIM_MAKRO_BONUS:
+        puan += 3.5
+
+    # Sorguda el/telefon tutma istenmediği halde "hand holding smartphone" stok klişelerini ağır cezalandır
+    ham_alt = str(hit.get("tags", "")).lower()
+    sorgu_ham = _kelimeler(sorgu, sus_at=False)
+    if not (sorgu_ham & {"hand", "hands", "finger", "fingers", "palm", "holding"}):
+        if any(k in ham_alt for k in ("holding a mobile", "holding a smart", "hands holding", "hand holding", "using a smart")):
+            puan -= 14.0
+
     # Beyaz stüdyo arka planlı ham katalog görsellerini ağır cezalandır
     par = _avg_parlaklik(hit.get("avg_color", ""))
     if par is not None:
         if par > 228:
             puan -= 20.0
-        elif 35 <= par <= 155:
-            puan += 1.8  # Sinematik dengeli/koyu atmosfer bonusu
+        elif 35 <= par <= 165:
+            puan += 1.8
 
     if str(hit.get("type", "photo")) != "photo":
         puan -= 25.0
@@ -286,6 +303,7 @@ def _sorgu_adaylari(sahne: dict, yedek: list[str], ana_konu: str, sahne_sirasi: 
 
     detay = _somut(sahne.get("gorsel"))
     anahtar = _somut(sahne.get("gorsel_anahtar") or "")
+    alternatif = _somut(sahne.get("gorsel_alternatif") or "")
     anchor = _somut(ana_konu)
 
     cekirdek = anahtar or detay
@@ -297,6 +315,11 @@ def _sorgu_adaylari(sahne: dict, yedek: list[str], ana_konu: str, sahne_sirasi: 
             adaylar.append(" ".join(oz_kelimeler[-2:]))
     if detay and detay != cekirdek:
         adaylar.append(detay)
+    if alternatif and alternatif != cekirdek:
+        adaylar.append(alternatif)
+        alt_oz = [w for w in alternatif.split() if w.lower() not in _SUS_KELIMELER]
+        if len(alt_oz) >= 2 and " ".join(alt_oz[-2:]).lower() != alternatif.lower():
+            adaylar.append(" ".join(alt_oz[-2:]))
     if cekirdek and anchor and cekirdek.lower()[:18] not in anchor.lower():
         adaylar.append(f"{cekirdek} {anchor}")
 
@@ -314,7 +337,7 @@ def _sorgu_adaylari(sahne: dict, yedek: list[str], ana_konu: str, sahne_sirasi: 
             continue
         gorulen.add(anahtar_kelime)
         sonuc.append(a)
-    return sonuc[:6]
+    return sonuc[:8]
 
 
 def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str, gevsek: bool = False) -> bool:
@@ -437,74 +460,39 @@ def dikey_kirp(img: Image.Image) -> Image.Image:
 
 
 def sinematik_isle(img: Image.Image, tohum: int = 20261112) -> Image.Image:
-    """Ham stok fotoğrafı Bilgi Dozu v2.2 koyu-bilim sinematik estetiğine dönüştürür.
+    """Ham fotoğrafı sablon_v2 (video_187..196) doğal editoryal netliğine hazırlar.
 
-    Yapılanlar:
-      1. Otomatik pozlama dengeleme (aşırı aydınlık gündüz çekimlerini sinematik karanlığa çeker)
-      2. Koyu teal-amber split-toning + filmik S-eğrisi kontrast
-      3. Mikro-netlik (UnsharpMask) ve renk derinliği
-      4. Radyal kenar karartma (vignette) + ince atmosferik biyolüminesan derinlik tozları + film greni
+    Kurallar:
+      - Turuncu/mavi yapay boyama (orange skin crush) ve yapay bokeh benekleri KESİNLİKLE YOKTUR.
+      - Normal/dengeli pozlamalı fotoğrafların orta kadraj parlaklığı ve doğal rengi %100 korunur
+        (üst/alt yazı okuma vinyetini shorts_pipeline.prepare_fullscreen_plate tek geçişte uygular).
+      - Yalnızca aşırı patlak çiğ gündüz çekimlerinde (ort_lum > 0.52) parlak tavan dengelenir.
     """
+    _ = tohum
     im = img.convert("RGB")
     a = np.asarray(im, dtype=np.float32) / 255.0
 
-    # 1) Pozlama dengeleme: çiğ gündüz stok görüntüsü hissini tamamen kaldır
     lum0 = 0.299 * a[..., 0] + 0.587 * a[..., 1] + 0.114 * a[..., 2]
     ort_lum = float(lum0.mean())
-    if ort_lum > 0.43:
-        gamma = float(np.clip(1.0 + (ort_lum - 0.41) * 1.42, 1.0, 1.58))
+    if ort_lum > 0.52:
+        gamma = float(np.clip(1.0 + (ort_lum - 0.42) * 1.65, 1.0, 1.58))
         a = np.power(np.clip(a, 0.0, 1.0), gamma)
-        # Parlak tavan yumuşatma (beyaz/sarı başlıkların arkasında parlamayı önler)
         fazla = np.maximum(0.0, a - 0.64)
-        a = a - 0.24 * fazla
-    elif ort_lum < 0.14:
-        a = np.power(np.clip(a, 0.0, 1.0), 0.84)
+        a = a - 0.25 * fazla
+        h, w, _ = a.shape
+        yy, xx = np.mgrid[0:h, 0:w]
+        nx = (xx - w / 2.0) / (w / 2.0)
+        ny = (yy - h / 2.0) / (h / 2.0)
+        vig = np.clip(1.02 - 0.18 * (nx * nx + ny * ny), 0.78, 1.0)[..., None]
+        a = np.clip(a * vig, 0.0, 1.0)
+    elif ort_lum < 0.13:
+        a = np.power(np.clip(a, 0.0, 1.0), 0.85)
 
-    # 2) Bilgi Dozu Teal-Amber renk ayrımı
-    r, g, b = a[..., 0], a[..., 1], a[..., 2]
-    parlaklik = 0.299 * r + 0.587 * g + 0.114 * b
-    golge = np.clip(1.0 - parlaklik * 1.50, 0.0, 1.0)
-    isik = np.clip(parlaklik * 1.45 - 0.32, 0.0, 1.0)
-    r = r + 0.105 * isik - 0.048 * golge
-    g = g + 0.022 * isik + 0.016 * golge
-    b = b + 0.125 * golge - 0.052 * isik
-    a = np.stack([r, g, b], axis=2)
-
-    # Filmik S-eğrisi
-    a = np.clip((a - 0.5) * 1.17 + 0.5, 0.0, 1.0)
-    a = np.clip(a + 0.045 * np.sin((a - 0.5) * 3.1), 0.0, 1.0)
-
-    out = Image.fromarray((a * 255.0).astype(np.uint8))
-
-    # 3) Doygunluk + mikro-keskinlik
-    out = ImageEnhance.Color(out).enhance(1.15)
-    out = ImageEnhance.Contrast(out).enhance(1.07)
-    out = out.filter(ImageFilter.UnsharpMask(radius=2.1, percent=120, threshold=3))
-
-    # 4) Atmosferik hafif biyolüminesan derinlik tozları (çok zarif bokeh dokusu)
-    w, h = out.size
-    rng = np.random.default_rng(tohum)
-    toz_katman = Image.new("RGB", (w, h), (0, 0, 0))
-    ciz = ImageDraw.Draw(toz_katman)
-    for _ in range(22):
-        px = int(rng.integers(int(w * 0.08), int(w * 0.92)))
-        py = int(rng.integers(int(h * 0.16), int(h * 0.84)))
-        cap = int(rng.integers(3, 9))
-        alfa = float(rng.uniform(0.07, 0.19))
-        renk = (235, 225, 95) if rng.random() > 0.35 else (75, 205, 245)
-        hedef_renk = tuple(int(c * alfa) for c in renk)
-        ciz.ellipse((px - cap, py - cap, px + cap, py + cap), fill=hedef_renk)
-    toz_katman = toz_katman.filter(ImageFilter.GaussianBlur(radius=3.4))
-
-    # Kenar karartma (vignette) + ince sinema greni
-    yy, xx = np.mgrid[0:h, 0:w]
-    nx = (xx - w / 2.0) / (w / 2.0)
-    ny = (yy - h / 2.0) / (h / 2.0)
-    vig = np.clip(1.04 - 0.30 * (nx * nx + ny * ny), 0.65, 1.04)[..., None]
-
-    arr = np.asarray(out, dtype=np.float32) * vig + np.asarray(toz_katman, dtype=np.float32)
-    arr = np.clip(arr + rng.normal(0.0, 2.6, arr.shape), 0, 255)
-    return Image.fromarray(arr.astype(np.uint8))
+    out = Image.fromarray((np.clip(a, 0.0, 1.0) * 255.0).astype(np.uint8))
+    out = ImageEnhance.Color(out).enhance(1.04)
+    out = ImageEnhance.Contrast(out).enhance(1.04)
+    out = out.filter(ImageFilter.UnsharpMask(radius=1.5, percent=85, threshold=3))
+    return out
 
 
 def _indir(url: str, hedef: Path) -> None:
@@ -589,6 +577,7 @@ def sahneler_icin_gorseller(
     yedek = yedek_sorgular or []
 
     kullanilan: set[str] = set()
+    kullanilan_sorgular: set[str] = set()
     yollar: list[Path] = []
     ana_konu = str((sahneler[0] if sahneler else {}).get("gorsel") or "").strip()
 
@@ -596,7 +585,12 @@ def sahneler_icin_gorseller(
         secim: tuple[str, dict] | None = None
         denenen: list[str] = []
         ham = klasor / f"ham_{i:02d}.jpg"
-        aday_sorgular = _sorgu_adaylari(sahne, yedek, ana_konu, sahne_sirasi=i - 1)
+        ham_aday_sorgular = _sorgu_adaylari(sahne, yedek, ana_konu, sahne_sirasi=i - 1)
+        # Daha önce başka bir sahnede seçilmiş yedek sorguyu sona at ki 7 sahnede çeşitlilik korunsun
+        aday_sorgular = (
+            [q for q in ham_aday_sorgular if q.lower() not in kullanilan_sorgular]
+            + [q for q in ham_aday_sorgular if q.lower() in kullanilan_sorgular]
+        )
 
         tekiller: list[str] = []
         for s_q in aday_sorgular:
@@ -678,6 +672,7 @@ def sahneler_icin_gorseller(
         sorgu, hit = secim
         uid = str(hit.get("uid") or f"{hit.get('kaynak', 'stok')}:{hit['id']}")
         kullanilan.add(uid)
+        kullanilan_sorgular.add(sorgu.lower())
 
         png = klasor / f"sahne_{i:02d}.png"
         with Image.open(ham) as im:
