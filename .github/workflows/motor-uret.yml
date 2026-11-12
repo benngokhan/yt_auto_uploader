@@ -16,9 +16,9 @@ on:
         type: boolean
         default: false
       sahne:
-        description: "Sahne sayısı (boş = 6)"
+        description: "Sahne sayısı (boş = 4)"
         required: false
-        default: "6"
+        default: "4"
         type: string
       sure_min:
         description: "En kısa süre (sn)"
@@ -33,7 +33,7 @@ on:
       sadece_ses:
         description: "Yalnızca onay sesi üret; görsel/video üretme"
         type: boolean
-        default: true
+        default: false
 
 concurrency:
   group: motor-uret
@@ -95,7 +95,7 @@ jobs:
           MOTOR_SURE_MAX: ${{ inputs.sure_max }}
           MOTOR_SADECE_SES: ${{ inputs.sadece_ses }}
         run: |
-          ARGS="--konu \"$MOTOR_KONU\" --sahne ${MOTOR_SAHNE:-6} --sure-min ${MOTOR_SURE_MIN:-38} --sure-max ${MOTOR_SURE_MAX:-42}"
+          ARGS="--konu \"$MOTOR_KONU\" --sahne ${MOTOR_SAHNE:-4} --sure-min ${MOTOR_SURE_MIN:-38} --sure-max ${MOTOR_SURE_MAX:-42}"
           [ "$MOTOR_KURU" = "true" ] && ARGS="$ARGS --kuru"
           [ "$MOTOR_SADECE_SES" = "true" ] && ARGS="$ARGS --sadece-ses"
           echo "Komut: python motor/uret.py $ARGS"
