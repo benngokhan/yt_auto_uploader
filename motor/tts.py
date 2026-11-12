@@ -231,7 +231,10 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
 def _edge_tts(metin: str, cikti: Path, ayar: dict) -> None:
     """Ücretsiz Ahmet Neural; uzun nokta boşluklarını yaklaşık 0,40 sn ile sınırlar."""
     ses = ayar.get("ses", {})
-    voice = ses.get("voice_id", "tr-TR-AhmetNeural")
+    # voice_id Gemini/ElevenLabs adı olabilir (ör. "Charon"); edge-tts bunları tanımaz.
+    # Yalnız tr-TR-* biçimindeki adlar kullanılır, aksi halde varsayılana düşülür.
+    _v = str(ses.get("voice_id") or "").strip()
+    voice = _v if _v.lower().startswith("tr-tr-") else "tr-TR-AhmetNeural"
     with tempfile.TemporaryDirectory(prefix="edge_tts_") as gecici:
         ham = Path(gecici) / "ham.mp3"
         try:
