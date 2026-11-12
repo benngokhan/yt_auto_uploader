@@ -1,0 +1,132 @@
+name: Viral 10 Shorts Üret ve Öncelikli Kuyruğa Al
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: viral10-uret
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  hazirla:
+    name: "1) Charon Sesler + 80 Pexels Görsel"
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: FFmpeg
+        run: |
+          command -v ffmpeg >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+      - name: Bağımlılıklar
+        run: |
+          pip install -q -r requirements-motor.txt openpyxl google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
+          python motor/varlik_hazirla.py
+      - name: 10 Bölüm Ses + 80 Benzersiz Görsel Hazırla
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY || secrets.PEXELS_KEY || secrets.PEXELS_API }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+        run: python motor/viral10_batch.py prepare --out /tmp/viral10_assets
+      - uses: actions/upload-artifact@v4
+        with:
+          name: viral10-assets
+          path: /tmp/viral10_assets/
+          retention-days: 2
+
+  render:
+    name: "2) Render (${{ matrix.nums }})"
+    needs: hazirla
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - shard: "s1"
+            nums: "177,178"
+          - shard: "s2"
+            nums: "179,180"
+          - shard: "s3"
+            nums: "181,182"
+          - shard: "s4"
+            nums: "183,184"
+          - shard: "s5"
+            nums: "185,186"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: FFmpeg
+        run: |
+          command -v ffmpeg >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+      - name: Bağımlılıklar
+        run: |
+          pip install -q -r requirements-motor.txt openpyxl
+          python motor/varlik_hazirla.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: viral10-assets
+          path: /tmp/viral10_assets
+      - name: Render Shard (${{ matrix.nums }})
+        run: python motor/viral10_batch.py render --assets /tmp/viral10_assets --out /tmp/viral10_out_${{ matrix.shard }} --nums "${{ matrix.nums }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: viral10-out-${{ matrix.shard }}
+          path: /tmp/viral10_out_${{ matrix.shard }}/
+          retention-days: 5
+
+  kuyruga_yerlestir:
+    name: "3) Drive Kuyruğunda #1 Önceliğe Al (177..186)"
+    needs: render
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Bağımlılıklar
+        run: |
+          pip install -q -r requirements.txt -r requirements-motor.txt openpyxl google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: viral10-out-*
+          path: /tmp/viral10_rendered
+          merge-multiple: true
+      - name: Drive Kuyruğu + baslik.xlsx Öncelik Kaydırma ve Yükleme
+        env:
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+        run: |
+          ls -lh /tmp/viral10_rendered
+          python motor/viral10_batch.py deploy --rendered /tmp/viral10_rendered
+      - name: Birim Testleri Doğrula (87/87)
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Güncel Tabloyu Repo'ya Kaydet
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add baslik.xlsx bilgidozu_yukleme_tablosu.xlsx
+          git diff --cached --quiet || git commit -m "feat(queue): ilk 10 kesfet/retansiyon odakli Shorts (video_177..186) yayin kuyrugunda 1. oncelige alindi [skip ci]"
+          git push origin HEAD:main
+      - uses: actions/upload-artifact@v4
+        with:
+          name: viral10-final-paket
+          path: |
+            /tmp/viral10_rendered/telemetry_*.json
+            /tmp/viral10_rendered/deploy_report.json
+            baslik.xlsx
+          retention-days: 7
