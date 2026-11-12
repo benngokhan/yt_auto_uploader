@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-12 17:42:00",
-  "generated_at_iso": "2026-11-12T17:42:00.570075+03:00",
+  "generated_at": "2026-11-12 17:43:08",
+  "generated_at_iso": "2026-11-12T17:43:08.546918+03:00",
   "folders": {
     "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
     "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
@@ -23,8 +23,9 @@
       "19:50",
       "20:00"
     ],
-    "friday_1930": "long",
+    "friday_1930": "short",
     "other_days": "short",
+    "shorts_only": true,
     "min_shorts_number": 155,
     "min_long_number": 8,
     "cover_fallback_generation": false,
@@ -34,7 +35,7 @@
     "ready_shorts": 21,
     "ready_longs": 0,
     "total_ready": 21,
-    "days_of_stock": 10.5,
+    "days_of_stock": 21,
     "next_short": "video_176.mp4",
     "next_short_title": "Asansör Koparsa Yere Çarpmadan Zıplamak Seni Kurtarır mı? 🛗⚡ #bilgidozu #shorts",
     "next_long": null,
@@ -341,155 +342,7 @@
       }
     ],
     "long_videos": [],
-    "long_covers": [
-      {
-        "id": "1rUuK0A8Y0B21IdMPuVObbaKzUUfiP-Ny",
-        "name": "kapak_176.jpg",
-        "mimeType": "image/jpeg",
-        "size": 497113,
-        "modifiedTime": "2026-11-11T17:32:34.405Z"
-      },
-      {
-        "id": "1XMjl-lhQrvEqiOsIMA33gEcu1YDqXlOY",
-        "name": "kapak_177.jpg",
-        "mimeType": "image/jpeg",
-        "size": 332217,
-        "modifiedTime": "2026-11-11T18:27:36.186Z"
-      },
-      {
-        "id": "1KxrhYEgR1DlcF222MbRgCPm_Q6s0eTAd",
-        "name": "kapak_178.jpg",
-        "mimeType": "image/jpeg",
-        "size": 387781,
-        "modifiedTime": "2026-11-11T18:27:38.829Z"
-      },
-      {
-        "id": "13QgOOd-y2_eTTGKMOVIxV01KZuU9RQ4O",
-        "name": "kapak_179.jpg",
-        "mimeType": "image/jpeg",
-        "size": 299012,
-        "modifiedTime": "2026-11-11T18:27:40.587Z"
-      },
-      {
-        "id": "1jbU3tVIbBQi9EOwo_SbLab-o68djLrAv",
-        "name": "kapak_180.jpg",
-        "mimeType": "image/jpeg",
-        "size": 441808,
-        "modifiedTime": "2026-11-11T18:27:43.232Z"
-      },
-      {
-        "id": "1ynRREXr89SPV8h0yzwBx4VKfL2bw3V7K",
-        "name": "kapak_181.jpg",
-        "mimeType": "image/jpeg",
-        "size": 526174,
-        "modifiedTime": "2026-11-11T18:27:45.163Z"
-      },
-      {
-        "id": "1Yk385ywnmPJfwoTVnavYoT1WE4eBN_GC",
-        "name": "kapak_182.jpg",
-        "mimeType": "image/jpeg",
-        "size": 300759,
-        "modifiedTime": "2026-11-11T18:28:26.982Z"
-      },
-      {
-        "id": "1hnhLyhe6rPpkckOgqHCeo5J73xP4mHGx",
-        "name": "kapak_183.jpg",
-        "mimeType": "image/jpeg",
-        "size": 586239,
-        "modifiedTime": "2026-11-11T18:28:29.648Z"
-      },
-      {
-        "id": "1wP6qzrQiDViD1k14rLh3PlZ0HD5Cle-K",
-        "name": "kapak_184.jpg",
-        "mimeType": "image/jpeg",
-        "size": 657519,
-        "modifiedTime": "2026-11-11T18:28:31.475Z"
-      },
-      {
-        "id": "1yRb8AhqffkCeP-1nmISXrx7_sq34alB3",
-        "name": "kapak_185.jpg",
-        "mimeType": "image/jpeg",
-        "size": 283912,
-        "modifiedTime": "2026-11-11T18:28:34.033Z"
-      },
-      {
-        "id": "1Ur0FzuGMuH23eSnImlYcjB-yLdx8CDQL",
-        "name": "kapak_186.jpg",
-        "mimeType": "image/jpeg",
-        "size": 463078,
-        "modifiedTime": "2026-11-11T18:28:36.297Z"
-      },
-      {
-        "id": "1jj8zlkqW6r0TezZ7Kkg5JJxrbbtGT5Ku",
-        "name": "kapak_187.jpg",
-        "mimeType": "image/jpeg",
-        "size": 387018,
-        "modifiedTime": "2026-11-12T08:13:59.464Z"
-      },
-      {
-        "id": "1QFBBK_mnUxDkpzN4iqEFocLAOtyuvWI8",
-        "name": "kapak_188.jpg",
-        "mimeType": "image/jpeg",
-        "size": 342285,
-        "modifiedTime": "2026-11-12T08:14:01.265Z"
-      },
-      {
-        "id": "10dyZN9ZBisxRTPlBKxQJsiP8sddHZJoL",
-        "name": "kapak_189.jpg",
-        "mimeType": "image/jpeg",
-        "size": 354229,
-        "modifiedTime": "2026-11-12T08:14:02.334Z"
-      },
-      {
-        "id": "1mnjeVpAMKu9RlPxrkseXNt_wsWvBa2F7",
-        "name": "kapak_190.jpg",
-        "mimeType": "image/jpeg",
-        "size": 371538,
-        "modifiedTime": "2026-11-12T08:14:03.636Z"
-      },
-      {
-        "id": "1Dlb1K50RAQLrJZhPeXY9dGJi80EsNikX",
-        "name": "kapak_191.jpg",
-        "mimeType": "image/jpeg",
-        "size": 386456,
-        "modifiedTime": "2026-11-12T08:14:04.904Z"
-      },
-      {
-        "id": "1Bubp5MsrFHzo5sEOt3pJF6l9tW1losuu",
-        "name": "kapak_192.jpg",
-        "mimeType": "image/jpeg",
-        "size": 532112,
-        "modifiedTime": "2026-11-12T08:14:06.176Z"
-      },
-      {
-        "id": "1qM0Ne2aiPem8J1e4UUVf7NVM8QGVkT5S",
-        "name": "kapak_193.jpg",
-        "mimeType": "image/jpeg",
-        "size": 381461,
-        "modifiedTime": "2026-11-12T08:14:07.494Z"
-      },
-      {
-        "id": "1XkrgMHjLHDsuxEftk8W3AvUg_5JwSsLM",
-        "name": "kapak_194.jpg",
-        "mimeType": "image/jpeg",
-        "size": 444775,
-        "modifiedTime": "2026-11-12T08:14:08.645Z"
-      },
-      {
-        "id": "1nxSA7vA9NgUxFAZw4xYESadsgiFPHukd",
-        "name": "kapak_195.jpg",
-        "mimeType": "image/jpeg",
-        "size": 313726,
-        "modifiedTime": "2026-11-12T08:14:10.218Z"
-      },
-      {
-        "id": "1um-S7NV4erqyS1fpiZ1jiDOHeEj5q_dw",
-        "name": "kapak_196.jpg",
-        "mimeType": "image/jpeg",
-        "size": 562174,
-        "modifiedTime": "2026-11-12T08:14:11.651Z"
-      }
-    ],
+    "long_covers": [],
     "ceo_files": [
       {
         "id": "1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo",
