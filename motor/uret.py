@@ -69,6 +69,47 @@ SAHNE_SISTEM = (
 )
 
 
+
+_GROQ_MODEL_ONBELLEK: dict[str, str] = {}
+
+
+def groq_model() -> str:
+    """Canlı model listesinden geçerli bir Groq modeli seçer.
+
+    404'ün kök nedeni buydu: GROQ_LLM_MODEL eski/yanlış bir ada işaret ediyor,
+    istek "model not found" dönüyordu. Seçim bir kez yapılır, önbelleğe alınır.
+    """
+    import urllib.request, json as _j
+    if "m" in _GROQ_MODEL_ONBELLEK:
+        return _GROQ_MODEL_ONBELLEK["m"]
+    anahtar = os.getenv("GROQ_API_KEY", "").strip()
+    istenen = os.getenv("GROQ_LLM_MODEL", "").strip()
+    secilen = istenen or "llama-3.3-70b-versatile"
+    if anahtar:
+        try:
+            r = urllib.request.Request(
+                "https://api.groq.com/openai/v1/models",
+                headers={"Authorization": f"Bearer {anahtar}",
+                         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36"})
+            with urllib.request.urlopen(r, timeout=45) as y:
+                canli = [m.get("id") for m in _j.load(y).get("data", []) if m.get("id")]
+            if canli:
+                if istenen and istenen in canli:
+                    secilen = istenen
+                else:
+                    tercih = ([m for m in canli if "llama-3.3-70b" in m]
+                              or [m for m in canli if "llama" in m and "guard" not in m]
+                              or [m for m in canli if "gpt-oss" in m]
+                              or canli)
+                    secilen = tercih[0]
+                    if istenen and istenen != secilen:
+                        print(f"UYARI: Groq modeli '{istenen}' geçersiz, '{secilen}' kullanılıyor.")
+        except Exception as e:
+            print(f"Groq model listesi alınamadı: {type(e).__name__}")
+    _GROQ_MODEL_ONBELLEK["m"] = secilen
+    return secilen
+
+
 def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
     """LLM'den sahne sahne plan alır: ses metni + üst başlık + altyazı vurguları."""
     import urllib.request
@@ -131,26 +172,7 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
     # sağlayıcı zinciri: groq -> gemini -> openrouter (mpt_uret ile aynı mantık)
     denemeler = []
     if os.getenv("GROQ_API_KEY"):
-        # GROQ_LLM_MODEL yanlış/eski ise 404 geliyordu; canlı model listesinden doğrula.
-        _groq_model = os.getenv("GROQ_LLM_MODEL", "").strip()
-        if _groq_model:
-            try:
-                _gr = urllib.request.Request(
-                    "https://api.groq.com/openai/v1/models",
-                    headers={"Authorization": f"Bearer {os.environ['GROQ_API_KEY']}",
-                             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36"})
-                with urllib.request.urlopen(_gr, timeout=45) as _gy:
-                    _canli = [m["id"] for m in json.load(_gy).get("data", [])]
-                if _groq_model not in _canli:
-                    _tercih = [m for m in _canli if "llama-3.3-70b" in m] or \
-                              [m for m in _canli if "llama" in m and "guard" not in m] or _canli
-                    if _tercih:
-                        print(f"UYARI: GROQ_LLM_MODEL '{_groq_model}' geçersiz, '{_tercih[0]}' kullanılacak.")
-                        _groq_model = _tercih[0]
-            except Exception as _ge:
-                print(f"Groq model listesi alınamadı: {type(_ge).__name__}")
-        if not _groq_model:
-            _groq_model = "llama-3.3-70b-versatile"
+        _groq_model = groq_model()
         denemeler.append(lambda: _ayikla(_cagir(
             "https://api.groq.com/openai/v1/chat/completions",
             {"model": _groq_model,
@@ -244,7 +266,7 @@ def _uzat(konu: str, istem: str, sahneler: list, mevcut_karakter: int) -> str:
         k = os.getenv("GROQ_API_KEY", "").strip()
         if not k:
             raise RuntimeError("groq yok")
-        govde = {"model": os.getenv("GROQ_LLM_MODEL", "llama-3.3-70b-versatile"),
+        govde = {"model": groq_model(),
                  "temperature": 0.8,
                  "response_format": {"type": "json_object"},
                  "messages": [{"role": "system", "content": SAHNE_SISTEM},
@@ -289,7 +311,7 @@ def _uzat(konu: str, istem: str, sahneler: list, mevcut_karakter: int) -> str:
             raise RuntimeError(f"gemini boş yanıt ({aday.get('finishReason')})")
         return metin
 
-    for dene in (_dene_groq, _dene_gemini):
+    for dene in (_dene_gemini, _dene_groq):
         try:
             metin = dene()
             import re as _re
