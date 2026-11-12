@@ -1,6 +1,6 @@
 {
-  "guncellendi": "2026-11-12T13:05:42.906086+00:00",
-  "not": "Sağlayıcı yalnız sunduğu limit başlıklarını gösterir; Gemini kalan günlük kotayı API anahtarıyla açıklamaz.",
+  "guncellendi": "2026-11-12T13:51:49.026311+00:00",
+  "not": "Sağlayıcı yalnız sunduğu limit başlıklarını gösterir; Pexels gerçek kalan aylık isteği döndürür.",
   "gemini": {
     "durum": "aktif",
     "http": 200,
@@ -9,8 +9,20 @@
   },
   "groq": {
     "durum": "hata",
-    "http": 403,
+    "http": 404,
     "limit": {},
-    "mesaj": "error code: 1010\n"
+    "mesaj": "The model `llama-3.3-70b-versatile` does not exist or you do not have access to it."
+  },
+  "pexels": {
+    "durum": "aktif",
+    "http": 200,
+    "limit": {
+      "limit": "25000",
+      "remaining": "24999",
+      "reset": "1797083508",
+      "remaining-requests": "24999",
+      "limit-requests": "25000"
+    },
+    "mesaj": ""
   }
 }
