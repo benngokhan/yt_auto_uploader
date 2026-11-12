@@ -101,8 +101,14 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
         for bekle in (0, 4, 12, 25):
             if bekle: time.sleep(bekle)
             try:
+                _ua = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                       "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
                 istek = urllib.request.Request(url, data=veri, method="POST",
-                                               headers={"Content-Type": "application/json", **basliklar})
+                                               headers={"Content-Type": "application/json",
+                                                        "User-Agent": _ua,
+                                                        "Accept": "application/json",
+                                                        "Accept-Language": "tr-TR,tr;q=0.9,en;q=0.8",
+                                                        **basliklar})
                 with urllib.request.urlopen(istek, timeout=120) as y:
                     return json.loads(y.read().decode())
             except urllib.error.HTTPError as e:
@@ -149,6 +155,19 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
             {},
         )["candidates"][0]["content"]["parts"][0]["text"]))
 
+    # OpenRouter — son yedek (ücretsiz modeller)
+    if os.getenv("OPENROUTER_API_KEY"):
+        _or_model = os.getenv("OPENROUTER_LLM_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
+        denemeler.append(lambda: _ayikla(_cagir(
+            "https://openrouter.ai/api/v1/chat/completions",
+            {"model": _or_model, "temperature": 0.7,
+             "messages": [{"role": "system", "content": SAHNE_SISTEM},
+                          {"role": "user", "content": istem}]},
+            {"Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}",
+             "HTTP-Referer": "https://github.com/benngokhan/yt_auto_uploader",
+             "X-Title": "Bilgi Dozu Motor"},
+        )["choices"][0]["message"]["content"]))
+
     for dene in denemeler:
         try:
             veri = dene()
@@ -160,6 +179,84 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
         except Exception as hata:  # noqa: BLE001
             print(f"LLM denemesi başarısız: {type(hata).__name__}: {str(hata)[:120]}")
     raise SystemExit("Sahne planı üretilemedi: tüm LLM sağlayıcıları başarısız.")
+
+
+def _uzat(konu: str, istem: str, sahneler: list, mevcut_karakter: int) -> str:
+    """Anlatım 300 karakterin altındaysa LLM'e açıkça uzatma isteği gönderir.
+    Sadece ikinci bir tur; başarısız olursa çağıran karar verir."""
+    import urllib.request, urllib.error, json as _j
+
+    _ua = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+           "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
+    mevcut = " ".join(str(x.get("ses", "")) for x in sahneler)
+    if not istem:
+        istem = (f"Konu: {konu}\nBilgi Dozu YouTube Shorts için sahne planı üret. "
+                 f"Video 4 sahne olacak, toplam anlatım 38-42 saniye. "
+                 f"Her sahne sesli okunacak doğal Türkçe cümle içersin.")
+    istek_metni = (
+        f"{istem}\n\nÖNEMLİ: Önceki deneme çok kısaydı ({mevcut_karakter} karakter ≈ "
+        f"{mevcut_karakter/15.8:.1f} saniye). Hedef 38-42 saniye, yani yaklaşık 620-680 KARAKTER.\n"
+        f"Aşağıdaki anlatımı 4 sahneye bölerek genişlet. Her sahne için daha fazla açıklama, "
+        f"somut sayı/örnek ve merak uyandıran detay ekle. Anlamı bozma, uydurma bilgi ekleme.\n\n"
+        f"Mevcut anlatım:\n{mevcut}")
+
+    def _dene_groq():
+        k = os.getenv("GROQ_API_KEY", "").strip()
+        if not k:
+            raise RuntimeError("groq yok")
+        govde = {"model": os.getenv("GROQ_LLM_MODEL", "llama-3.3-70b-versatile"),
+                 "temperature": 0.8,
+                 "response_format": {"type": "json_object"},
+                 "messages": [{"role": "system", "content": SAHNE_SISTEM},
+                              {"role": "user", "content": istek_metni}]}
+        r = urllib.request.Request("https://api.groq.com/openai/v1/chat/completions",
+                                   data=_j.dumps(govde).encode(), method="POST",
+                                   headers={"Content-Type": "application/json",
+                                            "User-Agent": _ua, "Accept": "application/json",
+                                            "Authorization": f"Bearer {k}"})
+        with urllib.request.urlopen(r, timeout=120) as y:
+            return _j.loads(y.read().decode())["choices"][0]["message"]["content"]
+
+    def _dene_gemini():
+        k = os.getenv("GEMINI_API_KEY", "").strip()
+        if not k:
+            raise RuntimeError("gemini yok")
+        import re as _re
+        with urllib.request.urlopen(
+            "https://generativelanguage.googleapis.com/v1beta/models?key=" + k, timeout=60) as y:
+            modeller = _j.load(y).get("models", [])
+        uygun = [m["name"].split("/", 1)[-1] for m in modeller
+                 if "generateContent" in m.get("supportedGenerationMethods", [])
+                 and "flash" in m.get("name", "").lower()
+                 and not any(x in m.get("name", "").lower() for x in ("tts", "image", "live", "omni"))]
+        if not uygun:
+            raise RuntimeError("gemini model yok")
+        model = sorted(uygun, key=lambda x: (("preview" not in x), x), reverse=True)[0]
+        govde = {"systemInstruction": {"parts": [{"text": SAHNE_SISTEM}]},
+                 "contents": [{"role": "user", "parts": [{"text": istek_metni}]}],
+                 "generationConfig": {"responseMimeType": "application/json", "temperature": 0.8}}
+        r = urllib.request.Request(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={k}",
+            data=_j.dumps(govde).encode(), method="POST",
+            headers={"Content-Type": "application/json", "User-Agent": _ua})
+        with urllib.request.urlopen(r, timeout=120) as y:
+            return _j.loads(y.read().decode())["candidates"][0]["content"]["parts"][0]["text"]
+
+    for dene in (_dene_groq, _dene_gemini):
+        try:
+            metin = dene()
+            import re as _re
+            m = _re.search(r"\{.*\}", metin, _re.S)
+            veri = _j.loads(m.group(0)) if m else {}
+            yeni_sahneler = veri.get("sahneler") or []
+            yeni = " ".join(str(x.get("ses", "")) for x in yeni_sahneler)
+            if len(yeni) >= 400:
+                sahneler.clear()
+                sahneler.extend(yeni_sahneler)
+                return yeni
+        except Exception as h:
+            print(f"uzatma ({dene.__name__}): {type(h).__name__}")
+    raise RuntimeError("anlatım uzatılamadı")
 
 
 def yayin_bilgisi_uret(konu: str, sahneler: list[dict]) -> dict:
@@ -251,7 +348,14 @@ def main() -> int:
     anlatim_karakter = len(" ".join(str(x.get("ses", "")).strip() for x in sahneler))
     print(f"Gerçek anlatım karakteri: {anlatim_karakter}")
     if anlatim_karakter < 300 or anlatim_karakter > 650:
-        raise SystemExit(f"Anlatım kalite kapısı: {anlatim_karakter} karakter; gerekli aralık 300-650. Video oluşturulmadı.")
+        # Otomatik kurtarma: LLM kısa yazdıysa 2. turda açıkça uzat iste.
+        try:
+            anlatim = _uzat(a.konu, "", sahneler, anlatim_karakter)
+            anlatim_karakter = len(anlatim)
+            print(f"Anlatım uzatıldı: {anlatim_karakter} karakter")
+        except Exception as _ue:
+            print(f"Uzatma denemesi başarısız: {type(_ue).__name__}")
+            raise SystemExit(f"Anlatım kalite kapısı: {anlatim_karakter} karakter; gerekli aralık 300-650. Video oluşturulmadı.")
     # XTTS'nin sert veya hatalı okuduğu kalıpları senaryo düzeyinde doğal Türkçeyle değiştir.
     # Böylece ses ile ekrandaki altyazı birebir aynı kalır.
     for s in sahneler:
