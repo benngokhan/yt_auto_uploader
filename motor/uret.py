@@ -112,6 +112,8 @@ def groq_model() -> str:
 
 def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
     """LLM'den sahne sahne plan alır: ses metni + üst başlık + altyazı vurguları."""
+    if ayar.get("sahneler_sablon"):
+        return sahne_plani_v2(konu, ayar.get("sahne_sayisi", 7), ayar)
     import urllib.request
 
     istem = (
@@ -337,6 +339,269 @@ def _anlatimi_uzat(konu: str, sahneler: list, hedef_toplam: int = 620) -> int:
     return len(" ".join(str(x.get("ses", "")) for x in sahneler))
 
 
+
+# ── ŞABLON v2.0 (MİRA / shorts_pipeline motoru) ─────────────────────────────
+# Sahne başlıkları LLM'den DEĞİL, motorun kendi metin çözümleyicisinden
+# (resolve_scene_headlines) gelir: video_187..196 standardıyla aynı çıktı.
+PROMPT_V2 = (
+    "Konu: {konu}\n\n"
+    "Bir YouTube Shorts için Türkçe seslendirme metni yaz. Kurallar:\n"
+    "- TAM {n} cümle yaz. Her cümle tek satır, sonda nokta/soru işareti olsun.\n"
+    "- Toplam 72-86 kelime, 38-45 saniye seslendirme.\n"
+    "- 1. cümle: KANCA. Merak uyandıran soru veya şaşırtıcı iddia.\n"
+    "- 2. cümle: PROBLEM/DURUM, tek cümle.\n"
+    "- 3-{son}: BİLİMSEL AÇIKLAMA. Her cümlede TEK ana bilgi ve mümkünse TEK somut sayı. "
+    "Uydurma sayı YASAK, sadece kaynaklı gerçek değer.\n"
+    "- Son cümle: net sonuç + izleyiciyi düşündüren kısa soru.\n"
+    "- Selamlama, 'abone olun', 'takip et' YASAK (motor kendi ekler).\n"
+    "- Kısaltma, parantez, üç nokta kullanma. Sesli okunduğunda doğal aksın.\n"
+    "Yalnız JSON döndür: {{\"cumleler\": [\"cümle 1\", \"cümle 2\", ...]}}"
+)
+
+
+def _llm_json(istem: str, ayar: dict) -> dict:
+    """Sahne planındaki sağlayıcı zincirini (groq -> gemini -> openrouter) tek istem için kullanır."""
+    import urllib.request
+    import re as _re
+
+    def _cagir(url, govde, basliklar):
+        import time, urllib.error
+        veri = json.dumps(govde).encode()
+        son_hata = None
+        for bekle in (0, 4, 12, 25):
+            if bekle:
+                time.sleep(bekle)
+            try:
+                _ua = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                       "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
+                istek = urllib.request.Request(url, data=veri, method="POST",
+                                               headers={"Content-Type": "application/json",
+                                                        "User-Agent": _ua,
+                                                        "Accept": "application/json",
+                                                        "Accept-Language": "tr-TR,tr;q=0.9,en;q=0.8",
+                                                        **basliklar})
+                with urllib.request.urlopen(istek, timeout=120) as y:
+                    return json.loads(y.read().decode())
+            except urllib.error.HTTPError as e:
+                son_hata = e
+                if e.code in (400, 401, 403, 404):
+                    raise
+                if e.code not in (429, 500, 502, 503, 504):
+                    raise
+            except Exception as e:
+                son_hata = e
+        raise son_hata
+
+    def _ayikla(metin):
+        m = _re.search(r"\{.*\}", metin, _re.S)
+        return json.loads(m.group(0)) if m else {}
+
+    if os.getenv("GROQ_API_KEY"):
+        try:
+            m = groq_model()
+            return _ayikla(_cagir("https://api.groq.com/openai/v1/chat/completions",
+                {"model": m, "temperature": 0.7,
+                 "messages": [{"role": "system", "content": SAHNE_SISTEM},
+                              {"role": "user", "content": istem}]},
+                {"Authorization": f"Bearer {os.environ['GROQ_API_KEY']}"})["choices"][0]["message"]["content"])
+        except Exception as h:
+            print(f"v2 groq başarısız: {type(h).__name__}")
+    if os.getenv("GEMINI_API_KEY"):
+        try:
+            model = os.getenv("GEMINI_LLM_MODEL", "").strip() or "gemini-2.5-flash"
+            if model.startswith("llama-") or model == "gemini-3.6-flash":
+                model = "gemini-2.5-flash"
+            return _ayikla(_cagir(
+                f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+                f"?key={os.environ['GEMINI_API_KEY']}",
+                {"systemInstruction": {"parts": [{"text": SAHNE_SISTEM}]},
+                 "contents": [{"role": "user", "parts": [{"text": istem}]}],
+                 "generationConfig": {"responseMimeType": "application/json", "temperature": 0.7}},
+                {})["candidates"][0]["content"]["parts"][0]["text"])
+        except Exception as h:
+            print(f"v2 gemini başarısız: {type(h).__name__}")
+    if os.getenv("OPENROUTER_API_KEY"):
+        try:
+            m = os.getenv("OPENROUTER_LLM_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
+            return _ayikla(_cagir("https://openrouter.ai/api/v1/chat/completions",
+                {"model": m, "temperature": 0.7,
+                 "messages": [{"role": "system", "content": SAHNE_SISTEM},
+                              {"role": "user", "content": istem}]},
+                {"Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}",
+                 "HTTP-Referer": "https://github.com/benngokhan/yt_auto_uploader",
+                 "X-Title": "Bilgi Dozu Motor"})["choices"][0]["message"]["content"])
+        except Exception as h:
+            print(f"v2 openrouter başarısız: {type(h).__name__}")
+    return {}
+
+
+def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
+    """Şablon v2.0: LLM yalnız cümleleri yazar.
+
+    Sahne sayısı, 2 satırlık TAM BÜYÜK HARF başlıklar ve sarı semantik ikon
+    (?, ▼, ⚡, ▲, !, ✔) motorun kendi çözümleyicisinden gelir:
+    shorts_pipeline.resolve_scene_headlines() — video_187..196 ile birebir aynı.
+    """
+    import sys as _sys
+
+    _sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "motor"))
+    try:
+        import shorts_pipeline as _sp
+    except Exception as h:
+        raise SystemExit(f"Şablon v2 motoru yüklenemedi (motor/shorts_pipeline.py): {h}")
+
+    n = max(4, min(8, int(n or 7)))
+    veri = _llm_json(PROMPT_V2.format(konu=konu, n=n, son=n - 1), ayar)
+    cumleler = veri.get("cumleler") or veri.get("sahneler") or []
+    cumleler = [str(c).strip() for c in cumleler if str(c).strip()]
+    if len(cumleler) < 4:
+        raise SystemExit(f"v2 sahne planı: LLM yeterli cümle vermedi ({len(cumleler)}); video üretilmedi.")
+    cumleler = cumleler[:n]
+
+    cfg = {"title": [[tr_upper(konu[:20]), "g"], [tr_upper(konu[20:40])]]}
+    try:
+        basliklar = _sp.resolve_scene_headlines(cfg, cumleler, len(cumleler))
+    except Exception as h:
+        print(f"Başlık çözümleyici uyarısı: {type(h).__name__}; yedek başlık kullanılıyor")
+        basliklar = [{"icon": "!", "line1": tr_upper(c.split()[0] if c.split() else ""), "line2": "BİLİM"}
+                     for c in cumleler]
+    print(f"Şablon v2 planı: {len(cumleler)} cümle, başlıklar motor çözümleyicisinden")
+    return [{"ses": c,
+             "baslik1": b.get("line1", ""),
+             "baslik2": b.get("line2", ""),
+             "ikon": b.get("icon", "!")}
+            for c, b in zip(cumleler, basliklar)]
+
+
+def tr_upper(metin: str) -> str:
+    """Türkçe doğru büyük harf (i -> İ, ı -> I)."""
+    return (metin or "").replace("i", "İ").replace("ı", "I").upper()
+
+
+def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> list:
+    """Her cümle için 4-8 kelimelik İNGİLİZCE, somut, fotoğraflanabilir arama cümlesi."""
+    n = len(cumleler)
+    istem = (
+        f"Konu: {konu}\n\n"
+        f"Aşağıdaki {n} Türkçe cümlenin her biri için, o cümlede anlatılan şeyi "
+        "gösteren FOTOĞRAFLANABİLİR somut bir İngilizce arama cümlesi yaz.\n"
+        "Kurallar: 4-8 kelime. Sadece ana nesne/olay, sıfat ve mecaz YOK. "
+        "Yazı, logo, tabela, ekran metni isteme. Konuyla ilgisiz süs görseli "
+        "(duvar kağıdı, soyut ışık, genel manzara) YASAK.\n"
+        "Örnek: \"honeybee hive\", \"cortisol brain\", \"alarm clock night\".\n"
+        "Yalnız JSON döndür: {\"aramalar\": [\"ingilizce arama 1\", ...]}"
+    )
+    veri = _llm_json(istem, ayar)
+    aramalar = [str(x).strip() for x in (veri.get("aramalar") or []) if str(x).strip()]
+    aramalar = aramalar[:n]
+    while len(aramalar) < n:
+        aramalar.append(konu)
+    print(f"Görsel aramaları: {aramalar}")
+    return aramalar
+
+
+def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
+    """ŞABLON v2.0 üretim hattı: sahne planı -> tek istek ses -> görseller ->
+    shorts_pipeline.render_video (MİRA v2 motoru) -> kapak -> onay."""
+    import shutil
+    import tts
+
+    re_ = sys.modules.get("render_engine") or motor_hazirla(ayar)
+    kok = KOK / "motor"
+    calisma = kok / "cikti" / "son"
+    calisma.mkdir(parents=True, exist_ok=True)
+
+    sahneler = sahne_plani_v2(a.konu, sahne_sayisi, ayar)
+    anlatim = " ".join(str(x["ses"]).strip() for x in sahneler)
+    print(f"Anlatım: {len(anlatim)} karakter / {len(sahneler)} cümle")
+    if len(anlatim) < 300:
+        raise SystemExit(f"Anlatım çok kısa: {len(anlatim)} karakter; video üretilmedi.")
+
+    # 1) TEK İSTEK SES (kural: tek anlatıcı, tek ton)
+    tek_wav = calisma / "vo_tek.wav"
+    tts.uret(anlatim, tek_wav, ayar)
+    if not tek_wav.exists():
+        raise SystemExit("Ses üretilemedi; video oluşturulmadı.")
+    print(f"Tek istek ses hazır: {round(re_.wav_duration(str(tek_wav)), 2)} sn")
+
+    # 2) GÖRSELLER (sahne başına bir görsel, sinematik + konuya %100 alakalı)
+    gorsel_klasoru = calisma / "gorseller"
+    gorsel_klasoru.mkdir(parents=True, exist_ok=True)
+    for eski_p in gorsel_klasoru.glob("*"):
+        if eski_p.is_file():
+            eski_p.unlink()
+    import gorsel_uret
+    # Görsel araması İNGİLİZCE anahtar ister; cümleyi LLM'e çevirtiyoruz.
+    aramalar = _gorsel_aramalari(a.konu, [s["ses"] for s in sahneler], ayar)
+    parallelar = gorsel_uret.sahneler_icin_gorseller(
+        [{"gorsel": ar, "gorsel_anahtar": ar, "ses": s["ses"]}
+         for s, ar in zip(sahneler, aramalar)],
+        gorsel_klasoru, yedek=False)
+    if len(parallelar) < len(sahneler):
+        raise SystemExit(f"Görsel sayısı yetersiz: {len(parallelar)} < {len(sahneler)}")
+
+    # 3) MİRA v2 MOTORU (shorts_pipeline)
+    vdir = calisma / "v2"
+    if vdir.exists():
+        shutil.rmtree(vdir)
+    vdir.mkdir(parents=True)
+    for i, p in enumerate(parallelar, start=1):
+        shutil.copyfile(p, vdir / f"s{i}.jpg")
+    shutil.copyfile(tek_wav, vdir / "vo_raw.wav")
+    (vdir / "script.txt").write_text(anlatim + "\n", encoding="utf-8")
+
+    cfg = {
+        "title": [[tr_upper(a.konu[:20]), "g"], [tr_upper(a.konu[20:40])]],
+        "scene_headlines": [{"icon": s.get("ikon", "!"), "line1": s["baslik1"], "line2": s["baslik2"]}
+                            for s in sahneler],
+        "cover_lines": [sahneler[0]["baslik1"], sahneler[0]["baslik2"]],
+        "music_theme": ayar.get("music_theme", "gunluk_bilim"),
+        "intro_lead": 1.45, "sentence_pause": 0.62, "outro_hold": 1.45,
+        "note1": ayar.get("kaynak_satiri", "Kaynak: doğrulanmış bilimsel yayınlar"),
+        "note2": "Görseller temsilîdir.",
+        "scenes": [f"s{i}.jpg" for i in range(1, len(sahneler) + 1)],
+    }
+    cfg_yolu = calisma / "shorts_config.json"
+    cfg_yolu.write_text(json.dumps({vdir.name: cfg}, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    import subprocess
+    import sys as _sys
+    motor_py = os.path.join(os.path.dirname(os.path.abspath(__file__)), "motor", "shorts_pipeline.py")
+    env = os.environ.copy()
+    env.setdefault("MIRA_MOTOR_FFMPEG", shutil.which("ffmpeg") or "")
+    print("MİRA v2 motoru çalışıyor (plates -> timing -> music -> render -> cover)…")
+    subprocess.run([_sys.executable, motor_py, "all", str(vdir), str(cfg_yolu)],
+                   check=True, env=env)
+
+    cikti = vdir / "video.mp4"
+    kapak = vdir / "kapak.jpg"
+    if not cikti.exists():
+        raise SystemExit("v2 motoru video üretmedi.")
+    hedef = calisma / "final.mp4"
+    shutil.copyfile(cikti, hedef)
+    shutil.copyfile(kapak, calisma / "kapak.jpg")
+    print(f"Video hazır: {hedef}")
+    print(f"Kapak hazır: {calisma / 'kapak.jpg'}")
+
+    metadata = yayin_bilgisi_uret(a.konu, sahneler)
+    (calisma / "yayin_bilgisi.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
+    print("Yayın bilgileri hazır")
+
+    if ayar.get("onay", {}).get("mod") == "elle" and not a.onay_verildi:
+        onay_dir = calisma / "onay_bekleyen"
+        onay_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(hedef, onay_dir / hedef.name)
+        shutil.copyfile(calisma / "kapak.jpg", onay_dir / "kapak.jpg")
+        print(f"ONAY BEKLİYOR: {onay_dir / hedef.name}")
+        print("Drive'a yüklenmedi, kuyruğa eklenmedi.")
+        return 0
+    if a.kuru:
+        print("KURU: Drive'a yüklenmedi, kuyruğa eklenmedi.")
+        return 0
+    print("Teslim adımı şablon v2'de henüz elle: --kuru ile çalıştırın.")
+    return 0
+
+
 def yayin_bilgisi_uret(konu: str, sahneler: list[dict]) -> dict:
     """Onay kartı ve Excel için eksiksiz YouTube yayın metadatası üretir."""
     import urllib.request, urllib.error, re
@@ -415,29 +680,37 @@ def main() -> int:
     a = ap.parse_args()
 
     ayar = ayar_yukle()
-    # KURAL (sahip, 12.11.2026): her video 4 sahne, 38-42 saniye.
-    # Görsel sayısı = sahne sayısı (4). Komut satırı bunu değiştiremez.
-    sahne_sayisi = 4
-    ayar["sahne_sayisi"] = 4
+    if ayar.get("sahneler_sablon"):
+        # ŞABLON v2.0: 7 sahne, 38-45 sn (onaylı video_187..196 standardı)
+        sahne_sayisi = int(ayar.get("sahne_sayisi") or 7)
+        print(f"Şablon v2 aktif: {sahne_sayisi} sahne")
+    else:
+        # KURAL (sahip, 12.11.2026): her video 4 sahne, 38-42 saniye.
+        sahne_sayisi = 4
+        ayar["sahne_sayisi"] = 4
     if a.sure_min:
         ayar.setdefault("sure", {})["min"] = a.sure_min
     if a.sure_max:
         ayar.setdefault("sure", {})["max"] = a.sure_max
     re_ = motor_hazirla(ayar)
 
+    if ayar.get("sahneler_sablon"):
+        return _sablon_v2_uret(a, ayar, sahne_sayisi, calisma=None)
+
     sahneler = sahne_plani(a.konu, sahne_sayisi, ayar)
     anlatim_karakter = len(" ".join(str(x.get("ses", "")).strip() for x in sahneler))
     print(f"Gerçek anlatım karakteri: {anlatim_karakter}")
     # Kalite kapısı: yalnız KISA anlatım video üretimini engeller.
     # Az yazdıysa sahne sahne otomatik genişletilir (hedef 38-42 sn ≈ 620-700 karakter).
-    if anlatim_karakter < 560:
+    esik = 380 if ayar.get("sahneler_sablon") else 560
+    if anlatim_karakter < esik:
         try:
             anlatim_karakter = _anlatimi_uzat(a.konu, sahneler, 620)
             print(f"Anlatım uzatıldı: {anlatim_karakter} karakter")
         except Exception as _ue:
             print(f"Uzatma denemesi başarısız: {type(_ue).__name__}")
-        if anlatim_karakter < 560:
-            raise SystemExit(f"Anlatım kalite kapısı: {anlatim_karakter} karakter; en az 560 gerekli. Video oluşturulmadı.")
+        if anlatim_karakter < esik:
+            raise SystemExit(f"Anlatım kalite kapısı: {anlatim_karakter} karakter; en az {esik} gerekli. Video oluşturulmadı.")
     if anlatim_karakter > 760:
         print(f"UYARI: anlatım uzun ({anlatim_karakter} karakter ≈ {anlatim_karakter/15.4:.0f} sn). Video yine üretilir.")
     # XTTS'nin sert veya hatalı okuduğu kalıpları senaryo düzeyinde doğal Türkçeyle değiştir.
@@ -454,7 +727,31 @@ def main() -> int:
     import tts
 
     vo_files, hizalamalar = [], []
+    if ayar.get("ses", {}).get("tek_istek") and len(sahneler) > 1:
+        # TEK SES KURALI: tüm cümleler TEK Gemini isteğinde okunur; 4 ayrı istek
+        # farklı ton üretiyordu (sahne 1: 106 Hz ... sahne 4: 156 Hz).
+        birlesik = " ".join(str(x["ses"]).strip() for x in sahneler)
+        tek_wav = calisma / "vo_tek.wav"
+        print(f"Tek istek ses: {len(birlesik)} karakter")
+        tts.uret(birlesik, tek_wav, ayar)
+        if tek_wav.exists():
+            import ses_kenar
+            import wave as _wv
+            ses_kenar.duzelt(tek_wav)
+            parcalar = ses_kenar.cumlelere_bol(tek_wav, [str(x["ses"]).strip() for x in sahneler])
+            for i, parca in enumerate(parcalar, start=1):
+                wav = calisma / f"vo_{i:02d}.wav"
+                parca.to_wav(wav)
+                vo_files.append(str(wav))
+                hizalamalar.append(hizala(wav, sahneler[i - 1]["ses"], ayar))
+                print(f"  sahne {i}: ses {round(re_.wav_duration(str(wav)), 2)} sn")
+            if len(vo_files) != len(sahneler):
+                raise SystemExit(f"Tek istek ses bölünmesi tutarsız: {len(vo_files)}/{len(sahneler)}")
+        else:
+            print("Tek istek ses üretilemedi; sahne sahne üretime dönülüyor.")
     for i, s in enumerate(sahneler, start=1):
+        if vo_files:
+            break
         wav = calisma / f"vo_{i:02d}.wav"
         hiz = tts.uret(s["ses"], wav, ayar)
         if hiz is None:
