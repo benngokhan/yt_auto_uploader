@@ -3,16 +3,30 @@ import numpy as np
 import cv2
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
-FONT_BLACK_PATH = "/home/user/pilot_engine/fonts/Montserrat-Black.ttf"
-FONT_BOLD_PATH  = "/home/user/pilot_engine/fonts/Montserrat-Bold.ttf"
-EMOJI_FONT_PATH = "/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf"
-BGM_PATH        = "/home/user/pilot_engine/audio/ambient_science_bgm.wav"
+# ── ŞABLON v2 (dikey_video_sablon_v2.md) ────────────────────────────────────
+# Fontlar varlik_hazirla.py ile motor/assets içine indirilir (Poppins = şablon).
+_ASSETS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+FONT_BLACK_PATH = os.path.join(_ASSETS, "Poppins-Black.ttf")
+FONT_BOLD_PATH  = os.path.join(_ASSETS, "Poppins-Bold.ttf")
+FONT_MED_PATH   = os.path.join(_ASSETS, "Poppins-Medium.ttf")
+ANTON_PATH      = os.path.join(_ASSETS, "Anton-Regular.ttf")
+EMOJI_FONT_PATH = os.path.join(_ASSETS, "NotoColorEmoji.ttf")
+BGM_PATH        = os.path.join(_ASSETS, "ambient_science_bgm.wav")
 
+# Şablon v2 paleti
 WHITE    = (255, 255, 255, 255)
-YELLOW   = (255, 214, 0, 255)    # #FFD600 — Pilot sari vurgu
-LIME     = (220, 255, 46, 255)   # #DCFF2E — @bilgidozuofficial neon-lime rozet/bar
-DARK_INK = (10, 18, 24, 255)
+YELLOW   = (255, 217, 30, 255)   # #FFD91E — vurgu sarısı (başlık 2. satır, vurgu kelime)
+LIME     = (227, 244, 36, 255)   # #E3F424 — marka limonu (çubuk, etiket, "DOZU", buton)
+DARK_INK = (14, 16, 20, 255)     # #0E1014 — düz zemin
+TRACK    = (57, 57, 57, 255)     # #393939 — ilerleme izi
+SECOND   = (236, 236, 239, 255)  # #ECECEF — ikincil metin (kaynak)
 CTA_RED  = (255, 34, 68, 255)
+
+# ── Güvenli alanlar (1080x1920) ──────────────────────────────────────────────
+SAFE_TOP    = 180     # üst arayüz — kullanma
+SAFE_BOTTOM = 1500    # alt arayüz başlangıcı (420 px alt rezerv)
+SAFE_RIGHT  = 930     # sağ 150 px rezerv (içerik x <= 930)
+PAD_LEFT    = 72
 
 def wav_duration(path):
     with wave.open(path, "rb") as wf:
@@ -502,8 +516,9 @@ def render_video_master(
     ]
 
     # Top & bottom legibility scrim
-    top_h = 250 if is_wide else 460
-    bot_h = 260 if is_wide else 360
+    # Şablon v2 güvenli alan: üst 180 px, alt 420 px karartma (yazı okunurluğu)
+    top_h = 250 if is_wide else 300
+    bot_h = 260 if is_wide else 470
     scrim_top_u16 = np.round((0.48 + 0.52 * (np.linspace(0, 1, top_h, dtype=np.float32)[:, None, None] ** 1.4)) * 256.0).astype(np.uint16)
     scrim_bot_u16 = np.round((0.44 + 0.56 * (np.linspace(1, 0, bot_h, dtype=np.float32)[:, None, None] ** 1.3)) * 256.0).astype(np.uint16)
 
@@ -595,13 +610,16 @@ def render_video_master(
     proc = subprocess.Popen(ffmpeg_cmd, stdin=subprocess.PIPE, stderr=log_f)
 
     half_cd = CROSS_DISSOLVE / 2.0
-    bar_y0, bar_y1 = (28, 34) if is_wide else (58, 64)
-    bar_x0, bar_x1 = (80, W - 80) if is_wide else (72, W - 72)
-    top_pill_y = 42 if is_wide else 74
-    title_y    = 44 if is_wide else 155
-    sub_y      = 770 if is_wide else 1288
-    cta_y      = 650 if is_wide else 1535
-    bot_y      = (H - 120) if is_wide else 1740
+    # ── ŞABLON v2 yerleşimi ──────────────────────────────────────────────
+    # Çubuk x72 y200 (936x6) · etiket x72 y232 (204x44) · başlık y329 (705x117)
+    # Altyazı y1230 (771x116) · alt bilgi y1380 · imza y1454 · sağ 150 px rezerv
+    bar_y0, bar_y1 = (28, 34) if is_wide else (200, 206)
+    bar_x0, bar_x1 = (80, W - 80) if is_wide else (PAD_LEFT, SAFE_RIGHT)
+    top_pill_y = 42 if is_wide else 232
+    title_y    = 44 if is_wide else 329
+    sub_y      = 770 if is_wide else 1230
+    cta_y      = 650 if is_wide else 1380
+    bot_y      = (H - 120) if is_wide else 1454
 
     last_sm = scenes_meta[-1]
 
@@ -653,7 +671,7 @@ def render_video_master(
         frame[bar_y0:bar_y1, bar_x0:bar_x1] = ((frame[bar_y0:bar_y1, bar_x0:bar_x1].astype(np.uint16) * 115 + 11264) >> 8).astype(np.uint8)
         fill_x = bar_x0 + int((bar_x1 - bar_x0) * (f_idx / max(1, TOTAL_FRAMES - 1)))
         if fill_x > bar_x0:
-            frame[bar_y0:bar_y1, bar_x0:fill_x] = (46, 255, 220)
+            frame[bar_y0:bar_y1, bar_x0:fill_x] = (36, 244, 227)   # #E3F424 (BGR)
 
         blend_fast_band(frame, top_pill_y, top_brand_pk, 1.0)
         blend_fast_band(frame, bot_y, bot_brand_pk, 1.0)

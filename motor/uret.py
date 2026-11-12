@@ -75,7 +75,7 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
 
     istem = (
         f"Konu: {konu}\n\n"
-        f"Video {sahne_sayisi} sahne olacak, toplam anlatım 38-42 saniye (sahne başına ~6-7 sn).\n"
+        f"Video TAM 4 sahne olacak, toplam anlatım 38-42 saniye (sahne başına ~9-10 sn).\n"
         "JSON şeması: {\"sahneler\": [{\"ses\": \"...\", \"baslik1\": \"...\", "
         "\"baslik2\": \"...\", \"emoji\": \"...\", \"gorsel\": \"...\", "
         "\"gorsel_anahtar\": \"...\", \"vurgular\": [\"kelime\", ...]}]}\n"
@@ -93,7 +93,7 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
         "Örnek: \"honeybee hive\", \"cortisol brain\", \"alarm clock night\". Bu kelimeler görsel aramasında birebir kullanılacak.\n"
         "- vurgular: o sahnenin altyazısında sarı boyanacak 1-3 kelime\n"
         "Selamlama ve 'abone olun' YASAK. İlk sahnenin sesi tek soru ve 5-8 kelime olsun. "
-        "Toplam anlatım boşluklar dahil 430-560 Türkçe karakter olmalı; ilk sahne hariç her sahne 110-160 karakter olmalı. "
+        "Toplam anlatım boşluklar dahil 620-700 Türkçe karakter olmalı (4 sahne, 38-42 sn). Her sahne 150-185 karakter olmalı. "
         "Cümleler doğal, bilgi yoğun ve sesli okumada toplam 38-42 saniyeye uygun olmalı. Son sahne yumuşak ve doğal bir cümleyle bitsin. 'Bakacağız' kelimesini ve sert slogan tonunu kullanma; gerekiyorsa 'Bir sonraki videoda bunu inceleyeceğiz.' de."
     )
 
@@ -360,7 +360,10 @@ def main() -> int:
     a = ap.parse_args()
 
     ayar = ayar_yukle()
-    sahne_sayisi = a.sahne or ayar.get("sahne_sayisi", 6)
+    # KURAL (sahip, 12.11.2026): her video 4 sahne, 38-42 saniye.
+    # Görsel sayısı = sahne sayısı (4). Komut satırı bunu değiştiremez.
+    sahne_sayisi = 4
+    ayar["sahne_sayisi"] = 4
     if a.sure_min:
         ayar.setdefault("sure", {})["min"] = a.sure_min
     if a.sure_max:
@@ -372,7 +375,7 @@ def main() -> int:
     print(f"Gerçek anlatım karakteri: {anlatim_karakter}")
     # Kalite kapısı: yalnız KISA anlatım video üretimini engeller.
     # Uzun anlatım kısaltılmaz; sadece uyarı yazılır (650 karakter ≈ 42 sn, üstü kırpılmıyor).
-    if anlatim_karakter < 300:
+    if anlatim_karakter < 560:
         # Otomatik kurtarma: LLM kısa yazdıysa 2. turda açıkça uzat iste.
         try:
             anlatim = _uzat(a.konu, "", sahneler, anlatim_karakter)
@@ -380,8 +383,8 @@ def main() -> int:
             print(f"Anlatım uzatıldı: {anlatim_karakter} karakter")
         except Exception as _ue:
             print(f"Uzatma denemesi başarısız: {type(_ue).__name__}")
-            raise SystemExit(f"Anlatım kalite kapısı: {anlatim_karakter} karakter; en az 300 gerekli. Video oluşturulmadı.")
-    if anlatim_karakter > 650:
+            raise SystemExit(f"Anlatım kalite kapısı: {anlatim_karakter} karakter; en az 560 gerekli. Video oluşturulmadı.")
+    if anlatim_karakter > 760:
         print(f"UYARI: anlatım uzun ({anlatim_karakter} karakter ≈ {anlatim_karakter/15.4:.0f} sn). Video yine üretilir.")
     # XTTS'nin sert veya hatalı okuduğu kalıpları senaryo düzeyinde doğal Türkçeyle değiştir.
     # Böylece ses ile ekrandaki altyazı birebir aynı kalır.

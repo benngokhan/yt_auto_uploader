@@ -255,6 +255,17 @@ def _edge_tts(metin: str, cikti: Path, ayar: dict) -> None:
             cikti.unlink(missing_ok=True)
             raise SesHatasi(f"Edge Ahmet Neural üretimi başarısız: {str(hata)[:160]}") from hata
 
+def _ses_kontrol(ayar: dict) -> None:
+    """Şablon/kural: ses Gemini + Charon olmalı. Değişirse üretim durur."""
+    ses = ayar.get("ses", {})
+    sag = str(ses.get("saglayici") or "").lower()
+    vid = str(ses.get("voice_id") or "").strip()
+    if sag not in {"gemini", "gemini_tts", "gemini_natural"}:
+        raise SesHatasi(f"Ses sağlayıcısı Gemini olmalı, ayarda: {sag!r}")
+    if vid and vid != "Charon":
+        raise SesHatasi(f"Ses kimliği Charon olmalı, ayarda: {vid!r}")
+
+
 def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
     """Sesi üretir. Hizalama hazırsa döndürür; yoksa None (çağıran Whisper'a düşer)."""
     cikti = Path(cikti)
@@ -273,28 +284,9 @@ def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
         _edge_tts(metin, cikti, ayar)
         return None
     if saglayici in {"gemini", "gemini_tts", "gemini_natural"}:
-        # Gemini günlük kotası (429) biterse video üretimi durmasın:
-        # sırayla ElevenLabs -> edge-tts denenir. Ses kimliği biraz değişebilir.
-        try:
-            _gemini_tts(metin, cikti, ayar)
-            return None
-        except Exception as _ge:
-            print(f"UYARI: Gemini ses başarısız ({type(_ge).__name__}). Yedek sağlayıcı denenecek.")
-            _son = None
-            if os.getenv("ELEVENLABS_API_KEY"):
-                try:
-                    _elevenlabs(metin, cikti, ayar)
-                    print("Ses yedeği: ElevenLabs kullanıldı.")
-                    return None
-                except Exception as _ee:
-                    _son = _ee
-                    print(f"UYARI: ElevenLabs yedeği de başarısız ({type(_ee).__name__}).")
-            try:
-                _edge_tts(metin, cikti, ayar)
-                print("Ses yedeği: edge-tts kullanıldı.")
-                return None
-            except Exception as _te:
-                _son = _te
-                print(f"UYARI: edge-tts yedeği de başarısız ({type(_te).__name__}).")
-            raise SesHatasi(f"Gemini ses üretilemedi, tüm yedekler başarısız: {_son}") from _ge
+        # KURAL (sahip): ses her zaman Gemini + Charon. Başka sese GEÇİLMEZ.
+        # Gemini kotası dolarsa üretim DURUR; video yanlış sesle çıkmaz.
+        _gemini_tts(metin, cikti, ayar)
+        _ses_kontrol(ayar)
+        return None
     raise SesHatasi(f"Desteklenmeyen ses sağlayıcısı: {saglayici!r}")
