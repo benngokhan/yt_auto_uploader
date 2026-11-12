@@ -77,14 +77,31 @@ def topic_from(cb):
     m=re.search(r'Konu:\s*(.+)',content)
     return m.group(1).strip() if m else 'Yeni Bilgi Dozu videosu'
 
-def finish(cb,text):
+def _baslik_from(cb):
+    """Uzun açıklama silineceği için mesajda kalacak kısa video başlığı."""
+    msg=cb.get('message') or {}
+    content=msg.get('text') or msg.get('caption') or ''
+    m=re.search(r'Başlık:\s*(.+)',content)
+    return m.group(1).strip() if m else topic_from(cb)
+
+
+def finish(cb,text,keep_buttons=False):
+    """Uzun yayın açıklamasını SİLER, yerine yalnız kısa durum bildirimi yazar.
+
+    Sahip kararı: "Reddet dediğimde uzun açıklama silinip yerine Reddedildi
+    notu gelsin." Bu yüzden eski metin korunmaz, tamamen değiştirilir.
+    """
     tg('answerCallbackQuery',{'callback_query_id':cb['id'],'text':text[:180],'show_alert':False})
-    msg=cb.get('message') or {}; content=msg.get('text') or msg.get('caption') or ''
-    payload={'chat_id':msg['chat']['id'],'message_id':msg['message_id'],'parse_mode':'HTML','reply_markup':{'inline_keyboard':[]}}
+    msg=cb.get('message') or {}
+    baslik=_baslik_from(cb)
+    govde=f"<b>{baslik}</b>\n\n{text}"
+    payload={'chat_id':msg['chat']['id'],'message_id':msg['message_id'],
+             'parse_mode':'HTML',
+             'reply_markup':{'inline_keyboard':[]} if not keep_buttons else msg.get('reply_markup',{})}
     if msg.get('text') is not None:
-        payload['text']=content+'\n\n'+text; method='editMessageText'
+        payload['text']=govde; method='editMessageText'
     else:
-        payload['caption']=content+'\n\n'+text; method='editMessageCaption'
+        payload['caption']=govde; method='editMessageCaption'
     tg(method,payload)
 
 def process(cb,drive):
@@ -93,14 +110,20 @@ def process(cb,drive):
     if not m:return
     action,run_no,run_id=m.group(1),m.group(2),m.group(3);topic=topic_from(cb)
     video,cover,meta_file=find_files(drive,run_no)
-    if action=='keep': finish(cb,'📁 Drive’da onay bekleyen olarak tutuluyor.');return
+    if action=='keep':
+        # Onay klasörünün adını Drive'dan oku, bildirimde o ad geçsin.
+        try:
+            klasor=drive.files().get(fileId=APPROVAL,fields='name').execute().get('name') or 'Onay Bekleyen Videolar'
+        except Exception:
+            klasor='Onay Bekleyen Videolar'
+        finish(cb,f"📁 Drive'da <b>{klasor}</b> klasörüne alındı.");return
     if action=='reject':
         for f in (video,cover,meta_file):
             if f:drive.files().update(fileId=f['id'],body={'trashed':True}).execute()
-        finish(cb,'❌ Reddedildi; dosyalar geri alınabilir şekilde çöpe taşındı.');return
+        finish(cb,"❌ Reddedildi.");return
     if action=='retry':
         gh('POST','actions/workflows/motor-uret.yml/dispatches',{'ref':'main','inputs':{'konu':topic,'kuru':'false','sahne':'4','sure_min':'38','sure_max':'42','sadece_ses':'false'}})
-        finish(cb,'🔄 Yeniden üretim başlatıldı.');return
+        finish(cb,"🔄 Üretiliyor.");return
     if action=='queue':
         if not video: finish(cb,'⚠️ Onay videosu Drive’da bulunamadı.');return
         no=next_no(drive)
@@ -116,7 +139,7 @@ def process(cb,drive):
                 drive.files().update(fileId=f['id'],addParents=APPROVAL,removeParents=QUEUE,body={'name':old_name},fields='id').execute()
             raise
         if meta_file: drive.files().update(fileId=meta_file['id'],body={'trashed':True}).execute()
-        finish(cb,f"✅ Yayın kuyruğuna alındı: video_{no}.mp4 / kapak_{no}.jpg\nBaşlık: {meta['baslik']}")
+        finish(cb,f"✅ video_{no}.mp4 olarak kuyruğa alındı.")
 
 def main():
     off,sha=offset_load(); data=tg('getUpdates',{'offset':off,'timeout':0,'allowed_updates':['callback_query']})
