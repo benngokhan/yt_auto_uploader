@@ -68,6 +68,14 @@ SAHNE_SISTEM = (
     "Metin Türkçe, konuşma dili, tek bir şaşırtıcı bilgi üzerine kurulu olacak."
 )
 
+# v2 istemlerinde başlık/emoji şeması istenmiyor; model eski şemayı taklit
+# edip boş nesne döndürüyordu. Bu yüzden ayrı ve sade bir sistem istemi var.
+_LLM_SISTEM = (
+    "Sen Bilgi Dozu adlı Türkçe bilim kanalının senaristisin. "
+    "Yalnızca istenen JSON şemasını döndür; açıklama, markdown veya kod bloğu ekleme. "
+    "Metinler Türkçe, konuşma diline yakın ve sesli okunduğunda doğal olacak."
+)
+
 
 
 _GROQ_MODEL_ONBELLEK: dict[str, str] = {}
@@ -359,10 +367,11 @@ PROMPT_V2 = (
 )
 
 
-def _llm_json(istem: str, ayar: dict) -> dict:
+def _llm_json(istem: str, ayar: dict, sistem: str | None = None) -> dict:
     """Sahne planındaki sağlayıcı zincirini (groq -> gemini -> openrouter) tek istem için kullanır."""
     import urllib.request
     import re as _re
+    sistem = sistem or _LLM_SISTEM
 
     def _cagir(url, govde, basliklar):
         import time, urllib.error
@@ -384,6 +393,10 @@ def _llm_json(istem: str, ayar: dict) -> dict:
                     return json.loads(y.read().decode())
             except urllib.error.HTTPError as e:
                 son_hata = e
+                try:
+                    print(f"v2 LLM HTTP {e.code}: {e.read().decode(errors='replace')[:300]}")
+                except Exception:
+                    pass
                 if e.code in (400, 401, 403, 404):
                     raise
                 if e.code not in (429, 500, 502, 503, 504):
@@ -415,10 +428,11 @@ def _llm_json(istem: str, ayar: dict) -> dict:
             print(f"v2 LLM: groq {m}")
             d = _ayikla(_cagir("https://api.groq.com/openai/v1/chat/completions",
                 {"model": m, "temperature": 0.7,
-                 "messages": [{"role": "system", "content": SAHNE_SISTEM},
+                 "messages": [{"role": "system", "content": sistem},
                               {"role": "user", "content": istem}]},
                 {"Authorization": f"Bearer {os.environ['GROQ_API_KEY']}"})["choices"][0]["message"]["content"])
-            if d.get("cumleler") or d.get("sahneler"):
+            print(f"v2 groq yanıtı: {'dolu' if d else 'BOŞ'}")
+            if d.get("cumleler") or d.get("sahneler") or d.get("aramalar"):
                 return d
         except Exception as h:
             print(f"v2 groq başarısız: {type(h).__name__}")
@@ -431,11 +445,12 @@ def _llm_json(istem: str, ayar: dict) -> dict:
             d = _ayikla(_cagir(
                 f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
                 f"?key={os.environ['GEMINI_API_KEY']}",
-                {"systemInstruction": {"parts": [{"text": SAHNE_SISTEM}]},
+                {"systemInstruction": {"parts": [{"text": sistem}]},
                  "contents": [{"role": "user", "parts": [{"text": istem}]}],
                  "generationConfig": {"responseMimeType": "application/json", "temperature": 0.7}},
                 {})["candidates"][0]["content"]["parts"][0]["text"])
-            if d.get("cumleler") or d.get("sahneler"):
+            print(f"v2 gemini yanıtı: {'dolu' if d else 'BOŞ'}")
+            if d.get("cumleler") or d.get("sahneler") or d.get("aramalar"):
                 return d
         except Exception as h:
             print(f"v2 gemini başarısız: {type(h).__name__}")
@@ -444,12 +459,13 @@ def _llm_json(istem: str, ayar: dict) -> dict:
             m = os.getenv("OPENROUTER_LLM_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
             d = _ayikla(_cagir("https://openrouter.ai/api/v1/chat/completions",
                 {"model": m, "temperature": 0.7,
-                 "messages": [{"role": "system", "content": SAHNE_SISTEM},
+                 "messages": [{"role": "system", "content": sistem},
                               {"role": "user", "content": istem}]},
                 {"Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}",
                  "HTTP-Referer": "https://github.com/benngokhan/yt_auto_uploader",
                  "X-Title": "Bilgi Dozu Motor"})["choices"][0]["message"]["content"])
-            if d.get("cumleler") or d.get("sahneler"):
+            print(f"v2 openrouter yanıtı: {'dolu' if d else 'BOŞ'}")
+            if d.get("cumleler") or d.get("sahneler") or d.get("aramalar"):
                 return d
         except Exception as h:
             print(f"v2 openrouter başarısız: {type(h).__name__}")
@@ -472,7 +488,7 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
         raise SystemExit(f"Şablon v2 motoru yüklenemedi (motor/shorts_pipeline.py): {h}")
 
     n = max(4, min(8, int(n or 7)))
-    veri = _llm_json(PROMPT_V2.format(konu=konu, n=n, son=n - 1), ayar)
+    veri = _llm_json(PROMPT_V2.format(konu=konu, n=n, son=n - 1), ayar, _LLM_SISTEM)
     cumleler = veri.get("cumleler") or veri.get("sahneler") or []
     # Model düz liste veya {cumle: ...} döndürdüyse toparla
     if isinstance(cumleler, str):
@@ -520,9 +536,10 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> list:
         "Yazı, logo, tabela, ekran metni isteme. Konuyla ilgisiz süs görseli "
         "(duvar kağıdı, soyut ışık, genel manzara) YASAK.\n"
         "Örnek: \"honeybee hive\", \"cortisol brain\", \"alarm clock night\".\n"
-        "Yalnız JSON döndür: {\"aramalar\": [\"ingilizce arama 1\", ...]}"
+        "Yalnız JSON döndür: {\"aramalar\": [\"ingilizce arama 1\", ...]}. "
+    "Anahtar adı tam olarak \"aramalar\" olacak, dizi {n} elemanlı olacak."
     )
-    veri = _llm_json(istem, ayar)
+    veri = _llm_json(istem, ayar, _LLM_SISTEM)
     aramalar = [str(x).strip() for x in (veri.get("aramalar") or []) if str(x).strip()]
     aramalar = aramalar[:n]
     while len(aramalar) < n:
