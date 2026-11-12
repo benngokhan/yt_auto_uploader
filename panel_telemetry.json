@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-12 11:05:14",
-  "generated_at_iso": "2026-11-12T11:05:14.074996+03:00",
+  "generated_at": "2026-11-12 12:23:31",
+  "generated_at_iso": "2026-11-12T12:23:31.589155+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -31,53 +31,18 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 14,
-    "ready_longs": 1,
-    "total_ready": 15,
-    "days_of_stock": 7.5,
+    "ready_shorts": 24,
+    "ready_longs": 0,
+    "total_ready": 24,
+    "days_of_stock": 12.0,
     "next_short": "video_173.mp4",
     "next_short_title": "Güneş Bir Saniyeliğine Sönseydi Ne Olurdu? ☀️ #bilgidozu #shorts",
-    "next_long": "uzun_video_22.mp4",
-    "next_long_title": "Tokken Neden Tatlı İsteriz? Beyindeki 'Tatlı Midesi' Şalterinin 2025 Bilimsel Kanıtı 🍰 #bilgidozu",
+    "next_long": null,
+    "next_long_title": "",
     "missing_covers": []
   },
   "drive_inventory": {
     "shorts_videos": [
-      {
-        "id": "1C6l1fYQanMJjYVbmE2J2e_-x-XgMydZx",
-        "name": "ONAY_40_final.mp4",
-        "mimeType": "video/mp4",
-        "size": 54257735,
-        "modifiedTime": "2026-11-12T01:18:37.431Z"
-      },
-      {
-        "id": "1uiImYuGSs63lL4TAFilGeYJJixJmZMWO",
-        "name": "ONAY_41_final.mp4",
-        "mimeType": "video/mp4",
-        "size": 35486376,
-        "modifiedTime": "2026-11-12T01:29:26.072Z"
-      },
-      {
-        "id": "19kWp6Oprc6RoOa20Z5g5pBc1fP76QDu6",
-        "name": "ONAY_48_final.mp4",
-        "mimeType": "video/mp4",
-        "size": 37037539,
-        "modifiedTime": "2026-11-12T05:58:42.372Z"
-      },
-      {
-        "id": "1_I8k-snMuksID4RTEG8Tmu7nMMTqRlJ5",
-        "name": "SES_ONAY_38.wav",
-        "mimeType": "audio/wav",
-        "size": 3701838,
-        "modifiedTime": "2026-11-12T00:52:01.659Z"
-      },
-      {
-        "id": "1v7NJbO692Lp55qjSqycja_CJooyBvUXm",
-        "name": "uzun_video_22.mp4",
-        "mimeType": "video/mp4",
-        "size": 26890531,
-        "modifiedTime": "2026-10-30T06:42:45.208Z"
-      },
       {
         "id": "1rlJGXzkPRgGAxOUZ6F7idMhIQI1_gwij",
         "name": "video_165.mp4",
@@ -233,25 +198,74 @@
         "modifiedTime": "2026-11-11T20:26:05.870Z"
       },
       {
-        "id": "1F4zjunR8z6D4IhpP6shV_OtR2pMguI-8",
-        "name": "YAYIN_BILGISI_40.json",
-        "mimeType": "application/json",
-        "size": 977,
-        "modifiedTime": "2026-11-12T01:18:38.797Z"
+        "id": "1b75xuwTHtR0ozsrGz8CLg2N9mieDFZSD",
+        "name": "video_187.mp4",
+        "mimeType": "video/mp4",
+        "size": 13813916,
+        "modifiedTime": "2026-11-12T08:36:36.456Z"
       },
       {
-        "id": "1wnISSFEeR7oOl0t3o3RRfSVkESolr6DR",
-        "name": "YAYIN_BILGISI_41.json",
-        "mimeType": "application/json",
-        "size": 802,
-        "modifiedTime": "2026-11-12T01:29:27.501Z"
+        "id": "1SNQ9uKvejTS4zR_tpH1BOtwDWvzEthNK",
+        "name": "video_188.mp4",
+        "mimeType": "video/mp4",
+        "size": 6518015,
+        "modifiedTime": "2026-11-12T08:36:36.949Z"
       },
       {
-        "id": "1cuqo8x7Yf_aTu5L9ToncAs-Kait8FFQg",
-        "name": "YAYIN_BILGISI_48.json",
-        "mimeType": "application/json",
-        "size": 1044,
-        "modifiedTime": "2026-11-12T05:58:44.103Z"
+        "id": "15jmrSLBPu_fvMlDl_y9iSnR-Coz5jbIl",
+        "name": "video_189.mp4",
+        "mimeType": "video/mp4",
+        "size": 7924778,
+        "modifiedTime": "2026-11-12T08:36:36.324Z"
+      },
+      {
+        "id": "19NwsgHyNWof_fDydAiQfxoWQ6Ah0V5ef",
+        "name": "video_190.mp4",
+        "mimeType": "video/mp4",
+        "size": 9491174,
+        "modifiedTime": "2026-11-12T08:36:36.214Z"
+      },
+      {
+        "id": "1luYCFzAhru4vidzTD1qQTx748to-0Kgj",
+        "name": "video_191.mp4",
+        "mimeType": "video/mp4",
+        "size": 8260013,
+        "modifiedTime": "2026-11-12T08:36:36.045Z"
+      },
+      {
+        "id": "1YESu-xxTuNUfb6Ih88yfyvbT9z5DSy9R",
+        "name": "video_192.mp4",
+        "mimeType": "video/mp4",
+        "size": 9692974,
+        "modifiedTime": "2026-11-12T08:36:35.969Z"
+      },
+      {
+        "id": "1sw2ZBClCTYvnmGJCPe1ZkrMV83yimJQn",
+        "name": "video_193.mp4",
+        "mimeType": "video/mp4",
+        "size": 8430163,
+        "modifiedTime": "2026-11-12T08:36:35.750Z"
+      },
+      {
+        "id": "11QJekQX2Qx64Pc88LjZeuLyKidBKCfNq",
+        "name": "video_194.mp4",
+        "mimeType": "video/mp4",
+        "size": 9358774,
+        "modifiedTime": "2026-11-12T08:36:35.599Z"
+      },
+      {
+        "id": "1nyrQ7uoRDBRhTpliJO5Yukj9vgApGdFr",
+        "name": "video_195.mp4",
+        "mimeType": "video/mp4",
+        "size": 7383794,
+        "modifiedTime": "2026-11-12T08:36:35.493Z"
+      },
+      {
+        "id": "1QU7IWq_KUwHQ0Lkse35LhZDP_AKKfEnq",
+        "name": "video_196.mp4",
+        "mimeType": "video/mp4",
+        "size": 12639000,
+        "modifiedTime": "2026-11-12T08:36:35.400Z"
       }
     ],
     "shorts_covers": [
@@ -410,6 +424,76 @@
         "modifiedTime": "2026-11-11T20:26:04.059Z"
       },
       {
+        "id": "1kSwRJb1Wv-VN6OJ_7ZUUliaccTiLms4i",
+        "name": "kapak_187.jpg",
+        "mimeType": "image/jpeg",
+        "size": 387018,
+        "modifiedTime": "2026-11-12T08:36:34.406Z"
+      },
+      {
+        "id": "1pMP2kWiy1nlpruEHgXsAaAlIOh-Pg441",
+        "name": "kapak_188.jpg",
+        "mimeType": "image/jpeg",
+        "size": 342285,
+        "modifiedTime": "2026-11-12T08:36:34.562Z"
+      },
+      {
+        "id": "1RHtpxC64sqfWYkNZCv6zdXzkuckcBdNu",
+        "name": "kapak_189.jpg",
+        "mimeType": "image/jpeg",
+        "size": 354229,
+        "modifiedTime": "2026-11-12T08:36:34.700Z"
+      },
+      {
+        "id": "1Uvcyeikm1oUQYnLKCbz4M8S_nkvItqSd",
+        "name": "kapak_190.jpg",
+        "mimeType": "image/jpeg",
+        "size": 371538,
+        "modifiedTime": "2026-11-12T08:36:34.768Z"
+      },
+      {
+        "id": "1pPw_Jb8o-pwFS_rz4IWWvo6cJUiPOlrD",
+        "name": "kapak_191.jpg",
+        "mimeType": "image/jpeg",
+        "size": 386456,
+        "modifiedTime": "2026-11-12T08:36:34.833Z"
+      },
+      {
+        "id": "1VRLv0iH94gsl3ITfFdvvyni68wFtnIdx",
+        "name": "kapak_192.jpg",
+        "mimeType": "image/jpeg",
+        "size": 532112,
+        "modifiedTime": "2026-11-12T08:36:34.904Z"
+      },
+      {
+        "id": "1Q8vgEIpMpjlNfwYiyvN0ybbZFIcexERK",
+        "name": "kapak_193.jpg",
+        "mimeType": "image/jpeg",
+        "size": 381461,
+        "modifiedTime": "2026-11-12T08:36:35.012Z"
+      },
+      {
+        "id": "1LL1GNpX7-kqGVoTIyk_ljiWxZoxUtduQ",
+        "name": "kapak_194.jpg",
+        "mimeType": "image/jpeg",
+        "size": 444775,
+        "modifiedTime": "2026-11-12T08:36:35.136Z"
+      },
+      {
+        "id": "1EXcp0zAbaG5PoF6q8Ubhn-_Y_VSAdpjM",
+        "name": "kapak_195.jpg",
+        "mimeType": "image/jpeg",
+        "size": 313726,
+        "modifiedTime": "2026-11-12T08:36:35.216Z"
+      },
+      {
+        "id": "1IkhSAaR4d_Ex4D3kjymSg9fMG27lhMqj",
+        "name": "kapak_196.jpg",
+        "mimeType": "image/jpeg",
+        "size": 562174,
+        "modifiedTime": "2026-11-12T08:36:35.296Z"
+      },
+      {
         "id": "1wYiFRYO3ea4khqVDtGe67pCNksDgpIUk",
         "name": "kapak_40.jpg",
         "mimeType": "image/jpeg",
@@ -429,24 +513,9 @@
         "mimeType": "image/jpeg",
         "size": 827044,
         "modifiedTime": "2026-11-12T05:58:39.852Z"
-      },
-      {
-        "id": "1e22SUjKLwfd2W9DjGMVS6cBsQjK7O0L6",
-        "name": "uzun_kapak_22.png",
-        "mimeType": "image/png",
-        "size": 1796645,
-        "modifiedTime": "2026-11-02T09:11:21.077Z"
       }
     ],
-    "long_videos": [
-      {
-        "id": "1v7NJbO692Lp55qjSqycja_CJooyBvUXm",
-        "name": "uzun_video_22.mp4",
-        "mimeType": "video/mp4",
-        "size": 26890531,
-        "modifiedTime": "2026-10-30T06:42:45.208Z"
-      }
-    ],
+    "long_videos": [],
     "long_covers": [
       {
         "id": "1lecGAec31EmrMBVZKbeHy-40AI3auHay",
@@ -603,6 +672,76 @@
         "modifiedTime": "2026-11-11T20:26:04.059Z"
       },
       {
+        "id": "1kSwRJb1Wv-VN6OJ_7ZUUliaccTiLms4i",
+        "name": "kapak_187.jpg",
+        "mimeType": "image/jpeg",
+        "size": 387018,
+        "modifiedTime": "2026-11-12T08:36:34.406Z"
+      },
+      {
+        "id": "1pMP2kWiy1nlpruEHgXsAaAlIOh-Pg441",
+        "name": "kapak_188.jpg",
+        "mimeType": "image/jpeg",
+        "size": 342285,
+        "modifiedTime": "2026-11-12T08:36:34.562Z"
+      },
+      {
+        "id": "1RHtpxC64sqfWYkNZCv6zdXzkuckcBdNu",
+        "name": "kapak_189.jpg",
+        "mimeType": "image/jpeg",
+        "size": 354229,
+        "modifiedTime": "2026-11-12T08:36:34.700Z"
+      },
+      {
+        "id": "1Uvcyeikm1oUQYnLKCbz4M8S_nkvItqSd",
+        "name": "kapak_190.jpg",
+        "mimeType": "image/jpeg",
+        "size": 371538,
+        "modifiedTime": "2026-11-12T08:36:34.768Z"
+      },
+      {
+        "id": "1pPw_Jb8o-pwFS_rz4IWWvo6cJUiPOlrD",
+        "name": "kapak_191.jpg",
+        "mimeType": "image/jpeg",
+        "size": 386456,
+        "modifiedTime": "2026-11-12T08:36:34.833Z"
+      },
+      {
+        "id": "1VRLv0iH94gsl3ITfFdvvyni68wFtnIdx",
+        "name": "kapak_192.jpg",
+        "mimeType": "image/jpeg",
+        "size": 532112,
+        "modifiedTime": "2026-11-12T08:36:34.904Z"
+      },
+      {
+        "id": "1Q8vgEIpMpjlNfwYiyvN0ybbZFIcexERK",
+        "name": "kapak_193.jpg",
+        "mimeType": "image/jpeg",
+        "size": 381461,
+        "modifiedTime": "2026-11-12T08:36:35.012Z"
+      },
+      {
+        "id": "1LL1GNpX7-kqGVoTIyk_ljiWxZoxUtduQ",
+        "name": "kapak_194.jpg",
+        "mimeType": "image/jpeg",
+        "size": 444775,
+        "modifiedTime": "2026-11-12T08:36:35.136Z"
+      },
+      {
+        "id": "1EXcp0zAbaG5PoF6q8Ubhn-_Y_VSAdpjM",
+        "name": "kapak_195.jpg",
+        "mimeType": "image/jpeg",
+        "size": 313726,
+        "modifiedTime": "2026-11-12T08:36:35.216Z"
+      },
+      {
+        "id": "1IkhSAaR4d_Ex4D3kjymSg9fMG27lhMqj",
+        "name": "kapak_196.jpg",
+        "mimeType": "image/jpeg",
+        "size": 562174,
+        "modifiedTime": "2026-11-12T08:36:35.296Z"
+      },
+      {
         "id": "1wYiFRYO3ea4khqVDtGe67pCNksDgpIUk",
         "name": "kapak_40.jpg",
         "mimeType": "image/jpeg",
@@ -622,13 +761,6 @@
         "mimeType": "image/jpeg",
         "size": 827044,
         "modifiedTime": "2026-11-12T05:58:39.852Z"
-      },
-      {
-        "id": "1e22SUjKLwfd2W9DjGMVS6cBsQjK7O0L6",
-        "name": "uzun_kapak_22.png",
-        "mimeType": "image/png",
-        "size": 1796645,
-        "modifiedTime": "2026-11-02T09:11:21.077Z"
       }
     ],
     "ceo_files": [
@@ -643,8 +775,8 @@
         "id": "17nS-VEILQ72k7NKEbYcnji90p1G5UbZZ",
         "name": "bilgidozu_yukleme_tablosu.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 172956,
-        "modifiedTime": "2026-11-12T00:32:27.643Z"
+        "size": 113704,
+        "modifiedTime": "2026-11-12T08:48:54.887Z"
       },
       {
         "id": "1ulh13cnzYTaIlp1vehJ7lDrSsgjKyM_X",
@@ -1713,6 +1845,316 @@
       "drive_cover_id": "1HieMd5T3v7kPxUt0NHTV42GvuDgEyDhP"
     },
     {
+      "row": 189,
+      "file_name": "video_187.mp4",
+      "number": 187,
+      "type": "short",
+      "status": "BEKLEMEDE",
+      "is_ready": true,
+      "is_published": false,
+      "title": "Bozuk Paranın Eline Sinen Keskin Kokusu Aslında Metalden Gelmiyor! 🪙🧬 #bilgidozu #shorts",
+      "description": "💬 Yıllarca elimizdeki o kokuyu bozuk paranın kiri sanmışız, meğer kendi derimizin kimyasal tepkimesiymiş! 🤯🪙 Bunu ilk duyduğunda sen de şaşırdın mı? Yoruma yaz! 👇\n\nBozuk parayı avucunda tuttuğunda eline sinen o keskin metal kokusunun aslında paradan gelmediğini biliyor muydun? Saf demire ter değmeden dokunsan tek bir koku bile alamazsın; çünkü metaller oda sıcaklığında buharlaşmaz! Virginia Tech kimyagerlerinin 7 gönüllüyle yaptığı deneye göre elindeki ter demir atomlarını çözer, oluşan iki değerlikli demir iyonları (Fe²⁺) deri yağlarını saniyeler içinde parçalayarak 1-okten-3-on adlı uçucu gazı üretir. Burnumuz metreküpte 50 nanogram izi bile yakalar ve taze kandaki demir de aynı molekülü ürettiği için beynimiz bunu 'metal kokusu' sanır.\n\n💬 Peki sen bu gerçeği öğrendikten sonra ilk bozuk parayı mı koklardın yoksa hemen elini mi yıkardın? Yoruma yaz! 👇\n\n📚 Kaynak: Virginia Tech • Angewandte Chemie International Edition (Glindemann et al., 2006)\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #kimya #insanvücudu #bilim #ilginçbilgiler",
+      "tags": [
+        "bilgidozu",
+        "bozuk para neden kokar",
+        "metal kokusu nereden gelir",
+        "1-okten-3-on",
+        "demir kokusu efsanesi",
+        "kimya",
+        "insan vücudu",
+        "bilim",
+        "ilginç bilgiler",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Kimya ve İnsan Vücudu",
+      "pinned_comment": "Yıllarca elimizdeki o kokuyu bozuk paranın kiri sanmışız, meğer kendi derimizin kimyasal tepkimesiymiş! 🤯🪙 Bunu ilk duyduğunda sen de şaşırdın mı? Yoruma yaz! 👇",
+      "youtube_url": "",
+      "has_drive_video": true,
+      "drive_video_id": "1b75xuwTHtR0ozsrGz8CLg2N9mieDFZSD",
+      "drive_video_size_mb": 13.17,
+      "expected_cover": "kapak_187.jpg",
+      "has_drive_cover": true,
+      "drive_cover_id": "1kSwRJb1Wv-VN6OJ_7ZUUliaccTiLms4i"
+    },
+    {
+      "row": 190,
+      "file_name": "video_188.mp4",
+      "number": 188,
+      "type": "short",
+      "status": "BEKLEMEDE",
+      "is_ready": true,
+      "is_published": false,
+      "title": "Parmak Çıtlatmak Kireçlenme Yapar mı? Sol Elini 50 Yıl Çıtlatan Doktor! 🖐️💥 #bilgidozu #shorts",
+      "description": "💬 İtiraf zamanı: Videoyu izlerken refleks olarak parmaklarını çıtlatan kaç kişiyiz? 😄🖐️ 'Çıtlatma kireçlenme yapar!' diyen birine bu videoyu gönder! 👇\n\nParmak çıtlatmanın yaşlanınca el titremesi ve kireçlenme yaptığı efsanesini kanıtlamak için bir doktor kendi üzerinde 50 yıl süren çılgın bir deney yaptı! Kaliforniyalı Dr. Donald Unger tam yarım asır boyunca her gün yalnızca sol elinin parmaklarını en az iki kez çıtlattı, sağ eline ise hiç dokunmadı. 36 binden fazla çıtlatmanın sonunda çekilen röntgenlerde iki el arasında en ufak bir kireçlenme farkı bile çıkmadı ve bu çalışma Ig Nobel Ödülü kazandı! Alberta Üniversitesi'nin gerçek zamanlı MR görüntüleri de o sesin kemik sürtünmesinden değil, eklem sıvısında saniyenin binde 300'ünde oluşan mikroskobik gaz boşluğundan geldiğini kanıtladı.\n\n💬 Bu videoyu izlerken dayanamayıp parmaklarını çıtlatanlar kimler? Dürüstçe yoruma yaz! 👇\n\n📚 Kaynak: Arthritis & Rheumatism (Unger, 1998) • University of Alberta Real-Time MRI (PLOS ONE, 2015)\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #tıp #insanvücudu #bilim #ilginçbilgiler",
+      "tags": [
+        "bilgidozu",
+        "parmak çıtlatmak zararlı mı",
+        "parmak çıtlatmak kireçlenme yapar mı",
+        "donald unger deneyi",
+        "eklem sesi neden çıkar",
+        "tıp",
+        "bilim",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Tıp ve Biyomekanik",
+      "pinned_comment": "İtiraf zamanı: Videoyu izlerken refleks olarak parmaklarını çıtlatan kaç kişiyiz? 😄🖐️ 'Çıtlatma kireçlenme yapar!' diyen birine bu videoyu gönder! 👇",
+      "youtube_url": "",
+      "has_drive_video": true,
+      "drive_video_id": "1SNQ9uKvejTS4zR_tpH1BOtwDWvzEthNK",
+      "drive_video_size_mb": 6.22,
+      "expected_cover": "kapak_188.jpg",
+      "has_drive_cover": true,
+      "drive_cover_id": "1pMP2kWiy1nlpruEHgXsAaAlIOh-Pg441"
+    },
+    {
+      "row": 191,
+      "file_name": "video_189.mp4",
+      "number": 189,
+      "type": "short",
+      "status": "BEKLEMEDE",
+      "is_ready": true,
+      "is_published": false,
+      "title": "Dişini Fırçaladıktan Hemen Sonra Portakal Suyu Neden Zehir Gibi Acı Gelir? 🪥🍊 #bilgidozu #shorts",
+      "description": "💬 Çocukken sabah kahvaltıdan önce diş fırçalayıp o ilk yudum portakal suyunda hayatının şokunu yaşayanlar el kaldırsın! 🙋‍♂️🍊👇\n\nSabah dişini fırçaladıktan hemen sonra bir yudum portakal suyu içtiğinde ağzını buruşturan o zehir gibi acı tadın suçlusu nane aroması değildir! Asıl sorumlu, neredeyse her diş macununun köpürmesini sağlayan sodyum lauril sülfat (SLS) adlı yüzey aktif moleküldür. Amerikan Kimya Derneği araştırmalarına göre bu madde hem dilindeki tatlı algılayıcı reseptörleri geçici olarak kapatır, hem de acı tat tomurcuklarını örten koruyucu yağ tabakasını parçalar. Sonuçta portakal suyunun doğal şekerini hiç alamazken, içindeki sitrik asidi olduğundan katbekat acı hissedersin.\n\n💬 Sabah yanlışlıkla diş fırçalayıp üstüne meyve suyu içme hatasına sen de düştün mü? Yoruma yaz! 👇\n\n📚 Kaynak: American Chemical Society (Reactions) • Journal of Sensory Studies\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #kimya #bilim #günlükbilim #ilginçbilgiler",
+      "tags": [
+        "bilgidozu",
+        "diş fırçaladıktan sonra portakal suyu",
+        "neden acı gelir",
+        "sodyum lauril sülfat",
+        "tat alma duyusu",
+        "kimya",
+        "günlük bilim",
+        "shorts"
+      ],
+      "category_name": "Kimya ve Duyusal Nörobilim",
+      "pinned_comment": "Çocukken sabah kahvaltıdan önce diş fırçalayıp o ilk yudum portakal suyunda hayatının şokunu yaşayanlar el kaldırsın! 🙋‍♂️🍊👇",
+      "youtube_url": "",
+      "has_drive_video": true,
+      "drive_video_id": "15jmrSLBPu_fvMlDl_y9iSnR-Coz5jbIl",
+      "drive_video_size_mb": 7.56,
+      "expected_cover": "kapak_189.jpg",
+      "has_drive_cover": true,
+      "drive_cover_id": "1RHtpxC64sqfWYkNZCv6zdXzkuckcBdNu"
+    },
+    {
+      "row": 192,
+      "file_name": "video_190.mp4",
+      "number": 190,
+      "type": "short",
+      "status": "BEKLEMEDE",
+      "is_ready": true,
+      "is_published": false,
+      "title": "Dakikada 15 Kez Göz Kırpıyorsun Ama Dünya Neden Hiç Kararmıyor? 👁️🧠 #bilgidozu #shorts",
+      "description": "💬 Şu an bu yorumu okurken göz kırpma kontrolünü tamamen manuele aldığım için özür dilerim! 😄👁️ Kaç saniye kırpmadan durabildin? Yoruma yaz! 👇\n\nDakikada ortalama 15 kez göz kırpıyorsun; yani uyanık geçirdiğin her günün toplam 44 dakikasında gözlerin tamamen kapalı kalıyor! Odaya saniyenin onda biri kadar ışık kapatılıp açılsa anında fark edersin; peki kendi göz kapağın indiğinde dünya neden hiç kararmıyor? Londra Üniversitesi (UCL) ve UC Berkeley nörobilimcilerine göre beyin göz kırpma emrini gönderdiği salisede görsel merkezdeki kararma sinyalini aktif olarak susturur. Üstelik ön beyindeki hafıza devresi kapak inmeden hemen önceki son net kareyi ekranda dondurup iki görüntüyü kusursuzca birbirine diker.\n\n💬 Bu videoyu izlerken bir anda otomatik göz kırpman bozulup manuel kırpmaya başladın mı? Yoruma yaz! 👇\n\n📚 Kaynak: University College London (Current Biology) • UC Berkeley Vision Science (2017)\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #beyin #nörobilim #bilim #ilginçbilgiler",
+      "tags": [
+        "bilgidozu",
+        "göz kırpınca neden karanlık görmeyiz",
+        "günde kaç kez göz kırparız",
+        "beyin sırları",
+        "nörobilim",
+        "görsel algı",
+        "bilim",
+        "shorts"
+      ],
+      "category_name": "Nörobilim ve Görsel Algı",
+      "pinned_comment": "Şu an bu yorumu okurken göz kırpma kontrolünü tamamen manuele aldığım için özür dilerim! 😄👁️ Kaç saniye kırpmadan durabildin? Yoruma yaz! 👇",
+      "youtube_url": "",
+      "has_drive_video": true,
+      "drive_video_id": "19NwsgHyNWof_fDydAiQfxoWQ6Ah0V5ef",
+      "drive_video_size_mb": 9.05,
+      "expected_cover": "kapak_190.jpg",
+      "has_drive_cover": true,
+      "drive_cover_id": "1Uvcyeikm1oUQYnLKCbz4M8S_nkvItqSd"
+    },
+    {
+      "row": 193,
+      "file_name": "video_191.mp4",
+      "number": 191,
+      "type": "short",
+      "status": "BEKLEMEDE",
+      "is_ready": true,
+      "is_published": false,
+      "title": "Aynı Odada Sivrisinekler Neden Hep Aynı Kişiyi Seçip Isırır? 🦟🧬 #bilgidozu #shorts",
+      "description": "💬 Odada 5 kişi varken tek bir sivrisineğin gelip yine seni bulduğu o arkadaşını yoruma etiketle (ya da o kişi sensen el kaldır)! 🙋‍♂️🦟👇\n\nYaz gecesi aynı odada beş kişi otururken sivrisineklerin diğerlerine hiç dokunmayıp hep aynı kişiyi delik deşik etmesinin sebebi 'tatlı kan' değildir! Dişi sivrisinek önce 50 metre uzaktan nefesinle verdiğin karbondioksit bulutunu ve vücut ısını takip ederek hedefe yaklaşır. Rockefeller Üniversitesi'nin Cell dergisinde yayımlanan 3 yıllık araştırması asıl sırrı çözdü: Bazı insanların derisi normalden çok daha yüksek oranda karboksilik asit üretir. Ne yersen ye ya da hangi sabunu kullanırsan kullan değişmeyen bu genetik koku imzası, o kişiyi ömür boyu yürüyen bir sivrisinek mıknatısına dönüştürür.\n\n💬 Sizin evde veya arkadaş grubunda bütün sivrisinekleri üzerine çeken o 'seçilmiş kişi' sen misin? Yoruma yaz! 👇\n\n📚 Kaynak: Rockefeller University Vosshall Lab (Cell, 2022)\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #biyoloji #doğa #bilim #ilginçbilgiler",
+      "tags": [
+        "bilgidozu",
+        "sivrisinekler neden hep beni ısırır",
+        "tatlı kan efsanesi",
+        "karboksilik asit sivrisinek",
+        "rockefeller araştırması",
+        "biyoloji",
+        "bilim",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Biyoloji ve Kimya",
+      "pinned_comment": "Odada 5 kişi varken tek bir sivrisineğin gelip yine seni bulduğu o arkadaşını yoruma etiketle (ya da o kişi sensen el kaldır)! 🙋‍♂️🦟👇",
+      "youtube_url": "",
+      "has_drive_video": true,
+      "drive_video_id": "1luYCFzAhru4vidzTD1qQTx748to-0Kgj",
+      "drive_video_size_mb": 7.88,
+      "expected_cover": "kapak_191.jpg",
+      "has_drive_cover": true,
+      "drive_cover_id": "1pPw_Jb8o-pwFS_rz4IWWvo6cJUiPOlrD"
+    },
+    {
+      "row": 194,
+      "file_name": "video_192.mp4",
+      "number": 192,
+      "type": "short",
+      "status": "BEKLEMEDE",
+      "is_ready": true,
+      "is_published": false,
+      "title": "Arabada Telefona Bakınca Midemiz Neden Bulanır? Beynin Zehirleniyorum Sanıyor! 🚗📱 #bilgidozu #shorts",
+      "description": "💬 Uzun yolda yan koltukta rahatça film izleyen insanlara özenen 'arka koltukta 1 dakikada midesi bulananlar kulübü' burada mı? 🚗🤢👇\n\nGiden bir arabada telefona veya kitaba yalnızca iki dakika baktığında midenin neden bir anda altüst olduğunu hiç düşündün mü? Virajlarda iç kulağındaki denge sıvısı çalkalanarak beynine 'hızla hareket ediyoruz' sinyali gönderir; sabit ekrana kilitlenen gözlerin ise 'hayır, hareketsiz duruyoruz' der. Cardiff Üniversitesi nörobilimcilerine göre milyonlarca yıllık evrimde göz ile iç kulağın birbiriyle çeliştiği tek doğal durum, halüsinasyon yaratan zehirli bir bitki yutulmasıdır! Beynin bu duyusal çatışmayı nörotoksin zehirlenmesi sanıp seni kurtarmak için mide bulantısı alarmını devreye sokar; ufuk çizgisine bakmak çelişkiyi anında bitirir.\n\n💬 Arabada arka koltukta telefona 30 saniye bile bakamayanlardan mısın, yoksa hiç etkilenmeyenlerden mi? Yoruma yaz! 👇\n\n📚 Kaynak: Cardiff University Neuroscience • NASA Vestibular & Motion Sickness Research\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #beyin #nörobilim #insanvücudu #bilim",
+      "tags": [
+        "bilgidozu",
+        "arabada telefona bakınca neden mide bulanır",
+        "yol tutması neden olur",
+        "araba tutması çözümü",
+        "iç kulak denge",
+        "nörobilim",
+        "bilim",
+        "shorts"
+      ],
+      "category_name": "Nörobilim ve Evrimsel Tıp",
+      "pinned_comment": "Uzun yolda yan koltukta rahatça film izleyen insanlara özenen 'arka koltukta 1 dakikada midesi bulananlar kulübü' burada mı? 🚗🤢👇",
+      "youtube_url": "",
+      "has_drive_video": true,
+      "drive_video_id": "1YESu-xxTuNUfb6Ih88yfyvbT9z5DSy9R",
+      "drive_video_size_mb": 9.24,
+      "expected_cover": "kapak_192.jpg",
+      "has_drive_cover": true,
+      "drive_cover_id": "1VRLv0iH94gsl3ITfFdvvyni68wFtnIdx"
+    },
+    {
+      "row": 195,
+      "file_name": "video_193.mp4",
+      "number": 193,
+      "type": "short",
+      "status": "BEKLEMEDE",
+      "is_ready": true,
+      "is_published": false,
+      "title": "Yerde Yüzüne Bakmadığın Domates Suyu Uçakta Neden Çok Lezzetli Gelir? ✈️🍅 #bilgidozu #shorts",
+      "description": "💬 Yerde kapağını bile açmayıp 10.000 metrede hostesten domates suyu isteyenler kimler? 😄✈️🍅 Senin uçaktaki vazgeçilmezin ne? 👇\n\nNormal hayatında hiç domates suyu içmeyen milyonlarca insanın uçağa bindiği an domates suyu istemesinin arkasında şaşırtıcı bir nörobilim sırrı var! 10 bin metre irtifada çöl kadar kuruyan %12 kabin nemi ve düşük basınç koku alma duyunu zayıflatır. Cornell Üniversitesi'nin 85 desibellik uçak motoru uğultusunu simüle ettiği deneyde, yüksek gürültünün dildeki tatlı algısını %30 oranında körelttiği kanıtlandı! Ancak aynı motor uğultusu dildeki beşinci tat olan 'umami' reseptörlerini tam tersine keskinleştirir ve umami deposu domates suyunu gökyüzünde lezzet patlamasına dönüştürür.\n\n💬 Uçakta en sevdiğin içecek ne? Sen de gökyüzünde domates suyu içenlerden misin? Yoruma yaz! 👇\n\n📚 Kaynak: Cornell University Food Science (Journal of Experimental Psychology, 2015) • Fraunhofer Institute\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #havacılık #bilim #beyin #ilginçbilgiler",
+      "tags": [
+        "bilgidozu",
+        "uçakta domates suyu neden lezzetli",
+        "uçakta tat alma neden değişir",
+        "umami nedir",
+        "cornell uçak gürültüsü araştırması",
+        "havacılık",
+        "bilim",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Duyusal Fizyoloji ve Havacılık",
+      "pinned_comment": "Yerde kapağını bile açmayıp 10.000 metrede hostesten domates suyu isteyenler kimler? 😄✈️🍅 Senin uçaktaki vazgeçilmezin ne? 👇",
+      "youtube_url": "",
+      "has_drive_video": true,
+      "drive_video_id": "1sw2ZBClCTYvnmGJCPe1ZkrMV83yimJQn",
+      "drive_video_size_mb": 8.04,
+      "expected_cover": "kapak_193.jpg",
+      "has_drive_cover": true,
+      "drive_cover_id": "1Q8vgEIpMpjlNfwYiyvN0ybbZFIcexERK"
+    },
+    {
+      "row": 196,
+      "file_name": "video_194.mp4",
+      "number": 194,
+      "type": "short",
+      "status": "BEKLEMEDE",
+      "is_ready": true,
+      "is_published": false,
+      "title": "Orta Parmağını Kıvırıp Masaya Koyduğunda Yüzük Parmağın Neden Kilitlenir? 🖐️🔒 #bilgidozu #shorts",
+      "description": "💬 Videonun 5. saniyesinde elini masaya koyup yüzük parmağıyla inatlaşan herkes burada mı? 😂🖐️ Kaldırabilen çıktı mı? Yoruma yaz! 👇\n\nŞu an telefonu bırakmadan tek elinle deneyebileceğin inanılmaz bir anatomi testi var: Orta parmağını içeri kıvırıp elini masaya yasla! Başparmağını, işaret parmağını ve serçe parmağını masadan kolayca kaldırabilirsin ama yüzük parmağın masaya zamkla yapışmış gibi kilitlenir! El cerrahisi anatomisine göre diğer parmakların kendilerine ait bağımsız gerdirici kas kirişleri varken, yüzük parmağının tendonu orta parmakla çapraz bağlarla birbirine kenetlenmiştir. Orta parmak bükülü kaldığı sürece bu ortak tendon gevşeyemez ve beynin ne kadar emir verirse versin yüzük parmağı fiziksel olarak kalkamaz.\n\n💬 Hemen denedin değil mi? Yüzük parmağını 1 milimetre bile oynatabilen var mı? Yoruma yaz! 👇\n\n📚 Kaynak: Journal of Hand Surgery • Gray's Anatomy (Juncturae Tendinum Biomechanics)\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #anatomi #insanvücudu #bilim #deney",
+      "tags": [
+        "bilgidozu",
+        "yüzük parmağı neden kalkmaz",
+        "orta parmak yüzük parmağı deneyi",
+        "el anatomisi",
+        "tendon testi",
+        "insan vücudu",
+        "bilim",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Anatomi ve Biyomekanik",
+      "pinned_comment": "Videonun 5. saniyesinde elini masaya koyup yüzük parmağıyla inatlaşan herkes burada mı? 😂🖐️ Kaldırabilen çıktı mı? Yoruma yaz! 👇",
+      "youtube_url": "",
+      "has_drive_video": true,
+      "drive_video_id": "11QJekQX2Qx64Pc88LjZeuLyKidBKCfNq",
+      "drive_video_size_mb": 8.93,
+      "expected_cover": "kapak_194.jpg",
+      "has_drive_cover": true,
+      "drive_cover_id": "1LL1GNpX7-kqGVoTIyk_ljiWxZoxUtduQ"
+    },
+    {
+      "row": 197,
+      "file_name": "video_195.mp4",
+      "number": 195,
+      "type": "short",
+      "status": "BEKLEMEDE",
+      "is_ready": true,
+      "is_published": false,
+      "title": "Parmak Şıklattığında Çıkan Ses İki Parmağın Çarpışmasından Gelmiyor! 🫰⚡ #bilgidozu #shorts",
+      "description": "💬 Şu an yavaş çekimde parmağını şıklatıp orta parmağının avuç içine vurduğunu ilk kez fark eden kaç kişiyiz? 🤯🫰👇\n\nParmak şıklattığında duyduğun o keskin 'şıklama' sesinin başparmakla orta parmağın sürtünmesinden çıktığını sanıyorsan yanılıyorsun! Georgia Tech fizikçilerinin yüksek hızlı kameralarla çözdüğü mekaniğe göre deri sürtünmesi yalnızca enerjiyi yay gibi biriktiren bir mandal görevi görür. Orta parmak kurtulduğu an yalnızca 7 milisaniyede, profesyonel bir beyzbol atıcısının kolundan 3 kat daha yüksek açısal ivmeye ulaşarak insan vücudunun en hızlı hareketini yapar! Duyduğun o patlama sesi ise orta parmağın başparmağın kökündeki avuç içi etine çarpmasıyla oluşan şok dalgasıdır; parmağa kaygan eldiven veya yüksük takınca ses anında yok olur.\n\n💬 Bunu duyunca parmağını şıklatıp avuç içine çarpışını kontrol edenler kimler? Yoruma yaz! 👇\n\n📚 Kaynak: Georgia Institute of Technology (Journal of the Royal Society Interface, 2021)\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #fizik #insanvücudu #bilim #ilginçbilgiler",
+      "tags": [
+        "bilgidozu",
+        "parmak şıklatma sesi nasıl çıkar",
+        "insan vücudunun en hızlı hareketi",
+        "georgia tech parmak şıklatma",
+        "biyomekanik",
+        "fizik",
+        "bilim",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Fizik ve Biyomekanik",
+      "pinned_comment": "Şu an yavaş çekimde parmağını şıklatıp orta parmağının avuç içine vurduğunu ilk kez fark eden kaç kişiyiz? 🤯🫰👇",
+      "youtube_url": "",
+      "has_drive_video": true,
+      "drive_video_id": "1nyrQ7uoRDBRhTpliJO5Yukj9vgApGdFr",
+      "drive_video_size_mb": 7.04,
+      "expected_cover": "kapak_195.jpg",
+      "has_drive_cover": true,
+      "drive_cover_id": "1EXcp0zAbaG5PoF6q8Ubhn-_Y_VSAdpjM"
+    },
+    {
+      "row": 198,
+      "file_name": "video_196.mp4",
+      "number": 196,
+      "type": "short",
+      "status": "BEKLEMEDE",
+      "is_ready": true,
+      "is_published": false,
+      "title": "Vücut Ateşin 39 Dereceye Çıkmışken Neden Buz Kesmiş Gibi Titreyerek Üşürsün? 🤒🧊 #bilgidozu #shorts",
+      "description": "💬 Annenin alnına elini koyup 'yanıyorsun üstünü aç!' dediği, senin ise 'anne donuyorum battaniye ver!' dediğin o klasik an... 😅🤒👇\n\nHasta olduğunda alnın 39 derece ateşle cayır cayır yanarken neden iki kat yorganın altında dişlerin birbirine vuracak kadar üşürsün? Çünkü o an oda soğumamıştır; beynin sana kendi termostatıyla zekice bir oyun oynuyordur! Harvard Tıp Fakültesi fizyologlarına göre bağışıklık hücreleri virüsleri yavaşlatmak için beyindeki hipotalamus ısı merkezine 'hedef sıcaklığı 37'den 39,5 dereceye çıkar' emri gönderir. Yeni hedef 39,5 derece olunca beynin 38 derecelik sıcak vücudunu bile 'fazla soğuk' algılar; damarları büzüp kasları saniyede onlarca kez titreterek sıcaklığı hedefe tırmandırır.\n\n💬 Ateşlendiğinde 'üstümü örtün donuyorum!' diyenlerden misin? Yoruma yaz! 👇\n\n📚 Kaynak: Harvard Medical School • Guyton and Hall Textbook of Medical Physiology\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #tıp #sağlık #insanvücudu #bilim",
+      "tags": [
+        "bilgidozu",
+        "ateş çıkınca neden üşürüz",
+        "ateş ve titreme neden olur",
+        "hipotalamus vücut ısısı",
+        "bağışıklık sistemi",
+        "tıp",
+        "sağlık",
+        "bilim",
+        "shorts",
+        "doz dışı"
+      ],
+      "category_name": "Tıp ve İnsan Fizyolojisi",
+      "pinned_comment": "Annenin alnına elini koyup 'yanıyorsun üstünü aç!' dediği, senin ise 'anne donuyorum battaniye ver!' dediğin o klasik an... 😅🤒👇",
+      "youtube_url": "",
+      "has_drive_video": true,
+      "drive_video_id": "1QU7IWq_KUwHQ0Lkse35LhZDP_AKKfEnq",
+      "drive_video_size_mb": 12.05,
+      "expected_cover": "kapak_196.jpg",
+      "has_drive_cover": true,
+      "drive_cover_id": "1IkhSAaR4d_Ex4D3kjymSg9fMG27lhMqj"
+    },
+    {
       "row": 64,
       "file_name": "uzun_video_8.mp4",
       "number": 8,
@@ -2162,12 +2604,12 @@
       "category_name": "İnsan Vücudu ve Beyin",
       "pinned_comment": "Yemekten hemen sonra tatlı arayanlardan mısın yoksa çayla geçiştirebilenlerden mi? Yoruma yaz! 👇",
       "youtube_url": "",
-      "has_drive_video": true,
-      "drive_video_id": "1v7NJbO692Lp55qjSqycja_CJooyBvUXm",
-      "drive_video_size_mb": 25.64,
+      "has_drive_video": false,
+      "drive_video_id": "",
+      "drive_video_size_mb": 0,
       "expected_cover": "uzun_kapak_22.png",
-      "has_drive_cover": true,
-      "drive_cover_id": "1e22SUjKLwfd2W9DjGMVS6cBsQjK7O0L6"
+      "has_drive_cover": false,
+      "drive_cover_id": ""
     }
   ],
   "isciler": [
