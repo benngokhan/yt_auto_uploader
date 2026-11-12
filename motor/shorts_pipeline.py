@@ -44,6 +44,7 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
+import endcard_v2
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -71,8 +72,11 @@ def _resolve_ffmpeg() -> str:
     which_ff = shutil.which("ffmpeg")
     if which_ff:
         return which_ff
-    import imageio_ffmpeg
-    return imageio_ffmpeg.get_ffmpeg_exe()
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        return "ffmpeg"
 
 
 FF = _resolve_ffmpeg()
@@ -96,11 +100,11 @@ BADGE_BEVEL = (154, 169, 13, 255)     # #9AA90D 3D alt kabartma gölgesi
 DARK_TEXT = (15, 18, 21, 255)         # #0F1215 rozet & buton koyu metin
 PURE_WHITE = (255, 255, 255, 255)     # #FFFFFF 1. satır başlık & pasif altyazı
 
-# Ses & Zamanlama Sabitleri (Onaylı deneme8 / v2 Master)
+# Ses & Zamanlama Sabitleri (Onaylı v2.1 Master + 3D Kapanış Kartı)
 DEFAULT_INTRO_LEAD = 1.45
 DEFAULT_SENT_PAUSE = 0.62
-DEFAULT_OUTRO_HOLD = 1.45
-DUCK_FLOOR = 0.165                    # -15.65 dB konuşma altı müzik seviyesi
+DEFAULT_OUTRO_HOLD = endcard_v2.OUTRO_HOLD_SEC  # 2.35 sn canlı 3D Kapanış Kartı tutuşu
+DUCK_FLOOR = 0.165                              # -15.65 dB konuşma altı müzik seviyesi
 TARGET_LUFS = -14.2
 
 
@@ -124,6 +128,7 @@ def norm_word(w: str) -> str:
 
 
 FONT_SEARCH_DIRS = [
+    os.path.join(HERE, "assets"),
     os.path.join(HERE, "fonts", "poppins"),
     os.path.join(HERE, "sablon_v165", "shorts", "fonts"),
     os.path.join(HERE, "fonts", "raw"),
@@ -973,19 +978,18 @@ def stage_timing(vdir_arg: str, explicit_cfg_path: str = None):
     for si in range(len(scene_timeline) - 1):
         scene_timeline[si + 1]["start"] = scene_timeline[si]["end"]
 
-    # [TAKİP ET] butonu tetik zamanı ("takip" kelimesi varsa tam o anda, yoksa son 1.9 sn)
-    cta_start = max(1.5, last_word_end - 0.55)
-    for ch in reversed(chunks):
-        for wd in ch["words"]:
-            if norm_word(wd["w"]).startswith("takip"):
-                cta_start = round(wd["s"], 3)
-                break
-        else:
-            continue
-        break
+    # Onaylı Saf 3D Kapanış Ekranı: "Daha fazla Bilgi Dozu..." cümlesine girer girmez kararır,
+    # tam "takip et!" dendiği anda fare butona tıklar!
+    flat_words = [wd for ch in chunks for wd in ch["words"]]
+    cta_start, click_delay = endcard_v2.find_endcard_and_click_times(flat_words, last_word_end)
+    for ch in chunks:
+        if ch["show"] >= cta_start - 0.05:
+            ch["hide"] = ch["show"]  # Kapanış cümlesinde altyazı gösterilmez, sadece animasyon!
+        elif ch["hide"] > cta_start:
+            ch["hide"] = round(cta_start, 3)
 
     out = {
-        "template_version": "2.0",
+        "template_version": "2.2",
         "fps": FPS,
         "total": total_dur,
         "vo_dur": round(dur_raw, 3),
@@ -996,6 +1000,7 @@ def stage_timing(vdir_arg: str, explicit_cfg_path: str = None):
         "outro_hold": outro_hold,
         "last_end": round(last_word_end, 3),
         "cta_start": round(cta_start, 3),
+        "cta_click_delay": round(click_delay, 3),
         "scene_switch": round(total_dur * 0.48, 2),
         "scenes": scene_timeline,
         "sentence_spans": [[round(a, 3), round(b, 3)] for a, b in spaced_sent_spans],
@@ -1131,27 +1136,9 @@ def synthesize_bilgidozu_jenerik(dur_sec: float, sr: int = SR, semitone_shift: i
     return np.clip(out, -0.92, 0.92)
 
 
-def synthesize_cta_sfx(sr: int = SR) -> np.ndarray:
-    """[TAKİP ET] butonu için sıcak yaylı pop + tık (click) ses efekti."""
-    n = int(0.65 * sr)
-    y = np.zeros(n, dtype=np.float64)
-    # 1) t=0.02s: sıcak kabarcık pop (185 Hz -> 430 Hz)
-    i0, ln = int(0.02 * sr), int(0.11 * sr)
-    tt = np.arange(ln, dtype=np.float64) / sr
-    f_pop = 185.0 + 245.0 * (1.0 - np.exp(-tt * 38.0))
-    ph = 2 * np.pi * np.cumsum(f_pop) / sr
-    y[i0:i0 + ln] += np.sin(ph) * (1.0 - np.exp(-tt * 140.0)) * np.exp(-tt * 28.0) * 0.28
-    # 2) t=0.34s: fiziksel buton tıklaması + onay tınısı
-    c0, cln = int(0.34 * sr), int(0.035 * sr)
-    ct = np.arange(cln, dtype=np.float64) / sr
-    click = (np.sin(2 * np.pi * 1480.0 * ct) * 0.55 + np.sin(2 * np.pi * 2850.0 * ct) * 0.45) * np.exp(-ct * 155.0)
-    y[c0:c0 + cln] += click * 0.26
-    c2 = c0 + int(0.045 * sr)
-    cln2 = int(0.14 * sr)
-    ct2 = np.arange(cln2, dtype=np.float64) / sr
-    confirm = (np.sin(2 * np.pi * 880.0 * ct2) * 0.6 + np.sin(2 * np.pi * 1318.5 * ct2) * 0.4) * np.exp(-ct2 * 18.0)
-    y[c2:c2 + cln2] += confirm * 0.16
-    return np.stack([y, y], axis=1)
+def synthesize_cta_sfx(click_delay: float = 1.25, sr: int = SR) -> np.ndarray:
+    """Onaylı 3D Kapanış Kartı SFX: yumuşak giriş pop + gerçek fare çift tık + A5->E6 onay tınısı."""
+    return endcard_v2.synthesize_endcard_sfx(click_delay=click_delay, sr=sr)
 
 
 def stage_music(vdir_arg: str, explicit_cfg_path: str = None):
@@ -1264,9 +1251,10 @@ def build_mix(work_dir: str, tl: dict) -> str:
 
     mix_st = np.stack([vo_mono, vo_mono], axis=1) + mus_ducked
 
-    # [TAKİP ET] pop + click SFX ekle
-    cta_t = float(tl.get("cta_start", max(1.0, total - 2.0)))
-    sfx = synthesize_cta_sfx(SR)
+    # [TAKİP ET] pop + click SFX ekle ("takip et!" anına kilitli)
+    cta_t = float(tl.get("cta_start", max(1.0, total - 2.6)))
+    click_delay = float(tl.get("cta_click_delay", 1.25))
+    sfx = synthesize_cta_sfx(click_delay=click_delay, sr=SR)
     s0 = int(round(cta_t * SR))
     if 0 <= s0 < n_tot:
         s1 = min(n_tot, s0 + len(sfx))
@@ -1415,7 +1403,8 @@ def render_video(vdir_arg: str, explicit_cfg_path: str = None):
     brand_w2 = wlen(meas, "DOZU", f_brand)
     brand_tot = brand_w1 + brand_w2
 
-    cta_start = float(tl.get("cta_start", max(1.0, total - 2.0)))
+    cta_start = float(tl.get("cta_start", max(1.0, total - 2.6)))
+    cta_click_delay = float(tl.get("cta_click_delay", 1.25))
 
     cmd = [
         FF, "-y", "-hide_banner", "-loglevel", "error",
@@ -1436,119 +1425,103 @@ def render_video(vdir_arg: str, explicit_cfg_path: str = None):
     for fi in range(NF):
         tsec = fi / float(FPS)
         bg, si, since_scene = _scene_bg_at(plates_by_idx, closing_plate, scenes_tl, tsec)
+        bg = endcard_v2.blur_bg_for_endcard(bg, tsec, cta_start, W=W)
+        ui_mul = endcard_v2.ui_fade_multiplier(tsec, cta_start)
+
         ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         d = ImageDraw.Draw(ov)
 
-        # 1) Üst İlerleme Çubuğu (x=79..1043, y=48..56)
-        prog = clamp01(fi / max(1, NF - 1))
-        d.rounded_rectangle([bar_x0, bar_y0, bar_x1, bar_y1], radius=S_(4), fill=(255, 255, 255, 58))
-        fw = int(round(bar_w * prog))
-        if fw > S_(6):
-            glow = Image.new("RGBA", (W, S_(90)), (0, 0, 0, 0))
-            gd = ImageDraw.Draw(glow)
-            gd.rounded_rectangle([bar_x0, bar_y0 - S_(2), bar_x0 + fw, bar_y1 + S_(2)],
-                                 radius=S_(5), fill=(217, 243, 38, 105))
-            ov.alpha_composite(glow.filter(ImageFilter.GaussianBlur(S_(5))), (0, 0))
-            d.rounded_rectangle([bar_x0, bar_y0, bar_x0 + fw, bar_y1], radius=S_(4), fill=PROG_YEL)
+        # Kapanış cümlesi ("Daha fazla Bilgi Dozu...") başladığında üstteki yeşil çubuk ve
+        # alttaki kaynak dahil TÜM arayüz söner; ekranda SADECE 3D animasyon kalır!
+        if ui_mul > 0.02:
+            # 1) Üst İlerleme Çubuğu (x=79..1043, y=48..56)
+            prog = clamp01(fi / max(1, NF - 1))
+            d.rounded_rectangle([bar_x0, bar_y0, bar_x1, bar_y1], radius=S_(4), fill=(255, 255, 255, int(58 * ui_mul)))
+            fw = int(round(bar_w * prog))
+            if fw > S_(6):
+                glow = Image.new("RGBA", (W, S_(90)), (0, 0, 0, 0))
+                gd = ImageDraw.Draw(glow)
+                gd.rounded_rectangle([bar_x0, bar_y0 - S_(2), bar_x0 + fw, bar_y1 + S_(2)],
+                                     radius=S_(5), fill=(217, 243, 38, int(105 * ui_mul)))
+                ov.alpha_composite(glow.filter(ImageFilter.GaussianBlur(S_(5))), (0, 0))
+                d.rounded_rectangle([bar_x0, bar_y0, bar_x0 + fw, bar_y1], radius=S_(4), fill=(217, 243, 38, int(255 * ui_mul)))
 
-        # 2) 3D Kabartmalı "BİLGİ DOZU" Rozeti (x=77, y=80)
-        ov.alpha_composite(badge_im, (S_(77) - S_(14), S_(80) - S_(14)))
-
-        # 3) Dinamik Sahne Başlığı + Semantik Sarı İkon (y=287..430)
-        sc_obj = scenes_tl[si]
-        e_hd = ease_out(since_scene / 0.20) if si > 0 else ease_out((tsec - 0.05) / 0.25)
-        if e_hd > 0.01:
-            al_h = int(255 * e_hd)
-            dy_h = int(round((1.0 - e_hd) * S_(14)))
-            draw_semantic_icon(ov, sc_obj["icon"], S_(108), S_(356) + dy_h, alpha=al_h)
-            fh = headline_fonts[si]
-            tx = S_(162)
-            y1 = S_(286) + dy_h
-            y2 = y1 + int(round(fh.size * 1.15))
-            d.text((tx + S_(3), y1 + S_(4)), sc_obj["line1"], font=fh, fill=(0, 0, 0, int(al_h * 0.82)))
-            d.text((tx, y1), sc_obj["line1"], font=fh, fill=(255, 255, 255, al_h))
-            d.text((tx + S_(3), y2 + S_(4)), sc_obj["line2"], font=fh, fill=(0, 0, 0, int(al_h * 0.82)))
-            d.text((tx, y2), sc_obj["line2"], font=fh, fill=(227, 244, 36, al_h))
-
-        # 4) Tek Kelime Aktif Sarı (#E3F424) Karaoke Altyazı (y=1131..1270)
-        active_ch = None
-        for ch in tl["chunks"]:
-            if ch["show"] <= tsec < ch["hide"]:
-                active_ch = ch
-                break
-        if active_ch is not None:
-            e_in = ease_out((tsec - active_ch["show"]) / 0.10)
-            e_out = clamp01((active_ch["hide"] - tsec) / 0.12)
-            al_c = int(255 * e_in * e_out)
-            if al_c > 4:
-                active_k = -1
-                for wi, wd in enumerate(active_ch["words"]):
-                    if (wd["s"] - 0.025) <= tsec <= (wd["e"] + 0.045):
-                        active_k = wi
-                    elif tsec >= wd["s"] and active_k == -1:
-                        active_k = wi
-                rows = active_ch["_rows"]
-                row_h = S_(66)
-                y_start = S_(1164) if len(rows) == 1 else S_(1131)
-                w_idx_global = 0
-                for ri, row in enumerate(rows):
-                    tot_rw = sum(ww for _, ww in row) + S_(15) * max(0, len(row) - 1)
-                    rx = (W - tot_rw) / 2.0
-                    ry = y_start + ri * row_h
-                    for wd, ww in row:
-                        is_now = (w_idx_global == active_k)
-                        lift = -S_(2) if is_now else 0
-                        col = (227, 244, 36, al_c) if is_now else (255, 255, 255, al_c)
-                        d.text((rx + S_(3), ry + lift + S_(4)), wd["w"], font=f_cap, fill=(0, 0, 0, int(al_c * 0.86)))
-                        d.text((rx, ry + lift), wd["w"], font=f_cap, fill=col)
-                        rx += ww + S_(15)
-                        w_idx_global += 1
-
-        # 5) Kapanış 3D [TAKİP ET] Butonu ("takip et!" hemen altında: y=1318..1382)
-        tb = tsec - cta_start
-        if tb >= 0.0:
-            # Yaylı pop-in (0..0.22s) + fiziksel basım (0.32..0.48s) + halka dalgası + parlama
-            if tb < 0.22:
-                u = tb / 0.22
-                sc_b = 0.55 + 0.53 * ease_out(u) - 0.08 * (u ** 2)
+            # 2) 3D Kabartmalı "BİLGİ DOZU" Rozeti (x=77, y=80)
+            if ui_mul >= 0.98:
+                ov.alpha_composite(badge_im, (S_(77) - S_(14), S_(80) - S_(14)))
             else:
-                sc_b = 1.0 + 0.018 * math.sin(2.0 * math.pi * 1.1 * (tb - 0.22))
-            pressed = 0.0
-            if 0.32 <= tb <= 0.50:
-                pressed = math.sin(math.pi * (tb - 0.32) / 0.18)
-                sc_b *= (1.0 - 0.055 * pressed)
-            sheen = (tb - 0.44) / 0.38 if 0.44 <= tb <= 0.82 else -1.0
+                b_tmp = badge_im.copy()
+                b_tmp.putalpha(b_tmp.getchannel("A").point(lambda v: int(v * ui_mul)))
+                ov.alpha_composite(b_tmp, (S_(77) - S_(14), S_(80) - S_(14)))
 
-            # Şok dalgası halkası (tıklama anından yayılan sarı halka)
-            if 0.34 <= tb <= 0.92:
-                rp = (tb - 0.34) / 0.58
-                ral = int(190 * (1.0 - rp) ** 1.6)
-                rxp = int(S_(114) + S_(82) * ease_out(rp))
-                ryp = int(S_(32) + S_(42) * ease_out(rp))
-                cx_b, cy_b = W // 2, S_(1350)
-                d.rounded_rectangle([cx_b - rxp, cy_b - ryp, cx_b + rxp, cy_b + ryp],
-                                    radius=S_(28), outline=(227, 244, 36, ral), width=max(1, S_(4)))
+            # 3) Dinamik Sahne Başlığı + Semantik Sarı İkon (y=287..430)
+            sc_obj = scenes_tl[si]
+            e_hd = ease_out(since_scene / 0.20) if si > 0 else ease_out((tsec - 0.05) / 0.25)
+            if e_hd > 0.01:
+                al_h = int(255 * e_hd * ui_mul)
+                dy_h = int(round((1.0 - e_hd) * S_(14)))
+                draw_semantic_icon(ov, sc_obj["icon"], S_(108), S_(356) + dy_h, alpha=al_h)
+                fh = headline_fonts[si]
+                tx = S_(162)
+                y1 = S_(286) + dy_h
+                y2 = y1 + int(round(fh.size * 1.15))
+                d.text((tx + S_(3), y1 + S_(4)), sc_obj["line1"], font=fh, fill=(0, 0, 0, int(al_h * 0.82)))
+                d.text((tx, y1), sc_obj["line1"], font=fh, fill=(255, 255, 255, al_h))
+                d.text((tx + S_(3), y2 + S_(4)), sc_obj["line2"], font=fh, fill=(0, 0, 0, int(al_h * 0.82)))
+                d.text((tx, y2), sc_obj["line2"], font=fh, fill=(227, 244, 36, al_h))
 
-            btn_cur = btn_idle if (pressed <= 0.01 and sheen < 0.0) else build_3d_cta_button(pressed=pressed, sheen_pos=sheen)
-            nw = max(4, int(round(btn_cur.width * sc_b)))
-            nh = max(4, int(round(btn_cur.height * sc_b)))
-            btn_rs = btn_cur if (nw == btn_cur.width and nh == btn_cur.height) else btn_cur.resize((nw, nh), Image.LANCZOS)
-            ov.alpha_composite(btn_rs, (W // 2 - nw // 2, S_(1350) - nh // 2))
+            # 4) Tek Kelime Aktif Sarı (#E3F424) Karaoke Altyazı (y=1131..1270)
+            active_ch = None
+            for ch in tl["chunks"]:
+                if ch["show"] <= tsec < ch["hide"]:
+                    active_ch = ch
+                    break
+            if active_ch is not None:
+                e_in = ease_out((tsec - active_ch["show"]) / 0.10)
+                e_out = clamp01((active_ch["hide"] - tsec) / 0.12)
+                al_c = int(255 * e_in * e_out * ui_mul)
+                if al_c > 4:
+                    active_k = -1
+                    for wi, wd in enumerate(active_ch["words"]):
+                        if (wd["s"] - 0.025) <= tsec <= (wd["e"] + 0.045):
+                            active_k = wi
+                        elif tsec >= wd["s"] and active_k == -1:
+                            active_k = wi
+                    rows = active_ch["_rows"]
+                    row_h = S_(66)
+                    y_start = S_(1164) if len(rows) == 1 else S_(1131)
+                    w_idx_global = 0
+                    for ri, row in enumerate(rows):
+                        tot_rw = sum(ww for _, ww in row) + S_(15) * max(0, len(row) - 1)
+                        rx = (W - tot_rw) / 2.0
+                        ry = y_start + ri * row_h
+                        for wd, ww in row:
+                            is_now = (w_idx_global == active_k)
+                            lift = -S_(2) if is_now else 0
+                            col = (227, 244, 36, al_c) if is_now else (255, 255, 255, al_c)
+                            d.text((rx + S_(3), ry + lift + S_(4)), wd["w"], font=f_cap, fill=(0, 0, 0, int(al_c * 0.86)))
+                            d.text((rx, ry + lift), wd["w"], font=f_cap, fill=col)
+                            rx += ww + S_(15)
+                            w_idx_global += 1
 
-        # 6) Alt Kaynak + Temsilî Not + Ortalı BİLGİ DOZU İmzası (y=1751..1883)
-        x_n1 = (W - wlen(d, note1_txt, f_note1)) / 2.0
-        x_n2 = (W - wlen(d, note2_txt, f_note2)) / 2.0
-        d.text((x_n1 + S_(2), S_(1753)), note1_txt, font=f_note1, fill=(0, 0, 0, 175))
-        d.text((x_n1, S_(1751)), note1_txt, font=f_note1, fill=(232, 236, 239, 225))
-        d.text((x_n2 + S_(2), S_(1786)), note2_txt, font=f_note2, fill=(0, 0, 0, 155))
-        d.text((x_n2, S_(1784)), note2_txt, font=f_note2, fill=(167, 176, 184, 195))
+            # 5) Alt Kaynak + Temsilî Not + BİLGİ DOZU İmzası (kapanış cümlesinde tamamen söner)
+            x_n1 = (W - wlen(d, note1_txt, f_note1)) / 2.0
+            x_n2 = (W - wlen(d, note2_txt, f_note2)) / 2.0
+            d.text((x_n1 + S_(2), S_(1753)), note1_txt, font=f_note1, fill=(0, 0, 0, int(175 * ui_mul)))
+            d.text((x_n1, S_(1751)), note1_txt, font=f_note1, fill=(232, 236, 239, int(225 * ui_mul)))
+            d.text((x_n2 + S_(2), S_(1786)), note2_txt, font=f_note2, fill=(0, 0, 0, int(155 * ui_mul)))
+            d.text((x_n2, S_(1784)), note2_txt, font=f_note2, fill=(167, 176, 184, int(195 * ui_mul)))
 
-        xb = (W - brand_tot) / 2.0
-        yb = S_(1828)
-        d.text((xb + S_(3), yb + S_(4)), "BİLGİ", font=f_brand, fill=(0, 0, 0, 200))
-        d.text((xb, yb), "BİLGİ", font=f_brand, fill=PURE_WHITE)
-        d.text((xb + brand_w1 + S_(3), yb + S_(4)), "DOZU", font=f_brand, fill=(0, 0, 0, 200))
-        d.text((xb + brand_w1, yb), "DOZU", font=f_brand, fill=BRAND_YEL)
+            al_br = int(255 * ui_mul)
+            xb = (W - brand_tot) / 2.0
+            yb = S_(1828)
+            d.text((xb + S_(3), yb + S_(4)), "BİLGİ", font=f_brand, fill=(0, 0, 0, int(200 * ui_mul)))
+            d.text((xb, yb), "BİLGİ", font=f_brand, fill=(255, 255, 255, al_br))
+            d.text((xb + brand_w1 + S_(3), yb + S_(4)), "DOZU", font=f_brand, fill=(0, 0, 0, int(200 * ui_mul)))
+            d.text((xb + brand_w1, yb), "DOZU", font=f_brand, fill=(227, 244, 36, al_br))
+
+        # 6) Onaylı Saf 3D Kapanış Ekranı (SADECE animasyon, sıfır yazı/çubuk kalabalığı!)
+        endcard_v2.composite_endcard(ov, tsec, cta_start, click_delay=cta_click_delay, W=W, H=H)
 
         frame_rgb = Image.alpha_composite(bg.convert("RGBA"), ov).convert("RGB")
         try:

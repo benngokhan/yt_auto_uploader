@@ -207,26 +207,53 @@ def _xtts(metin: str, cikti: Path, ayar: dict) -> None:
 
 
 def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
-    """Onaylı doğal Gemini erkek anlatıcı; pilotla aynı ham 24 kHz PCM çıkışı."""
-    import wave
+    """Onaylı doğal Gemini erkek anlatıcı; pilotla aynı ham 24 kHz PCM çıkışı (429/5xx akıllı retry destekli)."""
+    import time, urllib.error, wave
     anahtar = os.getenv("GEMINI_API_KEY", "").strip()
     if not anahtar:
         raise SesHatasi("GEMINI_API_KEY yok — doğal ses üretimi durduruldu.")
     ses = ayar.get("ses", {})
+    model_adi = ses.get("model", "gemini-2.5-flash-preview-tts")
     tarz = ses.get("tarz", "Sıcak, merak uyandıran ve doğal bir erkek bilim anlatıcısı gibi anlat. Kağıttan okur gibi monoton olma. Soruda hafifçe yüksel; şaşırtıcı bilgileri doğal biçimde vurgula. Enerjik ol ama bağırma. Cümle aralarını kısa ve akıcı tut.")
     prompt = f"Türkçe konuş. {tarz} Metin: {metin}"
-    govde = {"contents":[{"parts":[{"text":prompt}]}], "generationConfig":{"responseModalities":["AUDIO"], "speechConfig":{"voiceConfig":{"prebuiltVoiceConfig":{"voiceName":ses.get("voice_id", "Charon")}}}}}
-    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=" + anahtar
-    istek = urllib.request.Request(url, data=json.dumps(govde).encode(), method="POST", headers={"Content-Type":"application/json"})
-    try:
-        with urllib.request.urlopen(istek, timeout=180) as y:
-            veri = json.loads(y.read().decode())
-        raw = base64.b64decode(veri["candidates"][0]["content"]["parts"][0]["inlineData"]["data"])
-        with wave.open(str(cikti), "wb") as w:
-            w.setnchannels(1); w.setsampwidth(2); w.setframerate(24000); w.writeframes(raw)
-    except Exception as hata:
-        cikti.unlink(missing_ok=True)
-        raise SesHatasi(f"Gemini doğal ses üretimi başarısız: {str(hata)[:160]}") from hata
+    govde = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "responseModalities": ["AUDIO"],
+            "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": ses.get("voice_id", "Charon")}}},
+        },
+    }
+    veri_bytes = json.dumps(govde).encode()
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_adi}:generateContent?key={anahtar}"
+    son_hata: Exception | None = None
+    for deneme, bekle in enumerate((0, 12, 25, 45), start=1):
+        if bekle:
+            print(f"  Gemini TTS geçici yoğunluk, {bekle} sn beklenip tekrar deneniyor ({deneme}/4)...")
+            time.sleep(bekle)
+        istek = urllib.request.Request(url, data=veri_bytes, method="POST", headers={"Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(istek, timeout=180) as y:
+                veri = json.loads(y.read().decode())
+            raw = base64.b64decode(veri["candidates"][0]["content"]["parts"][0]["inlineData"]["data"])
+            with wave.open(str(cikti), "wb") as w:
+                w.setnchannels(1)
+                w.setsampwidth(2)
+                w.setframerate(24000)
+                w.writeframes(raw)
+            return
+        except urllib.error.HTTPError as e:
+            detay = ""
+            try:
+                detay = e.read().decode(errors="replace")[:220]
+            except Exception:
+                pass
+            son_hata = RuntimeError(f"HTTP {e.code}: {detay or e.reason}")
+            if e.code not in (429, 500, 502, 503, 504):
+                break
+        except Exception as e:
+            son_hata = e
+    cikti.unlink(missing_ok=True)
+    raise SesHatasi(f"Gemini doğal ses üretimi başarısız: {str(son_hata)[:180]}") from son_hata
 
 def _edge_tts(metin: str, cikti: Path, ayar: dict) -> None:
     """Ücretsiz Ahmet Neural; uzun nokta boşluklarını yaklaşık 0,40 sn ile sınırlar."""

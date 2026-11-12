@@ -1,6 +1,6 @@
 {
   "marka": "BİLGİ DOZU",
-  "sablon_surumu": "2.0 (Onaylı Master v2 — deneme8 / video_187..196 standardı)",
+  "sablon_surumu": "2.1 (Onaylı Master v2.1 — Canlı 3D Kapanış Kartı + Auto-Ducking)",
   "format": {
     "cozunurluk": "1080x1920",
     "fps": 30,
@@ -59,12 +59,12 @@
       "max_satir": 2,
       "stil": "Ekrana girdiği anda TÜM kelimeler %100 net beyaz (#FFFFFF); SADECE o an okunan TEK kelime #E3F424 sarı (+2px mikro kalkış). Önceki kelimeler sarıda kalmaz, gelecek kelimeler grileşmez."
     },
-    "kapanis_takip_et_butonu": {
-      "merkez_x": 540,
-      "merkez_y": 1350,
-      "boyut": "228x64",
-      "konum_kurali": "'takip et!' altyazısının hemen altında, hiçbir yazıyla çakışmaz",
-      "animasyon_ve_ses": "Yaylı pop-in + 0.34sn'de fiziksel 3D basılma + genişleyen sarı halka dalgası + diyagonal parlama + senkron pop/click SFX + ~1.45sn kapanış tutuşu"
+    "kapanis_3d_karti_endcard": {
+      "tetik_zamani": "'Daha fazla Bilgi Dozu...' (veya kapanış CTA) cümlesine girilir girilmez ekran kararır; tam 'takip et!' dendiği salisede fare imleci butona tıklar (+1.45 sn outro tutuşu)",
+      "arka_plan_gecisi": "0.26 sn içinde derin karartma (0.18x parlaklık) + GaussianBlur(18); üstteki yeşil ilerleme çubuğu, küçük rozet, sahne başlığı, altyazı ve alttaki kaynak/imza %100 söner — ekranda SADECE 3D kapanış animasyonu kalır",
+      "logo_merkez_y": 790,
+      "buton_merkez_y": 1085,
+      "katmanlar_ve_ses": "3D Bilgi [Dozu] logosu + 3D koyu-kırmızı kabartmalı [▶ TAKİP ET] YouTube butonu + sağ alttan kayarak gelip tam 'takip et!' anında tıklayan fare imleci + çift halkalı kırmızı/sarı şok dalgası + cam parlama + gerçek fare çift tık & A5->E6 onay tınısı SFX"
     },
     "alt_bilgi_ve_imza": {
       "kaynak_y": 1751,

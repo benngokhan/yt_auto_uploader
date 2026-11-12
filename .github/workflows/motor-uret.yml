@@ -16,9 +16,9 @@ on:
         type: boolean
         default: false
       sahne:
-        description: "Sahne sayısı (boş = 4)"
+        description: "Sahne sayısı (boş = 7)"
         required: false
-        default: "4"
+        default: "7"
         type: string
       sure_min:
         description: "En kısa süre (sn)"
@@ -28,7 +28,7 @@ on:
       sure_max:
         description: "En uzun süre (sn)"
         required: false
-        default: "42"
+        default: "45"
         type: string
       sadece_ses:
         description: "Yalnızca onay sesi üret; görsel/video üretme"
@@ -71,8 +71,14 @@ jobs:
 
       - name: Bağımlılıklar (XTTS-v2 CPU)
         run: |
-          pip install -q torch torchaudio torchcodec --index-url https://download.pytorch.org/whl/cpu
-          pip install -q six coqui-tts edge-tts -r requirements.txt -r requirements-motor.txt
+          SAGLAYICI=$(python -c "import json; print(json.load(open('motor/ayarlar.json')).get('ses',{}).get('saglayici',''))" 2>/dev/null || echo "")
+          if [ "$SAGLAYICI" = "xtts" ] || [ "$SAGLAYICI" = "xtts_v2" ] || [ "$SAGLAYICI" = "coqui_xtts" ]; then
+            pip install -q torch torchaudio torchcodec --index-url https://download.pytorch.org/whl/cpu
+            pip install -q six coqui-tts edge-tts -r requirements.txt -r requirements-motor.txt
+          else
+            echo "Hızlı mod aktif (ses=$SAGLAYICI): ağır XTTS/PyTorch paketleri atlanıyor..."
+            pip install -q -r requirements-motor.txt openpyxl google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib edge-tts
+          fi
 
       - name: Varlıklar (fontlar + fon müziği)
         run: python motor/varlik_hazirla.py
@@ -88,6 +94,7 @@ jobs:
           MOTOR_XTTS_REFERENCE: ref_095.wav
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           MOTOR_KONU: ${{ inputs.konu }}
           MOTOR_KURU: ${{ inputs.kuru }}
           MOTOR_SAHNE: ${{ inputs.sahne }}
@@ -102,7 +109,7 @@ jobs:
           eval python motor/uret.py $ARGS
 
       - name: Videoyu Drive'a koy (Onay Bekleyen Videolar)
-        if: always()
+        if: success() && inputs.kuru != true
         env:
           GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
           ONAY_KLASOR: ${{ vars.MOTOR_ONAY_KLASOR || '1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR' }}
@@ -154,7 +161,7 @@ jobs:
           PY
 
       - name: Telegram'a onay kartını gönder
-        if: always()
+        if: success() && inputs.kuru != true
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -236,7 +243,7 @@ jobs:
 
 
       - name: Videoyu indirilebilir yap
-        if: always()
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: motor-video

@@ -82,17 +82,15 @@ _GROQ_MODEL_ONBELLEK: dict[str, str] = {}
 
 
 def groq_model() -> str:
-    """Canlı model listesinden geçerli bir Groq modeli seçer.
-
-    404'ün kök nedeni buydu: GROQ_LLM_MODEL eski/yanlış bir ada işaret ediyor,
-    istek "model not found" dönüyordu. Seçim bir kez yapılır, önbelleğe alınır.
-    """
+    """Canlı model listesinden hızlı ve JSON uyumlu (reasoning olmayan) bir Groq modeli seçer."""
     import urllib.request, json as _j
     if "m" in _GROQ_MODEL_ONBELLEK:
         return _GROQ_MODEL_ONBELLEK["m"]
     anahtar = os.getenv("GROQ_API_KEY", "").strip()
     istenen = os.getenv("GROQ_LLM_MODEL", "").strip()
-    secilen = istenen or "llama-3.3-70b-versatile"
+    # gpt-oss / deepseek-r1 / qwq gibi reasoning modelleri content="" döndürebildiği için tercih edilmez
+    _REASONING_ATLA = ("gpt-oss", "deepseek-r1", "qwq", "guard", "whisper", "tts", "vision", "playai")
+    secilen = "llama-3.3-70b-versatile"
     if anahtar:
         try:
             r = urllib.request.Request(
@@ -102,16 +100,18 @@ def groq_model() -> str:
             with urllib.request.urlopen(r, timeout=45) as y:
                 canli = [m.get("id") for m in _j.load(y).get("data", []) if m.get("id")]
             if canli:
-                if istenen and istenen in canli:
+                temiz = [m for m in canli if not any(x in m.lower() for x in _REASONING_ATLA)]
+                if istenen and istenen in temiz:
                     secilen = istenen
                 else:
-                    tercih = ([m for m in canli if "llama-3.3-70b" in m]
-                              or [m for m in canli if "llama" in m and "guard" not in m]
-                              or [m for m in canli if "gpt-oss" in m]
+                    tercih = ([m for m in temiz if "llama-3.3-70b" in m]
+                              or [m for m in temiz if "llama-4" in m or "llama-3.1-8b" in m]
+                              or [m for m in temiz if "llama" in m]
+                              or temiz
                               or canli)
                     secilen = tercih[0]
                     if istenen and istenen != secilen:
-                        print(f"UYARI: Groq modeli '{istenen}' geçersiz, '{secilen}' kullanılıyor.")
+                        print(f"UYARI: Groq modeli '{istenen}' yerine JSON uyumlu '{secilen}' seçildi.")
         except Exception as e:
             print(f"Groq model listesi alınamadı: {type(e).__name__}")
     _GROQ_MODEL_ONBELLEK["m"] = secilen
@@ -409,6 +409,7 @@ def _llm_json(istem: str, ayar: dict, sistem: str | None = None) -> dict:
         metin = (metin or "").strip()
         if not metin:
             return {}
+        metin = _re.sub(r"<think>.*?</think>", "", metin, flags=_re.S).strip()
         m = _re.search(r"\{.*\}", metin, _re.S)
         if not m:
             print(f"v2 LLM ham yanıt (JSON yok): {metin[:400]}")
@@ -423,37 +424,67 @@ def _llm_json(istem: str, ayar: dict, sistem: str | None = None) -> dict:
             return {}
 
     if os.getenv("GROQ_API_KEY"):
-        try:
-            m = groq_model()
-            print(f"v2 LLM: groq {m}")
-            d = _ayikla(_cagir("https://api.groq.com/openai/v1/chat/completions",
-                {"model": m, "temperature": 0.7,
-                 "messages": [{"role": "system", "content": sistem},
-                              {"role": "user", "content": istem}]},
-                {"Authorization": f"Bearer {os.environ['GROQ_API_KEY']}"})["choices"][0]["message"]["content"])
-            print(f"v2 groq yanıtı: {'dolu' if d else 'BOŞ'}")
-            if d.get("cumleler") or d.get("sahneler") or d.get("aramalar"):
-                return d
-        except Exception as h:
-            print(f"v2 groq başarısız: {type(h).__name__}")
+        for m in dict.fromkeys([groq_model(), "llama-3.3-70b-versatile", "llama-3.1-8b-instant"]):
+            try:
+                print(f"v2 LLM: groq {m}")
+                yanit = _cagir(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    {"model": m, "temperature": 0.65, "max_tokens": 2048,
+                     "response_format": {"type": "json_object"},
+                     "messages": [{"role": "system", "content": sistem},
+                                  {"role": "user", "content": istem}]},
+                    {"Authorization": f"Bearer {os.environ['GROQ_API_KEY']}"},
+                )
+                msg = (yanit.get("choices") or [{}])[0].get("message") or {}
+                icerik = msg.get("content") or msg.get("reasoning") or ""
+                d = _ayikla(icerik)
+                print(f"v2 groq yanıtı ({m}): {'dolu' if d else 'BOŞ'}")
+                if d.get("cumleler") or d.get("sahneler") or d.get("aramalar"):
+                    return d
+            except Exception as h:
+                print(f"v2 groq ({m}) başarısız: {type(h).__name__}")
+
     if os.getenv("GEMINI_API_KEY"):
+        aday_modeller: list[str] = []
+        istenen_gem = os.getenv("GEMINI_LLM_MODEL", "").strip()
+        if istenen_gem and not istenen_gem.startswith("llama-") and istenen_gem not in ("gemini-2.5-flash", "gemini-3.6-flash"):
+            aday_modeller.append(istenen_gem)
         try:
-            model = os.getenv("GEMINI_LLM_MODEL", "").strip() or "gemini-2.5-flash"
-            if model.startswith("llama-") or model == "gemini-3.6-flash":
-                model = "gemini-2.5-flash"
-            print(f"v2 LLM: gemini {model}")
-            d = _ayikla(_cagir(
-                f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-                f"?key={os.environ['GEMINI_API_KEY']}",
-                {"systemInstruction": {"parts": [{"text": sistem}]},
-                 "contents": [{"role": "user", "parts": [{"text": istem}]}],
-                 "generationConfig": {"responseMimeType": "application/json", "temperature": 0.7}},
-                {})["candidates"][0]["content"]["parts"][0]["text"])
-            print(f"v2 gemini yanıtı: {'dolu' if d else 'BOŞ'}")
-            if d.get("cumleler") or d.get("sahneler") or d.get("aramalar"):
-                return d
-        except Exception as h:
-            print(f"v2 gemini başarısız: {type(h).__name__}")
+            with urllib.request.urlopen(
+                "https://generativelanguage.googleapis.com/v1beta/models?key=" + os.environ["GEMINI_API_KEY"],
+                timeout=45,
+            ) as y:
+                modeller = json.load(y).get("models", [])
+            uygun = [
+                m["name"].split("/", 1)[-1]
+                for m in modeller
+                if "generateContent" in m.get("supportedGenerationMethods", [])
+                and ("flash" in m.get("name", "").lower() or "pro" in m.get("name", "").lower())
+                and not any(x in m.get("name", "").lower() for x in ("tts", "image", "live", "omni", "embedding", "2.5-flash", "1.5-"))
+            ]
+            aday_modeller.extend(sorted(uygun, key=lambda x: (("flash" in x), ("preview" not in x), x), reverse=True)[:3])
+        except Exception as e:
+            print(f"Gemini model listesi alınamadı: {type(e).__name__}")
+        for model in dict.fromkeys(aday_modeller or ["gemini-flash-latest", "gemini-2.5-pro"]):
+            try:
+                print(f"v2 LLM: gemini {model}")
+                ham = _cagir(
+                    f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+                    f"?key={os.environ['GEMINI_API_KEY']}",
+                    {"systemInstruction": {"parts": [{"text": sistem}]},
+                     "contents": [{"role": "user", "parts": [{"text": istem}]}],
+                     "generationConfig": {"responseMimeType": "application/json", "temperature": 0.65, "maxOutputTokens": 2048}},
+                    {},
+                )
+                parcalar = ((ham.get("candidates") or [{}])[0].get("content") or {}).get("parts") or []
+                metin_gem = "".join(p.get("text", "") for p in parcalar if not p.get("thought"))
+                d = _ayikla(metin_gem)
+                print(f"v2 gemini yanıtı ({model}): {'dolu' if d else 'BOŞ'}")
+                if d.get("cumleler") or d.get("sahneler") or d.get("aramalar"):
+                    return d
+            except Exception as h:
+                print(f"v2 gemini ({model}) başarısız: {type(h).__name__}")
+
     if os.getenv("OPENROUTER_API_KEY"):
         try:
             m = os.getenv("OPENROUTER_LLM_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
@@ -473,24 +504,23 @@ def _llm_json(istem: str, ayar: dict, sistem: str | None = None) -> dict:
 
 
 def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
-    """Şablon v2.0: LLM yalnız cümleleri yazar.
+    """Şablon v2.2: LLM yalnız cümleleri yazar, sonuna Saf 3D Kapanış CTA cümlesi eklenir.
 
     Sahne sayısı, 2 satırlık TAM BÜYÜK HARF başlıklar ve sarı semantik ikon
     (?, ▼, ⚡, ▲, !, ✔) motorun kendi çözümleyicisinden gelir:
-    shorts_pipeline.resolve_scene_headlines() — video_187..196 ile birebir aynı.
+    shorts_pipeline.resolve_scene_headlines() — video_187..196 standardıyla birebir aynı.
     """
     import sys as _sys
 
-    _sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "motor"))
+    _sys.path.insert(0, str(MOTOR))
     try:
         import shorts_pipeline as _sp
     except Exception as h:
-        raise SystemExit(f"Şablon v2 motoru yüklenemedi (motor/shorts_pipeline.py): {h}")
+        raise SystemExit(f"Şablon v2.2 motoru yüklenemedi (motor/shorts_pipeline.py): {h}")
 
     n = max(4, min(8, int(n or 7)))
     veri = _llm_json(PROMPT_V2.format(konu=konu, n=n, son=n - 1), ayar, _LLM_SISTEM)
     cumleler = veri.get("cumleler") or veri.get("sahneler") or []
-    # Model düz liste veya {cumle: ...} döndürdüyse toparla
     if isinstance(cumleler, str):
         cumleler = [cumleler]
     duzgun = []
@@ -512,7 +542,17 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
         print(f"Başlık çözümleyici uyarısı: {type(h).__name__}; yedek başlık kullanılıyor")
         basliklar = [{"icon": "!", "line1": tr_upper(c.split()[0] if c.split() else ""), "line2": "BİLİM"}
                      for c in cumleler]
-    print(f"Şablon v2 planı: {len(cumleler)} cümle, başlıklar motor çözümleyicisinden")
+
+    # Saf 3D Kapanış Ekranı (v2.2): başlıklar saf cümlelerden çözüldükten SONRA son sahneye sabit CTA eklenir;
+    # "Daha fazla Bilgi Dozu..." başlar başlamaz ekran kararır ve tam "takip et!" dendiğinde fare tıklar.
+    kapanis_cta = "Daha fazla Bilgi Dozu için takip et!"
+    if "takip et" not in cumleler[-1].lower():
+        son_c = cumleler[-1].rstrip()
+        if son_c and son_c[-1] not in ".!?":
+            son_c += "?"
+        cumleler[-1] = f"{son_c} {kapanis_cta}"
+
+    print(f"Şablon v2.2 planı: {len(cumleler)} cümle (+ Saf 3D Kapanış CTA), başlıklar motor çözümleyicisinden")
     return [{"ses": c,
              "baslik1": b.get("line1", ""),
              "baslik2": b.get("line2", ""),
@@ -525,38 +565,43 @@ def tr_upper(metin: str) -> str:
     return (metin or "").replace("i", "İ").replace("ı", "I").upper()
 
 
-def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> list:
-    """Her cümle için 4-8 kelimelik İNGİLİZCE, somut, fotoğraflanabilir arama cümlesi."""
+def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[str], list[str]]:
+    """Her cümle için 2-4 kelimelik İNGİLİZCE somut Pixabay araması + genel konu yedekleri üretir."""
     n = len(cumleler)
+    numarali = "\n".join(f"{i+1}) {c}" for i, c in enumerate(cumleler))
     istem = (
         f"Konu: {konu}\n\n"
-        f"Aşağıdaki {n} Türkçe cümlenin her biri için, o cümlede anlatılan şeyi "
-        "gösteren FOTOĞRAFLANABİLİR somut bir İngilizce arama cümlesi yaz.\n"
-        "Kurallar: 4-8 kelime. Sadece ana nesne/olay, sıfat ve mecaz YOK. "
-        "Yazı, logo, tabela, ekran metni isteme. Konuyla ilgisiz süs görseli "
-        "(duvar kağıdı, soyut ışık, genel manzara) YASAK.\n"
-        "Örnek: \"honeybee hive\", \"cortisol brain\", \"alarm clock night\".\n"
-        "Yalnız JSON döndür: {\"aramalar\": [\"ingilizce arama 1\", ...]}. "
-    "Anahtar adı tam olarak \"aramalar\" olacak, dizi {n} elemanlı olacak."
+        f"Cümleler:\n{numarali}\n\n"
+        f"Yukarıdaki {n} Türkçe cümlenin her biri için Pixabay stok fotoğraf aramasında kesin sonuç verecek "
+        f"2-4 kelimelik SOMUT İNGİLİZCE nesne araması yaz.\n"
+        "Kurallar: Sadece fotoğraflanabilir somut nesne (ör. \"human hand fingers\", \"sound wave water\", "
+        "\"honeybee hive\", \"human brain scan\", \"night alarm clock\"). Soyut mecaz, sıfat, yazı/tabela YASAK.\n"
+        f"Yalnız JSON döndür: {{\"aramalar\": [\"arama 1\", ...], \"yedekler\": [\"ana nesne 1\", \"ana nesne 2\", \"ana nesne 3\"]}}. "
+        f"\"aramalar\" dizisi TAM {n} elemanlı olacak."
     )
     veri = _llm_json(istem, ayar, _LLM_SISTEM)
     aramalar = [str(x).strip() for x in (veri.get("aramalar") or []) if str(x).strip()]
+    yedekler = [str(x).strip() for x in (veri.get("yedekler") or []) if str(x).strip()]
     aramalar = aramalar[:n]
+    varsayilan_yedek = yedekler[0] if yedekler else "science macro"
     while len(aramalar) < n:
-        aramalar.append(konu)
-    print(f"Görsel aramaları: {aramalar}")
-    return aramalar
+        aramalar.append(aramalar[0] if aramalar else varsayilan_yedek)
+    print(f"Görsel aramaları ({len(aramalar)}): {aramalar} | yedekler={yedekler}")
+    return aramalar, yedekler
 
 
 def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
-    """ŞABLON v2.0 üretim hattı: sahne planı -> tek istek ses -> görseller ->
-    shorts_pipeline.render_video (MİRA v2 motoru) -> kapak -> onay."""
+    """ŞABLON v2.2 üretim hattı: sahne planı -> tek istek ses -> görseller ->
+    shorts_pipeline.py all (MİRA v2.2 + Saf 3D Kapanış) -> kapak -> onay."""
     import shutil
+    from PIL import Image
     import tts
 
     re_ = sys.modules.get("render_engine") or motor_hazirla(ayar)
     kok = KOK / "motor"
     calisma = kok / "cikti" / "son"
+    if calisma.exists():
+        shutil.rmtree(calisma, ignore_errors=True)
     calisma.mkdir(parents=True, exist_ok=True)
 
     sahneler = sahne_plani_v2(a.konu, sahne_sayisi, ayar)
@@ -572,29 +617,35 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         raise SystemExit("Ses üretilemedi; video oluşturulmadı.")
     print(f"Tek istek ses hazır: {round(re_.wav_duration(str(tek_wav)), 2)} sn")
 
+    if getattr(a, "sadece_ses", False):
+        ses_onay = calisma / "ses_onay.wav"
+        shutil.copyfile(tek_wav, ses_onay)
+        tek_wav.unlink(missing_ok=True)
+        print(f"Sadece ses üretildi: {ses_onay}")
+        return 0
+
     # 2) GÖRSELLER (sahne başına bir görsel, sinematik + konuya %100 alakalı)
     gorsel_klasoru = calisma / "gorseller"
     gorsel_klasoru.mkdir(parents=True, exist_ok=True)
-    for eski_p in gorsel_klasoru.glob("*"):
-        if eski_p.is_file():
-            eski_p.unlink()
     import gorsel_uret
-    # Görsel araması İNGİLİZCE anahtar ister; cümleyi LLM'e çevirtiyoruz.
-    aramalar = _gorsel_aramalari(a.konu, [s["ses"] for s in sahneler], ayar)
+    aramalar, yedekler = _gorsel_aramalari(
+        a.konu,
+        [s["ses"].replace("Daha fazla Bilgi Dozu için takip et!", "").strip() or a.konu for s in sahneler],
+        ayar,
+    )
     parallelar = gorsel_uret.sahneler_icin_gorseller(
-        [{"gorsel": ar, "gorsel_anahtar": ar, "ses": s["ses"]}
+        [{"gorsel": ar, "gorsel_anahtar": " ".join(ar.split()[:2]), "ses": s["ses"]}
          for s, ar in zip(sahneler, aramalar)],
-        gorsel_klasoru, yedek=False)
+        gorsel_klasoru, yedek_sorgular=yedekler)
     if len(parallelar) < len(sahneler):
         raise SystemExit(f"Görsel sayısı yetersiz: {len(parallelar)} < {len(sahneler)}")
 
-    # 3) MİRA v2 MOTORU (shorts_pipeline)
+    # 3) MİRA v2.2 MOTORU (shorts_pipeline + endcard_v2)
     vdir = calisma / "v2"
-    if vdir.exists():
-        shutil.rmtree(vdir)
-    vdir.mkdir(parents=True)
+    vdir.mkdir(parents=True, exist_ok=True)
     for i, p in enumerate(parallelar, start=1):
-        shutil.copyfile(p, vdir / f"s{i}.jpg")
+        with Image.open(p) as im_p:
+            im_p.convert("RGB").save(vdir / f"s{i}.jpg", "JPEG", quality=94)
     shutil.copyfile(tek_wav, vdir / "vo_raw.wav")
     (vdir / "script.txt").write_text(anlatim + "\n", encoding="utf-8")
 
@@ -612,41 +663,42 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     cfg_yolu = calisma / "shorts_config.json"
     cfg_yolu.write_text(json.dumps({vdir.name: cfg}, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    import subprocess
-    import sys as _sys
-    motor_py = os.path.join(os.path.dirname(os.path.abspath(__file__)), "motor", "shorts_pipeline.py")
+    motor_py = str(MOTOR / "shorts_pipeline.py")
     env = os.environ.copy()
     env.setdefault("MIRA_MOTOR_FFMPEG", shutil.which("ffmpeg") or "")
-    print("MİRA v2 motoru çalışıyor (plates -> timing -> music -> render -> cover)…")
-    subprocess.run([_sys.executable, motor_py, "all", str(vdir), str(cfg_yolu)],
+    print("MİRA v2.2 motoru çalışıyor (plates -> timing -> music -> render -> cover)…")
+    subprocess.run([sys.executable, motor_py, "all", str(vdir), str(cfg_yolu)],
                    check=True, env=env)
 
     cikti = vdir / "video.mp4"
     kapak = vdir / "kapak.jpg"
     if not cikti.exists():
-        raise SystemExit("v2 motoru video üretmedi.")
-    hedef = calisma / "final.mp4"
-    shutil.copyfile(cikti, hedef)
-    shutil.copyfile(kapak, calisma / "kapak.jpg")
-    print(f"Video hazır: {hedef}")
-    print(f"Kapak hazır: {calisma / 'kapak.jpg'}")
+        raise SystemExit("v2.2 motoru video üretmedi.")
+
+    onay_dir = calisma / "onay_bekleyen"
+    onay_dir.mkdir(parents=True, exist_ok=True)
+    hedef_mp4 = onay_dir / "final.mp4"
+    hedef_kapak = onay_dir / "kapak.jpg"
+    shutil.copyfile(cikti, hedef_mp4)
+    shutil.copyfile(kapak, hedef_kapak)
+
+    # Geçici klasörleri temizle ki Drive/Telegram glob araması tek MP4 ve tek kapak bulsun
+    shutil.rmtree(vdir, ignore_errors=True)
+    shutil.rmtree(gorsel_klasoru, ignore_errors=True)
+    tek_wav.unlink(missing_ok=True)
+    cfg_yolu.unlink(missing_ok=True)
+
+    print(f"Video hazır: {hedef_mp4}")
+    print(f"Kapak hazır: {hedef_kapak}")
 
     metadata = yayin_bilgisi_uret(a.konu, sahneler)
     (calisma / "yayin_bilgisi.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
     print("Yayın bilgileri hazır")
 
-    if ayar.get("onay", {}).get("mod") == "elle" and not a.onay_verildi:
-        onay_dir = calisma / "onay_bekleyen"
-        onay_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(hedef, onay_dir / hedef.name)
-        shutil.copyfile(calisma / "kapak.jpg", onay_dir / "kapak.jpg")
-        print(f"ONAY BEKLİYOR: {onay_dir / hedef.name}")
-        print("Drive'a yüklenmedi, kuyruğa eklenmedi.")
-        return 0
     if a.kuru:
-        print("KURU: Drive'a yüklenmedi, kuyruğa eklenmedi.")
+        print(f"KURU KOŞU TAMAMLANDI: {hedef_mp4} (Drive/Telegram adımı atlanır)")
         return 0
-    print("Teslim adımı şablon v2'de henüz elle: --kuru ile çalıştırın.")
+    print(f"ONAY BEKLİYOR: {hedef_mp4}")
     return 0
 
 
@@ -660,10 +712,11 @@ def yayin_bilgisi_uret(konu: str, sahneler: list[dict]) -> dict:
               '"kategori":"kategori","konu_ozeti":"tek cümle"}. Abartılı garanti, sahte bilgi ve genel/geçici metin kullanma.')
     text=None; errors=[]
     groq=os.getenv("GROQ_API_KEY","").strip()
+    _ua="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36"
     if groq:
         try:
-            body={"model":"llama-3.3-70b-versatile","temperature":0.5,"response_format":{"type":"json_object"},"messages":[{"role":"user","content":prompt}]}
-            req=urllib.request.Request("https://api.groq.com/openai/v1/chat/completions",data=json.dumps(body).encode(),headers={"Content-Type":"application/json","Authorization":"Bearer "+groq})
+            body={"model":groq_model(),"temperature":0.5,"response_format":{"type":"json_object"},"messages":[{"role":"user","content":prompt}]}
+            req=urllib.request.Request("https://api.groq.com/openai/v1/chat/completions",data=json.dumps(body).encode(),headers={"Content-Type":"application/json","User-Agent":_ua,"Authorization":"Bearer "+groq})
             with urllib.request.urlopen(req,timeout=120) as r:text=json.load(r)["choices"][0]["message"]["content"]
         except Exception as e: errors.append("groq:"+repr(e))
     key=os.getenv("GEMINI_API_KEY","").strip()
@@ -671,7 +724,7 @@ def yayin_bilgisi_uret(konu: str, sahneler: list[dict]) -> dict:
         try:
             import time
             with urllib.request.urlopen("https://generativelanguage.googleapis.com/v1beta/models?key="+key,timeout=60) as r:models=json.load(r).get("models",[])
-            usable=[m["name"].split("/",1)[-1] for m in models if "generateContent" in m.get("supportedGenerationMethods",[]) and "flash" in m.get("name","").lower() and not any(x in m.get("name","").lower() for x in ("tts","image","live","omni"))]
+            usable=[m["name"].split("/",1)[-1] for m in models if "generateContent" in m.get("supportedGenerationMethods",[]) and "flash" in m.get("name","").lower() and not any(x in m.get("name","").lower() for x in ("tts","image","live","omni","2.5-flash","1.5-"))]
             model=sorted(usable,key=lambda x:(("preview" not in x),x),reverse=True)[0]
             body={"contents":[{"parts":[{"text":prompt}]}],"generationConfig":{"responseMimeType":"application/json","temperature":0.5}}
             son=None

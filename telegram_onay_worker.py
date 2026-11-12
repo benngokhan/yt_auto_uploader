@@ -40,12 +40,17 @@ def drive_service():
     return build('drive','v3',credentials=c,cache_discovery=False)
 
 def find_files(drive,run_no):
-    q=f"'{APPROVAL}' in parents and trashed=false"
-    files=drive.files().list(q=q,fields='files(id,name,mimeType)',pageSize=1000).execute().get('files',[])
-    video=next((x for x in files if x['name'].startswith(f'ONAY_{run_no}_') and x['name'].endswith('.mp4')),None)
-    cover=next((x for x in files if x['name']==f'kapak_{run_no}.jpg'),None)
-    meta=next((x for x in files if x['name']==f'YAYIN_BILGISI_{run_no}.json'),None)
-    return video,cover,meta
+    for klasor_id in dict.fromkeys([APPROVAL, QUEUE]):
+        if not klasor_id:
+            continue
+        q=f"'{klasor_id}' in parents and trashed=false"
+        files=drive.files().list(q=q,fields='files(id,name,mimeType,parents)',pageSize=1000).execute().get('files',[])
+        video=next((x for x in files if x['name'].startswith(f'ONAY_{run_no}_') and x['name'].endswith('.mp4')),None)
+        cover=next((x for x in files if x['name']==f'kapak_{run_no}.jpg'),None)
+        meta=next((x for x in files if x['name']==f'YAYIN_BILGISI_{run_no}.json'),None)
+        if video:
+            return video,cover,meta
+    return None,None,None
 
 def next_no(drive):
     fs=drive.files().list(q=f"'{QUEUE}' in parents and trashed=false",fields='files(name)',pageSize=1000).execute().get('files',[])
@@ -122,21 +127,36 @@ def process(cb,drive):
             if f:drive.files().update(fileId=f['id'],body={'trashed':True}).execute()
         finish(cb,"❌ Reddedildi.");return
     if action=='retry':
-        gh('POST','actions/workflows/motor-uret.yml/dispatches',{'ref':'main','inputs':{'konu':topic,'kuru':'false','sahne':'4','sure_min':'38','sure_max':'42','sadece_ses':'false'}})
+        gh('POST','actions/workflows/motor-uret.yml/dispatches',{'ref':'main','inputs':{'konu':topic,'kuru':'false','sahne':'7','sure_min':'38','sure_max':'45','sadece_ses':'false'}})
         finish(cb,"🔄 Üretiliyor.");return
     if action=='queue':
         if not video: finish(cb,'⚠️ Onay videosu Drive’da bulunamadı.');return
         no=next_no(drive)
         meta=metadata_read(drive,meta_file,topic)
         moved=[]
+        v_parents=video.get('parents') or [APPROVAL]
+        in_queue=(QUEUE in v_parents)
         try:
-            drive.files().update(fileId=video['id'],addParents=QUEUE,removeParents=APPROVAL,body={'name':f'video_{no}.mp4'},fields='id').execute(); moved.append((video,f'ONAY_{run_no}_geri_alindi.mp4'))
+            if in_queue:
+                drive.files().update(fileId=video['id'],body={'name':f'video_{no}.mp4'},fields='id').execute()
+            else:
+                drive.files().update(fileId=video['id'],addParents=QUEUE,removeParents=','.join(v_parents),body={'name':f'video_{no}.mp4'},fields='id').execute()
+            moved.append((video,f'ONAY_{run_no}_geri_alindi.mp4',in_queue,v_parents))
             if cover:
-                drive.files().update(fileId=cover['id'],addParents=QUEUE,removeParents=APPROVAL,body={'name':f'kapak_{no}.jpg'},fields='id').execute(); moved.append((cover,f'kapak_{run_no}.jpg'))
+                c_parents=cover.get('parents') or [APPROVAL]
+                c_in_q=(QUEUE in c_parents)
+                if c_in_q:
+                    drive.files().update(fileId=cover['id'],body={'name':f'kapak_{no}.jpg'},fields='id').execute()
+                else:
+                    drive.files().update(fileId=cover['id'],addParents=QUEUE,removeParents=','.join(c_parents),body={'name':f'kapak_{no}.jpg'},fields='id').execute()
+                moved.append((cover,f'kapak_{run_no}.jpg',c_in_q,c_parents))
             workbook_add(drive,no,topic,meta)
         except Exception:
-            for f,old_name in moved:
-                drive.files().update(fileId=f['id'],addParents=APPROVAL,removeParents=QUEUE,body={'name':old_name},fields='id').execute()
+            for f,old_name,was_in_q,orig_p in moved:
+                if was_in_q:
+                    drive.files().update(fileId=f['id'],body={'name':old_name},fields='id').execute()
+                else:
+                    drive.files().update(fileId=f['id'],addParents=','.join(orig_p),removeParents=QUEUE,body={'name':old_name},fields='id').execute()
             raise
         if meta_file: drive.files().update(fileId=meta_file['id'],body={'trashed':True}).execute()
         finish(cb,f"✅ video_{no}.mp4 olarak kuyruğa alındı.")

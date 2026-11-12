@@ -150,12 +150,19 @@ _SUS_KELIMELER = {
     "dancing", "communication", "collection", "process", "concept",
 }
 
-# Video konusundan bağımsız, ASLA istenmeyen görsel türleri.
-_YASAK_ETIKET = {
-    "portrait", "model", "girl", "boy", "woman", "man", "people", "person",
-    "hanói", "hanoi", "vietnamese", "selfie", "smile", "fashion", "makeup",
-    "tea", "coffee", "drink", "cup", "wine", "beer", "food", "dish",
-    "car", "motorcycle", "city", "building", "wedding", "couple",
+# Video konusundan bağımsız, ASLA istenmeyen görsel türleri (portre/selfie/düğün/alkol/yemek/araç).
+# Not: İnsan anatomisi (hand, finger, eye, brain, skin, ear, heart, sleep) konularında Pixabay
+# fotoğraflarına otomatik "person/people/man/woman" etiketi eklediği için o kelimeler yalnızca
+# sorgu insan vücudu içermiyorsa yasaklanır.
+_YASAK_ETIKET_KESIN = {
+    "portrait", "model", "hanói", "hanoi", "vietnamese", "selfie", "smile",
+    "fashion", "makeup", "tea", "coffee", "drink", "cup", "wine", "beer",
+    "food", "dish", "car", "motorcycle", "wedding", "couple", "bikini", "lingerie",
+}
+_INSAN_ANATOMI = {
+    "hand", "hands", "finger", "fingers", "thumb", "palm", "skin", "eye", "eyes",
+    "brain", "ear", "ears", "heart", "blood", "muscle", "bone", "skeleton", "sleep",
+    "sleeping", "face", "mouth", "tongue", "nose", "human", "nerve", "body",
 }
 
 
@@ -165,26 +172,35 @@ def _kelimeler(metin: str, sus_at: bool = True) -> set[str]:
     return {x for x in k if x not in _SUS_KELIMELER} if sus_at else k
 
 
-def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str) -> bool:
-    """Görsel gerçekten sahnenin ana NESNESİNİ gösteriyor mu?
+def _yasak_etiket_seti(sorgu: str, ana_konu: str) -> set[str]:
+    tum = _kelimeler(f"{sorgu} {ana_konu}", sus_at=False)
+    if tum & _INSAN_ANATOMI:
+        return _YASAK_ETIKET_KESIN
+    return _YASAK_ETIKET_KESIN | {"girl", "boy", "woman", "man"}
 
-    Kural: sahnenin çekirdek nesne kelimelerinden en az BİRİ etiketlerde
-    birebir geçmeli, yasak tür etiketi bulunmamalı ve puan eşiği aşılmalı.
-    Canlı testte "waggle dance" sorgusuna dans eden kız, "nectar collection"
-    sorgusuna çay bardakları geldi; bu kapı onları eler.
-    """
+
+def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str, gevsek: bool = False) -> bool:
+    """Görsel gerçekten sahnenin ana NESNESİNİ gösteriyor mu?"""
     etiketler = _kelimeler(hit.get("tags", ""), sus_at=False)
     if not etiketler:
         return False
-    if etiketler & _YASAK_ETIKET:          # insan/yiyecek/araç → doğrudan ele
+    if etiketler & _yasak_etiket_seti(sorgu, ana_konu):
+        return False
+    if str(hit.get("type", "photo")) != "photo":
         return False
     cekirdek = _kelimeler(sorgu) or _kelimeler(ana_konu)
     if not cekirdek:
-        return False
-    # Çekirdeğin en az %34'ü (en az 1 kelime) etiketlerde olmalı.
+        return _puanla(hit, sorgu) >= 4.0
     ortak = len(cekirdek & etiketler)
-    gerekli = 1 if len(cekirdek) <= 3 else 2
-    return ortak >= gerekli and _puanla(hit, sorgu) >= 6.0
+    if gevsek:
+        # Kök eşleşmesi (ör. fingers <-> finger, waves <-> wave)
+        if ortak == 0:
+            kok_c = {w[:4] for w in cekirdek if len(w) >= 4}
+            kok_e = {w[:4] for w in etiketler if len(w) >= 4}
+            ortak = len(kok_c & kok_e)
+        return ortak >= 1 and _puanla(hit, sorgu) >= 3.5
+    gerekli = 1 if len(cekirdek) <= 4 else 2
+    return ortak >= gerekli and _puanla(hit, sorgu) >= 5.5
 
 
 def dikey_kirp(img: Image.Image) -> Image.Image:
@@ -273,14 +289,41 @@ def sahneler_icin_gorseller(sahneler: list[dict], klasor: Path,
     for i, sahne in enumerate(sahneler, start=1):
         secim = None
         denenen = []
-        for sorgu in _sorgu_adaylari(sahne, yedek, ana_konu):
+        aday_sorgular = _sorgu_adaylari(sahne, yedek, ana_konu)
+        # 1. Aşama: Katı nesne eşleşmesi
+        for sorgu in aday_sorgular:
             denenen.append(sorgu)
             sonuc = [h for h in pixabay_ara(sorgu, anahtar)
-                      if h["id"] not in kullanilan and _yeterince_uygun(h, sorgu, ana_konu)]
+                     if h["id"] not in kullanilan and _yeterince_uygun(h, sorgu, ana_konu, gevsek=False)]
             if sonuc:
                 secim = (sorgu, sonuc[0])
                 break
-            print(f"  görsel {i}: uygun sonuç yok, yeni sorguya geçiliyor: {sorgu!r}")
+        # 2. Aşama: Tekil kelime / kök eşleşmeli gevşek arama
+        if not secim:
+            tekiller = []
+            for s_q in aday_sorgular:
+                for w_q in s_q.split():
+                    if len(w_q) >= 4 and w_q.lower() not in _SUS_KELIMELER and w_q.lower() not in tekiller:
+                        tekiller.append(w_q.lower())
+            for sorgu in (aday_sorgular + tekiller[:4]):
+                if sorgu not in denenen:
+                    denenen.append(sorgu)
+                sonuc = [h for h in pixabay_ara(sorgu, anahtar)
+                         if h["id"] not in kullanilan and _yeterince_uygun(h, sorgu, ana_konu, gevsek=True)]
+                if sonuc:
+                    secim = (sorgu, sonuc[0])
+                    break
+        # 3. Aşama: Bilimsel genel görsel yedeği (üretimin 0 görselle çökmesini önler)
+        if not secim:
+            for gen_sorgu in ("science physics", "laboratory microscope", "nature macro", "stars galaxy"):
+                denenen.append(gen_sorgu)
+                sonuc = [h for h in pixabay_ara(gen_sorgu, anahtar)
+                         if h["id"] not in kullanilan
+                         and str(h.get("type", "photo")) == "photo"
+                         and not (_kelimeler(h.get("tags", ""), sus_at=False) & _YASAK_ETIKET_KESIN)]
+                if sonuc:
+                    secim = (gen_sorgu, sonuc[0])
+                    break
         if not secim:
             raise SystemExit(
                 f"Sahne {i} için Pixabay sonucu yok (denenen: {denenen}) — üretim durdu.")

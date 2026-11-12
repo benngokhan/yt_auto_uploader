@@ -37,9 +37,9 @@
     "ses": "Onaylı Gemini Charon doğal erkek anlatıcı; Ahmet Neural yedekte korunur; otomatik fallback yok",
     "gorsel": "Pixabay fotoğraf + teal-amber sinematik düzenleme (AI/ücretli servis yok)",
     "akis": "Her video elle onaylı; otomatik yayın yok",
-    "sablon": "v2.0 motoru: 7 sahne, dinamik başlık, tek kelime karaoke, 3D takip butonu, jenerik intro + auto-ducking (12.11.2026)",
+    "sablon": "v2.2 motoru: 7 sahne, dinamik başlık + sarı ikon, tek kelime karaoke, saf 3D kapanış ekranı ('Daha fazla Bilgi Dozu...' cümlesinde kararır, 'takip et!' anında fare tıklar, sıfır çubuk/kaynak), jenerik intro + auto-ducking",
     "ses_tek_istek": "Tüm cümleler TEK Gemini isteğinde okunur (4 ayrı istek 4 farklı ton üretiyordu)"
   },
   "sahneler_sablon": true,
-  "sablon_surumu": "2.0 (MIRA master v2 — shorts_pipeline.py)"
+  "sablon_surumu": "2.2 (MIRA master v2.2 — shorts_pipeline.py + endcard_v2.py)"
 }
