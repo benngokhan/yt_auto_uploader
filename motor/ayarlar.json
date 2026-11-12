@@ -1,10 +1,10 @@
 {
-  "sahne_sayisi": 4,
+  "sahne_sayisi": 7,
   "sure": {
     "min": 38,
-    "max": 42
+    "max": 45
   },
-  "fps": 60,
+  "fps": 30,
   "ses": {
     "saglayici": "gemini_tts",
     "voice_id": "Charon",
@@ -14,7 +14,8 @@
     "referans_yolu": "ref_095.wav",
     "islem": "Onaylı doğal Gemini pilotu; ham 24kHz PCM; ek ton/hız filtresi yok",
     "fallback": false,
-    "tarz": "Sıcak, merak uyandıran ve doğal bir erkek bilim anlatıcısı gibi anlat. Kağıttan okur gibi monoton olma. Soruda hafifçe yüksel; şaşırtıcı bilgileri doğal biçimde vurgula. Enerjik ol ama bağırma. Cümle aralarını kısa ve akıcı tut."
+    "tarz": "Sıcak, merak uyandıran ve doğal bir erkek bilim anlatıcısı gibi anlat. Kağıttan okur gibi monoton olma. Soruda hafifçe yüksel; şaşırtıcı bilgileri doğal biçimde vurgula. Enerjik ol ama bağırma. Cümle aralarını kısa ve akıcı tut.",
+    "tek_istek": true
   },
   "gorsel": {
     "kaynak": "pixabay",
@@ -35,6 +36,10 @@
     "sure": "38-42 sn (kullanıcı: 3 Kasım 2026)",
     "ses": "Onaylı Gemini Charon doğal erkek anlatıcı; Ahmet Neural yedekte korunur; otomatik fallback yok",
     "gorsel": "Pixabay fotoğraf + teal-amber sinematik düzenleme (AI/ücretli servis yok)",
-    "akis": "Her video elle onaylı; otomatik yayın yok"
-  }
+    "akis": "Her video elle onaylı; otomatik yayın yok",
+    "sablon": "v2.0 motoru: 7 sahne, dinamik başlık, tek kelime karaoke, 3D takip butonu, jenerik intro + auto-ducking (12.11.2026)",
+    "ses_tek_istek": "Tüm cümleler TEK Gemini isteğinde okunur (4 ayrı istek 4 farklı ton üretiyordu)"
+  },
+  "sahneler_sablon": true,
+  "sablon_surumu": "2.0 (MIRA master v2 — shorts_pipeline.py)"
 }
