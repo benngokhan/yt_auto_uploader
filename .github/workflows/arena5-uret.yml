@@ -1,0 +1,117 @@
+name: Arena 5 Günlük Strateji Shorts Render ve Kuyruk
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: arena5-uret
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  hazirla:
+    name: "1) Charon Ses + 35 Özel Görsel Hazırla"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: FFmpeg
+        run: command -v ffmpeg >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+      - name: Bağımlılıklar
+        run: |
+          pip install -q -r requirements-motor.txt openpyxl
+          python motor/varlik_hazirla.py
+      - name: 5 Bölüm Charon Ses + Özel Görselleri Aç
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python motor/arena5_pipeline.py prepare --out /tmp/arena5_assets
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arena5-assets
+          path: /tmp/arena5_assets/
+          retention-days: 2
+
+  render:
+    name: "2) Render (video_${{ matrix.num }})"
+    needs: hazirla
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: true
+      matrix:
+        num: [177, 178, 179, 180, 181]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: FFmpeg
+        run: command -v ffmpeg >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+      - name: Bağımlılıklar
+        run: |
+          pip install -q -r requirements-motor.txt openpyxl
+          python motor/varlik_hazirla.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: arena5-assets
+          path: /tmp/arena5_assets
+      - name: Render video_${{ matrix.num }}.mp4
+        run: python motor/arena5_pipeline.py render --assets /tmp/arena5_assets --out /tmp/arena5_out_${{ matrix.num }} --num ${{ matrix.num }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arena5-out-${{ matrix.num }}
+          path: /tmp/arena5_out_${{ matrix.num }}/
+          retention-days: 5
+
+  kuyruk_5gun:
+    name: "3) Drive 5 Günlük Kuyruğa Yerleştir (177..181)"
+    needs: render
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Bağımlılıklar
+        run: pip install -q -r requirements.txt -r requirements-motor.txt openpyxl google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: arena5-out-*
+          path: /tmp/arena5_rendered
+          merge-multiple: true
+      - name: Drive Kuyruğu 5 Günlük Seriye Çek ve Yükle
+        env:
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+        run: |
+          ls -lh /tmp/arena5_rendered
+          python motor/arena5_pipeline.py deploy --rendered /tmp/arena5_rendered
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arena5-final-rapor
+          path: |
+            /tmp/arena5_rendered/telemetry_*.json
+            /tmp/arena5_rendered/deploy_report.json
+            baslik.xlsx
+          retention-days: 5
+      - name: Repo baslik.xlsx Senkronla
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add baslik.xlsx bilgidozu_yukleme_tablosu.xlsx
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(queue): set 5-day Arena bespoke cohort (video_177..181) + shift original queue to 182..201"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
