@@ -37,16 +37,13 @@ YT_GUNLUK_KOTA = 10_000        # YouTube Data API varsayılan günlük kota (bir
 YT_YUKLEME_BIRIM = 1_700       # upload ~1600 + thumbnail 50 (+ yorum/oynatma listesi payı)
 ACTIONS_FREE_DK = 2_000        # private repo ücretsiz Actions dakikası
 
-# Drive kırılımı (hangi klasör ne kadar yer tutuyor)
+# Drive kırılımı (yalnızca active.sav81@gmail.com klasörleri)
 DRIVE_KLASORLER = [
-    ("Kısa Videolar", "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR"),
-    ("Uzun Videolar", "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR"),
-    ("Kısa Kapaklar", "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR"),
-    ("Uzun Kapaklar", "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR"),
-    ("CEO / Tablolar", "190zQiUYkp8fsQFleva77TKqc9MeGxZiI"),
+    ("Video + Kapak Kuyruğu (video kapak)", "1GK-yImpb09445uXfTUbIl7l6AfNM4BOb"),
+    ("Ana Klasör & baslik.xlsx (Bilgi_Dozu_Yeni_Shorts)", "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC"),
+    ("Onay Bekleyenler (Onay_Bekleyen)", "1xyO_jNjbpghfR7CJ1P9DUvkzdb6eC0qf"),
 ]
-# Arşiv klasörü (botun günlük akışı kullanmaz, yer kaplar)
-DRIVE_ARSIV = ("Arşiv / Yedek (GİRMEK YASAK)", "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_")
+DRIVE_ARSIV = ("OKUU (Yedek Paketler)", "12oLj4ZsIR7vRMJwe7-HHnX1R-2rI9pdA")
 
 
 def now():

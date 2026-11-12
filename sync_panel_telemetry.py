@@ -35,8 +35,8 @@ from sheets_metadata import (
 from uploader import get_google_clients, load_uploaded_ids
 
 BASE_DIR = Path(__file__).resolve().parent
-RETENTION_FOLDER_ID = "1LyZBIc52OzaGZBaq8yXODcseZ0wilsrs"
-RETENTION_REPORT_ID = "1-04hX_5htkheIkCe-W-56bu4zBkfXOvT"
+RETENTION_FOLDER_ID = "1gwtRBik2Dpvdz1VRaosBx9wokqT53Dzk"  # active.sav81@gmail.com / Retansiyon
+RETENTION_REPORT_ID = "1EjCcuxkwdxRYTlQ60OLPWbo6CQWnh_cO"  # active.sav81@gmail.com / Bilgi_Dozu_Retansiyon_Raporu.xlsx
 TELEMETRY_FILE = BASE_DIR / "panel_telemetry.json"
 
 
@@ -139,9 +139,7 @@ def _parse_retention_workbook(raw_bytes: bytes) -> dict:
 
 
 def _resolve_table_file_id(drive) -> str:
-    """Ana yukleme tablosunun Drive dosya kimligini bulur (CEO klasoru)."""
-    if DEFAULT_SHEETS_ID:
-        return DEFAULT_SHEETS_ID
+    """Ana yukleme tablosunun Drive dosya kimligini bulur (active.sav81@gmail.com / baslik.xlsx)."""
     try:
         resp = (
             drive.files()
@@ -152,13 +150,17 @@ def _resolve_table_file_id(drive) -> str:
             )
             .execute()
         )
-        for f in resp.get("files", []):
+        files = resp.get("files", [])
+        for f in files:
+            if (f.get("name") or "").lower() == "baslik.xlsx":
+                return f["id"]
+        for f in files:
             name = (f.get("name") or "").lower()
             if name.startswith("bilgidozu") and name.endswith((".xlsx", ".xlsm")):
                 return f["id"]
     except Exception as e:
         print(f"[telemetry] Tablo kimligi okunamadi: {e}")
-    return ""
+    return DEFAULT_SHEETS_ID or ""
 
 
 def cover_candidates(num: int, is_long: bool) -> list[str]:
@@ -191,26 +193,31 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
     tr_now = datetime.now(timezone(timedelta(hours=3)))
     now_str = tr_now.strftime("%Y-%m-%d %H:%M:%S")
 
-    # Sync workbook between GitHub and Drive
+    # Sync workbook between GitHub and Drive (active.sav81@gmail.com / baslik.xlsx)
     if drive is not None:
         try:
+            wb_baslik_path = BASE_DIR / "baslik.xlsx"
             wb_local_path = BASE_DIR / "bilgidozu_yukleme_tablosu.xlsx"
-            if push_table_to_drive and wb_local_path.exists():
+            src_push = wb_baslik_path if wb_baslik_path.exists() else wb_local_path
+            if push_table_to_drive and src_push.exists():
                 from googleapiclient.http import MediaFileUpload
                 table_id = _resolve_table_file_id(drive)
                 if not table_id:
                     raise RuntimeError("Yukleme tablosu Drive'da bulunamadi")
                 media = MediaFileUpload(
-                    str(wb_local_path),
+                    str(src_push),
                     mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     resumable=False,
                 )
                 drive.files().update(fileId=table_id, media_body=media).execute()
                 print(f"[telemetry] GitHub tablosu Drive'a yazildi (fileId={table_id}).")
             else:
-                raw_wb = _download_workbook_bytes_from_drive(drive, CEO_FOLDER_ID)
-                if raw_wb:
-                    wb_local_path.write_bytes(raw_wb)
+                dl_wb = _download_workbook_bytes_from_drive(drive, CEO_FOLDER_ID)
+                if dl_wb is not None:
+                    raw_buf, _wb_name = dl_wb
+                    raw_bytes = raw_buf.getvalue()
+                    wb_baslik_path.write_bytes(raw_bytes)
+                    wb_local_path.write_bytes(raw_bytes)
         except Exception as e:
             print(f"[telemetry] Drive tablo senkron uyarısı: {e}")
 

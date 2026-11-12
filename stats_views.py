@@ -19,7 +19,8 @@ from pathlib import Path
 
 import openpyxl
 
-TABLE = Path("bilgidozu_yukleme_tablosu.xlsx")
+TABLE = Path("baslik.xlsx")
+MIRROR_TABLE = Path("bilgidozu_yukleme_tablosu.xlsx")
 CHANNEL = "https://www.youtube.com/@bilgidozuofficial"
 LINK_COL, VIEWS_COL, TITLE_COL, FILE_COL = 10, 12, 3, 2
 
@@ -139,6 +140,7 @@ def main() -> None:
         raise RuntimeError("Hiçbir video verisi alınamadı — eski değerler başarı raporu olarak sunulamaz.")
     if not dry and written:
         wb.save(TABLE)
+        wb.save(MIRROR_TABLE)
     wb.close()
 
     deltas.sort(reverse=True)

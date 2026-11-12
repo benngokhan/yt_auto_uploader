@@ -26,10 +26,10 @@ from openpyxl.utils import get_column_letter
 
 CHANNEL_ID = 'UC3bjZMPZ5FW2JQGfU41iaUg'
 REPOSITORY = 'benngokhan/yt_auto_uploader'
-FOLDER_ID = '1LyZBIc52OzaGZBaq8yXODcseZ0wilsrs'
-PARENT_ID = '190zQiUYkp8fsQFleva77TKqc9MeGxZiI'
-REPORT_ID = '1-04hX_5htkheIkCe-W-56bu4zBkfXOvT'
-EXPECTED_PERMISSIONS = {'06006357664194807857': 'owner', '16570037873922638546': 'writer'}
+FOLDER_ID = '1gwtRBik2Dpvdz1VRaosBx9wokqT53Dzk'
+PARENT_ID = '1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC'
+REPORT_ID = '1EjCcuxkwdxRYTlQ60OLPWbo6CQWnh_cO'
+EXPECTED_PERMISSIONS = {'17527318730224050852': 'owner', '16570037873922638546': 'writer'}
 XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 ANALYTICS_URL = 'https://youtubeanalytics.googleapis.com/v2/reports'
 ALLOWED_HOSTS = {'oauth2.googleapis.com', 'www.googleapis.com', 'youtubeanalytics.googleapis.com', 'api.github.com'}

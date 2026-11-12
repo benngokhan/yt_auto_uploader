@@ -112,7 +112,7 @@ jobs:
         if: success() && inputs.kuru != true
         env:
           GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
-          ONAY_KLASOR: ${{ vars.MOTOR_ONAY_KLASOR || '1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR' }}
+          ONAY_KLASOR: ${{ vars.MOTOR_ONAY_KLASOR || '1xyO_jNjbpghfR7CJ1P9DUvkzdb6eC0qf' }}
           RUN_NO: ${{ github.run_number }}
         run: |
           shopt -s globstar nullglob

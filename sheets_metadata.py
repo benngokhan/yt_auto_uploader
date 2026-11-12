@@ -28,15 +28,15 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
-YOUTUBE_OTOMASYON_FOLDER_ID = "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj"
-CEO_FOLDER_ID = "190zQiUYkp8fsQFleva77TKqc9MeGxZiI"
-SHORTS_VIDEO_FOLDER_ID = "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR"
-SHORTS_COVER_FOLDER_ID = "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR"
-LONG_VIDEO_FOLDER_ID = "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR"
-LONG_COVER_FOLDER_ID = "1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR"
+YOUTUBE_OTOMASYON_FOLDER_ID = "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC"  # active.sav81@gmail.com / Bilgi_Dozu_Yeni_Shorts
+CEO_FOLDER_ID = "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC"                # active.sav81@gmail.com / Bilgi_Dozu_Yeni_Shorts
+SHORTS_VIDEO_FOLDER_ID = "1GK-yImpb09445uXfTUbIl7l6AfNM4BOb"       # active.sav81@gmail.com / video kapak
+SHORTS_COVER_FOLDER_ID = "1GK-yImpb09445uXfTUbIl7l6AfNM4BOb"       # active.sav81@gmail.com / video kapak
+LONG_VIDEO_FOLDER_ID = "1GK-yImpb09445uXfTUbIl7l6AfNM4BOb"         # active.sav81@gmail.com / video kapak
+LONG_COVER_FOLDER_ID = "1GK-yImpb09445uXfTUbIl7l6AfNM4BOb"         # active.sav81@gmail.com / video kapak
 
-DEFAULT_DRIVE_FOLDER_ID = CEO_FOLDER_ID  # Ana tablo (bilgidozu_yukleme_tablosu.xlsx) YOUTUBE_OTOMASYON / CEO klasöründe
-DEFAULT_SHEETS_ID = ""
+DEFAULT_DRIVE_FOLDER_ID = CEO_FOLDER_ID  # Ana tablo (baslik.xlsx) Bilgi_Dozu_Yeni_Shorts klasöründe
+DEFAULT_SHEETS_ID = "1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo"  # active.sav81@gmail.com / baslik.xlsx
 # Kısa videolar video_155.mp4, uzun videolar uzun_video_8.mp4 ile başlar.
 MIN_SHORTS_NUMBER = 155
 MIN_LONG_NUMBER = 8
@@ -287,8 +287,10 @@ def _download_workbook_bytes_from_drive(drive, folder_id: str, sheets_id: str = 
             ).execute()
             files = res.get("files", [])
             if files:
-                # EMİR 024: ana tablo her zaman bilgidozu_yukleme_tablosu.xlsx (baslik.xlsx = arşiv, dokunulmaz)
-                preferred = [x for x in files if x.get("name") == "bilgidozu_yukleme_tablosu.xlsx"]
+                # Ana tablo: active.sav81@gmail.com / Bilgi_Dozu_Yeni_Shorts içindeki baslik.xlsx
+                preferred = [x for x in files if x.get("name") == "baslik.xlsx"]
+                if not preferred:
+                    preferred = [x for x in files if x.get("name") == "bilgidozu_yukleme_tablosu.xlsx"]
                 f = preferred[0] if preferred else files[0]
                 fid = f["id"]
                 mime = f.get("mimeType", "")
@@ -342,9 +344,9 @@ def load_table_from_drive_or_local(
     base_dir = Path(__file__).parent
     for candidate in [
         local_fallback,
-        base_dir / "bilgidozu_yukleme_tablosu.xlsx",
         base_dir / "baslik.xlsx",
-        Path("/home/user/bilgidozu_yukleme_tablosu.xlsx"),
+        base_dir / "bilgidozu_yukleme_tablosu.xlsx",
+        Path("/home/user/baslik.xlsx"),
     ]:
         if candidate and Path(candidate).exists():
             try:
@@ -737,23 +739,23 @@ def get_next_scheduled_video(
 # ---------------------------------------------------------------------------
 
 def _find_primary_table(drive, folder_id: str) -> Optional[str]:
-    """Kuyruk klasöründeki ana tablonun Drive ID'si (bilgidozu tablosu; yoksa baslik.xlsx)."""
+    """Kuyruk klasöründeki ana tablonun Drive ID'si (baslik.xlsx; yoksa bilgidozu tablosu)."""
     if not drive or not folder_id:
         return None
     try:
         res = drive.files().list(
-            q=f"'{folder_id}' in parents and (name = 'bilgidozu_yukleme_tablosu.xlsx' or name = 'baslik.xlsx') and trashed = false",
+            q=f"'{folder_id}' in parents and (name = 'baslik.xlsx' or name = 'bilgidozu_yukleme_tablosu.xlsx') and trashed = false",
             pageSize=10,
             fields="files(id, name)",
         ).execute()
         files = res.get("files", [])
         for fobj in files:
-            if fobj.get("name") == "bilgidozu_yukleme_tablosu.xlsx":
+            if fobj.get("name") == "baslik.xlsx":
                 return fobj["id"]
-        return files[0]["id"] if files else None
+        return files[0]["id"] if files else (DEFAULT_SHEETS_ID or None)
     except Exception as e:
         log.warning(f"Ana tablo aranırken hata (zararsız): {e}")
-        return None
+        return DEFAULT_SHEETS_ID or None
 
 
 def _drive_table_write(drive, table_file_id: str, writer) -> bool:
@@ -874,8 +876,8 @@ def update_excel_status_in_drive(
         files = res.get("files", [])
         if not files:
             return False
-        # EMİR 024: yalnız ana tabloya yaz (baslik.xlsx = arşiv, dokunma)
-        primary = [x for x in files if x.get("name") == "bilgidozu_yukleme_tablosu.xlsx"]
+        # Ana tablo: active.sav81@gmail.com içindeki baslik.xlsx
+        primary = [x for x in files if x.get("name") == "baslik.xlsx"]
         if primary:
             files = primary
         now_tr_str = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d %H:%M")

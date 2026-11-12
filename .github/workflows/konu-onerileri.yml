@@ -23,8 +23,8 @@ jobs:
           GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          WORKBOOK_ID: 1ulh13cnzYTaIlp1vehJ7lDrSsgjKyM_X
-          APPROVAL_FOLDER: 1N6mMUu3rEvCIie4o4XUWegPzFngMgHHM
+          WORKBOOK_ID: 1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo
+          APPROVAL_FOLDER: 1xyO_jNjbpghfR7CJ1P9DUvkzdb6eC0qf
         run: python konu_onerileri_uret.py
       - name: Güncel önerileri kaydet
         run: |

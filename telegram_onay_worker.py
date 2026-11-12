@@ -9,9 +9,9 @@ from openpyxl import load_workbook
 
 BOT=os.environ['TELEGRAM_BOT_TOKEN']; CHAT=str(os.environ['TELEGRAM_CHAT_ID'])
 GH=os.environ['GITHUB_TOKEN']; REPO=os.getenv('GITHUB_REPOSITORY','benngokhan/yt_auto_uploader')
-APPROVAL=os.getenv('APPROVAL_FOLDER','1N6mMUu3rEvCIie4o4XUWegPzFngMgHHM')
-QUEUE=os.getenv('QUEUE_FOLDER','1Mht2RXUJG9qAhinl8PGjMgOXg58AOUIR')
-BOOK=os.getenv('WORKBOOK_ID','1ulh13cnzYTaIlp1vehJ7lDrSsgjKyM_X')
+APPROVAL=os.getenv('APPROVAL_FOLDER','1xyO_jNjbpghfR7CJ1P9DUvkzdb6eC0qf')  # active.sav81@gmail.com / Onay_Bekleyen
+QUEUE=os.getenv('QUEUE_FOLDER','1GK-yImpb09445uXfTUbIl7l6AfNM4BOb')        # active.sav81@gmail.com / video kapak
+BOOK=os.getenv('WORKBOOK_ID','1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo')          # active.sav81@gmail.com / baslik.xlsx
 OFFSET_PATH='telegram_callback_offset.txt'
 
 def tg(method,payload):
@@ -52,10 +52,31 @@ def find_files(drive,run_no):
             return video,cover,meta
     return None,None,None
 
-def next_no(drive):
+def next_no(drive, topic=""):
     fs=drive.files().list(q=f"'{QUEUE}' in parents and trashed=false",fields='files(name)',pageSize=1000).execute().get('files',[])
     nums=[int(m.group(1)) for x in fs if (m:=re.fullmatch(r'video_(\d+)\.mp4',x['name']))]
-    return max(nums+[175])+1
+    try:
+        req=drive.files().get_media(fileId=BOOK); p=Path('workbook_scan.xlsx')
+        with p.open('wb') as f:
+            dl=MediaIoBaseDownload(f,req);done=False
+            while not done:_,done=dl.next_chunk()
+        wb=load_workbook(p,data_only=True); ws=wb['DRIVE']
+        t_low=(topic or '').strip().lower()
+        for r in range(2,ws.max_row+1):
+            fn=str(ws.cell(r,2).value or '').strip()
+            st=str(ws.cell(r,1).value or '').strip().upper()
+            ttl=str(ws.cell(r,3).value or '').strip().lower()
+            m=re.fullmatch(r'video_(\d+)\.mp4',fn)
+            if m:
+                n=int(m.group(1))
+                if 'TASLAK' in st and t_low and len(t_low)>=10 and (t_low[:18] in ttl or ttl[:18] in t_low):
+                    wb.close()
+                    return n
+                nums.append(n)
+        wb.close()
+    except Exception:
+        pass
+    return max(nums+[196])+1
 
 def metadata_read(drive, meta, topic):
     if not meta: raise RuntimeError("Yayın bilgisi dosyası bulunamadı; kuyruğa alma durduruldu")
@@ -70,9 +91,17 @@ def workbook_add(drive,no,topic,meta):
     with p.open('wb') as f:
         dl=MediaIoBaseDownload(f,req);done=False
         while not done:_,done=dl.next_chunk()
-    wb=load_workbook(p);ws=wb['DRIVE']; row=ws.max_row+1
-    while row>2 and not ws.cell(row-1,2).value: row-=1
-    ws.cell(row,1,'BEKLEMEDE');ws.cell(row,2,f'video_{no}.mp4');ws.cell(row,3,meta['baslik']);ws.cell(row,4,meta['aciklama']);ws.cell(row,5,meta['hashtag']);ws.cell(row,6,meta['etiketler'])
+    wb=load_workbook(p);ws=wb['DRIVE']
+    target_fn=f'video_{no}.mp4'
+    row=None
+    for r in range(2,ws.max_row+1):
+        if str(ws.cell(r,2).value or '').strip().lower()==target_fn.lower():
+            row=r
+            break
+    if row is None:
+        row=ws.max_row+1
+        while row>2 and not ws.cell(row-1,2).value: row-=1
+    ws.cell(row,1,'BEKLEMEDE');ws.cell(row,2,target_fn);ws.cell(row,3,meta['baslik']);ws.cell(row,4,meta['aciklama']);ws.cell(row,5,meta['hashtag']);ws.cell(row,6,meta['etiketler'])
     ws.cell(row,7,meta['sabit_yorum']);ws.cell(row,8,meta['kategori'])
     wb.save(p)
     drive.files().update(fileId=BOOK,media_body=MediaFileUpload(str(p),mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')).execute()
@@ -131,7 +160,7 @@ def process(cb,drive):
         finish(cb,"🔄 Üretiliyor.");return
     if action=='queue':
         if not video: finish(cb,'⚠️ Onay videosu Drive’da bulunamadı.');return
-        no=next_no(drive)
+        no=next_no(drive,topic)
         meta=metadata_read(drive,meta_file,topic)
         moved=[]
         v_parents=video.get('parents') or [APPROVAL]

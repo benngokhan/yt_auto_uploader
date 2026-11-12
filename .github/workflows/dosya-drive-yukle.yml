@@ -48,7 +48,7 @@ jobs:
           dosya = Path(os.environ["DOSYA"].strip())
           if not dosya.exists():
               raise SystemExit(f"Dosya yok: {dosya}")
-          klasor = os.environ.get("HEDEF", "").strip() or "190zQiUYkp8fsQFleva77TKqc9MeGxZiI"
+          klasor = os.environ.get("HEDEF", "").strip() or "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC"
           mime = mimetypes.guess_type(dosya.name)[0] or "application/octet-stream"
           medya = MediaFileUpload(str(dosya), mimetype=mime, resumable=True)
           sonuc = drive.files().create(

@@ -11,8 +11,8 @@ try:  # Gemini/Groq çağrılarını say (kota API'de yok)
     import kota_sayac  # noqa: F401
 except Exception:
     pass
-BOOK=os.getenv('WORKBOOK_ID','1ulh13cnzYTaIlp1vehJ7lDrSsgjKyM_X')
-APPROVAL=os.getenv('APPROVAL_FOLDER','1N6mMUu3rEvCIie4o4XUWegPzFngMgHHM')
+BOOK=os.getenv('WORKBOOK_ID','1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo')       # active.sav81@gmail.com / baslik.xlsx
+APPROVAL=os.getenv('APPROVAL_FOLDER','1xyO_jNjbpghfR7CJ1P9DUvkzdb6eC0qf')  # active.sav81@gmail.com / Onay_Bekleyen
 
 def norm(s):
  s=str(s or '').lower();s=re.sub(r'#\S+',' ',s);s=re.sub(r'[^a-zçğıöşü0-9 ]',' ',s);return ' '.join(s.split())
@@ -49,7 +49,7 @@ def main():
  if groq:
   try:
    gb={'model':'llama-3.3-70b-versatile','temperature':0.8,'response_format':{'type':'json_object'},'messages':[{'role':'user','content':prompt}]}
-   req=urllib.request.Request('https://api.groq.com/openai/v1/chat/completions',data=json.dumps(gb).encode(),headers={'Content-Type':'application/json','Authorization':'Bearer '+groq})
+   req=urllib.request.Request('https://api.groq.com/openai/v1/chat/completions',data=json.dumps(gb).encode(),headers={'Content-Type':'application/json','Authorization':'Bearer '+groq,'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0 Safari/537.36'})
    with urllib.request.urlopen(req,timeout=180) as r:text=json.load(r)['choices'][0]['message']['content']
    print('provider groq')
   except Exception as e: errors.append('groq:'+repr(e))

@@ -47,7 +47,7 @@ jobs:
           drive = build("drive", "v3", credentials=creds)
 
           dosya = os.environ["DOSYA"].strip()
-          klasor = os.environ.get("HEDEF", "").strip() or "190zQiUYkp8fsQFleva77TKqc9MeGxZiI"
+          klasor = os.environ.get("HEDEF", "").strip() or "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC"
           medya = MediaFileUpload(dosya, mimetype="text/markdown", resumable=False)
           sonuc = drive.files().create(
               body={"name": Path(dosya).name, "parents": [klasor]},

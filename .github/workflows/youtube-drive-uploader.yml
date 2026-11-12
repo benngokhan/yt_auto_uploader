@@ -79,8 +79,8 @@ jobs:
         env:
           GOOGLE_CLIENT_SECRETS_JSON: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}
           GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
-          DRIVE_QUEUE_FOLDER_ID: '190zQiUYkp8fsQFleva77TKqc9MeGxZiI'
-          SHEETS_ID: '1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ'
+          DRIVE_QUEUE_FOLDER_ID: '1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC'
+          SHEETS_ID: '1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo'
         run: |
           python - <<'PY'
           import json, os
@@ -92,11 +92,11 @@ jobs:
           Path("client_secrets.json").write_text(os.environ["GOOGLE_CLIENT_SECRETS_JSON"], encoding="utf-8")
           Path("token.json").write_text(os.environ["GOOGLE_TOKEN_JSON"], encoding="utf-8")
           cfg = json.loads(Path("config.json").read_text(encoding="utf-8")) if Path("config.json").exists() else {}
-          raw_folder = os.getenv("DRIVE_QUEUE_FOLDER_ID", "190zQiUYkp8fsQFleva77TKqc9MeGxZiI").strip()
+          raw_folder = os.getenv("DRIVE_QUEUE_FOLDER_ID", "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC").strip()
           if not raw_folder:
-              raw_folder = "190zQiUYkp8fsQFleva77TKqc9MeGxZiI"
+              raw_folder = "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC"
           cfg["drive_queue_folder_id"] = raw_folder
-          cfg["sheets_id"] = os.getenv("SHEETS_ID", "1UzMG-WhYrNnmE2jlq56YZgzsRkmnAhkZ").strip()
+          cfg["sheets_id"] = os.getenv("SHEETS_ID", "1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo").strip()
           cfg["privacy_status"] = "public"
           Path("config.json").write_text(json.dumps(cfg, indent=2, ensure_ascii=False), encoding="utf-8")
           PY
@@ -134,13 +134,11 @@ jobs:
               import io, openpyxl
               from googleapiclient.http import MediaFileUpload
               from sheets_metadata import DEFAULT_SHEETS_ID, _download_workbook_bytes_from_drive
-              raw_wb = _download_workbook_bytes_from_drive(drive, cfg["drive_queue_folder_id"])
-              if raw_wb and Path("bilgidozu_yukleme_tablosu.xlsx").exists():
-                  wb_d = openpyxl.load_workbook(io.BytesIO(raw_wb), data_only=True)
-                  if "DRIVE" in wb_d.sheetnames and str(wb_d["DRIVE"].cell(148, 8).value or "").strip() == "BEKLEMEDE":
-                      media = MediaFileUpload("bilgidozu_yukleme_tablosu.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", resumable=False)
-                      drive.files().update(fileId=DEFAULT_SHEETS_ID, media_body=media).execute()
-                      print("DRIVE TABLO SENKRONIZE EDILDI: uzun_video_17.mp4 -> YÜKLENDİ & İŞÇİLER güncellendi.")
+              dl_wb = _download_workbook_bytes_from_drive(drive, cfg["drive_queue_folder_id"])
+              if dl_wb and Path("baslik.xlsx").exists():
+                  wb_buf, wb_name = dl_wb
+                  wb_d = openpyxl.load_workbook(wb_buf, data_only=True)
+                  print(f"CANLI DRIVE TABLOSU OKUNDU: {wb_name} ({len(wb_d.sheetnames)} sekme)")
           except Exception as sync_err:
               print("Drive tablo senkron uyarısı:", sync_err)
           print(validate_metadata_workbook(drive, cfg["drive_queue_folder_id"]))

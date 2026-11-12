@@ -825,7 +825,7 @@ def build_telegram_report(
     return msg_html
 
 
-def drain_lobi_to_queue(drive, queue_folder: str, lobi_id: str = "1JULlauO1eFpXgGdZKdZZDyqesSdkeT6f") -> int:
+def drain_lobi_to_queue(drive, queue_folder: str, lobi_id: str = "1xyO_jNjbpghfR7CJ1P9DUvkzdb6eC0qf") -> int:
     """YENİ SERİ KİLİDİ (26.10.2026): Eski lobi klasöründen otomatik dosya taşıma tamamen kapatıldı."""
     return 0
     try:
@@ -1677,7 +1677,7 @@ def upload_job(
             from crosspost_worker import run_crosspost
 
             xcap = build_crosspost_caption(meta)
-            crosspost_result = run_crosspost(tmp_path, file_name, xcap, drive=drive, folder_id="1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_")
+            crosspost_result = run_crosspost(tmp_path, file_name, xcap, drive=drive, folder_id="1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC")
             log.info(f"Çapraz paylaşım sonucu: {crosspost_result}")
         except Exception as xe:
             # Kimlik bilgileri/çerezler exception metninde bulunabileceğinden metni yazdırma.

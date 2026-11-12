@@ -27,8 +27,8 @@ from pathlib import Path
 log = logging.getLogger("crosspost")
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(name)s | %(message)s")
 
-# KartaL Stok (Bot'un yayın çekim klasörü) — çapraz paylaşım anahtar dosyası burada durur
-STOCK_FOLDER_ID = "1w8tz_lv7iMFsRRCaTKUSY_ri0F107rz_"
+# Ana klasör (active.sav81@gmail.com / Bilgi_Dozu_Yeni_Shorts)
+STOCK_FOLDER_ID = "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC"
 KEYS_FILE_NAME = "crosspost_keys.json"
 
 # Kullanıcı her iki platformu pasife aldı. Env/Drive'daki eski oturumlar veya
