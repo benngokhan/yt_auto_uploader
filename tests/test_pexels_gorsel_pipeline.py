@@ -34,6 +34,16 @@ def _make_textured_photo(w=1200, h=1800, base_rgb=(45, 70, 95), bright_border=Fa
 
 
 class PexelsGorselPipelineTests(unittest.TestCase):
+    def test_scene_own_query_always_precedes_shorter_fallbacks(self):
+        adaylar = gorsel_uret._sorgu_adaylari(
+            {"gorsel": "retina cell microscope", "gorsel_anahtar": "retina cell microscope"},
+            yedek=["mobile phone", "human eye"],
+            ana_konu="smartphone glowing screen",
+            sahne_sirasi=2,
+        )
+        self.assertEqual(adaylar[0], "retina cell microscope")
+        self.assertLess(adaylar.index("retina cell microscope"), adaylar.index("mobile phone"))
+
     def test_slug_extraction_and_scoring(self):
         slug = gorsel_uret._pexels_slug_kelimeler(
             "https://www.pexels.com/photo/close-up-of-water-droplets-on-glass-1234567/"

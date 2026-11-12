@@ -271,8 +271,8 @@ def pixabay_ara(sorgu: str, anahtar: str, adet: int = 60) -> list[dict]:
     return sorted(sonuclar.values(), key=lambda h: _puanla(h, sorgu), reverse=True)
 
 
-def _sorgu_adaylari(sahne: dict, yedek: list[str], ana_konu: str) -> list[str]:
-    """Sahnenin somut nesnesini arayan, kelime tekrarı yapmayan İngilizce sorgular."""
+def _sorgu_adaylari(sahne: dict, yedek: list[str], ana_konu: str, sahne_sirasi: int = 0) -> list[str]:
+    """Sahnenin kendi somut nesnesini DAİMA en başta arar; genel yedekler yalnızca en sonda denenir."""
     def _temiz(x: str) -> str:
         return " ".join(str(x or "").replace(",", " ").split())
 
@@ -292,11 +292,19 @@ def _sorgu_adaylari(sahne: dict, yedek: list[str], ana_konu: str) -> list[str]:
     adaylar: list[str] = []
     if cekirdek:
         adaylar.append(cekirdek)
-    if cekirdek and anchor and cekirdek.lower()[:20] not in anchor.lower():
-        adaylar.append(f"{cekirdek} {anchor}")
+        oz_kelimeler = [w for w in cekirdek.split() if w.lower() not in _SUS_KELIMELER]
+        if len(oz_kelimeler) >= 2 and " ".join(oz_kelimeler[-2:]).lower() != cekirdek.lower():
+            adaylar.append(" ".join(oz_kelimeler[-2:]))
     if detay and detay != cekirdek:
         adaylar.append(detay)
-    adaylar += [_temiz(y) for y in yedek if _temiz(y)]
+    if cekirdek and anchor and cekirdek.lower()[:18] not in anchor.lower():
+        adaylar.append(f"{cekirdek} {anchor}")
+
+    # Genel konu yedekleri YALNIZCA sahnenin kendi sorguları sonuç vermezse en sonda denenir
+    temiz_yedek = [_temiz(y) for y in yedek if _temiz(y)]
+    if temiz_yedek:
+        kaydir = sahne_sirasi % len(temiz_yedek)
+        adaylar += temiz_yedek[kaydir:] + temiz_yedek[:kaydir]
 
     gorulen: set[str] = set()
     sonuc: list[str] = []
@@ -306,7 +314,7 @@ def _sorgu_adaylari(sahne: dict, yedek: list[str], ana_konu: str) -> list[str]:
             continue
         gorulen.add(anahtar_kelime)
         sonuc.append(a)
-    return sorted(sonuc, key=lambda x: len(x.split()))[:6]
+    return sonuc[:6]
 
 
 def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str, gevsek: bool = False) -> bool:
@@ -588,7 +596,7 @@ def sahneler_icin_gorseller(
         secim: tuple[str, dict] | None = None
         denenen: list[str] = []
         ham = klasor / f"ham_{i:02d}.jpg"
-        aday_sorgular = _sorgu_adaylari(sahne, yedek, ana_konu)
+        aday_sorgular = _sorgu_adaylari(sahne, yedek, ana_konu, sahne_sirasi=i - 1)
 
         tekiller: list[str] = []
         for s_q in aday_sorgular:

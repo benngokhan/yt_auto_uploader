@@ -55,14 +55,12 @@ def main():
         if gk
         else {"durum": "anahtar_yok", "http": 0, "limit": {}, "mesaj": ""}
     )
-    body = {"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": "Sadece OK yaz."}], "max_tokens": 1}
     groq = (
         call(
             "Groq",
             urllib.request.Request(
-                "https://api.groq.com/openai/v1/chat/completions",
-                data=json.dumps(body).encode(),
-                headers={"Content-Type": "application/json", "Authorization": "Bearer " + qk},
+                "https://api.groq.com/openai/v1/models",
+                headers={"Authorization": "Bearer " + qk, "Accept": "application/json"},
             ),
         )
         if qk

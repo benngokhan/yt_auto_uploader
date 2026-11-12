@@ -88,8 +88,8 @@ def groq_model() -> str:
         return _GROQ_MODEL_ONBELLEK["m"]
     anahtar = os.getenv("GROQ_API_KEY", "").strip()
     istenen = os.getenv("GROQ_LLM_MODEL", "").strip()
-    # gpt-oss / deepseek-r1 / qwq gibi reasoning modelleri content="" döndürebildiği için tercih edilmez
-    _REASONING_ATLA = ("gpt-oss", "deepseek-r1", "qwq", "guard", "whisper", "tts", "vision", "playai")
+    # gpt-oss / deepseek-r1 / qwq / orpheus gibi reasoning veya ses modelleri tercih edilmez
+    _REASONING_ATLA = ("gpt-oss", "deepseek-r1", "qwq", "guard", "whisper", "tts", "vision", "playai", "orpheus", "compound", "allam", "safeguard")
     secilen = "llama-3.3-70b-versatile"
     if anahtar:
         try:
