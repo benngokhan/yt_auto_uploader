@@ -95,7 +95,7 @@ jobs:
           MOTOR_SURE_MAX: ${{ inputs.sure_max }}
           MOTOR_SADECE_SES: ${{ inputs.sadece_ses }}
         run: |
-          ARGS="--konu \"$MOTOR_KONU\" --sahne ${MOTOR_SAHNE:-4} --sure-min ${MOTOR_SURE_MIN:-38} --sure-max ${MOTOR_SURE_MAX:-42}"
+          ARGS="--konu \"$MOTOR_KONU\" --sahne ${MOTOR_SAHNE:-7} --sure-min ${MOTOR_SURE_MIN:-38} --sure-max ${MOTOR_SURE_MAX:-45}"
           [ "$MOTOR_KURU" = "true" ] && ARGS="$ARGS --kuru"
           [ "$MOTOR_SADECE_SES" = "true" ] && ARGS="$ARGS --sadece-ses"
           echo "Komut: python motor/uret.py $ARGS"
