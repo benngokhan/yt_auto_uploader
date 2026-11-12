@@ -1,5 +1,5 @@
 {
-  "guncellendi": "2026-11-12T14:02:41.537394+00:00",
+  "guncellendi": "2026-11-12T14:22:13.662778+00:00",
   "not": "Sağlayıcı yalnız sunduğu limit başlıklarını gösterir; Pexels gerçek kalan aylık isteği döndürür.",
   "gemini": {
     "durum": "aktif",
@@ -18,9 +18,9 @@
     "http": 200,
     "limit": {
       "limit": "25000",
-      "remaining": "24989",
+      "remaining": "24988",
       "reset": "1797083508",
-      "remaining-requests": "24989",
+      "remaining-requests": "24988",
       "limit-requests": "25000"
     },
     "mesaj": ""
