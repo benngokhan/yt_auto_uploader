@@ -191,11 +191,28 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
              "X-Title": "Bilgi Dozu Motor"},
         )["choices"][0]["message"]["content"]))
 
+    def _tamamla(liste: list, adet: int, konu: str) -> list:
+        """LLM 4'ten az/çok sahne verdiyse 4'e oturt ve boş alanları doldur."""
+        liste = [x for x in liste if str(x.get("ses", "")).strip()][:adet]
+        while len(liste) < adet:
+            liste.append({"ses": "", "baslik1": "", "baslik2": "",
+                          "emoji": "🔎", "gorsel": konu, "gorsel_anahtar": konu,
+                          "vurgular": []})
+        for x in liste:
+            x.setdefault("baslik1", "")
+            x.setdefault("baslik2", "")
+            x.setdefault("emoji", "🔎")
+            x.setdefault("gorsel", konu)
+            x.setdefault("gorsel_anahtar", x.get("gorsel", konu))
+            x.setdefault("vurgular", [])
+        return liste
+
     for dene in denemeler:
         try:
             veri = dene()
             sahneler = veri.get("sahneler") or []
-            if len(sahneler) >= 3:
+            if len(sahneler) >= 2:
+                sahneler = _tamamla(sahneler, 4, konu)
                 print(f"Sahne planı hazır ({len(sahneler)} sahne)")
                 return sahneler
             print("LLM yanıtı geçersiz sahne şeması döndürdü")
@@ -262,8 +279,15 @@ def _uzat(konu: str, istem: str, sahneler: list, mevcut_karakter: int) -> str:
             f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={k}",
             data=_j.dumps(govde).encode(), method="POST",
             headers={"Content-Type": "application/json", "User-Agent": _ua})
-        with urllib.request.urlopen(r, timeout=120) as y:
-            return _j.loads(y.read().decode())["candidates"][0]["content"]["parts"][0]["text"]
+        with urllib.request.urlopen(r, timeout=180) as y:
+            ham = _j.loads(y.read().decode())
+        # Yanıt kesilirse (MAX_TOKENS) veya JSON yarım gelirse açık hata ver.
+        aday = (ham.get("candidates") or [{}])[0]
+        parcalar = (aday.get("content") or {}).get("parts") or []
+        metin = "".join(p.get("text", "") for p in parcalar).strip()
+        if not metin:
+            raise RuntimeError(f"gemini boş yanıt ({aday.get('finishReason')})")
+        return metin
 
     for dene in (_dene_groq, _dene_gemini):
         try:
@@ -273,7 +297,7 @@ def _uzat(konu: str, istem: str, sahneler: list, mevcut_karakter: int) -> str:
             veri = _j.loads(m.group(0)) if m else {}
             yeni_sahneler = veri.get("sahneler") or []
             yeni = " ".join(str(x.get("ses", "")) for x in yeni_sahneler)
-            if len(yeni) >= 400:
+            if len(yeni) >= 560:
                 sahneler.clear()
                 sahneler.extend(yeni_sahneler)
                 return yeni
