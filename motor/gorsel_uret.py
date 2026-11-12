@@ -96,6 +96,8 @@ _SUS_KELIMELER = {
     "background", "wallpaper", "beautiful", "abstract", "concept", "dance",
     "dancing", "communication", "collection", "process", "dark", "studio",
     "vertical", "selective", "focus", "high", "resolution",
+    "texture", "textures", "textured", "surface", "pattern", "patterns",
+    "structure", "material", "object", "detail", "details", "detailed",
 }
 
 # Video konusundan bağımsız, ASLA istenmeyen görsel türleri + ham katalog/vektör/yazı/gündelik stok terimleri.
@@ -108,6 +110,8 @@ _YASAK_ETIKET_KESIN = {
     "isolated", "cutout", "mockup", "template", "banner", "poster", "signboard", "watermark",
     "collage", "infographic", "diagram", "cartoon", "vector", "illustration", "sketch", "drawing",
     "clipart", "mannequin", "shopping", "sale", "discount",
+    "crumpled", "paper", "cosmetic", "cosmetics", "skincare", "serum", "lotion", "cream",
+    "perfume", "twine", "burlap", "citrus", "orange", "lemon", "blinds", "curtain", "curtains",
 }
 _YASAK_IFADELER = (
     "white background",

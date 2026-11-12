@@ -136,11 +136,11 @@ jobs:
               creds.refresh(Request())
           drive = build("drive", "v3", credentials=creds)
 
-          # Eski hatalı şablonla üretilmiş ONAY_55 kalıntılarını temizle
+          # Eski hatalı/ara deneme ONAY_55 ve ONAY_57 kalıntılarını temizle
           try:
               eski_q = (
                   f"'{os.environ['ONAY_KLASOR']}' in parents and trashed = false and "
-                  "(name = 'ONAY_55_final.mp4' or name = 'kapak_55.jpg' or name = 'YAYIN_BILGISI_55.json')"
+                  "(name contains '_55' or name contains '_57')"
               )
               for ef in drive.files().list(q=eski_q, fields="files(id,name)").execute().get("files", []):
                   try:

@@ -325,7 +325,7 @@ def _tek_sahne_uzat(konu: str, ses_metni: str, hedef: int = 165) -> str:
         try:
             metin = " ".join(dene().replace("\n", " ").split())
             metin = metin.strip('"\' ')
-            if len(metin) >= 110:
+            if len(metin) >= max(68, hedef - 18):
                 return metin
         except Exception as h:
             print(f"  sahne uzatma ({dene.__name__}): {type(h).__name__}")
@@ -335,15 +335,19 @@ def _tek_sahne_uzat(konu: str, ses_metni: str, hedef: int = 165) -> str:
 def _anlatimi_uzat(konu: str, sahneler: list, hedef_toplam: int = 620) -> int:
     """Her sahneyi ayrı ayrı genişletir; toplam hedefe ulaşana kadar dener."""
     import math
+    alt_sinir = max(78, hedef_toplam // max(1, len(sahneler)))
+    ust_sinir = max(115, alt_sinir + 35)
     for tur in range(3):
         toplam = len(" ".join(str(x.get("ses", "")) for x in sahneler))
         if toplam >= hedef_toplam:
             break
         eksik = hedef_toplam - toplam
         for s in sahneler:
+            if len(" ".join(str(x.get("ses", "")) for x in sahneler)) >= hedef_toplam:
+                break
             mevcut = len(str(s.get("ses", "")))
-            pay = max(0, eksik // max(1, len(sahneler)))
-            hedef = min(190, max(140, mevcut + pay))
+            pay = max(12, eksik // max(1, len(sahneler)))
+            hedef = min(ust_sinir, max(alt_sinir, mevcut + pay))
             if mevcut < hedef - 5:
                 yeni = _tek_sahne_uzat(konu, str(s.get("ses", "")), hedef)
                 if len(yeni) > mevcut:
@@ -358,13 +362,13 @@ def _anlatimi_uzat(konu: str, sahneler: list, hedef_toplam: int = 620) -> int:
 PROMPT_V2 = (
     "Konu: {konu}\n\n"
     "Bilgi Dozu YouTube Shorts için Türkçe bilimsel seslendirme metni, her sahnenin 2 satırlık vurucu üst başlığı ve gerçek bilimsel kaynağını yaz. Kurallar:\n"
-    "- TAM {n} cümle yaz. Her cümle tek satır, sonda nokta, ünlem veya soru işareti olsun.\n"
-    "- Toplam 80-92 kelime (yaklaşık 540-630 karakter) olsun ki seslendirme 39-44 saniye sürsün.\n"
-    "- 1. cümle: KANCA. Merak uyandıran soru veya şaşırtıcı bilimsel gerçek.\n"
-    "- 2. cümle: PROBLEM/DURUM, yaygın yanılgıyı yıkan tek cümle.\n"
-    "- 3-{son}: BİLİMSEL AÇIKLAMA. Her cümlede TEK somut mekanizma ve mümkünse TEK gerçek bilimsel sayı "
+    "- TAM {n} cümle yaz. Her cümle 12-16 kelimeden oluşan (80-95 karakterlik), bilgi dolu tek bir cümle olsun; 5-7 kelimelik kısa cümleler YASAK!\n"
+    "- SÜRE KURALI (ÇOK KRİTİK): {n} cümlenin toplam uzunluğu KESİNLİKLE 560-650 karakter (85-98 kelime) olmalı ki seslendirme + kapanış 39-44 saniye sürsün.\n"
+    "- 1. cümle: KANCA (12-15 kelime). Merak uyandıran soru veya şaşırtıcı bilimsel gerçek.\n"
+    "- 2. cümle: PROBLEM/DURUM (12-16 kelime), yaygın yanılgıyı yıkan doyurucu tek cümle.\n"
+    "- 3-{son}: BİLİMSEL AÇIKLAMA (her biri 13-16 kelime). Her cümlede TEK somut mekanizma ve mümkünse TEK gerçek bilimsel sayı "
     "(uydurma sayı YASAK, yalnızca doğrulanmış gerçek değer).\n"
-    "- Son cümle: net özet sonuç + izleyiciyi hemen denemeye/düşünmeye çağıran kısa soru.\n"
+    "- Son cümle (11-15 kelime): net bilimsel özet sonuç + izleyiciyi hemen denemeye/düşünmeye çağıran kısa soru.\n"
     "- Selamlama, 'abone olun', 'takip et' YASAK (motor kendi ekler).\n"
     "- Kısaltma, parantez, üç nokta kullanma. Sesli okunduğunda doğal aksın.\n"
     "- 'sahne_basliklari': TAM {n} elemanlı dizi. Her cümle için dilbilgisi düzgün, vurucu 2 satır TAM BÜYÜK HARF başlık (her satır EN FAZLA 18 karakter, kelime ortasından bölünmez) ve anlamına uygun ikon ('?', '▼', '⚡', '▲', '!', '✔'). Örnek: "
@@ -621,16 +625,19 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict]
     istem = (
         f"Konu: {konu}\n\n"
         f"Cümleler:\n{numarali}\n\n"
-        f"Yukarıdaki {n} Türkçe bilim cümlesinin her biri için Pexels dikey fotoğraf aramasında "
-        f"editoryal/bilimsel yakın plan (macro/close-up) sonuç verecek BİRBİRİNDEN TAMAMEN FARKLI İngilizce somut nesne aramaları yaz.\n"
-        "KESİN KURALLAR:\n"
+        f"Yukarıdaki {n} Türkçe bilim cümlesinin her biri için Pexels gerçek kamera fotoğrafı arşivinde "
+        f"net 4K dikey bilimsel/tıbbi/optik sonuç verecek BİRBİRİNDEN TAMAMEN FARKLI İngilizce somut nesne aramaları yaz.\n"
+        "KESİN KURALLAR (Pexels gerçek kamera fotoğrafı arşividir, 3D çizim arşivi değildir):\n"
         "1) İki sahnede aynı ana kelimeyi TEKRARLAMA.\n"
-        "2) Gündelik yaşam/stok klişeleri ('mobile phone', 'hand holding phone', 'person texting', 'person in bed', 'man', 'woman', 'office') YASAK!\n"
-        "3) Doğrudan bilimsel/optik/fiziksel/anatomik yakın plan nesneler yaz "
-        "(ör. 'human eye iris macro', 'clinical thermometer macro', 'ice crystals frost', 'microscope lens light', "
-        "'light prism spectrum', 'red blood cells', 'water droplets glass', 'neural network light', 'clockwork gears macro').\n"
-        f"Yalnız JSON döndür: {{\"sahneler_gorsel\": [{{\"ana\": \"2-3 kelimelik somut makro nesne\", \"alternatif\": \"farklı 2 kelimelik somut nesne\"}}, ...], "
-        f"\"yedekler\": [\"farklı bilim nesnesi 1\", \"farklı bilim nesnesi 2\", \"farklı bilim nesnesi 3\", \"farklı bilim nesnesi 4\"]}}. "
+        "2) SADECE gerçek bir fotoğrafçının kamerayla çekebileceği somut bilimsel/optik/anatomik/laboratuvar nesneleri yaz "
+        "(mükemmel örnekler: 'human eye iris', 'scientist microscope', 'laboratory test tube', 'brain mri scan', "
+        "'optical glass lens', 'blue laser beam', 'hourglass sand', 'medical laboratory', 'astronomy night sky', "
+        "'water droplets glass', 'wristwatch gears', 'clinical thermometer').\n"
+        "3) YASAK SORGULAR: Kamerayla çekilemeyen soyut molekül/bakteri adları ('vitamin molecule', 'retinal pigment', 'bacteria', 'protein') YASAK (bunlar kozmetik şişesi döndürür; yerine 'laboratory pipette' veya 'scientist microscope' yaz)! "
+        "'texture', 'pattern', 'abstract', 'background' kelimeleri YASAK (kağıt dokusu döndürür)! "
+        "Gündelik stok klişeleri ('mobile phone', 'hand holding phone', 'person texting', 'person in bed', 'man', 'woman', 'office', 'window') YASAK!\n"
+        f"Yalnız JSON döndür: {{\"sahneler_gorsel\": [{{\"ana\": \"2-3 kelimelik gerçek fotoğraflanabilir bilim nesnesi\", \"alternatif\": \"farklı 2-3 kelimelik bilim nesnesi\"}}, ...], "
+        f"\"yedekler\": [\"scientist microscope\", \"laboratory test tube\", \"optical glass lens\", \"brain mri scan\"]}}. "
         f"\"sahneler_gorsel\" dizisi TAM {n} elemanlı olacak."
     )
     veri = _llm_json(istem, ayar, _LLM_SISTEM)
@@ -674,6 +681,19 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
 
     sahneler = sahne_plani_v2(a.konu, sahne_sayisi, ayar)
     anlatim = " ".join(str(x["ses"]).strip() for x in sahneler)
+    print(f"Anlatım (ilk): {len(anlatim)} karakter / {len(sahneler)} cümle")
+    # 38-44 sn video hedefi için CTA dahil toplam metin en az ~575 karakter olmalı
+    if len(anlatim) < 575 and len(sahneler) >= 2:
+        kapanis_cta = "Daha fazla Bilgi Dozu için takip et!"
+        son_ham = str(sahneler[-1]["ses"]).replace(kapanis_cta, "").strip()
+        sahneler[-1]["ses"] = son_ham
+        _anlatimi_uzat(a.konu, sahneler, hedef_toplam=565)
+        son_yeni = str(sahneler[-1]["ses"]).rstrip()
+        if son_yeni and son_yeni[-1] not in ".!?":
+            son_yeni += "."
+        if "takip et" not in son_yeni.lower():
+            sahneler[-1]["ses"] = f"{son_yeni} {kapanis_cta}"
+        anlatim = " ".join(str(x["ses"]).strip() for x in sahneler)
     print(f"Anlatım: {len(anlatim)} karakter / {len(sahneler)} cümle")
     if len(anlatim) < 300:
         raise SystemExit(f"Anlatım çok kısa: {len(anlatim)} karakter; video üretilmedi.")
