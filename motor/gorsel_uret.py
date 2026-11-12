@@ -96,9 +96,14 @@ def _sorgu_adaylari(sahne: dict, yedek: list[str], ana_konu: str) -> list[str]:
     def _temiz(x: str) -> str:
         return " ".join(str(x or "").replace(",", " ").split())
 
-    detay = _temiz(sahne.get("gorsel"))
-    anahtar = _temiz(sahne.get("gorsel_anahtar") or "")
-    anchor = _temiz(ana_konu)
+    SOYUT = {"communication", "communicate", "dance", "dancing", "waggle",
+             "collection", "process", "concept", "how", "why", "secret"}
+    def _somut(x: str) -> str:
+        return " ".join(w for w in _temiz(x).split() if w.lower() not in SOYUT)
+
+    detay = _somut(sahne.get("gorsel"))
+    anahtar = _somut(sahne.get("gorsel_anahtar") or "")
+    anchor = _somut(ana_konu)
 
     # Sahnenin kendi ana nesnesi varsa onu kullan; yoksa ilk sahnenin nesnesi.
     cekirdek = anahtar or detay
@@ -137,20 +142,49 @@ def _kelimeler(metin: str) -> set[str]:
             if len(k) >= 3 and k not in _SUS_KELIMELER}
 
 
-def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str) -> bool:
-    """Görselin etiketleri sahnenin ana nesnesini taşıyor mu?
+# Alaka ölçümünde sayılmayan süs/sanat kelimeleri.
+_SUS_KELIMELER = {
+    "macro", "close", "closeup", "photography", "photo", "documentary",
+    "cinematic", "shot", "view", "style", "light", "lighting", "nature",
+    "background", "wallpaper", "beautiful", "abstract", "concept", "dance",
+    "dancing", "communication", "collection", "process", "concept",
+}
 
-    Kural: sahne sorgusunun çekirdek kelimelerinden EN AZ BİRİ etiketlerde
-    geçmeli VE puan eşiği aşılmalı. Eski sürüm ana konu + sorgu kelimelerini
-    birleştirip çok katı davranıyordu; artık sahnenin kendi nesnesine bakıyor.
+# Video konusundan bağımsız, ASLA istenmeyen görsel türleri.
+_YASAK_ETIKET = {
+    "portrait", "model", "girl", "boy", "woman", "man", "people", "person",
+    "hanói", "hanoi", "vietnamese", "selfie", "smile", "fashion", "makeup",
+    "tea", "coffee", "drink", "cup", "wine", "beer", "food", "dish",
+    "car", "motorcycle", "city", "building", "wedding", "couple",
+}
+
+
+def _kelimeler(metin: str, sus_at: bool = True) -> set[str]:
+    import re
+    k = {x for x in re.split(r"[^\wçğıöşü]+", str(metin or "").lower()) if len(x) >= 3}
+    return {x for x in k if x not in _SUS_KELIMELER} if sus_at else k
+
+
+def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str) -> bool:
+    """Görsel gerçekten sahnenin ana NESNESİNİ gösteriyor mu?
+
+    Kural: sahnenin çekirdek nesne kelimelerinden en az BİRİ etiketlerde
+    birebir geçmeli, yasak tür etiketi bulunmamalı ve puan eşiği aşılmalı.
+    Canlı testte "waggle dance" sorgusuna dans eden kız, "nectar collection"
+    sorgusuna çay bardakları geldi; bu kapı onları eler.
     """
-    etiketler = _kelimeler(hit.get("tags", ""))
+    etiketler = _kelimeler(hit.get("tags", ""), sus_at=False)
     if not etiketler:
         return False
-    sahne_kelime = _kelimeler(sorgu)
-    cekirdek = sorted(sahne_kelime)[:4] or sorted(_kelimeler(ana_konu))[:4]
-    ortak = len(set(cekirdek) & etiketler)
-    return ortak >= 1 and _puanla(hit, sorgu) >= 6.0
+    if etiketler & _YASAK_ETIKET:          # insan/yiyecek/araç → doğrudan ele
+        return False
+    cekirdek = _kelimeler(sorgu) or _kelimeler(ana_konu)
+    if not cekirdek:
+        return False
+    # Çekirdeğin en az %34'ü (en az 1 kelime) etiketlerde olmalı.
+    ortak = len(cekirdek & etiketler)
+    gerekli = 1 if len(cekirdek) <= 3 else 2
+    return ortak >= gerekli and _puanla(hit, sorgu) >= 6.0
 
 
 def dikey_kirp(img: Image.Image) -> Image.Image:
