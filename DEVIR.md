@@ -137,3 +137,33 @@ Panelden yazılabilen 5 anahtar: `ELEVENLABS_API_KEY`, `OPENROUTER_API_KEY`, `GE
 
 **Anahtar asla repoya/loga yazılmaz** — `::add-mask::` ile maskelenir.
 
+---
+
+## 12. MOTOR ONARILDI — 12.11.2026 04:00
+
+Motor **6 koşu boyunca failure** idi; hepsi çözüldü. **İlk başarılı koşu: `43129889209`.**
+
+| Sorun | Çözüm | Commit |
+|---|---|---|
+| Groq 403 / 404 | Tarayıcı `User-Agent` + canlı model listesinden model doğrulama + OpenRouter son yedek | `7bb63718`, `903b276d` |
+| Anlatım 335 karakter (kısa) | `_uzat()` otomatik uzatma turu | `7bb63718` |
+| Anlatım 651/738 karakter → kapı reddediyordu | Üst sınır artık engel değil, yalnız uyarı | `903b276d` |
+| Drive 404 (onay klasörü) | `ONAY_KLASOR` varsayılanı `1Mht2RXU…` yapıldı; 404 artık koşuyu patlatmıyor | `e9cdeccd` |
+| Gemini TTS 429 (günlük kota bitti) | Yedek zinciri: Gemini → ElevenLabs → edge-tts | `a8c63324` |
+| edge-tts `Invalid voice 'Charon'` | Gemini ses adı edge'e geçmiyor, `tr-TR-AhmetNeural`'a düşüyor | `a45388cc` |
+| Yüklenen video Drive'da kalıyordu | `uploader.py` → `_arsiv_temizle()` çöpe atar; **video_173+ korunur** | `e83c7857` |
+
+**Kanıt (run 43129889209):** anlatım 627 karakter · 6 sahne · ses yedeği edge-tts · video + kapak üretildi · Drive'a `SES_ONAY_38.wav` (3,7 MB) düştü · artifact `motor-video` 2,7 MB.
+
+**Not:** Gemini TTS günlük kotası dolduğu için ses şu an **edge-tts (Ahmet Neural)** ile üretiliyor. Kota her gün 00:00 Pasifik'te sıfırlanır; Gemini otomatik geri döner.
+
+### Panel stok hatası da düzeldi
+`sync_panel_telemetry.py` üç ayrı hataydı:
+1. `load_table_from_drive_or_local(None, …)` → Drive'a hiç bakmıyordu, **bayat yerel xlsx** okunuyordu → canlı tablo `17nS-VEILQ72k7NKEbYcnji90p1G5UbZZ` okunuyor (`d6fb209a`).
+2. Tüm klasör kimlikleri aynı klasörü gösterdiği için **kapaklar video sanılıyordu** + aynı video 2 kez ekleniyordu → tür bazlı ayrım (`994ad81a`).
+3. **İşçi hesabı `galtundal81` klasörleri göremiyordu** → CEO, onay ve üretim klasörleri writer olarak paylaşıldı. (Drive izin değişikliği, kod değil.)
+
+**Sonuç:** panel kuyruğu 47 satır, sahte "TABLO DIŞI" satırı **0**, "eksik kapak" **0**.
+**Stok: 15 video (14 Shorts + 1 Uzun) = 7,5 gün.** Sıradaki: `video_173.mp4`, `uzun_video_22.mp4`.
+
+**Kalan 2 açık konu (üretimi durdurmuyor):** P1 `SITE_SYNC_TOKEN` ölü (panelden anahtar kaydı çalışmıyor) · P2 ElevenLabs izni `user_read` yok.
