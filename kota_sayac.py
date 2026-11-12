@@ -28,13 +28,15 @@ LIMITLER = BASE / "kota_limitleri.json"
 
 # Gemini/Groq ücretsiz katman için makul varsayılanlar — elle ayarlanabilir
 VARSAYILAN_LIMIT = {
-    # Gerçek ÜCRETSİZ KATMAN değerleri (Google AI + Groq rate-limit dokümanı)
+    # Gerçek ÜCRETSİZ KATMAN değerleri (Google AI + Groq + Pexels rate-limit dokümanı)
     "gemini": {"gunluk_istek": 1500, "dakika_istek": 15, "birim": "istek/gün"},
     "groq": {"gunluk_istek": 1000, "dakika_istek": 30, "birim": "istek/gün"},
     "openrouter": {"gunluk_istek": 50, "birim": "istek/gün"},  # ücretsiz modeller
+    "pexels": {"gunluk_istek": 4800, "birim": "istek/gün"},
+    "pixabay": {"gunluk_istek": 5000, "birim": "istek/gün"},
 }
 
-_SAYAC = {"gemini": 0, "groq": 0, "openrouter": 0, "elevenlabs": 0, "telegram": 0}
+_SAYAC = {"gemini": 0, "groq": 0, "openrouter": 0, "elevenlabs": 0, "telegram": 0, "pexels": 0, "pixabay": 0}
 _KILIT = threading.Lock()
 _OKU, _YAZ = urllib.request.urlopen, urllib.request.Request
 
@@ -51,6 +53,10 @@ def _saglayici(url: str) -> str | None:
         return "elevenlabs"
     if "api.telegram.org" in u:
         return "telegram"
+    if "api.pexels.com" in u:
+        return "pexels"
+    if "pixabay.com/api" in u:
+        return "pixabay"
     return None
 
 
@@ -120,7 +126,7 @@ def bugun_ozet() -> dict:
     ayni_gun = d.get("gun") == _bugun()
     sayaclar = (d.get("sayaclar") or {}) if ayni_gun else {}
     out = {}
-    for ad in ("gemini", "groq", "openrouter"):
+    for ad in ("gemini", "groq", "openrouter", "pexels", "pixabay"):
         kullanilan = int(sayaclar.get(ad) or 0)
         limit = (lim.get(ad) or {}).get("gunluk_istek")
         birim = (lim.get(ad) or {}).get("birim") or "istek/gün"

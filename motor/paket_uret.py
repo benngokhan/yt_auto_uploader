@@ -10,7 +10,7 @@ MOTOR = ROOT / "motor"
 sys.path.insert(0, str(MOTOR)); sys.path.insert(0, str(ROOT))
 import uret, tts  # noqa: E402
 
-PARENT = os.getenv("MOTOR_PAKET_DRIVE_ID", "1lKrhKOx9ywnhhA9xRkBGlhjxY8Ee9fg1")
+PARENT = os.getenv("MOTOR_PAKET_DRIVE_ID", "1xyO_jNjbpghfR7CJ1P9DUvkzdb6eC0qf")
 
 
 def slug(s: str) -> str:

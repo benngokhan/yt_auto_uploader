@@ -18,7 +18,8 @@
     "tek_istek": true
   },
   "gorsel": {
-    "kaynak": "pixabay",
+    "kaynak": "pexels",
+    "yedek_kaynak": "pixabay",
     "klasor": "motor/cikti/gorseller",
     "dikey": true,
     "min_genislik": 1080
@@ -35,7 +36,7 @@
   "kararlar": {
     "sure": "38-42 sn (kullanıcı: 3 Kasım 2026)",
     "ses": "Onaylı Gemini Charon doğal erkek anlatıcı; Ahmet Neural yedekte korunur; otomatik fallback yok",
-    "gorsel": "Pixabay fotoğraf + teal-amber sinematik düzenleme (AI/ücretli servis yok)",
+    "gorsel": "Pexels dikey (portrait) küratörlü fotoğraf (birincil) + Pixabay yedek + anti-ham piksel filtresi + koyu teal-amber sinematik işleme",
     "akis": "Her video elle onaylı; otomatik yayın yok",
     "sablon": "v2.2 motoru: 7 sahne, dinamik başlık + sarı ikon, tek kelime karaoke, saf 3D kapanış ekranı ('Daha fazla Bilgi Dozu...' cümlesinde kararır, 'takip et!' anında fare tıklar, sıfır çubuk/kaynak), jenerik intro + auto-ducking",
     "ses_tek_istek": "Tüm cümleler TEK Gemini isteğinde okunur (4 ayrı istek 4 farklı ton üretiyordu)"

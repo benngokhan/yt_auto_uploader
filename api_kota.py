@@ -371,6 +371,48 @@ def telegram():
         return hata("Telegram", e)
 
 
+def pexels():
+    key = (os.getenv("PEXELS_API_KEY") or os.getenv("PEXELS_KEY") or os.getenv("PEXELS_API") or "").strip()
+    if not key:
+        return hata("Pexels", "Anahtar yok (PEXELS_API_KEY)", "yok",
+                    panel_aksiyon="API & Kota ekranından PEXELS_API_KEY ekle")
+    try:
+        req = urllib.request.Request(
+            "https://api.pexels.com/v1/curated?per_page=1",
+            headers={"Authorization": key, "User-Agent": UA, "Accept": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=30) as r:
+            r.read()
+            hdr = {k.lower(): v for k, v in r.headers.items()}
+        lim_raw = hdr.get("x-ratelimit-limit")
+        rem_raw = hdr.get("x-ratelimit-remaining")
+        rst_raw = hdr.get("x-ratelimit-reset")
+        limit = int(lim_raw) if lim_raw and str(lim_raw).isdigit() else 20000
+        kalan = int(rem_raw) if rem_raw and str(rem_raw).isdigit() else limit
+        kullanilan = max(limit - kalan, 0)
+        reset_iso = ""
+        if rst_raw and str(rst_raw).isdigit():
+            try:
+                reset_iso = datetime.fromtimestamp(int(rst_raw), tz=timezone.utc).isoformat(timespec="seconds")
+            except Exception:
+                reset_iso = ""
+        return ok("Pexels",
+                  kalan=kalan, limit=limit, kullanilan=kullanilan,
+                  birim="istek/ay (saatlik 200)",
+                  reset_iso=reset_iso,
+                  yenilenme="aylık 20.000 istek · saatlik 200 istek penceresi",
+                  not_="Birincil dikey küratörlü sahne görseli kaynağı (anti-ham sinematik mod)")
+    except urllib.error.HTTPError as e:
+        try:
+            govde = e.read().decode("utf-8", "replace")[:160]
+        except Exception:
+            govde = ""
+        return hata("Pexels", f"HTTP {e.code} · {govde}".strip(" ·"),
+                    "gecersiz" if e.code in (401, 403) else "hata")
+    except Exception as e:
+        return hata("Pexels", e)
+
+
 # ── GitHub: token kotası + Actions dakikası ────────────────────────────────
 def github():
     tok = (os.getenv("GITHUB_TOKEN") or "").strip()
@@ -420,12 +462,14 @@ def github():
 
 
 def secret_durumu():
-    """Workflow 'gh secret list' çıktısını secret_listesi.json'a yazar; burada okunur."""
+    """Workflow 'gh secret list' çıktısını ve ortam değişkenlerini birlikte kontrol eder."""
     gerekli = {
-        "ELEVENLABS_API_KEY": "Ses üretimi (ElevenLabs)",
-        "OPENROUTER_API_KEY": "Yedek LLM + TTS (OpenRouter)",
-        "GEMINI_API_KEY": "Başlık/açıklama üretimi, Gemini TTS",
+        "PEXELS_API_KEY": "Birincil sinematik görsel kaynağı (Pexels)",
+        "PIXABAY_API_KEY": "Yedek görsel kaynağı (Pixabay)",
+        "GEMINI_API_KEY": "Başlık/açıklama üretimi, Gemini Charon TTS",
         "GROQ_API_KEY": "Hızlı LLM (Groq)",
+        "OPENROUTER_API_KEY": "Yedek LLM + TTS (OpenRouter)",
+        "ELEVENLABS_API_KEY": "Yedek ses üretimi (ElevenLabs)",
         "GOOGLE_TOKEN_JSON": "Drive + YouTube OAuth",
         "GOOGLE_CLIENT_SECRETS_JSON": "Drive + YouTube OAuth",
         "TELEGRAM_BOT_TOKEN": "Telegram bildirimleri",
@@ -438,6 +482,18 @@ def secret_durumu():
                 mevcut.add(s if isinstance(s, str) else s.get("name", ""))
         except Exception:
             pass
+    # Ortamda dolu gelen secret'ları da mevcut kabul et (gh secret list yetkisi yoksa yanlış 'eksik' yazmasın)
+    if (os.getenv("PEXELS_API_KEY") or os.getenv("PEXELS_KEY") or os.getenv("PEXELS_API") or "").strip():
+        mevcut.add("PEXELS_API_KEY")
+    if (BASE / "token.json").exists():
+        mevcut.add("GOOGLE_TOKEN_JSON")
+    if (BASE / "client_secrets.json").exists():
+        mevcut.add("GOOGLE_CLIENT_SECRETS_JSON")
+    if (os.getenv("GH_TOKEN") or "").strip():
+        mevcut.add("SITE_SYNC_TOKEN")
+    for ad in gerekli:
+        if (os.getenv(ad) or "").strip():
+            mevcut.add(ad)
     out = []
     for ad, aciklama in gerekli.items():
         out.append({"ad": ad, "var": ad in mevcut, "aciklama": aciklama})
@@ -445,6 +501,7 @@ def secret_durumu():
 
 
 YENILENME = {
+    "Pexels": "aylık 20.000 istek · saatlik 200 istek penceresi",
     "ElevenLabs": "aylık · fatura dönemi başında sıfırlanır (kalan kredi devretmez)",
     "OpenRouter": "aylık sıfırlanmaz · kredi yükledikçe artar",
     "Gemini": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
@@ -458,7 +515,7 @@ YENILENME = {
 
 def main() -> int:
     print("API kotası toplanıyor…")
-    servisler = [elevenlabs(), openrouter(), gemini(), groq(), telegram(), github()]
+    servisler = [pexels(), gemini(), groq(), openrouter(), elevenlabs(), telegram(), github()]
     servisler += google()
     for s in servisler:
         if not s.get("yenilenme"):

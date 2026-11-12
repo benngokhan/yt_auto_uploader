@@ -597,16 +597,17 @@ def tr_upper(metin: str) -> str:
 
 
 def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[str], list[str]]:
-    """Her cümle için 2-4 kelimelik İNGİLİZCE somut Pixabay araması + genel konu yedekleri üretir."""
+    """Her cümle için 2-4 kelimelik İNGİLİZCE somut Pexels araması + genel konu yedekleri üretir."""
     n = len(cumleler)
     numarali = "\n".join(f"{i+1}) {c}" for i, c in enumerate(cumleler))
     istem = (
         f"Konu: {konu}\n\n"
         f"Cümleler:\n{numarali}\n\n"
-        f"Yukarıdaki {n} Türkçe cümlenin her biri için Pixabay stok fotoğraf aramasında tam isabetli sonuç verecek "
+        f"Yukarıdaki {n} Türkçe cümlenin her biri için Pexels stok fotoğraf aramasında tam isabetli, sinematik sonuç verecek "
         f"2-3 kelimelik SOMUT İNGİLİZCE İSİM (NOUN) araması yaz.\n"
-        "Kurallar: Sıfat ve fiil ('fast moving', 'close up', 'snapping') KULLANMA; sadece doğrudan fotoğraflanan somut nesne "
-        "(ör. \"human hand\", \"palm fingers\", \"sound wave\", \"acoustic speaker\", \"ear anatomy\", \"honeybee hive\", \"brain scan\").\n"
+        "Kurallar: Soyut fiil/sıfat ('fast moving', 'amazing secret', 'snapping') ve beyaz zeminli katalog kelimesi KULLANMA; "
+        "yalnızca doğrudan fotoğraflanan somut nesne yaz "
+        "(ör. \"human hand\", \"palm fingers\", \"sound wave\", \"acoustic speaker\", \"ear anatomy\", \"honeybee hive\", \"brain mri scan\").\n"
         f"Yalnız JSON döndür: {{\"aramalar\": [\"nesne 1\", ...], \"yedekler\": [\"ana nesne 1\", \"ana nesne 2\", \"ana nesne 3\"]}}. "
         f"\"aramalar\" dizisi TAM {n} elemanlı olacak."
     )
@@ -918,7 +919,7 @@ def main() -> int:
     if not gorsel_klasoru.is_absolute():
         gorsel_klasoru = KOK / gorsel_klasoru
 
-    if kaynak == "pixabay":
+    if kaynak in ("pexels", "pixabay", "auto", "stok"):
         konu_kelimeleri = [k for k in {w.strip('.,?!:;').lower() for w in a.konu.split()} if len(k) > 3]
         yedek = [" ".join(konu_kelimeleri[:3])] if konu_kelimeleri else []
         parallelar = gorsel_uret.sahneler_icin_gorseller(sahneler, gorsel_klasoru, yedek)

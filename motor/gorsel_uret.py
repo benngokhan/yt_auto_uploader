@@ -1,145 +1,92 @@
 #!/usr/bin/env python3
-"""Sahne görselleri — Pixabay (ücretsiz, anahtar repoda var) + 1080x1920 hazırlık.
+"""Sahne görselleri — Pexels (birincil, küratörlü dikey) + Pixabay (yedek) + Anti-Ham Sinematik İşleme.
 
-Karar (kullanıcı): görseller Pixabay'den gelir; teal-amber sinematik renk
-düzenlemesi ve parçacık efekti render motorunda uygulanır (sablon tekilliği).
-
-Kurallar:
-    * Dikey (9:16) tercih edilir, kısa kenar >= 1080 olmalı
-    * Her sahne için ayrı görsel; aynı görsel iki kez kullanılmaz
-    * Ham görselde yazı/filigran olmamalı → üretim sonrası 'elle onay' kapısı
+Karar (kullanıcı):
+    * Görseller öncelikle Pexels API'den (orientation=portrait, yüksek çözünürlük) çekilir;
+      Pexels'te bulunamayan niş terimlerde Pixabay yedek olarak devreye girer.
+    * Ham / düz stok fotoğraf, beyaz stüdyo kesimi (isolated cutout), bulanık veya patlamış
+      ışıklı görsel videoya GİREMEZ: hem etiket/renk puanlamasında hem indirme sonrası
+      piksel denetiminde (_ham_kusurlu_mu) elenir.
+    * Kabul edilen her görsel 9:16 dikey kadraj + Bilgi Dozu koyu teal-amber sinematik
+      renk düzenlemesi + pozlama dengeleme + mikro-parçacık derinliği ile işlenir.
 """
 from __future__ import annotations
 
 import json
 import os
+import re
+import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
 
-from PIL import Image
+import numpy as np
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
-HEDEF = (1080, 1920)
-ARAMA_URL = "https://pixabay.com/api/"
+HEDEF = (1350, 2400)  # Tam 9:16 dikey, Ken Burns zoom için yüksek keskinlik
+PEXELS_URL = "https://api.pexels.com/v1/search"
+PIXABAY_URL = "https://pixabay.com/api/"
+
+_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+)
 
 
-def _istek(url: str) -> dict:
-    istek = urllib.request.Request(url, headers={"User-Agent": "bilgidozu-motor/1.0 (+github)"})
-    try:
-        with urllib.request.urlopen(istek, timeout=60) as y:
-            return json.loads(y.read().decode())
-    except Exception as hata:  # noqa: BLE001
-        govde = ""
+def _istek(url: str, ek_baslik: dict | None = None, saglayici: str = "Görsel API") -> dict:
+    basliklar = {"User-Agent": _UA, "Accept": "application/json"}
+    if ek_baslik:
+        basliklar.update(ek_baslik)
+    son_hata: Exception | None = None
+    for bekle in (0, 2, 5):
+        if bekle:
+            time.sleep(bekle)
+        istek = urllib.request.Request(url, headers=basliklar)
         try:
-            govde = hata.read().decode()[:300]      # type: ignore[attr-defined]
+            with urllib.request.urlopen(istek, timeout=60) as y:
+                return json.loads(y.read().decode("utf-8"))
+        except urllib.error.HTTPError as hata:
+            son_hata = hata
+            if hata.code in (429, 500, 502, 503, 504):
+                continue
+            govde = ""
+            try:
+                govde = hata.read().decode("utf-8", "replace")[:300]
+            except Exception:  # noqa: BLE001
+                pass
+            raise SystemExit(f"{saglayici} isteği başarısız (HTTP {hata.code}): {govde}") from hata
+        except Exception as hata:  # noqa: BLE001
+            son_hata = hata
+            continue
+    govde = ""
+    if hasattr(son_hata, "read"):
+        try:
+            govde = son_hata.read().decode("utf-8", "replace")[:300]  # type: ignore[union-attr]
         except Exception:  # noqa: BLE001
             pass
-        raise SystemExit(f"Pixabay isteği başarısız: {hata} | {govde}") from hata
+    raise SystemExit(f"{saglayici} isteği başarısız: {son_hata} | {govde}") from son_hata
 
 
-def _puanla(hit: dict, sorgu: str) -> float:
-    """Etiket uyumu + çözünürlük + beğeni → alaka puanı."""
-    q = {k.lower() for k in sorgu.replace("+", " ").split() if len(k) > 2}
-    etiketler = {t.lower() for t in str(hit.get("tags", "")).replace(",", " ").split()}
-    ortak = len(q & etiketler)
-    puan = ortak * 10.0
-    puan += min(4.0, (hit.get("imageWidth", 0) * hit.get("imageHeight", 0)) / 6_000_000)
-    puan += min(3.0, (hit.get("likes", 0) + hit.get("downloads", 0) / 50.0) / 100.0)
-    if hit.get("imageHeight", 0) > hit.get("imageWidth", 0):
-        puan += 3.0
-    if (hit.get("imageWidth", 0) >= 1080 and hit.get("imageHeight", 0) >= 1440):
-        puan += 2.0
-    # Fotoğraf türü şartlarını geçemeyen (illüstrasyon/vektör) sonuçları ele
-    if str(hit.get("type", "photo")) != "photo":
-        puan -= 20.0
-    return puan
+def _pexels_slug_kelimeler(url: str) -> str:
+    """Pexels URL'sindeki açıklayıcı İngilizce başlığı çıkarır."""
+    m = re.search(r"/photo/([a-z0-9-]+?)(?:-\d+)?/?$", str(url or "").lower())
+    if not m:
+        return ""
+    kelimeler = [k for k in m.group(1).split("-") if k and not k.isdigit()]
+    return " ".join(kelimeler)
 
 
-def pixabay_ara(sorgu: str, anahtar: str, adet: int = 60) -> list[dict]:
-    """Sorguya en uygun dikey fotoğrafları puana göre sıralı döndürür.
-
-    Önce katı (dikey + büyük), sonuç azsa gevşek (her yön) arama yapılır.
-    """
-    temel = {
-        "key": anahtar,
-        "q": sorgu,
-        "image_type": "photo",
-        "safesearch": "true",
-        "order": "popular",
-        "per_page": str(min(adet, 200)),
-        "lang": "en",
-        "order": "popular",
-    }
-    sonuclar: dict[int, dict] = {}
-    for ek in ({"orientation": "vertical", "min_width": 1400, "min_height": 1400},
-               {"min_width": 1200, "min_height": 900}):
-        try:
-            veri = _istek(f"{ARAMA_URL}?{urllib.parse.urlencode({**temel, **ek})}")
-        except SystemExit:
-            if sonuclar:      # gevşek aramada hata olursa elimizdekiyle devam
-                break
-            raise
-        for h in veri.get("hits", []):
-            sonuclar.setdefault(h["id"], h)
-        if len(sonuclar) >= 8:
-            break
-    return sorted(sonuclar.values(), key=lambda h: _puanla(h, sorgu), reverse=True)
-
-
-def _sorgu_adaylari(sahne: dict, yedek: list[str], ana_konu: str) -> list[str]:
-    """Sahnenin somut nesnesini arayan, kelime tekrarı yapmayan sorgular.
-
-    Eski sürüm aynı kelimeleri iki kez ekliyordu ("person waking up before alarm
-    clock person waking up before alarm clock") ve Pixabay alakasız sonuç
-    döndürüyordu. Artık: kısa ve öz sorgu önce, süsleyici kelimeler sonra.
-    """
-    def _temiz(x: str) -> str:
-        return " ".join(str(x or "").replace(",", " ").split())
-
-    SOYUT = {"communication", "communicate", "dance", "dancing", "waggle",
-             "collection", "process", "concept", "how", "why", "secret"}
-    def _somut(x: str) -> str:
-        return " ".join(w for w in _temiz(x).split() if w.lower() not in SOYUT)
-
-    detay = _somut(sahne.get("gorsel"))
-    anahtar = _somut(sahne.get("gorsel_anahtar") or "")
-    anchor = _somut(ana_konu)
-
-    # Sahnenin kendi ana nesnesi varsa onu kullan; yoksa ilk sahnenin nesnesi.
-    cekirdek = anahtar or detay
-    adaylar: list[str] = []
-    if cekirdek:
-        adaylar.append(cekirdek)                      # en yalın, en isabetli
-    if cekirdek and anchor and cekirdek.lower()[:20] not in anchor.lower():
-        adaylar.append(f"{cekirdek} {anchor}")
-    if detay and detay != cekirdek:
-        adaylar.append(detay)
-    adaylar += [_temiz(y) for y in yedek if _temiz(y)]
-
-    # Kelime tekrarını at, kısa sorguyu öne al.
-    gorulen: set[str] = set()
-    sonuc: list[str] = []
-    for a in adaylar:
-        anahtar_kelime = " ".join(sorted({k.lower() for k in a.split()}))
-        if not anahtar_kelime or anahtar_kelime in gorulen:
-            continue
-        gorulen.add(anahtar_kelime)
-        sonuc.append(a)
-    return sorted(sonuc, key=lambda x: len(x.split()))[:6]
-
-
-# Fotoğrafçılık/süsleme kelimeleri — alaka ölçümünde sayılmaz.
-_SUS_KELIMELER = {
-    "macro", "close", "closeup", "photography", "photo", "documentary",
-    "cinematic", "shot", "view", "style", "light", "lighting", "nature",
-    "background", "wallpaper", "beautiful", "abstract", "concept",
-}
-
-
-def _kelimeler(metin: str) -> set[str]:
-    import re
-    return {k for k in re.split(r"[^\wçğıöşü]+", str(metin or "").lower())
-            if len(k) >= 3 and k not in _SUS_KELIMELER}
+def _avg_parlaklik(hex_renk: str) -> float | None:
+    """'#RRGGBB' ortalama parlaklığını (0..255) döndürür."""
+    h = str(hex_renk or "").strip().lstrip("#")
+    if len(h) != 6:
+        return None
+    try:
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        return 0.299 * r + 0.587 * g + 0.114 * b
+    except ValueError:
+        return None
 
 
 # Alaka ölçümünde sayılmayan süs/sanat kelimeleri.
@@ -147,19 +94,28 @@ _SUS_KELIMELER = {
     "macro", "close", "closeup", "photography", "photo", "documentary",
     "cinematic", "shot", "view", "style", "light", "lighting", "nature",
     "background", "wallpaper", "beautiful", "abstract", "concept", "dance",
-    "dancing", "communication", "collection", "process", "concept",
+    "dancing", "communication", "collection", "process", "dark", "studio",
+    "vertical", "selective", "focus", "high", "resolution",
 }
 
-# Video konusundan bağımsız, ASLA istenmeyen görsel türleri (portre/selfie/düğün/alkol/yemek/araç).
-# Not: İnsan anatomisi (hand, finger, eye, brain, skin, ear, heart, sleep) konularında Pixabay
-# fotoğraflarına otomatik "person/people/man/woman" etiketi eklediği için o kelimeler yalnızca
-# sorgu insan vücudu içermiyorsa yasaklanır.
+# Video konusundan bağımsız, ASLA istenmeyen görsel türleri + ham katalog/vektör/yazı terimleri.
 _YASAK_ETIKET_KESIN = {
     "portrait", "model", "girl", "boy", "beauty", "glamour", "hanói", "hanoi", "vietnamese",
     "selfie", "smile", "fashion", "makeup", "tea", "coffee", "drink", "cup", "wine", "beer",
     "food", "dish", "car", "motorcycle", "wedding", "couple", "bikini", "lingerie",
     "cleaner", "vacuuming", "cleaning", "delivery", "cardboard", "trolley", "subway", "businessman",
+    "isolated", "cutout", "mockup", "template", "banner", "poster", "signboard", "watermark",
+    "collage", "infographic", "diagram", "cartoon", "vector", "illustration", "sketch", "drawing",
+    "clipart", "mannequin", "shopping", "sale", "discount",
 }
+_YASAK_IFADELER = (
+    "white background",
+    "isolated on white",
+    "blank sign",
+    "empty board",
+    "copy space",
+    "text space",
+)
 _INSAN_ANATOMI = {
     "hand", "hands", "finger", "fingers", "thumb", "palm", "skin", "eye", "eyes",
     "brain", "ear", "ears", "heart", "blood", "muscle", "bone", "skeleton", "sleep",
@@ -168,7 +124,6 @@ _INSAN_ANATOMI = {
 
 
 def _kelimeler(metin: str, sus_at: bool = True) -> set[str]:
-    import re
     k = {x for x in re.split(r"[^\wçğıöşü]+", str(metin or "").lower()) if len(x) >= 3}
     return {x for x in k if x not in _SUS_KELIMELER} if sus_at else k
 
@@ -180,163 +135,549 @@ def _yasak_etiket_seti(sorgu: str, ana_konu: str) -> set[str]:
     return _YASAK_ETIKET_KESIN | {"girl", "boy", "woman", "man"}
 
 
-def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str, gevsek: bool = False) -> bool:
-    """Görsel gerçekten sahnenin ana NESNESİNİ gösteriyor mu?"""
+def _puanla(hit: dict, sorgu: str) -> float:
+    """Etiket/açıklama uyumu + dikey kadraj + çözünürlük + kaynak kalitesi → alaka puanı."""
+    q = _kelimeler(sorgu.replace("+", " "), sus_at=True)
     etiketler = _kelimeler(hit.get("tags", ""), sus_at=False)
+    ortak = len(q & etiketler)
+    # Çoğul/tekil kök uyumu (droplet <-> droplets, finger <-> fingers)
+    ek_kok = 0
+    if q and etiketler:
+        kalan_q = q - etiketler
+        kok_q = {w[:4] for w in kalan_q if len(w) >= 4}
+        kok_e = {w[:4] for w in etiketler if len(w) >= 4}
+        ek_kok = len(kok_q & kok_e)
+
+    puan = ortak * 10.0 + ek_kok * 4.0
+    w = int(hit.get("imageWidth") or 0)
+    h = int(hit.get("imageHeight") or 0)
+    puan += min(4.0, (w * h) / 6_000_000)
+    puan += min(3.0, (hit.get("likes", 0) + hit.get("downloads", 0) / 50.0) / 100.0)
+
+    if hit.get("kaynak") == "pexels":
+        puan += 4.5  # Küratörlü editoryal fotoğraf önceliği
+
+    if h > w:
+        puan += 4.5
+        if w > 0 and (h / w) >= 1.32:
+            puan += 2.5
+    elif w > 0 and (w / max(h, 1)) > 1.45:
+        puan -= 3.5  # Yatay geniş açılı görsellerde kırpma kaybı olur
+
+    if min(w, h) >= 1080 and max(w, h) >= 1600:
+        puan += 2.5
+
+    # Beyaz stüdyo arka planlı ham katalog görsellerini ağır cezalandır
+    par = _avg_parlaklik(hit.get("avg_color", ""))
+    if par is not None:
+        if par > 228:
+            puan -= 20.0
+        elif 35 <= par <= 155:
+            puan += 1.8  # Sinematik dengeli/koyu atmosfer bonusu
+
+    if str(hit.get("type", "photo")) != "photo":
+        puan -= 25.0
+    return puan
+
+
+def pexels_ara(sorgu: str, anahtar: str, adet: int = 40) -> list[dict]:
+    """Pexels API üzerinden dikey ve yüksek çözünürlüklü fotoğrafları puana göre döndürür."""
+    baslik = {"Authorization": anahtar}
+    sonuclar: dict[int, dict] = {}
+    for ek in (
+        {"orientation": "portrait", "size": "large"},
+        {"size": "large"},
+    ):
+        param = {
+            "query": sorgu,
+            "per_page": str(min(adet, 80)),
+            "locale": "en-US",
+            **ek,
+        }
+        try:
+            veri = _istek(f"{PEXELS_URL}?{urllib.parse.urlencode(param)}", baslik, saglayici="Pexels")
+        except SystemExit:
+            if sonuclar:
+                break
+            raise
+        for p in veri.get("photos", []):
+            pid = p.get("id")
+            src = p.get("src") or {}
+            indir_url = (
+                src.get("original")
+                or src.get("large2x")
+                or src.get("portrait")
+                or src.get("large")
+                or ""
+            )
+            if not pid or not indir_url:
+                continue
+            alt_birlesik = f"{p.get('alt') or ''} {_pexels_slug_kelimeler(p.get('url') or '')}".strip()
+            sonuclar.setdefault(
+                int(pid),
+                {
+                    "uid": f"pexels:{pid}",
+                    "kaynak": "pexels",
+                    "id": int(pid),
+                    "imageWidth": int(p.get("width") or 0),
+                    "imageHeight": int(p.get("height") or 0),
+                    "tags": alt_birlesik or sorgu,
+                    "type": "photo",
+                    "avg_color": str(p.get("avg_color") or ""),
+                    "likes": 120,
+                    "downloads": 4000,
+                    "indir_url": indir_url,
+                },
+            )
+        if len(sonuclar) >= 8:
+            break
+    return sorted(sonuclar.values(), key=lambda h: _puanla(h, sorgu), reverse=True)
+
+
+def pixabay_ara(sorgu: str, anahtar: str, adet: int = 60) -> list[dict]:
+    """Pixabay yedek fotoğraf araması."""
+    temel = {
+        "key": anahtar,
+        "q": sorgu,
+        "image_type": "photo",
+        "safesearch": "true",
+        "order": "popular",
+        "per_page": str(min(adet, 200)),
+        "lang": "en",
+    }
+    sonuclar: dict[int, dict] = {}
+    for ek in (
+        {"orientation": "vertical", "min_width": 1400, "min_height": 1400},
+        {"min_width": 1200, "min_height": 900},
+    ):
+        try:
+            veri = _istek(f"{PIXABAY_URL}?{urllib.parse.urlencode({**temel, **ek})}", saglayici="Pixabay")
+        except SystemExit:
+            if sonuclar:
+                break
+            raise
+        for h in veri.get("hits", []):
+            hid = h.get("id")
+            indir_url = h.get("fullHDURL") or h.get("largeImageURL") or ""
+            if not hid or not indir_url:
+                continue
+            kopya = dict(h)
+            kopya["uid"] = f"pixabay:{hid}"
+            kopya["kaynak"] = "pixabay"
+            kopya["indir_url"] = indir_url
+            sonuclar.setdefault(int(hid), kopya)
+        if len(sonuclar) >= 8:
+            break
+    return sorted(sonuclar.values(), key=lambda h: _puanla(h, sorgu), reverse=True)
+
+
+def _sorgu_adaylari(sahne: dict, yedek: list[str], ana_konu: str) -> list[str]:
+    """Sahnenin somut nesnesini arayan, kelime tekrarı yapmayan İngilizce sorgular."""
+    def _temiz(x: str) -> str:
+        return " ".join(str(x or "").replace(",", " ").split())
+
+    soyut = {
+        "communication", "communicate", "dance", "dancing", "waggle",
+        "collection", "process", "concept", "how", "why", "secret",
+    }
+
+    def _somut(x: str) -> str:
+        return " ".join(w for w in _temiz(x).split() if w.lower() not in soyut)
+
+    detay = _somut(sahne.get("gorsel"))
+    anahtar = _somut(sahne.get("gorsel_anahtar") or "")
+    anchor = _somut(ana_konu)
+
+    cekirdek = anahtar or detay
+    adaylar: list[str] = []
+    if cekirdek:
+        adaylar.append(cekirdek)
+    if cekirdek and anchor and cekirdek.lower()[:20] not in anchor.lower():
+        adaylar.append(f"{cekirdek} {anchor}")
+    if detay and detay != cekirdek:
+        adaylar.append(detay)
+    adaylar += [_temiz(y) for y in yedek if _temiz(y)]
+
+    gorulen: set[str] = set()
+    sonuc: list[str] = []
+    for a in adaylar:
+        anahtar_kelime = " ".join(sorted({k.lower() for k in a.split()}))
+        if not anahtar_kelime or anahtar_kelime in gorulen:
+            continue
+        gorulen.add(anahtar_kelime)
+        sonuc.append(a)
+    return sorted(sonuc, key=lambda x: len(x.split()))[:6]
+
+
+def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str, gevsek: bool = False) -> bool:
+    """Görsel gerçekten sahnenin ana nesnesini gösteriyor ve ham kusur taşımıyor mu?"""
+    ham_etiket = str(hit.get("tags", "")).lower()
+    if any(ifade in ham_etiket for ifade in _YASAK_IFADELER):
+        return False
+    etiketler = _kelimeler(ham_etiket, sus_at=False)
     if not etiketler:
         return False
     if etiketler & _yasak_etiket_seti(sorgu, ana_konu):
         return False
     if str(hit.get("type", "photo")) != "photo":
         return False
+    par = _avg_parlaklik(hit.get("avg_color", ""))
+    if not gevsek and par is not None and par > 232:
+        return False
+
     cekirdek = _kelimeler(sorgu) or _kelimeler(ana_konu)
     if not cekirdek:
         return _puanla(hit, sorgu) >= 4.0
+
     ortak = len(cekirdek & etiketler)
+    kok_ortak = 0
+    if ortak == 0:
+        kok_c = {w[:4] for w in cekirdek if len(w) >= 4}
+        kok_e = {w[:4] for w in etiketler if len(w) >= 4}
+        kok_ortak = len(kok_c & kok_e)
+
     if gevsek:
-        # Kök eşleşmesi (ör. fingers <-> finger, waves <-> wave)
-        if ortak == 0:
-            kok_c = {w[:4] for w in cekirdek if len(w) >= 4}
-            kok_e = {w[:4] for w in etiketler if len(w) >= 4}
-            ortak = len(kok_c & kok_e)
-        return ortak >= 1 and _puanla(hit, sorgu) >= 3.5
+        return (ortak + kok_ortak) >= 1 and _puanla(hit, sorgu) >= 3.5
+
+    # Pexels alt metinlerinde çoğul/tekil farkı sık olduğundan kök eşleşmesini katı modda da tanı
+    etkin_ortak = ortak + (1 if kok_ortak >= 1 and hit.get("kaynak") == "pexels" else 0)
     gerekli = 1 if len(cekirdek) <= 4 else 2
-    return ortak >= gerekli and _puanla(hit, sorgu) >= 5.5
+    return etkin_ortak >= gerekli and _puanla(hit, sorgu) >= 5.5
+
+
+def _ham_kusurlu_mu(im: Image.Image) -> tuple[bool, str]:
+    """İndirilen ham görseli piksel düzeyinde denetler:
+    beyaz stüdyo kesimi, düz clipart arka planı, aşırı patlamış ışık veya bulanıklığı eler."""
+    en, boy = im.size
+    if min(en, boy) < 700:
+        return True, f"cozunurluk_dusuk({en}x{boy})"
+
+    kucuk = np.asarray(im.convert("RGB").resize((270, 480), Image.BILINEAR), dtype=np.float32)
+    h, w, _ = kucuk.shape
+    b_y, b_x = max(8, int(h * 0.06)), max(8, int(w * 0.06))
+    kenar = np.concatenate(
+        [
+            kucuk[:b_y, :, :].reshape(-1, 3),
+            kucuk[-b_y:, :, :].reshape(-1, 3),
+            kucuk[:, :b_x, :].reshape(-1, 3),
+            kucuk[:, -b_x:, :].reshape(-1, 3),
+        ],
+        axis=0,
+    )
+    beyaz_oran = float(np.mean((kenar[:, 0] > 238) & (kenar[:, 1] > 238) & (kenar[:, 2] > 238)))
+    if beyaz_oran > 0.30:
+        return True, f"beyaz_studyo_kesim({beyaz_oran:.2f})"
+
+    kenar_std = float(np.std(kenar))
+    if kenar_std < 4.2:
+        return True, f"duz_yapay_arkaplan(std={kenar_std:.1f})"
+
+    luma = (0.299 * kucuk[..., 0] + 0.587 * kucuk[..., 1] + 0.114 * kucuk[..., 2]) / 255.0
+    patlak_oran = float(np.mean(luma > 0.95))
+    if patlak_oran > 0.34:
+        return True, f"patlamis_isik({patlak_oran:.2f})"
+
+    gri = luma * 255.0
+    keskinlik = float(np.mean(np.abs(np.diff(gri, axis=1))) + np.mean(np.abs(np.diff(gri, axis=0))))
+    if keskinlik < 2.1:
+        return True, f"bulanik_gorsel({keskinlik:.2f})"
+
+    return False, "ok"
 
 
 def dikey_kirp(img: Image.Image) -> Image.Image:
-    """9:16'ya merkez kırp, sonra 1080x1920'ye ölçekle."""
-    en, boy = img.size
-    hedef_oran = HEDEF[1] / HEDEF[0]
-    if en / boy > 1 / hedef_oran:          # fazla geniş → yanlardan kırp
+    """9:16 dikey kadraj (1350x2400).
+    Dikey/kareye yakın fotoğrafları akıllı merkez kırpar;
+    nadir yatay yedeklerde konuyu %70 kesmek yerine atmosferik koyu-teal zemin üzerine yumuşak yedirir."""
+    im = img.convert("RGB")
+    en, boy = im.size
+    hedef_w, hedef_h = HEDEF
+    hedef_oran = hedef_h / hedef_w  # 1.777...
+
+    if (en / max(boy, 1)) > 1.22:
+        # Yatay fotoğraf: konuyu parçalamadan sinematik atmosferli dikey tuvale yerleştir
+        arka = im.resize((hedef_w, hedef_h), Image.LANCZOS).filter(ImageFilter.GaussianBlur(42))
+        arka_np = np.asarray(arka, dtype=np.float32) * 0.28 + np.array([8.0, 18.0, 24.0], dtype=np.float32)
+        tuval = np.clip(arka_np, 0, 255)
+
+        ic_h = int(hedef_h * 0.78)
+        ic_w = max(hedef_w, int(en * (ic_h / max(boy, 1))))
+        on = im.resize((ic_w, ic_h), Image.LANCZOS)
+        sol = (ic_w - hedef_w) // 2
+        on_kirp = np.asarray(on.crop((sol, 0, sol + hedef_w, ic_h)), dtype=np.float32)
+
+        maske = np.ones((ic_h, hedef_w, 1), dtype=np.float32)
+        gecis = int(ic_h * 0.14)
+        ust_egri = (np.linspace(0.0, 1.0, gecis, dtype=np.float32) ** 1.45)[:, None, None]
+        maske[:gecis] = ust_egri
+        maske[-gecis:] = ust_egri[::-1]
+
+        y0 = (hedef_h - ic_h) // 2
+        tuval[y0 : y0 + ic_h] = tuval[y0 : y0 + ic_h] * (1.0 - maske) + on_kirp * maske
+        return Image.fromarray(np.clip(tuval, 0, 255).astype(np.uint8))
+
+    if en / boy > 1.0 / hedef_oran:
         yeni_en = int(boy / hedef_oran)
         sol = (en - yeni_en) // 2
-        img = img.crop((sol, 0, sol + yeni_en, boy))
-    else:                                   # fazla uzun → üst/alttan kırp
+        im = im.crop((sol, 0, sol + yeni_en, boy))
+    else:
         yeni_boy = int(en * hedef_oran)
-        ust = (boy - yeni_boy) // 2
-        img = img.crop((0, ust, en, ust + yeni_boy))
-    return img.resize(HEDEF, Image.LANCZOS)
+        # Dikey portre/nesne çekimlerinde odak genelde üst-orta bölgededir (%45)
+        ust = int((boy - yeni_boy) * 0.45)
+        im = im.crop((0, ust, en, ust + yeni_boy))
+    return im.resize(HEDEF, Image.LANCZOS)
 
 
-def sinematik_isle(img: Image.Image) -> Image.Image:
-    """Ham stok fotoğrafı sinematik görünüme çevirir.
+def sinematik_isle(img: Image.Image, tohum: int = 20261112) -> Image.Image:
+    """Ham stok fotoğrafı Bilgi Dozu v2.2 koyu-bilim sinematik estetiğine dönüştürür.
 
-    Yapılanlar: teal-amber renk düzenlemesi, kontrast, doygunluk, kenar
-    karartma (vignette), hafif film greni ve keskinleştirme. Render motoru
-    ayrıca kendi katmanını uyguluyor; buradaki işlem ham görselin "stok
-    fotoğraf" gibi düz görünmesini engeller.
+    Yapılanlar:
+      1. Otomatik pozlama dengeleme (aşırı aydınlık gündüz çekimlerini sinematik karanlığa çeker)
+      2. Koyu teal-amber split-toning + filmik S-eğrisi kontrast
+      3. Mikro-netlik (UnsharpMask) ve renk derinliği
+      4. Radyal kenar karartma (vignette) + ince atmosferik biyolüminesan derinlik tozları + film greni
     """
-    from PIL import ImageEnhance, ImageFilter
-    import numpy as np
-
     im = img.convert("RGB")
-    a = np.asarray(im).astype(np.float32) / 255.0
-    r, g, b = a[..., 0], a[..., 1], a[..., 2]
+    a = np.asarray(im, dtype=np.float32) / 255.0
 
-    # Teal-amber: gölgeler soğuk (mavi-yeşil), ışıklar sıcak.
-    parlaklik = a.mean(axis=2)          # (h, w) — kanal boyutu OLMAMALI
-    golge = np.clip(1.0 - parlaklik * 1.4, 0.0, 1.0)
-    isik = np.clip(parlaklik * 1.4 - 0.35, 0.0, 1.0)
-    r = r + 0.11 * isik - 0.04 * golge
-    g = g + 0.02 * isik + 0.01 * golge
-    b = b + 0.12 * golge - 0.05 * isik
+    # 1) Pozlama dengeleme: çiğ gündüz stok görüntüsü hissini tamamen kaldır
+    lum0 = 0.299 * a[..., 0] + 0.587 * a[..., 1] + 0.114 * a[..., 2]
+    ort_lum = float(lum0.mean())
+    if ort_lum > 0.43:
+        gamma = float(np.clip(1.0 + (ort_lum - 0.41) * 1.42, 1.0, 1.58))
+        a = np.power(np.clip(a, 0.0, 1.0), gamma)
+        # Parlak tavan yumuşatma (beyaz/sarı başlıkların arkasında parlamayı önler)
+        fazla = np.maximum(0.0, a - 0.64)
+        a = a - 0.24 * fazla
+    elif ort_lum < 0.14:
+        a = np.power(np.clip(a, 0.0, 1.0), 0.84)
+
+    # 2) Bilgi Dozu Teal-Amber renk ayrımı
+    r, g, b = a[..., 0], a[..., 1], a[..., 2]
+    parlaklik = 0.299 * r + 0.587 * g + 0.114 * b
+    golge = np.clip(1.0 - parlaklik * 1.50, 0.0, 1.0)
+    isik = np.clip(parlaklik * 1.45 - 0.32, 0.0, 1.0)
+    r = r + 0.105 * isik - 0.048 * golge
+    g = g + 0.022 * isik + 0.016 * golge
+    b = b + 0.125 * golge - 0.052 * isik
     a = np.stack([r, g, b], axis=2)
 
-    # Kontrast + filmik S eğrisi
-    a = np.clip((a - 0.5) * 1.16 + 0.5, 0.0, 1.0)
+    # Filmik S-eğrisi
+    a = np.clip((a - 0.5) * 1.17 + 0.5, 0.0, 1.0)
     a = np.clip(a + 0.045 * np.sin((a - 0.5) * 3.1), 0.0, 1.0)
 
     out = Image.fromarray((a * 255.0).astype(np.uint8))
 
-    # Doygunluk ve keskinlik
-    out = ImageEnhance.Color(out).enhance(1.14)
-    out = ImageEnhance.Contrast(out).enhance(1.06)
-    out = out.filter(ImageFilter.UnsharpMask(radius=2.0, percent=115, threshold=3))
+    # 3) Doygunluk + mikro-keskinlik
+    out = ImageEnhance.Color(out).enhance(1.15)
+    out = ImageEnhance.Contrast(out).enhance(1.07)
+    out = out.filter(ImageFilter.UnsharpMask(radius=2.1, percent=120, threshold=3))
 
-    # Kenar karartma (vignette)
+    # 4) Atmosferik hafif biyolüminesan derinlik tozları (çok zarif bokeh dokusu)
     w, h = out.size
-    yy, xx = np.mgrid[0:h, 0:w]
-    nx = (xx - w / 2) / (w / 2)
-    ny = (yy - h / 2) / (h / 2)
-    vig = np.clip(1.06 - 0.26 * (nx * nx + ny * ny), 0.72, 1.06)[..., None]
-    arr = np.clip(np.asarray(out).astype(np.float32) * vig, 0, 255)
+    rng = np.random.default_rng(tohum)
+    toz_katman = Image.new("RGB", (w, h), (0, 0, 0))
+    ciz = ImageDraw.Draw(toz_katman)
+    for _ in range(22):
+        px = int(rng.integers(int(w * 0.08), int(w * 0.92)))
+        py = int(rng.integers(int(h * 0.16), int(h * 0.84)))
+        cap = int(rng.integers(3, 9))
+        alfa = float(rng.uniform(0.07, 0.19))
+        renk = (235, 225, 95) if rng.random() > 0.35 else (75, 205, 245)
+        hedef_renk = tuple(int(c * alfa) for c in renk)
+        ciz.ellipse((px - cap, py - cap, px + cap, py + cap), fill=hedef_renk)
+    toz_katman = toz_katman.filter(ImageFilter.GaussianBlur(radius=3.4))
 
-    # Hafif film greni
-    rng = np.random.default_rng(20261112)
-    arr = np.clip(arr + rng.normal(0.0, 3.4, arr.shape), 0, 255)
+    # Kenar karartma (vignette) + ince sinema greni
+    yy, xx = np.mgrid[0:h, 0:w]
+    nx = (xx - w / 2.0) / (w / 2.0)
+    ny = (yy - h / 2.0) / (h / 2.0)
+    vig = np.clip(1.04 - 0.30 * (nx * nx + ny * ny), 0.65, 1.04)[..., None]
+
+    arr = np.asarray(out, dtype=np.float32) * vig + np.asarray(toz_katman, dtype=np.float32)
+    arr = np.clip(arr + rng.normal(0.0, 2.6, arr.shape), 0, 255)
     return Image.fromarray(arr.astype(np.uint8))
 
 
 def _indir(url: str, hedef: Path) -> None:
-    istek = urllib.request.Request(url, headers={"User-Agent": "bilgidozu-motor/1.0"})
-    with urllib.request.urlopen(istek, timeout=120) as y:
-        hedef.write_bytes(y.read())
+    son_hata: Exception | None = None
+    for bekle in (0, 2, 4):
+        if bekle:
+            time.sleep(bekle)
+        istek = urllib.request.Request(url, headers={"User-Agent": _UA})
+        try:
+            with urllib.request.urlopen(istek, timeout=120) as y:
+                hedef.write_bytes(y.read())
+                return
+        except Exception as hata:  # noqa: BLE001
+            son_hata = hata
+    raise SystemExit(f"Görsel indirilemedi ({url[:90]}): {son_hata}") from son_hata
 
 
-def sahneler_icin_gorseller(sahneler: list[dict], klasor: Path,
-                             yedek_sorgular: list[str] | None = None) -> list[Path]:
-    """Her sahne için en uygun görseli indirir, 1080x1920 PNG olarak kaydeder."""
-    anahtar = os.getenv("PIXABAY_API_KEY", "").strip()
-    if not anahtar:
-        raise SystemExit("PIXABAY_API_KEY yok — görseller indirilemedi, üretim durdu.")
+def _adaylardan_indir_ve_dogrula(
+    adaylar: list[dict],
+    sorgu: str,
+    ham_dosya: Path,
+    kullanilan: set[str],
+    siki_piksel: bool = True,
+) -> tuple[str, dict] | None:
+    """Sıralı adaylardan ilk piksel-temiz görseli indirip doğrular."""
+    for hit in adaylar[:4]:
+        uid = str(hit.get("uid") or f"{hit.get('kaynak', 'stok')}:{hit['id']}")
+        if uid in kullanilan:
+            continue
+        indir_url = str(hit.get("indir_url") or hit.get("fullHDURL") or hit.get("largeImageURL") or "")
+        if not indir_url:
+            continue
+        try:
+            _indir(indir_url, ham_dosya)
+            with Image.open(ham_dosya) as im:
+                im.load()
+                if siki_piksel:
+                    kusurlu, neden = _ham_kusurlu_mu(im)
+                    if kusurlu:
+                        print(f"    [anti-ham elendi] {uid} ({neden}) — sonraki adaya geçiliyor")
+                        ham_dosya.unlink(missing_ok=True)
+                        continue
+            return (sorgu, hit)
+        except SystemExit:
+            ham_dosya.unlink(missing_ok=True)
+            continue
+        except Exception as e:  # noqa: BLE001
+            print(f"    [görsel okuma uyarısı] {uid}: {e}")
+            ham_dosya.unlink(missing_ok=True)
+            continue
+    return None
+
+
+def sahneler_icin_gorseller(
+    sahneler: list[dict],
+    klasor: Path,
+    yedek_sorgular: list[str] | None = None,
+) -> list[Path]:
+    """Her sahne için Pexels (birincil) / Pixabay (yedek) üzerinden görsel indirir,
+    anti-ham piksel denetiminden geçirir ve sinematik 9:16 PNG olarak kaydeder."""
+    pexels_key = (
+        os.getenv("PEXELS_API_KEY")
+        or os.getenv("PEXELS_KEY")
+        or os.getenv("PEXELS_API")
+        or ""
+    ).strip()
+    pixabay_key = os.getenv("PIXABAY_API_KEY", "").strip()
+
+    if not pexels_key and not pixabay_key:
+        raise SystemExit("PEXELS_API_KEY (veya PIXABAY_API_KEY) yok — görseller indirilemedi, üretim durdu.")
+
+    saglayicilar: list[tuple[str, str, object]] = []
+    if pexels_key:
+        saglayicilar.append(("pexels", pexels_key, pexels_ara))
+    if pixabay_key:
+        saglayicilar.append(("pixabay", pixabay_key, pixabay_ara))
+
+    aktif_adlar = " -> ".join(ad for ad, _, _ in saglayicilar)
+    print(f"Görsel sağlayıcı sırası: {aktif_adlar} (anti-ham piksel filtresi + koyu sinematik işleme aktif)")
+
     klasor.mkdir(parents=True, exist_ok=True)
     yedek = yedek_sorgular or []
 
-    kullanilan: set[int] = set()
+    kullanilan: set[str] = set()
     yollar: list[Path] = []
-    # İlk sahnenin somut ana nesnesi tüm sahnelerde konu çıpasıdır.
     ana_konu = str((sahneler[0] if sahneler else {}).get("gorsel") or "").strip()
+
     for i, sahne in enumerate(sahneler, start=1):
-        secim = None
-        denenen = []
+        secim: tuple[str, dict] | None = None
+        denenen: list[str] = []
+        ham = klasor / f"ham_{i:02d}.jpg"
         aday_sorgular = _sorgu_adaylari(sahne, yedek, ana_konu)
-        # 1. Aşama: Katı nesne eşleşmesi
-        for sorgu in aday_sorgular:
-            denenen.append(sorgu)
-            sonuc = [h for h in pixabay_ara(sorgu, anahtar)
-                     if h["id"] not in kullanilan and _yeterince_uygun(h, sorgu, ana_konu, gevsek=False)]
-            if sonuc:
-                secim = (sorgu, sonuc[0])
+
+        tekiller: list[str] = []
+        for s_q in aday_sorgular:
+            for w_q in s_q.split():
+                if len(w_q) >= 4 and w_q.lower() not in _SUS_KELIMELER and w_q.lower() not in tekiller:
+                    tekiller.append(w_q.lower())
+
+        # Önce Pexels'te (katı -> gevşek), bulunamazsa Pixabay'de (katı -> gevşek) dene
+        for sag_adi, sag_key, ara_fn in saglayicilar:
+            if secim:
                 break
-        # 2. Aşama: Tekil kelime / kök eşleşmeli gevşek arama
+            try:
+                # 1. Aşama: Katı nesne + anti-ham piksel denetimi
+                for sorgu in aday_sorgular:
+                    denenen.append(f"{sag_adi}:{sorgu}")
+                    uygunlar = [
+                        h for h in ara_fn(sorgu, sag_key)
+                        if str(h.get("uid") or f"{sag_adi}:{h['id']}") not in kullanilan
+                        and _yeterince_uygun(h, sorgu, ana_konu, gevsek=False)
+                    ]
+                    if uygunlar:
+                        secim = _adaylardan_indir_ve_dogrula(uygunlar, sorgu, ham, kullanilan, siki_piksel=True)
+                        if secim:
+                            break
+
+                # 2. Aşama: Kök/tekil kelime eşleşmeli gevşek arama + anti-ham piksel denetimi
+                if not secim:
+                    for sorgu in (aday_sorgular + tekiller[:4]):
+                        etiket_s = f"{sag_adi}~{sorgu}"
+                        if etiket_s not in denenen:
+                            denenen.append(etiket_s)
+                        uygunlar = [
+                            h for h in ara_fn(sorgu, sag_key)
+                            if str(h.get("uid") or f"{sag_adi}:{h['id']}") not in kullanilan
+                            and _yeterince_uygun(h, sorgu, ana_konu, gevsek=True)
+                        ]
+                        if uygunlar:
+                            secim = _adaylardan_indir_ve_dogrula(uygunlar, sorgu, ham, kullanilan, siki_piksel=True)
+                            if secim:
+                                break
+            except SystemExit as e:
+                # Birincil sağlayıcıda geçici sorun olursa yedek sağlayıcıya şans ver
+                if len(saglayicilar) > 1 and sag_adi != saglayicilar[-1][0]:
+                    print(f"  [uyarı] {sag_adi} geçici hata verdi, yedek kaynağa geçiliyor: {e}")
+                    continue
+                raise
+
+        # 3. Aşama: Koyu bilimsel atmosfer yedeği (üretimin 0 görselle çökmesini önler)
         if not secim:
-            tekiller = []
-            for s_q in aday_sorgular:
-                for w_q in s_q.split():
-                    if len(w_q) >= 4 and w_q.lower() not in _SUS_KELIMELER and w_q.lower() not in tekiller:
-                        tekiller.append(w_q.lower())
-            for sorgu in (aday_sorgular + tekiller[:4]):
-                if sorgu not in denenen:
-                    denenen.append(sorgu)
-                sonuc = [h for h in pixabay_ara(sorgu, anahtar)
-                         if h["id"] not in kullanilan and _yeterince_uygun(h, sorgu, ana_konu, gevsek=True)]
-                if sonuc:
-                    secim = (sorgu, sonuc[0])
+            for gen_sorgu in (
+                "dark laboratory microscope",
+                "cosmos galaxy nebula",
+                "physics light prism",
+                "deep ocean bioluminescence",
+            ):
+                if secim:
                     break
-        # 3. Aşama: Bilimsel genel görsel yedeği (üretimin 0 görselle çökmesini önler)
-        if not secim:
-            for gen_sorgu in ("science physics", "laboratory microscope", "nature macro", "stars galaxy"):
-                denenen.append(gen_sorgu)
-                sonuc = [h for h in pixabay_ara(gen_sorgu, anahtar)
-                         if h["id"] not in kullanilan
-                         and str(h.get("type", "photo")) == "photo"
-                         and not (_kelimeler(h.get("tags", ""), sus_at=False) & _YASAK_ETIKET_KESIN)]
-                if sonuc:
-                    secim = (gen_sorgu, sonuc[0])
-                    break
-        if not secim:
+                for sag_adi, sag_key, ara_fn in saglayicilar:
+                    denenen.append(f"{sag_adi}:{gen_sorgu}")
+                    try:
+                        uygunlar = [
+                            h for h in ara_fn(gen_sorgu, sag_key)
+                            if str(h.get("uid") or f"{sag_adi}:{h['id']}") not in kullanilan
+                            and str(h.get("type", "photo")) == "photo"
+                            and not (_kelimeler(h.get("tags", ""), sus_at=False) & _YASAK_ETIKET_KESIN)
+                        ]
+                    except SystemExit:
+                        continue
+                    if uygunlar:
+                        secim = _adaylardan_indir_ve_dogrula(uygunlar, gen_sorgu, ham, kullanilan, siki_piksel=False)
+                        if secim:
+                            break
+
+        if not secim or not ham.exists():
             raise SystemExit(
-                f"Sahne {i} için Pixabay sonucu yok (denenen: {denenen}) — üretim durdu.")
+                f"Sahne {i} için uygun görsel bulunamadı (denenen: {denenen}) — üretim durdu."
+            )
 
         sorgu, hit = secim
-        ham = klasor / f"ham_{i:02d}.jpg"
-        _indir(hit.get("fullHDURL") or hit["largeImageURL"], ham)
-        kullanilan.add(hit["id"])
+        uid = str(hit.get("uid") or f"{hit.get('kaynak', 'stok')}:{hit['id']}")
+        kullanilan.add(uid)
 
         png = klasor / f"sahne_{i:02d}.png"
         with Image.open(ham) as im:
-            sinematik_isle(dikey_kirp(im.convert("RGB"))).save(png, quality=95)
+            sinematik_isle(dikey_kirp(im.convert("RGB")), tohum=20261100 + i).save(png, quality=95)
+        ham.unlink(missing_ok=True)
         yollar.append(png)
-        print(f"  görsel {i}: pixabay#{hit['id']} / sorgu={sorgu!r} / etiket={str(hit.get('tags'))[:60]}")
+        print(
+            f"  görsel {i}: {uid} ({hit.get('imageWidth')}x{hit.get('imageHeight')}) "
+            f"/ sorgu={sorgu!r} / açıklama={str(hit.get('tags'))[:65]}"
+        )
     return yollar

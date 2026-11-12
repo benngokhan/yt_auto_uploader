@@ -61,12 +61,13 @@ def _env(ad: str, zorunlu: bool = True) -> str:
 
 
 def video_kaynagi() -> str:
-    """Stok görüntü sağlayıcısı. Pexels yeni anahtar vermeyi durdurdu (Kas 2026),
-    bu yüzden Pixabay varsayılan. VIDEO_SOURCE ile elle de seçilebilir."""
+    """Stok görüntü sağlayıcısı. PEXELS_API_KEY varsa birincil olarak Pexels seçilir;
+    yoksa Pixabay/Coverr yedeğine düşer. VIDEO_SOURCE ile elle de seçilebilir."""
     secim = os.getenv("VIDEO_SOURCE", "").strip().lower()
     if secim in ("pexels", "pixabay", "coverr"):
         return secim
-    # Pixabay: kütüphane geniş (dikey aramada Coverr'da 0-4 sonuç çıkıyor).
+    if (os.getenv("PEXELS_API_KEY") or os.getenv("PEXELS_KEY") or os.getenv("PEXELS_API") or "").strip():
+        return "pexels"
     if os.getenv("PIXABAY_API_KEY", "").strip():
         return "pixabay"
     if os.getenv("COVERR_API_KEY", "").strip():
@@ -428,7 +429,7 @@ def main() -> int:
 
     # Görüntü kaynağı yedekleme: birincil kaynakta malzeme bulunamazsa diğerine geç.
     adaylar = [video_kaynagi()]
-    for yedek in ("pixabay", "coverr", "pexels"):
+    for yedek in ("pexels", "pixabay", "coverr"):
         if yedek not in adaylar and os.getenv(f"{yedek.upper()}_API_KEY", "").strip():
             adaylar.append(yedek)
 

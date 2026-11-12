@@ -88,6 +88,7 @@ jobs:
           # Kullanıcı 7 Kasım 2026'da para kazanmanın kapalı olduğunu belirterek
           # ticari olmayan CPML şartlarıyla üretime onay verdi.
           COQUI_TOS_AGREED: "1"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY || secrets.PEXELS_KEY || secrets.PEXELS_API }}
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
           MOTOR_VOICE_ID: Charon
