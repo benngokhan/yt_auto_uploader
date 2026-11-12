@@ -269,7 +269,15 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
     long_video_map = {f["name"].lower(): f for f in long_videos}
     long_cover_map = {f["name"].lower(): f for f in long_covers}
 
-    records = load_table_from_drive_or_local(None, CEO_FOLDER_ID)
+    # drive=None verilirse fonksiyon Drive'a hiç bakmaz, repodaki BAYAT yerel
+    # xlsx'i okur. Tablo mutlaka canlı Drive dosyasından okunmalı.
+    if drive is not None:
+        try:
+            _, _tablo_adi = _download_workbook_bytes_from_drive(drive, CEO_FOLDER_ID)
+            print(f"[telemetry] Canlı tablo okundu: {_tablo_adi}")
+        except Exception as _te:
+            print(f"[telemetry] Canlı tablo uyarısı: {_te}")
+    records = load_table_from_drive_or_local(drive, CEO_FOLDER_ID)
     done_ids = load_uploaded_ids(BASE_DIR / "uploaded.txt")
 
     next_short = None
