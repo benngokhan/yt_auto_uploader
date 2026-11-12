@@ -270,6 +270,28 @@ def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
         _edge_tts(metin, cikti, ayar)
         return None
     if saglayici in {"gemini", "gemini_tts", "gemini_natural"}:
-        _gemini_tts(metin, cikti, ayar)
-        return None
+        # Gemini günlük kotası (429) biterse video üretimi durmasın:
+        # sırayla ElevenLabs -> edge-tts denenir. Ses kimliği biraz değişebilir.
+        try:
+            _gemini_tts(metin, cikti, ayar)
+            return None
+        except Exception as _ge:
+            print(f"UYARI: Gemini ses başarısız ({type(_ge).__name__}). Yedek sağlayıcı denenecek.")
+            _son = None
+            if os.getenv("ELEVENLABS_API_KEY"):
+                try:
+                    _elevenlabs(metin, cikti, ayar)
+                    print("Ses yedeği: ElevenLabs kullanıldı.")
+                    return None
+                except Exception as _ee:
+                    _son = _ee
+                    print(f"UYARI: ElevenLabs yedeği de başarısız ({type(_ee).__name__}).")
+            try:
+                _edge_tts(metin, cikti, ayar)
+                print("Ses yedeği: edge-tts kullanıldı.")
+                return None
+            except Exception as _te:
+                _son = _te
+                print(f"UYARI: edge-tts yedeği de başarısız ({type(_te).__name__}).")
+            raise SesHatasi(f"Gemini ses üretilemedi, tüm yedekler başarısız: {_son}") from _ge
     raise SesHatasi(f"Desteklenmeyen ses sağlayıcısı: {saglayici!r}")
