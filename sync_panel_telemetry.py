@@ -313,18 +313,20 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
 
         v_file = long_video_map.get(fname.lower()) if is_long else shorts_video_map.get(fname.lower())
         expected_cover, c_file = pick_cover(long_cover_map if is_long else shorts_cover_map, num, is_long)
+        raw_status_str = str(rec.get("status", "")).strip()
+        is_scheduled_plan = "PLANLANDI" in raw_status_str.upper()
         is_published = (
             rec.get("has_youtube_link")
             or fname in done_ids
             or fname in KNOWN_PUBLISHED_NAMES
-            or str(rec.get("status", "")).upper() in ("YÜKLENDİ", "YUKLENDI", "PUBLISHED")
+            or raw_status_str.upper() in ("YÜKLENDİ", "YUKLENDI", "PUBLISHED")
         )
         queue_items.append({
             "row": rec.get("row"),
             "file_name": fname,
             "number": num,
             "type": "long" if is_long else "short",
-            "status": "YÜKLENDİ" if is_published else rec.get("status", "BEKLEMEDE"),
+            "status": raw_status_str if is_scheduled_plan else ("YÜKLENDİ" if is_published else (raw_status_str or "BEKLEMEDE")),
             "is_ready": bool(rec.get("is_ready")) and not is_published,
             "is_published": bool(is_published),
             "title": rec.get("title", ""),
