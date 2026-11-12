@@ -1,16 +1,15 @@
 {
-  "guncellendi": "2026-11-12T14:22:13.662778+00:00",
-  "not": "Sağlayıcı yalnız sunduğu limit başlıklarını gösterir; Pexels gerçek kalan aylık isteği döndürür.",
+  "guncellendi": "2026-11-12T14:43:22.237113+00:00",
+  "not": "Pexels ve Groq kalan kotası doğrudan sağlayıcı başlıklarından, Gemini günlük kullanımı canlı Actions koşularından okunur.",
   "gemini": {
     "durum": "aktif",
     "http": 200,
-    "limit": {},
-    "mesaj": ""
-  },
-  "groq": {
-    "durum": "aktif",
-    "http": 200,
-    "limit": {},
+    "limit": {
+      "limit-requests": "1500",
+      "remaining-requests": "1433",
+      "used-requests": "67",
+      "birim": "istek/gün"
+    },
     "mesaj": ""
   },
   "pexels": {
@@ -18,11 +17,26 @@
     "http": 200,
     "limit": {
       "limit": "25000",
-      "remaining": "24988",
+      "remaining": "24986",
       "reset": "1797083508",
-      "remaining-requests": "24988",
-      "limit-requests": "25000"
+      "remaining-requests": "24986",
+      "limit-requests": "25000",
+      "birim": "istek/ay"
     },
     "mesaj": ""
+  },
+  "groq": {
+    "durum": "aktif",
+    "http": 200,
+    "limit": {
+      "limit-requests": "1000",
+      "limit-tokens": "8000",
+      "remaining-requests": "999",
+      "remaining-tokens": "7927",
+      "reset-requests": "1m26.4s",
+      "reset-tokens": "547ms",
+      "birim": "istek/gün"
+    },
+    "mesaj": "Model: openai/gpt-oss-120b"
   }
 }

@@ -1,97 +1,54 @@
 {
-  "zaman": "2026-11-12T13:52:31+00:00",
+  "zaman": "2026-11-12T14:43:22+00:00",
   "servisler": [
     {
       "ad": "Pexels",
       "durum": "ok",
-      "kalan": 24998,
+      "kalan": 24987,
       "limit": 25000,
-      "kullanilan": 2,
-      "birim": "istek/ay (saatlik 200)",
+      "kullanilan": 13,
+      "birim": "istek/ay",
       "reset_iso": "2026-12-12T13:51:48+00:00",
-      "yenilenme": "aylık 20.000 istek · saatlik 200 istek penceresi",
-      "not_": "Birincil dikey küratörlü sahne görseli kaynağı (anti-ham sinematik mod)"
+      "yenilenme": "aylık kota · saatlik 200 istek penceresi",
+      "not_": "Birincil 9:16 dikey sinematik sahne görseli kaynağı"
     },
     {
-      "ad": "Gemini",
+      "ad": "Gemini · Charon",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1495,
-      "kullanilan": 5,
-      "birim": "istek/gün (kendi sayacimiz)",
+      "kalan": 1433,
+      "kullanilan": 67,
+      "birim": "istek/gün",
       "model_sayisi": 50,
-      "yenilenme": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
-      "not_": "LLM + TTS · kota API'de yok, yaptığımız çağrılar sayılıyor"
+      "yenilenme": "günlük · her gün TR 10:00 (00:00 Pasifik) sıfırlanır",
+      "not_": "Charon TTS seslendirme + yardımcı metin üretimi"
     },
     {
       "ad": "Groq",
       "durum": "ok",
       "limit": 1000,
-      "kalan": 995,
-      "kullanilan": 5,
-      "birim": "istek/gün (kendi sayacimiz)",
-      "model_sayisi": 11,
-      "yenilenme": "dakika + günlük token · günlük kısım gece 00:00 UTC",
-      "not_": "ücretsiz katman · kota API'de yok, çağrılar sayılıyor"
+      "kalan": 999,
+      "kullanilan": 1,
+      "birim": "istek/gün",
+      "yenilenme": "günlük kota · her gece 00:00 UTC sıfırlanır",
+      "not_": "Hızlı senaryo ve başlık motoru (Model: openai/gpt-oss-20b"
     },
     {
-      "ad": "OpenRouter",
+      "ad": "Pixabay (Yedek)",
       "durum": "ok",
-      "kalan": 40,
-      "limit": 50,
-      "kullanilan": 10,
-      "birim": "istek/gün (ücretsiz modeller)",
-      "ucretsiz": true,
-      "yenilenme": "günlük · gece 00:00 UTC · ücretsiz model hakkı",
-      "not_": "ÜCRETSİZ KATMAN · kredi yüklemeden ücretsiz modeller",
-      "kredi_alimi": 0,
-      "kredi_kullanimi": 0
-    },
-    {
-      "ad": "ElevenLabs",
-      "durum": "ok",
-      "kalan": 10000,
-      "limit": 10000,
-      "kullanilan": 0,
-      "birim": "karakter/kredi",
-      "tier": "free",
-      "reset_unix": 1796620024,
-      "reset_iso": "2026-12-07T05:07:04+00:00",
-      "klonlama": false,
-      "yenilenme": "aylık · fatura dönemi başında sıfırlanır (kredi devretmez)",
-      "not_": "1 kredi = 1 karakter (v2/v3) · Flash/Turbo yarı fiyat"
-    },
-    {
-      "ad": "Telegram",
-      "durum": "ok",
-      "limit": null,
-      "kalan": null,
-      "kullanilan": null,
-      "birim": "mesaj/gün (limit yok pratikte)",
-      "bot": "@Bilgindozlu_bot",
-      "yenilenme": "saniye başına limit · günlük kota yok",
-      "not_": "bildirim kanalı"
-    },
-    {
-      "ad": "GitHub",
-      "durum": "ok",
-      "kalan": 5000,
-      "limit": 5000,
-      "kullanilan": 0,
-      "birim": "istek/saat",
-      "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
-      "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 376.8,
-      "actions_kosu": 500,
-      "actions_limit": 2000,
-      "actions_kalan": 1623.2
+      "kalan": 99,
+      "limit": 100,
+      "kullanilan": 1,
+      "birim": "istek/dk",
+      "yenilenme": "dakikalık 100 istek penceresi · ücretsiz API",
+      "not_": "İkincil yedek görsel kaynağı"
     },
     {
       "ad": "Google Drive",
       "durum": "ok",
-      "kalan": 3859843819,
+      "kalan": 3843064319,
       "limit": 16106127360,
-      "kullanilan": 12246283541,
+      "kullanilan": 12263063041,
       "birim": "bayt",
       "kirilim": [
         {
@@ -102,74 +59,58 @@
         },
         {
           "ad": "Ana Klasör & baslik.xlsx (Bilgi_Dozu_Yeni_Shorts)",
-          "boyut": 251302888,
-          "dosya": 53,
-          "sahip": "active.sav81@gmail.com"
+          "boyut": 268082388,
+          "dosya": 56,
+          "sahip": "active.sav81@gmail.com, galtundal81@gmail.com"
         },
         {
           "ad": "Onay Bekleyenler (Onay_Bekleyen)",
-          "boyut": 0,
-          "dosya": 0,
-          "sahip": ""
-        },
-        {
-          "ad": "Gmail + Fotoğraflar (Drive dışı)",
-          "boyut": 3899478734,
-          "dosya": 0
+          "boyut": 16779500,
+          "dosya": 3,
+          "sahip": "galtundal81@gmail.com"
         }
       ],
-      "buyuk_dosyalar": [
-        {
-          "ad": "takeout-20261111T180849Z-1-009.zip",
-          "boyut": 2147645103
-        },
-        {
-          "ad": "takeout-20261111T180849Z-1-010.zip",
-          "boyut": 2147615175
-        },
-        {
-          "ad": "takeout-20261111T180849Z-1-008.zip",
-          "boyut": 2147572997
-        },
-        {
-          "ad": "BilgiDozu_Sablon_Motor.zip",
-          "boyut": 57323884
-        },
-        {
-          "ad": "ONAY_40_final.mp4",
-          "boyut": 54257735
-        },
-        {
-          "ad": "ONAY_20_final.mp4",
-          "boyut": 48102915
-        },
-        {
-          "ad": "final.mp4",
-          "boyut": 46493659
-        },
-        {
-          "ad": "ONAY_16_final.mp4",
-          "boyut": 42831080
-        }
-      ],
-      "drive_gorunen": 9171087808,
-      "kendi_dosyalar": 8346804807,
-      "paylasilan": 824283001,
-      "disalan": 3899478734,
       "hesap": "galtundal81@gmail.com",
-      "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
-      "not_": "Kota hesap bazlı: klasör başka hesaba aitse yer ONUN kotasından düşer"
+      "yenilenme": "kalıcı depolama · dosya silince yer açılır",
+      "not_": "Yayın kuyruğu ve onay bekleyen videolar depolaması"
     },
     {
       "ad": "YouTube Data API",
       "durum": "ok",
-      "kalan": 4900,
+      "kalan": 10000,
       "limit": 10000,
-      "kullanilan": 5100,
-      "birim": "birim (tahmini)",
-      "bugun_yukleme": 3,
-      "yenilenme": "günlük · gece 00:00 Pasifik (TR 10:00) sıfırlanır",
-      "not_": "gerçek kota API'de yok; yükleme ≈ 1700 birim sayıldı"
+      "kullanilan": 0,
+      "birim": "birim/gün",
+      "bugun_yukleme": 0,
+      "yenilenme": "günlük · her gün TR 10:00 sıfırlanır",
+      "not_": "Her Shorts yüklemesi ≈ 1700 birim (günde ~5 yükleme kapasitesi)"
+    },
+    {
+      "ad": "GitHub Actions",
+      "durum": "ok",
+      "kalan": 1614.1,
+      "limit": 2000,
+      "kullanilan": 385.9,
+      "birim": "dk/ay",
+      "actions_dakika": 385.9,
+      "actions_kosu": 500,
+      "actions_limit": 2000,
+      "actions_kalan": 1614.1,
+      "api_kalan": 4993,
+      "api_limit": 5000,
+      "yenilenme": "aylık 2.000 dk ücretsiz · her ayın 1'inde sıfırlanır",
+      "not_": "Bu ay 500 iş akışı koştu · Saatlik API: 4993/5000"
+    },
+    {
+      "ad": "Telegram Bot",
+      "durum": "ok",
+      "limit": 30,
+      "kalan": 30,
+      "kullanilan": 0,
+      "birim": "istek/sn",
+      "bot": "@Bilgindozlu_bot",
+      "yenilenme": "anlık · günlük kota sınırı yok",
+      "not_": "Onay kartları ve yayın bildirimleri aktif"
     }
   ],
   "secretler": [
@@ -186,22 +127,12 @@
     {
       "ad": "GEMINI_API_KEY",
       "var": true,
-      "aciklama": "Başlık/açıklama üretimi, Gemini Charon TTS"
+      "aciklama": "Gemini Charon TTS + yardımcı metin"
     },
     {
       "ad": "GROQ_API_KEY",
       "var": true,
-      "aciklama": "Hızlı LLM (Groq)"
-    },
-    {
-      "ad": "OPENROUTER_API_KEY",
-      "var": true,
-      "aciklama": "Yedek LLM + TTS (OpenRouter)"
-    },
-    {
-      "ad": "ELEVENLABS_API_KEY",
-      "var": true,
-      "aciklama": "Yedek ses üretimi (ElevenLabs)"
+      "aciklama": "Hızlı senaryo/başlık LLM (Groq)"
     },
     {
       "ad": "GOOGLE_TOKEN_JSON",
@@ -221,255 +152,13 @@
     {
       "ad": "SITE_SYNC_TOKEN",
       "var": true,
-      "aciklama": "Panele veri yayını + secret yazma"
+      "aciklama": "Panel secret yazma yetkisi"
     }
   ],
   "ozet": {
-    "ok": 9,
+    "ok": 8,
     "eksik": 0,
     "gecersiz": 0,
     "hata": 0
-  },
-  "gecmis": [
-    {
-      "zaman": "2026-11-02T14:02:52+00:00",
-      "elevenlabs_kalan": null
-    },
-    {
-      "zaman": "2026-11-02T14:06:07+00:00",
-      "elevenlabs_kalan": 9561
-    },
-    {
-      "zaman": "2026-11-02T18:58:59+00:00",
-      "elevenlabs_kalan": 7897
-    },
-    {
-      "zaman": "2026-11-03T01:03:31+00:00",
-      "elevenlabs_kalan": 7897
-    },
-    {
-      "zaman": "2026-11-03T07:12:13+00:00",
-      "elevenlabs_kalan": 7897
-    },
-    {
-      "zaman": "2026-11-03T10:32:06+00:00",
-      "elevenlabs_kalan": 7317
-    },
-    {
-      "zaman": "2026-11-03T10:33:04+00:00",
-      "elevenlabs_kalan": 7317
-    },
-    {
-      "zaman": "2026-11-03T11:50:06+00:00",
-      "elevenlabs_kalan": 7317
-    },
-    {
-      "zaman": "2026-11-03T11:52:17+00:00",
-      "elevenlabs_kalan": 7317
-    },
-    {
-      "zaman": "2026-11-03T11:54:05+00:00",
-      "elevenlabs_kalan": 7317
-    },
-    {
-      "zaman": "2026-11-03T12:04:56+00:00",
-      "elevenlabs_kalan": 7317
-    },
-    {
-      "zaman": "2026-11-03T13:03:29+00:00",
-      "elevenlabs_kalan": 7317
-    },
-    {
-      "zaman": "2026-11-03T18:56:42+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-04T01:06:17+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-04T07:18:54+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-04T13:07:29+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-04T18:59:51+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-05T01:07:49+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-05T07:22:08+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-05T13:14:12+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-05T18:58:20+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-06T01:11:06+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-06T07:19:25+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-06T13:07:35+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-06T18:55:41+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-07T01:00:45+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-07T06:59:21+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-07T12:53:41+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-07T18:48:12+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-07T23:20:19+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-07T23:25:07+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-07T23:26:11+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-07T23:34:10+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-07T23:41:15+00:00",
-      "elevenlabs_kalan": null
-    },
-    {
-      "zaman": "2026-11-07T23:44:37+00:00",
-      "elevenlabs_kalan": null
-    },
-    {
-      "zaman": "2026-11-07T23:46:17+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-07T23:50:39+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-07T23:54:32+00:00",
-      "elevenlabs_kalan": 1384
-    },
-    {
-      "zaman": "2026-11-08T01:06:43+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-08T07:00:50+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-08T12:54:47+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-08T18:48:48+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-09T01:10:33+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-09T07:29:58+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-09T13:16:25+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-09T18:58:42+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-10T01:04:32+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-10T07:12:20+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-10T13:04:55+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-10T18:56:58+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-11T01:07:30+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-11T07:18:11+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-11T13:12:45+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-11T19:00:36+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-12T01:14:59+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-12T03:23:45+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-12T05:46:43+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-12T07:23:06+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-12T13:16:50+00:00",
-      "elevenlabs_kalan": 10000
-    },
-    {
-      "zaman": "2026-11-12T13:52:31+00:00",
-      "elevenlabs_kalan": 10000
-    }
-  ]
+  }
 }
