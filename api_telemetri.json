@@ -1,5 +1,5 @@
 {
-  "zaman": "2026-11-12T07:23:06+00:00",
+  "zaman": "2026-11-12T13:16:50+00:00",
   "servisler": [
     {
       "ad": "ElevenLabs",
@@ -18,9 +18,9 @@
     {
       "ad": "OpenRouter",
       "durum": "ok",
-      "kalan": 44,
+      "kalan": 42,
       "limit": 50,
-      "kullanilan": 6,
+      "kullanilan": 8,
       "birim": "istek/gün (ücretsiz modeller)",
       "ucretsiz": true,
       "yenilenme": "günlük · gece 00:00 UTC · ücretsiz model hakkı",
@@ -32,8 +32,8 @@
       "ad": "Gemini",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1497,
-      "kullanilan": 3,
+      "kalan": 1496,
+      "kullanilan": 4,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 50,
       "yenilenme": "günlük istek (RPD) · gece 00:00 Pasifik (TR 10:00)",
@@ -43,8 +43,8 @@
       "ad": "Groq",
       "durum": "ok",
       "limit": 1000,
-      "kalan": 997,
-      "kullanilan": 3,
+      "kalan": 996,
+      "kullanilan": 4,
       "birim": "istek/gün (kendi sayacimiz)",
       "model_sayisi": 11,
       "yenilenme": "dakika + günlük token · günlük kısım gece 00:00 UTC",
@@ -70,10 +70,10 @@
       "birim": "istek/saat",
       "yenilenme": "istek kotası saatlik · Actions dakikası AYLIK (ayın 1'i)",
       "not_": "panel API kotası (saatlik pencerede yenilenir)",
-      "actions_dakika": 370.7,
+      "actions_dakika": 374.8,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1629.3
+      "actions_kalan": 1625.2
     },
     {
       "ad": "Google Drive",
@@ -85,31 +85,31 @@
       "kirilim": [
         {
           "ad": "Kısa Videolar",
-          "boyut": 535462336,
-          "dosya": 56,
+          "boyut": 473877224,
+          "dosya": 67,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
         {
           "ad": "Uzun Videolar",
-          "boyut": 535462336,
-          "dosya": 56,
+          "boyut": 473877224,
+          "dosya": 67,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
         {
           "ad": "Kısa Kapaklar",
-          "boyut": 535462336,
-          "dosya": 56,
+          "boyut": 473877224,
+          "dosya": 67,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
         {
           "ad": "Uzun Kapaklar",
-          "boyut": 535462336,
-          "dosya": 56,
+          "boyut": 473877224,
+          "dosya": 67,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
         {
           "ad": "CEO / Tablolar",
-          "boyut": 377411209,
+          "boyut": 377351767,
           "dosya": 48,
           "sahip": "galtundal81@gmail.com, gokhanaltundal@gmail.com"
         },
@@ -153,9 +153,9 @@
           "boyut": 42831080
         }
       ],
-      "drive_gorunen": 8850943163,
+      "drive_gorunen": 8919784920,
       "kendi_dosyalar": 8346804807,
-      "paylasilan": 504138356,
+      "paylasilan": 572980113,
       "disalan": 3899478734,
       "hesap": "galtundal81@gmail.com",
       "yenilenme": "yenilenmez · sadece dosya silince/artırınca değişir",
@@ -222,10 +222,6 @@
     "hata": 0
   },
   "gecmis": [
-    {
-      "zaman": "2026-11-02T13:46:54+00:00",
-      "elevenlabs_kalan": null
-    },
     {
       "zaman": "2026-11-02T13:48:11+00:00",
       "elevenlabs_kalan": null
@@ -460,6 +456,10 @@
     },
     {
       "zaman": "2026-11-12T07:23:06+00:00",
+      "elevenlabs_kalan": 10000
+    },
+    {
+      "zaman": "2026-11-12T13:16:50+00:00",
       "elevenlabs_kalan": 10000
     }
   ]
