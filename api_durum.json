@@ -1,5 +1,5 @@
 {
-  "guncellendi": "2026-11-12T13:51:49.026311+00:00",
+  "guncellendi": "2026-11-12T14:02:41.537394+00:00",
   "not": "Sağlayıcı yalnız sunduğu limit başlıklarını gösterir; Pexels gerçek kalan aylık isteği döndürür.",
   "gemini": {
     "durum": "aktif",
@@ -8,19 +8,19 @@
     "mesaj": ""
   },
   "groq": {
-    "durum": "hata",
-    "http": 404,
+    "durum": "aktif",
+    "http": 200,
     "limit": {},
-    "mesaj": "The model `llama-3.3-70b-versatile` does not exist or you do not have access to it."
+    "mesaj": ""
   },
   "pexels": {
     "durum": "aktif",
     "http": 200,
     "limit": {
       "limit": "25000",
-      "remaining": "24999",
+      "remaining": "24989",
       "reset": "1797083508",
-      "remaining-requests": "24999",
+      "remaining-requests": "24989",
       "limit-requests": "25000"
     },
     "mesaj": ""
