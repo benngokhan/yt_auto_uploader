@@ -1,22 +1,12 @@
 {
- "total": 23535,
- "day_gain": 9,
- "updated": 5,
+ "total": 23552,
+ "day_gain": 17,
+ "updated": 16,
  "baseline_count": 0,
  "compared_count": 48,
  "unavailable_count": 4,
  "dry_run": false,
  "top": [
-  {
-   "delta": 3,
-   "title": "Karanlıkta Gözümüz Gece Görüşünü Nasıl Açar? Korsan Bandı ve",
-   "file": "uzun_video_17.mp4"
-  },
-  {
-   "delta": 2,
-   "title": "Doğa İnsandan Daha Zeki! İnsan Aklını Aşan 3 Gizli Deha 🧠🦅 #",
-   "file": "uzun_video_2.mp4"
-  },
   {
    "delta": 2,
    "title": "Baldır Kasların Aslında İkinci Kalbin! Kanı Kalbe Nasıl Taşı",
@@ -29,8 +19,18 @@
   },
   {
    "delta": 1,
-   "title": "Sevdiğin Birine Bakınca Göz Bebeğin Neden Otomatik Büyür? 👀 ",
-   "file": "video_83.mp4"
+   "title": "Üçgen ve Açı Kelimelerini Atatürk'ün Bizzat Türettiğini Bili",
+   "file": "video_157.mp4"
+  },
+  {
+   "delta": 1,
+   "title": "Vücudundaki Tüm Acıyı Yöneten Beynin Kendisi Acı Hissedemez!",
+   "file": "video_35.mp4"
+  },
+  {
+   "delta": 1,
+   "title": "Vücudundaki Hücrelerin Yarısından Fazlası Aslında Bakteri! 🦠",
+   "file": "video_86.mp4"
   }
  ]
 }
