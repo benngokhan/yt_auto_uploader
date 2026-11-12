@@ -393,12 +393,23 @@ def _llm_json(istem: str, ayar: dict) -> dict:
         raise son_hata
 
     def _ayikla(metin):
+        metin = (metin or "").strip()
+        if not metin:
+            return {}
         m = _re.search(r"\{.*\}", metin, _re.S)
-        return json.loads(m.group(0)) if m else {}
+        if not m:
+            print(f"v2 LLM ham yanıt (JSON yok): {metin[:400]}")
+            return {}
+        try:
+            return json.loads(m.group(0))
+        except Exception:
+            print(f"v2 LLM JSON çözülemedi: {metin[:500]}")
+            return {}
 
     if os.getenv("GROQ_API_KEY"):
         try:
             m = groq_model()
+            print(f"v2 LLM: groq {m}")
             return _ayikla(_cagir("https://api.groq.com/openai/v1/chat/completions",
                 {"model": m, "temperature": 0.7,
                  "messages": [{"role": "system", "content": SAHNE_SISTEM},
@@ -411,6 +422,7 @@ def _llm_json(istem: str, ayar: dict) -> dict:
             model = os.getenv("GEMINI_LLM_MODEL", "").strip() or "gemini-2.5-flash"
             if model.startswith("llama-") or model == "gemini-3.6-flash":
                 model = "gemini-2.5-flash"
+            print(f"v2 LLM: gemini {model}")
             return _ayikla(_cagir(
                 f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
                 f"?key={os.environ['GEMINI_API_KEY']}",
