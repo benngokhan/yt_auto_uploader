@@ -25,15 +25,17 @@ from pathlib import Path
 from typing import Any
 
 VOICE_TARGET_LUFS = -18.0
-MUSIC_BELOW_VOICE_LU = 2.0
+MUSIC_BELOW_VOICE_LU = 12.0   # ÖLÇÜM (12.11): 2.0'da müzik konuşmayla iç içe geçiyordu; video sesinin %82'si bastı, konuşma 800-3000 Hz'de eziliyordu
 MASTER_TARGET_LUFS = -16.0   # CEO ses kuralı: çıkış -16 LUFS / -1 dBTP (eski kod -14 idi — 167'nin sapması)
 TRUE_PEAK_CEILING_DB = -1.0
-DUCKING_THRESHOLD = 0.030       # linear amplitude, about -30.5 dBFS
-DUCKING_RATIO = 8.0
+DUCKING_THRESHOLD = 0.012       # daha erken devreye gir (konuşma başlar başlamaz)
+DUCKING_RATIO = 16.0   # konuşma sırasında müziği daha çok kıs
 DUCKING_ATTACK_MS = 18.0
 DUCKING_RELEASE_MS = 550.0
 DUCKING_KNEE = 2.0
-MUSIC_EQ = "equalizer=f=2200:t=q:w=1.2:g=-3.5"
+MUSIC_EQ = ("highpass=f=120,lowpass=f=4200,"   # bas gümbürtüsünü ve tiz sızmayı kes
+            "equalizer=f=250:t=q:w=1.0:g=-6,"   # bas-orta bulutlanmayı indir
+            "equalizer=f=2200:t=q:w=1.2:g=-2.5")  # konuşma bandını hafif geri çek
 AUDIO_FORMAT = "aformat=sample_rates=44100:channel_layouts=stereo"
 
 
