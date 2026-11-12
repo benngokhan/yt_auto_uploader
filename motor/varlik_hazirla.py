@@ -25,6 +25,8 @@ FONTLAR = {
     # Şablon v2 başlık/altyazı fontu: Poppins Bold + Black
     "Poppins-Bold.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Bold.ttf",
     "Poppins-Black.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Black.ttf",
+    # Şablon v2.0 kaynak/uyarı satırı fontu
+    "Poppins-Regular.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Regular.ttf",
 }
 
 
