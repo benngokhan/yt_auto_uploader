@@ -133,9 +133,17 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
         "- gorsel_anahtar: o sahnenin EN ÖNEMLİ 2-3 İNGİLİZCE kelimesi (sadece ana nesne, sıfat yok). "
         "Örnek: \"honeybee hive\", \"cortisol brain\", \"alarm clock night\". Bu kelimeler görsel aramasında birebir kullanılacak.\n"
         "- vurgular: o sahnenin altyazısında sarı boyanacak 1-3 kelime\n"
-        "Selamlama ve 'abone olun' YASAK. İlk sahnenin sesi tek soru ve 5-8 kelime olsun. "
-        "Toplam anlatım boşluklar dahil 620-700 Türkçe karakter olmalı (4 sahne, 38-42 sn). Her sahne 150-185 karakter olmalı. "
-        "Cümleler doğal, bilgi yoğun ve sesli okumada toplam 38-42 saniyeye uygun olmalı. Son sahne yumuşak ve doğal bir cümleyle bitsin. 'Bakacağız' kelimesini ve sert slogan tonunu kullanma; gerekiyorsa 'Bir sonraki videoda bunu inceleyeceğiz.' de."
+        "\nSAHNE YAPISI (sahibin onayladığı akış, TAM 4 sahne):\n"
+        "1) KANCA (0-3 sn): Merak uyandıran soru veya şaşırtıcı iddia. Tek soru, 5-8 kelime.\n"
+        "2) PROBLEM / DURUM: Ne olduğunu tek cümlede kur. İzleyici 'ne oluyor?' diye bağlansın.\n"
+        "3) BİLİMSEL AÇIKLAMA: Asıl bilgi. Her cümlede TEK ana bilgi ve MÜMKÜNSE TEK SOMUT SAYI "
+        "(ör. 'saniyede 13 kez', '2,5 milimetre'). Uydurma sayı yasak; kaynaklı gerçek değer ver.\n"
+        "4) SONUÇ + KAPANIŞ: Net, doğrulanmış cevabı ver ve sonunda izleyiciyi düşündüren KISA bir soru sor "
+        "(ör. 'PEKİ O ANDA SEN İLK NE YAPARDIN?').\n"
+        "Selamlama ve 'abone olun' YASAK. Sabit kapanış cümlesini ve takip butonunu video motoru ekler, sen yazma.\n"
+        "Uzunluk: toplam anlatım boşluklar dahil 620-700 Türkçe karakter (4 sahne, 38-42 sn) olmalı; "
+        "her sahne 150-185 karakter olmalı. Cümleler doğal, bilgi yoğun ve sesli okumada 38-42 saniyeye uygun olmalı. "
+        "'Bakacağız' kelimesini ve sert slogan tonunu kullanma."
     )
 
     def _cagir(url, govde, basliklar):
