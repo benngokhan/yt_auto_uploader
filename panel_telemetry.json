@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-12 08:46:02",
-  "generated_at_iso": "2026-11-12T08:46:02.732280+03:00",
+  "generated_at": "2026-11-12 09:49:36",
+  "generated_at_iso": "2026-11-12T09:49:36.625267+03:00",
   "folders": {
     "youtube_otomasyon": "1OQwocu1j3sIyUxLmjesR7EGTlwnGn0vj",
     "ceo": "190zQiUYkp8fsQFleva77TKqc9MeGxZiI",
@@ -56,6 +56,13 @@
         "mimeType": "video/mp4",
         "size": 35486376,
         "modifiedTime": "2026-11-12T01:29:26.072Z"
+      },
+      {
+        "id": "19kWp6Oprc6RoOa20Z5g5pBc1fP76QDu6",
+        "name": "ONAY_48_final.mp4",
+        "mimeType": "video/mp4",
+        "size": 37037539,
+        "modifiedTime": "2026-11-12T05:58:42.372Z"
       },
       {
         "id": "1_I8k-snMuksID4RTEG8Tmu7nMMTqRlJ5",
@@ -238,6 +245,13 @@
         "mimeType": "application/json",
         "size": 802,
         "modifiedTime": "2026-11-12T01:29:27.501Z"
+      },
+      {
+        "id": "1cuqo8x7Yf_aTu5L9ToncAs-Kait8FFQg",
+        "name": "YAYIN_BILGISI_48.json",
+        "mimeType": "application/json",
+        "size": 1044,
+        "modifiedTime": "2026-11-12T05:58:44.103Z"
       }
     ],
     "shorts_covers": [
@@ -408,6 +422,13 @@
         "mimeType": "image/jpeg",
         "size": 827044,
         "modifiedTime": "2026-11-12T01:29:23.459Z"
+      },
+      {
+        "id": "1DI3UOUDUHZwnBqSxKrcXTHyr23qNk8ii",
+        "name": "kapak_48.jpg",
+        "mimeType": "image/jpeg",
+        "size": 827044,
+        "modifiedTime": "2026-11-12T05:58:39.852Z"
       },
       {
         "id": "1e22SUjKLwfd2W9DjGMVS6cBsQjK7O0L6",
@@ -594,6 +615,13 @@
         "mimeType": "image/jpeg",
         "size": 827044,
         "modifiedTime": "2026-11-12T01:29:23.459Z"
+      },
+      {
+        "id": "1DI3UOUDUHZwnBqSxKrcXTHyr23qNk8ii",
+        "name": "kapak_48.jpg",
+        "mimeType": "image/jpeg",
+        "size": 827044,
+        "modifiedTime": "2026-11-12T05:58:39.852Z"
       },
       {
         "id": "1e22SUjKLwfd2W9DjGMVS6cBsQjK7O0L6",
