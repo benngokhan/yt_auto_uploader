@@ -191,9 +191,28 @@ jobs:
               -F "chat_id=${TELEGRAM_CHAT_ID}" -F "photo=@${kapaklar[0]}" \
               -F "caption=🖼 Video kapağı · ${KONU}"
           fi
-          curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo" \
-            -F "chat_id=${TELEGRAM_CHAT_ID}" -F "video=@${videolar[0]}" \
-            -F "supports_streaming=true" -F "caption=${CAPTION}"
+          # Telegram bot API videoyu 50 MB'a kadar kabul eder; üstü 413 verir.
+          # Kural: 45 MB üstüyse Telegram için hafif kopya üretilir.
+          TG_MAX_MB=45
+          BOYUT_MB=$(du -m "${videolar[0]}" | cut -f1)
+          GONDER="${videolar[0]}"
+          if [ "$BOYUT_MB" -gt "$TG_MAX_MB" ]; then
+            echo "Video ${BOYUT_MB} MB > ${TG_MAX_MB} MB, Telegram için sıkıştırılıyor."
+            GONDER="motor/cikti/son/onay_bekleyen/final_tg.mp4"
+            ffmpeg -y -i "${videolar[0]}" \
+              -c:v libx264 -preset veryfast -crf 27 -maxrate 5M -bufsize 10M \
+              -vf "scale=1080:1920:force_original_aspect_ratio=decrease,format=yuv420p" \
+              -c:a aac -b:a 128k -movflags +faststart "$GONDER" 2>/dev/null \
+              || cp "${videolar[0]}" "$GONDER"
+            echo "Telegram kopyası: $(du -m "$GONDER" | cut -f1) MB"
+          fi
+          if ! curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo" \
+            -F "chat_id=${TELEGRAM_CHAT_ID}" -F "video=@${GONDER}" \
+            -F "supports_streaming=true" -F "caption=${CAPTION}"; then
+            echo "UYARI: Telegram video gönderilemedi (boyut/sınır). Video Drive'da ve artifact'ta hazır."
+          fi
+          # Telegram'a gidemezse koşu patlamasın: Drive + artifact yolu zaten çalıştı.
+          rm -f "motor/cikti/son/onay_bekleyen/final_tg.mp4" 2>/dev/null || true
           python - "$META" "$KONU" > /tmp/yayin_karti.txt <<'PY3'
           import json,sys,html
           d=json.load(open(sys.argv[1])); konu=sys.argv[2]
