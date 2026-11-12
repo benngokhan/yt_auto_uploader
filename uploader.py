@@ -373,6 +373,49 @@ def load_uploaded_ids(list_path: Path) -> set:
     return ids
 
 
+def _arsiv_temizle(drive, queue_folder: str, file_name: str) -> None:
+    """Yayınlanmış videoyu ve eşleşen kapağını Drive'da çöpe taşır.
+    Klasörden tamamen kaldırmaz; çöp kutusundan 30 gün geri alınabilir."""
+    import re as _re
+
+    if not drive or not queue_folder or not file_name:
+        return
+
+    # Koruma: video_173 ve üstü arşivde KALIR (henüz yayınlanmadı)
+    m = _re.search(r"(\d+)", file_name)
+    if m and file_name.lower().startswith("video_") and int(m.group(1)) >= 173:
+        log.info("Arşiv koruması: %s silinmedi (henüz yayın sırası gelmedi).", file_name)
+        return
+
+    adlar = {file_name.lower()}
+    mm = _re.search(r"(\d+)", file_name)
+    if mm:
+        num = mm.group(1)
+        adlar.add(f"kapak_{num}.jpg")
+        adlar.add(f"kapak_{num}.png")
+
+    try:
+        res = drive.files().list(
+            q=f"'{queue_folder}' in parents and trashed=false",
+            pageSize=200,
+            fields="files(id,name)",
+        ).execute()
+    except Exception as e:
+        log.warning("Arşiv taraması yapılamadı: %s", type(e).__name__)
+        return
+
+    silinen = []
+    for f in res.get("files", []):
+        if (f.get("name") or "").lower() in adlar:
+            try:
+                drive.files().update(fileId=f["id"], body={"trashed": True}).execute()
+                silinen.append(f["name"])
+            except Exception as e:
+                log.warning("Çöpe atılamadı (%s): %s", f.get("name"), type(e).__name__)
+    if silinen:
+        log.info("Drive arşivi temizlendi (çöpe atıldı): %s", ", ".join(silinen))
+
+
 def mark_as_uploaded(list_path: Path, file_id: str, file_name: str, yt_url: str, title: str = "", slot_key: str = "") -> None:
     list_path.parent.mkdir(parents=True, exist_ok=True)
     if slot_key:
@@ -1565,6 +1608,14 @@ def upload_job(
         # Record publication before optional thumbnail/comment work can fail.
         mark_as_uploaded(list_path, file_id, file_name, yt_url, title=meta["title"], slot_key=slot_key)
         update_excel_status_in_drive(drive, queue_folder, file_name, new_status="YÜKLENDİ", youtube_url=yt_url)
+
+        # Yüklenen videoyu ve kapağını Drive'dan ÇÖPE at (kalıcı silme değil).
+        # Sahibin kuralı: arşivde yalnız HENÜZ yayınlanmamış (video_>=173) dosyalar kalsın.
+        try:
+            _arsiv_temizle(drive, queue_folder, file_name)
+        except Exception as _ae:
+            log.warning("Drive arşiv temizliği atlandı (yükleme etkilenmedi): %s", type(_ae).__name__)
+
 
         # Optional, after the publication is recorded; never modify an older video here.
         try:
