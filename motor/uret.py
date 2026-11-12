@@ -401,7 +401,10 @@ def _llm_json(istem: str, ayar: dict) -> dict:
             print(f"v2 LLM ham yanıt (JSON yok): {metin[:400]}")
             return {}
         try:
-            return json.loads(m.group(0))
+            d = json.loads(m.group(0))
+            if isinstance(d, dict):
+                print(f"v2 LLM JSON anahtarları: {list(d.keys())[:6]}")
+            return d
         except Exception:
             print(f"v2 LLM JSON çözülemedi: {metin[:500]}")
             return {}
@@ -410,11 +413,13 @@ def _llm_json(istem: str, ayar: dict) -> dict:
         try:
             m = groq_model()
             print(f"v2 LLM: groq {m}")
-            return _ayikla(_cagir("https://api.groq.com/openai/v1/chat/completions",
+            d = _ayikla(_cagir("https://api.groq.com/openai/v1/chat/completions",
                 {"model": m, "temperature": 0.7,
                  "messages": [{"role": "system", "content": SAHNE_SISTEM},
                               {"role": "user", "content": istem}]},
                 {"Authorization": f"Bearer {os.environ['GROQ_API_KEY']}"})["choices"][0]["message"]["content"])
+            if d.get("cumleler") or d.get("sahneler"):
+                return d
         except Exception as h:
             print(f"v2 groq başarısız: {type(h).__name__}")
     if os.getenv("GEMINI_API_KEY"):
@@ -423,25 +428,29 @@ def _llm_json(istem: str, ayar: dict) -> dict:
             if model.startswith("llama-") or model == "gemini-3.6-flash":
                 model = "gemini-2.5-flash"
             print(f"v2 LLM: gemini {model}")
-            return _ayikla(_cagir(
+            d = _ayikla(_cagir(
                 f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
                 f"?key={os.environ['GEMINI_API_KEY']}",
                 {"systemInstruction": {"parts": [{"text": SAHNE_SISTEM}]},
                  "contents": [{"role": "user", "parts": [{"text": istem}]}],
                  "generationConfig": {"responseMimeType": "application/json", "temperature": 0.7}},
                 {})["candidates"][0]["content"]["parts"][0]["text"])
+            if d.get("cumleler") or d.get("sahneler"):
+                return d
         except Exception as h:
             print(f"v2 gemini başarısız: {type(h).__name__}")
     if os.getenv("OPENROUTER_API_KEY"):
         try:
             m = os.getenv("OPENROUTER_LLM_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
-            return _ayikla(_cagir("https://openrouter.ai/api/v1/chat/completions",
+            d = _ayikla(_cagir("https://openrouter.ai/api/v1/chat/completions",
                 {"model": m, "temperature": 0.7,
                  "messages": [{"role": "system", "content": SAHNE_SISTEM},
                               {"role": "user", "content": istem}]},
                 {"Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}",
                  "HTTP-Referer": "https://github.com/benngokhan/yt_auto_uploader",
                  "X-Title": "Bilgi Dozu Motor"})["choices"][0]["message"]["content"])
+            if d.get("cumleler") or d.get("sahneler"):
+                return d
         except Exception as h:
             print(f"v2 openrouter başarısız: {type(h).__name__}")
     return {}
@@ -465,7 +474,17 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
     n = max(4, min(8, int(n or 7)))
     veri = _llm_json(PROMPT_V2.format(konu=konu, n=n, son=n - 1), ayar)
     cumleler = veri.get("cumleler") or veri.get("sahneler") or []
-    cumleler = [str(c).strip() for c in cumleler if str(c).strip()]
+    # Model düz liste veya {cumle: ...} döndürdüyse toparla
+    if isinstance(cumleler, str):
+        cumleler = [cumleler]
+    duzgun = []
+    for c in cumleler:
+        if isinstance(c, dict):
+            c = c.get("cumle") or c.get("ses") or c.get("metin") or ""
+        c = str(c).strip()
+        if c:
+            duzgun.append(c)
+    cumleler = duzgun
     if len(cumleler) < 4:
         raise SystemExit(f"v2 sahne planı: LLM yeterli cümle vermedi ({len(cumleler)}); video üretilmedi.")
     cumleler = cumleler[:n]
