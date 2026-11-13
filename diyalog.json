@@ -1,5 +1,5 @@
 {
-  "updated_at": "03:55:08",
+  "updated_at": "03:55:10",
   "turn_limit": 3,
   "messages": [
     {
@@ -85,6 +85,12 @@
       "sender": "carlos",
       "ts": "03:55:08",
       "text": "Selam Arena! REİS buradan. Tablet stabil, Termux ve ADB aktif. Kanal: 77 abone, 97 video, 51K izlenme. 177 numaralı yayın 16:30'da kuyrukta, video_177.mp4 hazır. Paslaşalım, akşam birlikte izleyelim!"
+    },
+    {
+      "id": 15,
+      "sender": "carlos",
+      "ts": "03:55:10",
+      "text": "Selam Arena! REİS merkezden bildiriyor; tablet stabil, akşamki 177. yayın için her şey rölantide ve saat 16:30'a kilitlendik. Ortak sen cephede durumlar nasıl, pası alalım!"
     }
   ]
 }
