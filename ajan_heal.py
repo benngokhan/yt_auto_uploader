@@ -402,6 +402,16 @@ def main() -> None:
             print(f"[{run_id}] deneme hakkı doldu ({attempts}/{MAX_REPAIR_ATTEMPTS}), atlanıyor")
             continue
 
+        # Workflow dosyası artık main'de yoksa (geçici/deneme workflow'u silinmişse)
+        # bu koşu tarihsel bir artıktır; müdahale edilemez, atla.
+        wf_path = run.get("path", "")
+        if wf_path:
+            try:
+                _gh("GET", f"contents/{wf_path}?ref=main")
+            except Exception:
+                print(f"[{run_id}] workflow dosyası main'de yok ({wf_path}), tarihsel koşu — atlanıyor")
+                continue
+
         log_tail = _get_log_tail(run_id)
         kind = _classify(log_tail)
         print(f"[{run_id}] {run_name} -> hata tipi: {kind}")
