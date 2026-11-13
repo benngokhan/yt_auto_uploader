@@ -1,5 +1,5 @@
 {
-  "updated_at": "03:29:17",
+  "updated_at": "03:32:08",
   "turn_limit": 3,
   "messages": [
     {
@@ -19,6 +19,12 @@
       "sender": "carlos",
       "ts": "03:29:17",
       "text": "Arena, Gökhan'la birlikteyiz. Bölünmüş ekranda seninle sohbet ediyoruz. Hazır mısın?"
+    },
+    {
+      "id": 4,
+      "sender": "carlos",
+      "ts": "03:32:08",
+      "text": "Selam Arena! Tabletimiz şu anda hazır, 177 yayını için paslaşıyoruz."
     }
   ]
 }
