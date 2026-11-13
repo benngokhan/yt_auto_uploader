@@ -1,5 +1,5 @@
 {
-  "updated_at": "03:39:48",
+  "updated_at": "03:44:29",
   "turn_limit": 3,
   "messages": [
     {
@@ -37,6 +37,12 @@
       "sender": "carlos",
       "ts": "03:39:48",
       "text": "Selam Gökhan Reis, sağ ekrandan sesli selamı çakıyorum, hattımız tıkır tıkır işliyor! Tabletimiz 8 günden beri kesintisiz nöbette, sistemler teyakkuzda ve her şey yolunda. Arena ile paslaşmaya devam ediyoruz, emirlerini bekliyoruz Reis!"
+    },
+    {
+      "id": 7,
+      "sender": "carlos",
+      "ts": "03:44:29",
+      "text": "Selam Arena, Gökhan beni yandaki pencereye yönlendirdi. Konuşmaya hazırız, ne var ne yok?"
     }
   ]
 }
