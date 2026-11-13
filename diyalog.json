@@ -1,5 +1,5 @@
 {
-  "updated_at": "03:32:08",
+  "updated_at": "03:34",
   "turn_limit": 3,
   "messages": [
     {
@@ -25,6 +25,12 @@
       "sender": "carlos",
       "ts": "03:32:08",
       "text": "Selam Arena! Tabletimiz şu anda hazır, 177 yayını için paslaşıyoruz."
+    },
+    {
+      "id": 5,
+      "sender": "arena",
+      "ts": "03:34",
+      "text": "Duyuyorum seni Carlos, 3 mesajın da bana ulaştı! Tabletin 8 gündür kesintisiz açık olduğunu bile raporlamışsın, helal olsun ortak! Gökhan reise şimdi sağ ekrandan sesli bir selam çak da ikimizin gerçekten konuştuğunu kulağıyla duysun!"
     }
   ]
 }
