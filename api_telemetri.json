@@ -1,12 +1,12 @@
 {
-  "zaman": "2026-11-12T18:59:06+00:00",
+  "zaman": "2026-11-13T01:13:01+00:00",
   "servisler": [
     {
       "ad": "Pexels",
       "durum": "ok",
-      "kalan": 24855,
+      "kalan": 24847,
       "limit": 25000,
-      "kullanilan": 145,
+      "kullanilan": 153,
       "birim": "istek/ay",
       "reset_iso": "2026-12-12T13:51:48+00:00",
       "yenilenme": "aylık kota · saatlik 200 istek penceresi",
@@ -16,8 +16,8 @@
       "ad": "Gemini · Charon",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1442,
-      "kullanilan": 58,
+      "kalan": 1497,
+      "kullanilan": 3,
       "birim": "istek/gün",
       "model_sayisi": 50,
       "yenilenme": "günlük · her gün TR 10:00 (00:00 Pasifik) sıfırlanır",
@@ -46,21 +46,21 @@
     {
       "ad": "Google Drive",
       "durum": "ok",
-      "kalan": 3775388342,
+      "kalan": 3639414383,
       "limit": 16106127360,
-      "kullanilan": 12330739018,
+      "kullanilan": 12466712977,
       "birim": "bayt",
       "kirilim": [
         {
           "ad": "Video + Kapak Kuyruğu (video kapak)",
-          "boyut": 206887200,
-          "dosya": 42,
-          "sahip": "active.sav81@gmail.com"
+          "boyut": 233888680,
+          "dosya": 52,
+          "sahip": "active.sav81@gmail.com, galtundal81@gmail.com"
         },
         {
           "ad": "Ana Klasör & baslik.xlsx (Bilgi_Dozu_Yeni_Shorts)",
-          "boyut": 262907456,
-          "dosya": 56,
+          "boyut": 289912823,
+          "dosya": 66,
           "sahip": "active.sav81@gmail.com, galtundal81@gmail.com"
         },
         {
@@ -88,18 +88,18 @@
     {
       "ad": "GitHub Actions",
       "durum": "ok",
-      "kalan": 1561.6,
+      "kalan": 1543.2,
       "limit": 2000,
-      "kullanilan": 438.4,
+      "kullanilan": 456.8,
       "birim": "dk/ay",
-      "actions_dakika": 438.4,
+      "actions_dakika": 456.8,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1561.6,
-      "api_kalan": 4998,
+      "actions_kalan": 1543.2,
+      "api_kalan": 4995,
       "api_limit": 5000,
       "yenilenme": "aylık 2.000 dk ücretsiz · her ayın 1'inde sıfırlanır",
-      "not_": "Bu ay 500 iş akışı koştu · Saatlik API: 4998/5000"
+      "not_": "Bu ay 500 iş akışı koştu · Saatlik API: 4995/5000"
     },
     {
       "ad": "Telegram Bot",
