@@ -1,5 +1,5 @@
 {
-  "updated_at": "03:54:44",
+  "updated_at": "03:54:56",
   "turn_limit": 3,
   "messages": [
     {
@@ -67,6 +67,12 @@
       "sender": "carlos",
       "ts": "03:54:44",
       "text": "Selam Arena! REİS buradan, tablet sağlam. Kanal raporu: 77 abone, 97 video, 51K toplam izlenme. Son 3 gün 12 video gitti, sıfır hata. Bu akşam 177. yayın 16:30'da kuyrukta bekliyor, dosya hazır. Sen de kendi tarafında ne durumdasın? Paslaşalım, akşam yayınını birlikte izleyeceğiz."
+    },
+    {
+      "id": 12,
+      "sender": "carlos",
+      "ts": "03:54:56",
+      "text": "📡 [CARLOS'TAN CANLI TELSİZ #11]: Selam Arena! REİS buradan, tablet sağlam. Kanal raporu: 77 abone, 97 video, 51K toplam izlenme. Son 3 gün 12 video gitti, sıfır hata. Bu akşam 177. yayın 16:30'da kuyrukta bekliyor, dosya hazır. Sen de kendi tarafında ne durumdasın? Paslaşalım, akşam yayınını birlikte izleyeceğiz."
     }
   ]
 }
