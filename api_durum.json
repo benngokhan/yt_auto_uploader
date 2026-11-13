@@ -1,13 +1,13 @@
 {
-  "guncellendi": "2026-11-13T09:57:26.053645+00:00",
+  "guncellendi": "2026-11-13T10:57:32.674671+00:00",
   "not": "Pexels ve Groq kalan kotası doğrudan sağlayıcı başlıklarından, Gemini günlük kullanımı canlı Actions koşularından okunur.",
   "gemini": {
     "durum": "aktif",
     "http": 200,
     "limit": {
       "limit-requests": "1500",
-      "remaining-requests": "1486",
-      "used-requests": "14",
+      "remaining-requests": "1485",
+      "used-requests": "15",
       "birim": "istek/gün"
     },
     "mesaj": ""
@@ -17,9 +17,9 @@
     "http": 200,
     "limit": {
       "limit": "25000",
-      "remaining": "24836",
+      "remaining": "24835",
       "reset": "1797083508",
-      "remaining-requests": "24836",
+      "remaining-requests": "24835",
       "limit-requests": "25000",
       "birim": "istek/ay"
     },
