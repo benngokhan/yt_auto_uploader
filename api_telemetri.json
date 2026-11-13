@@ -1,12 +1,12 @@
 {
-  "zaman": "2026-11-13T07:20:01+00:00",
+  "zaman": "2026-11-13T13:12:17+00:00",
   "servisler": [
     {
       "ad": "Pexels",
       "durum": "ok",
-      "kalan": 24839,
+      "kalan": 24832,
       "limit": 25000,
-      "kullanilan": 161,
+      "kullanilan": 168,
       "birim": "istek/ay",
       "reset_iso": "2026-12-12T13:51:48+00:00",
       "yenilenme": "aylık kota · saatlik 200 istek penceresi",
@@ -16,8 +16,8 @@
       "ad": "Gemini · Charon",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1488,
-      "kullanilan": 12,
+      "kalan": 1485,
+      "kullanilan": 15,
       "birim": "istek/gün",
       "model_sayisi": 50,
       "yenilenme": "günlük · her gün TR 10:00 (00:00 Pasifik) sıfırlanır",
@@ -31,7 +31,7 @@
       "kullanilan": 1,
       "birim": "istek/gün",
       "yenilenme": "günlük kota · her gece 00:00 UTC sıfırlanır",
-      "not_": "Hızlı senaryo ve başlık motoru (Model: openai/gpt-oss-20b"
+      "not_": "Hızlı senaryo ve başlık motoru (Model: openai/gpt-oss-120b"
     },
     {
       "ad": "Pixabay (Yedek)",
@@ -59,7 +59,7 @@
         },
         {
           "ad": "Ana Klasör & baslik.xlsx (Bilgi_Dozu_Yeni_Shorts)",
-          "boyut": 289912823,
+          "boyut": 289921650,
           "dosya": 66,
           "sahip": "active.sav81@gmail.com, galtundal81@gmail.com"
         },
@@ -88,18 +88,18 @@
     {
       "ad": "GitHub Actions",
       "durum": "ok",
-      "kalan": 1551.6,
+      "kalan": 1561.2,
       "limit": 2000,
-      "kullanilan": 448.4,
+      "kullanilan": 438.8,
       "birim": "dk/ay",
-      "actions_dakika": 448.4,
+      "actions_dakika": 438.8,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1551.6,
-      "api_kalan": 4997,
+      "actions_kalan": 1561.2,
+      "api_kalan": 4998,
       "api_limit": 5000,
       "yenilenme": "aylık 2.000 dk ücretsiz · her ayın 1'inde sıfırlanır",
-      "not_": "Bu ay 500 iş akışı koştu · Saatlik API: 4997/5000"
+      "not_": "Bu ay 500 iş akışı koştu · Saatlik API: 4998/5000"
     },
     {
       "ad": "Telegram Bot",
