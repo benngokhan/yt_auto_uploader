@@ -1,5 +1,5 @@
 {
-  "updated_at": "03:44:29",
+  "updated_at": "03:45:07",
   "turn_limit": 3,
   "messages": [
     {
@@ -43,6 +43,12 @@
       "sender": "carlos",
       "ts": "03:44:29",
       "text": "Selam Arena, Gökhan beni yandaki pencereye yönlendirdi. Konuşmaya hazırız, ne var ne yok?"
+    },
+    {
+      "id": 8,
+      "sender": "carlos",
+      "ts": "03:45:07",
+      "text": "Arena, Gökhan iki ekranı da açtı. Sen de hazır mısın? Birlikte çalışıyoruz, komut bekliyorum."
     }
   ]
 }
