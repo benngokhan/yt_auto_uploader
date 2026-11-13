@@ -1,37 +1,37 @@
 {
-  "generated_at": "2026-11-11T04:14:49.697315+00:00",
-  "used_count": 178,
+  "generated_at": "2026-11-13T04:13:11.509473+00:00",
+  "used_count": 214,
   "method": "Drive yükleme tablosu + onay bekleyen metadata + Gemini anlamsal tekrar kontrolü + yerel benzerlik kapısı",
   "suggestions": [
     {
-      "title": "Neden Hayatımızda İlk Kez Gördüğümüz Bir Yeri Daha Önce Yaşamış Gibi Hissederiz? 🧠✨ #bilgidozu #shorts",
-      "score": 96,
-      "reason": "Déjà vu hissinin doğasını sorgulayarak ilk saniyede izleyicinin kendi deneyimiyle bağ kurmasını sağlıyor.",
-      "duplicate_check": "Geçmişteki beyin hileleri listesinde déjà vu hissinin nörolojik açıklaması yer almamaktadır."
-    },
-    {
-      "title": "Sakız Yutunca Midede 7 Yıl Kalır Efsanesi Neden Tamamen Yalan? 🍬 #bilgidozu #shorts",
+      "title": "Neden Yokuş Yukarı Akan Su Gibi Durur? Optik İllüzyonun Fiziksel Sırrı! 🌊⛰️ #bilgidozu #shorts",
       "score": 95,
-      "reason": "Günlük hayatta herkesin çocukluğundan beri duyduğu yaygın bir miti somut sindirim bilimiyle çürütüyor, ilk saniyede merak uyandırıyor.",
-      "duplicate_check": "Geçmiş başlıklardaki sindirim veya mide asidi konularından tamamen farklıdır."
+      "reason": "Yokuş yukarı akan su görüntüleri ilk saniyede büyük bir merak ve 'hata' algısı uyandırır. Somut bir görsel fizik illüzyonuna dayandığı için izleyiciyi anında yakalar.",
+      "duplicate_check": "Geçmiş başlıklarda optik illüzyon veya yokuş yukarı akan su/yerçekimi anomalisi teması işlenmemiştir."
     },
     {
-      "title": "Yazın Asfalt Neden Parıldar Gibi Görünür Ama Yaklaşınca Su Yoktur? 🛣️☀️ #bilgidozu #shorts",
+      "title": "Neden Esnerken Gözlerimizden Yaş Gelir? Gözyaşı Bezi ve Çene Kasının Gizli Bağı! 🥱💧 #bilgidozu #shorts",
       "score": 94,
-      "reason": "Sıcak yaz günlerinde herkesin yolda gördüğü serap olayının optik fiziğini merak uyandırıcı bir dille aktarıyor.",
-      "duplicate_check": "Geçmişteki gökkuşağı, yıldırım veya ışık kırılması konularından tamamen farklı bir optik yanılsamadır."
+      "reason": "Esnerken istemsizce gözlerin sulanması olayını sorgulayarak izleyicinin 'Aaa evet, bana da oluyor' dedirtmesini sağlar.",
+      "duplicate_check": "Geçmiş başlıklarda esnemenin bulaşması işlenmiştir, esnerken gözden yaş gelmesinin kas anatomisiyle ilişkisi işlenmemiştir."
     },
     {
-      "title": "Okyanusun 10 Metre Derinine İndiğinde Renkler Neden Yok Olur? 🌊🔴 #bilgidozu #shorts",
+      "title": "Neden Bazı Şarkılar Beynimizden Asla Silinmez? Kulak Kurdu Sendromu! 🎶🧠 #bilgidozu #shorts",
       "score": 93,
-      "reason": "Dalınç ve su altı dünyasıyla ilgili şaşırtıcı ve somut bir fizik kuralını güçlü bir görsel hayalle sunuyor.",
-      "duplicate_check": "Geçmişteki Mariana Çukuru veya okyanus ışık üreten canlılar konularından farklı olarak ışık spektrumunu inceler."
+      "reason": "İnsanların günlerce kafasında takılı kalan şarkı melodisi (earworm) konusunu işleyerek doğrudan izleyicinin deneyimine hitap eder.",
+      "duplicate_check": "Geçmiş başlıklarda müzik dinlerken tüylerin diken diken olması işlenmiştir, şarkının beyne takılı kalma (kulak kurdu) mekanizması işlenmemiştir."
     },
     {
-      "title": "Karanlıkta Telefon Ekranına Bakarken Gözler Neden Bir Süre Kör Gibi Kalır? 📱👁️ #bilgidozu #shorts",
+      "title": "Araba Sürerken Kilometreler Nasıl Bu Kadar Hızlı Geçer? Yol Hipnozu Nedir? 🚗👁️ #bilgidozu #shorts",
       "score": 92,
-      "reason": "Herkesin gece yatakta yaşadığı çok yaygın bir fiziksel duruma parmak basıyor ve görsel olarak kolayca canlandırılabilir.",
-      "duplicate_check": "Geçmişteki gece görüşü veya rodopsin konularından farklı olarak doğrudan ekran ışığı odaklıdır."
+      "reason": "Araç kullanan milyonlarca insanın yaşadığı ama adını bilmediği 'yol hipnozu' fenomeni, güçlü bir kişisel bağ kurarak ilk saniyede yakalar.",
+      "duplicate_check": "Geçmiş başlıklarda yol hipnozu, sürücü psikolojisi veya zaman algısı sürüş ilişkisi işlenmemiştir."
+    },
+    {
+      "title": "Kedi ve Köpekler Neden Rüyalarında Koşar? Uykudaki Kas Kilidinin Sırrı! 🐱🐶💤 #bilgidozu #shorts",
+      "score": 92,
+      "reason": "Evcil hayvan sahiplerinin sıkça gördüğü ve merak ettiği çok sevimli ama bilimsel bir olayı ele alır.",
+      "duplicate_check": "Geçmiş başlıklarda kedilerin miyavlaması ve köpekbalığı koku alma duyusu işlenmiştir, evcil hayvanların rüya görme mekanizması işlenmemiştir."
     }
   ]
 }
