@@ -301,9 +301,22 @@ def _fix_code_error(log_tail: str, run_name: str) -> tuple[bool, str]:
 # ---------------------------------------------------------------- ana akış
 
 def _get_failed_runs() -> list[dict]:
-    since = (datetime.now(timezone.utc) - timedelta(hours=LOOKBACK_HOURS)).strftime("%Y-%m-%dT%H:%M:%SZ")
-    runs = _gh("GET", f"actions/runs?per_page=30&created={since}")
-    return [r for r in runs.get("workflow_runs", []) if r.get("conclusion") == "failure"]
+    # NOT: GitHub API "created" filtresi ">=YYYY-MM-DD" formatında çalışır; saat kısmı eklenince
+    # boş sonuç döner. Bu yüzden filtreyi tarih (gün) düzeyinde verip Python'da saat filtresi uygula.
+    since_dt = datetime.now(timezone.utc) - timedelta(hours=LOOKBACK_HOURS)
+    since_day = since_dt.strftime("%Y-%m-%d")
+    runs = _gh("GET", f"actions/runs?per_page=50&created=>={since_day}")
+    out = []
+    for r in runs.get("workflow_runs", []):
+        if r.get("conclusion") != "failure":
+            continue
+        try:
+            created = datetime.fromisoformat(r["created_at"].replace("Z", "+00:00"))
+        except Exception:
+            continue
+        if created >= since_dt:
+            out.append(r)
+    return out
 
 
 def _get_log_tail(run_id: int) -> str:
