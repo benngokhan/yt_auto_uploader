@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-13 12:21:35",
-  "generated_at_iso": "2026-11-13T12:21:35.724872+03:00",
+  "generated_at": "2026-11-13 12:24:15",
+  "generated_at_iso": "2026-11-13T12:24:15.246256+03:00",
   "folders": {
     "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
     "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
@@ -2839,10 +2839,10 @@
   ],
   "retention": {
     "info": {
-      "Dönem": "2026-10-13 — 2026-11-11",
-      "Hazırlanma (Türkiye)": "12.11.2026 12:25",
-      "Video sayısı": 97,
-      "Eğri verisi olan video": 10,
+      "Dönem": "2026-10-14 — 2026-11-12",
+      "Hazırlanma (Türkiye)": "13.11.2026 12:23",
+      "Video sayısı": 99,
+      "Eğri verisi olan video": 9,
       "Eğri kapsamı": "Son yayınlanan en fazla 10 video; veri varsa.",
       "Ortalama izlenen %": "Videonun ortalama izlenme yüzdesidir; 3. saniye tutma oranı değildir.",
       "3. saniye oranı": "En yakın zaman noktasındaki audienceWatchRatio × 100; yaklaşık değerdir.",
@@ -2850,17 +2850,17 @@
       "Eksik bilgi": "Boş hücre sıfır demek değildir. YouTube verileri 1–2 gün gecikebilir.",
       "Gizlilik": "Bu rapor yalnız özel Drive dosyasında tutulur; mevcut yayın tablosuna yazılmaz."
     },
-    "video_count": 97,
-    "curve_count": 10,
+    "video_count": 99,
+    "curve_count": 9,
     "metrics": [
       {
         "title": "Gece Yatakta Tek Ayağını Yorgandan Çıkarınca Neden Hemen Uykun Gelir? 🦶 #bilgidozu #shorts",
         "published_date": "2026-11-04",
         "duration_sec": 53.0,
-        "views": 1355,
+        "views": 1357,
         "avg_view_sec": 27.0,
-        "avg_view_pct": 51.11,
-        "watch_time_min": 348.0,
+        "avg_view_pct": 51.06,
+        "watch_time_min": 349.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/P4ReB0TGUwk",
@@ -2883,11 +2883,11 @@
         "title": "Mariana Çukuru Ne Kadar Derin? 🌊 #bilgidozu #shorts",
         "published_date": "2026-11-07",
         "duration_sec": 42.0,
-        "views": 1267,
+        "views": 1275,
         "avg_view_sec": 24.0,
-        "avg_view_pct": 57.22,
-        "watch_time_min": 265.0,
-        "hook_3s_pct": 108.32,
+        "avg_view_pct": 57.29,
+        "watch_time_min": 267.0,
+        "hook_3s_pct": 108.27,
         "curve_status": "Hazır",
         "url": "https://youtu.be/l6WhTkbP9yU",
         "video_id": "l6WhTkbP9yU"
@@ -3000,7 +3000,7 @@
         "title": "Karnında Bir Beyin Var! 🧠",
         "published_date": "2026-10-16",
         "duration_sec": 36.0,
-        "views": 1043,
+        "views": 1042,
         "avg_view_sec": 18.0,
         "avg_view_pct": 52.64,
         "watch_time_min": 96.0,
@@ -3023,19 +3023,6 @@
         "video_id": "KfHoxTt2y60"
       },
       {
-        "title": "99 Yılda Sadece 9 Damla Düştü: Dünyanın En Uzun Deneyi #Shorts #bilgiteknolojileri",
-        "published_date": "2026-10-16",
-        "duration_sec": 36.0,
-        "views": 1028,
-        "avg_view_sec": 23.0,
-        "avg_view_pct": 64.95,
-        "watch_time_min": 124.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/NGHtductf2Y",
-        "video_id": "NGHtductf2Y"
-      },
-      {
         "title": "Odaya Niçin Girdiğini Kapı Siliyor! 🚪",
         "published_date": "2026-10-15",
         "duration_sec": 36.0,
@@ -3047,6 +3034,19 @@
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/Es86PRkY1hw",
         "video_id": "Es86PRkY1hw"
+      },
+      {
+        "title": "99 Yılda Sadece 9 Damla Düştü: Dünyanın En Uzun Deneyi #Shorts #bilgiteknolojileri",
+        "published_date": "2026-10-16",
+        "duration_sec": 36.0,
+        "views": 1028,
+        "avg_view_sec": 23.0,
+        "avg_view_pct": 64.95,
+        "watch_time_min": 124.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/NGHtductf2Y",
+        "video_id": "NGHtductf2Y"
       },
       {
         "title": "Ağlamamak İçin Kendini Tuttuğunda Boğazına Neden Yumru Oturur? 😢 #bilgidozu #shorts",
@@ -3182,14 +3182,27 @@
         "title": "Baldır Kasların Aslında İkinci Kalbin! Kanı Kalbe Nasıl Taşıyor? 🦵💪 #bilgidozu #shorts",
         "published_date": "2026-10-27",
         "duration_sec": 54.0,
-        "views": 709,
+        "views": 711,
         "avg_view_sec": 21.0,
-        "avg_view_pct": 38.89,
-        "watch_time_min": 57.0,
+        "avg_view_pct": 39.46,
+        "watch_time_min": 58.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/8HI5KUWLQuM",
         "video_id": "8HI5KUWLQuM"
+      },
+      {
+        "title": "Benzin Pompası Depo Dolunca Çipsiz ve Sensörsüz Nasıl Kendi Durur? ⛽ #bilgidozu #shorts",
+        "published_date": "2026-11-08",
+        "duration_sec": 51.0,
+        "views": 666,
+        "avg_view_sec": 42.0,
+        "avg_view_pct": 82.42,
+        "watch_time_min": 181.0,
+        "hook_3s_pct": 133.33,
+        "curve_status": "Hazır",
+        "url": "https://youtu.be/0poEsgrpgIM",
+        "video_id": "0poEsgrpgIM"
       },
       {
         "title": "Kışın Kalbi Durup Buz Tutan, Baharda Çözülüp Canlanan Kurbağa! 🐸❄️ #bilgidozu #shorts",
@@ -3205,17 +3218,17 @@
         "video_id": "jrySNivbPcQ"
       },
       {
-        "title": "Benzin Pompası Depo Dolunca Çipsiz ve Sensörsüz Nasıl Kendi Durur? ⛽ #bilgidozu #shorts",
-        "published_date": "2026-11-08",
-        "duration_sec": 51.0,
-        "views": 642,
-        "avg_view_sec": 43.0,
-        "avg_view_pct": 85.0,
-        "watch_time_min": 176.0,
-        "hook_3s_pct": 135.19,
+        "title": "Gözlerin Açıkken Hapşırmak Neden İmkansız? Beynin O Salisede Ne Yapar? 🤧 #bilgidozu #shorts",
+        "published_date": "2026-11-09",
+        "duration_sec": 50.0,
+        "views": 634,
+        "avg_view_sec": 25.0,
+        "avg_view_pct": 50.23,
+        "watch_time_min": 89.0,
+        "hook_3s_pct": 104.64,
         "curve_status": "Hazır",
-        "url": "https://youtu.be/0poEsgrpgIM",
-        "video_id": "0poEsgrpgIM"
+        "url": "https://youtu.be/edfxi8rEQVI",
+        "video_id": "edfxi8rEQVI"
       },
       {
         "title": "Sabah Uyandığında Boyun Geceye Göre Neden 2 Santim Daha Uzun Çıkar? 📏 #bilgidozu #shorts",
@@ -3273,10 +3286,10 @@
         "title": "Üzgün Olmasan Bile Her 5 Dakikada Bir Neden Fark Etmeden İç Çekersin? 🫁 #bilgidozu #shorts",
         "published_date": "2026-11-05",
         "duration_sec": 58.0,
-        "views": 497,
-        "avg_view_sec": 18.0,
-        "avg_view_pct": 32.22,
-        "watch_time_min": 51.0,
+        "views": 499,
+        "avg_view_sec": 19.0,
+        "avg_view_pct": 32.76,
+        "watch_time_min": 53.0,
         "hook_3s_pct": 100.0,
         "curve_status": "Hazır",
         "url": "https://youtu.be/m1O6pNJvPwQ",
@@ -3296,19 +3309,6 @@
         "video_id": "DDdoh5PRoQQ"
       },
       {
-        "title": "Deja Vu: Beyninin Zaman Hatası! 🧠 #Shorts",
-        "published_date": "2026-10-11",
-        "duration_sec": 36.0,
-        "views": 457,
-        "avg_view_sec": 18.0,
-        "avg_view_pct": 51.17,
-        "watch_time_min": 33.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/BOmRddkkZfE",
-        "video_id": "BOmRddkkZfE"
-      },
-      {
         "title": "Gözünde Bir Kör Nokta Var — Beynin Boşluğu Gizliyor! 👁️🧠 #bilgidozu #shorts",
         "published_date": "2026-10-23",
         "duration_sec": 40.0,
@@ -3325,40 +3325,40 @@
         "title": "Çok Tuzlu Çekirdek Yediğinde Dudakların Neden Kuruyup Büzüşür? 🧂 #bilgidozu #shorts",
         "published_date": "2026-11-05",
         "duration_sec": 53.0,
-        "views": 432,
+        "views": 434,
         "avg_view_sec": 23.0,
-        "avg_view_pct": 43.44,
+        "avg_view_pct": 43.57,
         "watch_time_min": 56.0,
-        "hook_3s_pct": 103.73,
-        "curve_status": "Hazır",
-        "url": "https://youtu.be/DFOAE6foZ8E",
-        "video_id": "DFOAE6foZ8E"
-      },
-      {
-        "title": "Uyurken Beynin İsmini Kontrol Ediyor! 👂",
-        "published_date": "2026-10-18",
-        "duration_sec": 36.0,
-        "views": 411,
-        "avg_view_sec": 18.0,
-        "avg_view_pct": 50.75,
-        "watch_time_min": 31.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/TTquqw3WSTg",
-        "video_id": "TTquqw3WSTg"
+        "url": "https://youtu.be/DFOAE6foZ8E",
+        "video_id": "DFOAE6foZ8E"
       },
       {
         "title": "Efsanevi Şam Çeliği Kılıçların İçinden Karbon Nanotüp Çıktı! ⚔️ #bilgidozu #shorts",
         "published_date": "2026-11-08",
         "duration_sec": 54.0,
-        "views": 410,
-        "avg_view_sec": 25.0,
-        "avg_view_pct": 47.02,
-        "watch_time_min": 62.0,
-        "hook_3s_pct": 105.88,
+        "views": 428,
+        "avg_view_sec": 24.0,
+        "avg_view_pct": 46.09,
+        "watch_time_min": 65.0,
+        "hook_3s_pct": 105.52,
         "curve_status": "Hazır",
         "url": "https://youtu.be/HpSHy45_L6g",
         "video_id": "HpSHy45_L6g"
+      },
+      {
+        "title": "Uyurken Beynin İsmini Kontrol Ediyor! 👂",
+        "published_date": "2026-10-18",
+        "duration_sec": 36.0,
+        "views": 410,
+        "avg_view_sec": 18.0,
+        "avg_view_pct": 51.2,
+        "watch_time_min": 31.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/TTquqw3WSTg",
+        "video_id": "TTquqw3WSTg"
       },
       {
         "title": "Buzun Üzeri Neden Kaygandır: Eksi Derecede Bile Akan Gizli Katman! 🧊 #bilgidozu #shorts",
@@ -3387,30 +3387,30 @@
         "video_id": "UiqMegJbkJ8"
       },
       {
+        "title": "Mikrodalga Fırın Camındaki Delikli Siyah Tel Neden Var? ⚡ #bilgidozu #shorts",
+        "published_date": "2026-11-09",
+        "duration_sec": 54.0,
+        "views": 398,
+        "avg_view_sec": 32.0,
+        "avg_view_pct": 59.86,
+        "watch_time_min": 91.0,
+        "hook_3s_pct": 109.88,
+        "curve_status": "Hazır",
+        "url": "https://youtu.be/jaXF4A5Erek",
+        "video_id": "jaXF4A5Erek"
+      },
+      {
         "title": "Aynı Kelimeyi 20 Kez Söyleyince Neden Anlamı Bir Anda Silinir? 🧠 #bilgidozu #shorts",
         "published_date": "2026-11-03",
         "duration_sec": 53.0,
-        "views": 367,
+        "views": 371,
         "avg_view_sec": 27.0,
-        "avg_view_pct": 52.64,
+        "avg_view_pct": 52.47,
         "watch_time_min": 70.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/YtvsarKc75s",
         "video_id": "YtvsarKc75s"
-      },
-      {
-        "title": "Uykuya Dalarken Niçin Düşersin? 😴",
-        "published_date": "2026-10-13",
-        "duration_sec": 36.0,
-        "views": 348,
-        "avg_view_sec": 15.0,
-        "avg_view_pct": 42.84,
-        "watch_time_min": 22.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/_weo5Nxygkc",
-        "video_id": "_weo5Nxygkc"
       },
       {
         "title": "Ahtapotun Bir Değil Üç Kalbi Var (Kanı da Mavi) #Shorts",
@@ -3439,17 +3439,17 @@
         "video_id": "5b2Xru597kk"
       },
       {
-        "title": "Gözlerin Açıkken Hapşırmak Neden İmkansız? Beynin O Salisede Ne Yapar? 🤧 #bilgidozu #shorts",
-        "published_date": "2026-11-09",
-        "duration_sec": 50.0,
-        "views": 280,
-        "avg_view_sec": 23.0,
-        "avg_view_pct": 46.99,
-        "watch_time_min": 38.0,
-        "hook_3s_pct": 102.2,
+        "title": "Elektrikli Yılan Balığı 860 Volt Elektrik Üretirken Kendini Neden Çarpmaz? ⚡ #bilgidozu #shorts",
+        "published_date": "2026-11-10",
+        "duration_sec": 53.0,
+        "views": 287,
+        "avg_view_sec": 32.0,
+        "avg_view_pct": 61.44,
+        "watch_time_min": 68.0,
+        "hook_3s_pct": 108.33,
         "curve_status": "Hazır",
-        "url": "https://youtu.be/edfxi8rEQVI",
-        "video_id": "edfxi8rEQVI"
+        "url": "https://youtu.be/mWlIdAEN5qA",
+        "video_id": "mWlIdAEN5qA"
       },
       {
         "title": "Göz Kapağın Neden Kendi Kendine Seğirir? Anlamı Bu! 👁🧠 #bilgidozu #shorts",
@@ -3463,19 +3463,6 @@
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/obPceKVDg3k",
         "video_id": "obPceKVDg3k"
-      },
-      {
-        "title": "Mikrodalga Fırın Camındaki Delikli Siyah Tel Neden Var? ⚡ #bilgidozu #shorts",
-        "published_date": "2026-11-09",
-        "duration_sec": 54.0,
-        "views": 242,
-        "avg_view_sec": 35.0,
-        "avg_view_pct": 65.29,
-        "watch_time_min": 56.0,
-        "hook_3s_pct": 112.09,
-        "curve_status": "Hazır",
-        "url": "https://youtu.be/jaXF4A5Erek",
-        "video_id": "jaXF4A5Erek"
       },
       {
         "title": "Karadelikler Elektrik Süpürgesi Değil! NASA Açıkladı 🕳️✨ #bilgidozu #shorts",
@@ -3520,9 +3507,9 @@
         "title": "İlk Yudum Su Daha Kana Karışmadan Susuzluğunu Nasıl Anında Keser? 💧 #bilgidozu #shorts",
         "published_date": "2026-10-31",
         "duration_sec": 55.0,
-        "views": 181,
-        "avg_view_sec": 31.0,
-        "avg_view_pct": 57.29,
+        "views": 182,
+        "avg_view_sec": 30.0,
+        "avg_view_pct": 56.2,
         "watch_time_min": 28.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
@@ -3556,6 +3543,19 @@
         "video_id": "SBOuforDIV4"
       },
       {
+        "title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
+        "published_date": "2026-11-06",
+        "duration_sec": 215.0,
+        "views": 156,
+        "avg_view_sec": 37.0,
+        "avg_view_pct": 17.52,
+        "watch_time_min": 94.0,
+        "hook_3s_pct": 99.33,
+        "curve_status": "Hazır",
+        "url": "https://youtu.be/WRLtRGqYpY8",
+        "video_id": "WRLtRGqYpY8"
+      },
+      {
         "title": "Bu Minik Karides Avını Kıskacıyla Değil, Patlayan Kabarcıkla Vuruyor! 🦐💥 #bilgidozu #shorts",
         "published_date": "2026-10-24",
         "duration_sec": 38.0,
@@ -3567,19 +3567,6 @@
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/07gRpcD8Hp0",
         "video_id": "07gRpcD8Hp0"
-      },
-      {
-        "title": "Okyanusta Kendi Işığını Üreten Canlılar: Soğuk Işık, Av Tuzağı ve Karşı Aydınlatma! 🌊✨ #bilgidozu",
-        "published_date": "2026-11-06",
-        "duration_sec": 215.0,
-        "views": 150,
-        "avg_view_sec": 38.0,
-        "avg_view_pct": 18.05,
-        "watch_time_min": 93.0,
-        "hook_3s_pct": 99.3,
-        "curve_status": "Hazır",
-        "url": "https://youtu.be/WRLtRGqYpY8",
-        "video_id": "WRLtRGqYpY8"
       },
       {
         "title": "Güneşe Dönünce Hapşırıyor musun? Bu Bir Refleks: ACHOO! ☀️🤧 #bilgidozu #shorts",
@@ -3595,6 +3582,19 @@
         "video_id": "LGXmOwTtGOw"
       },
       {
+        "title": "Sevdiğin Birine Bakınca Göz Bebeğin Neden Otomatik Büyür? 👀 #bilgidozu #shorts",
+        "published_date": "2026-10-28",
+        "duration_sec": 41.0,
+        "views": 147,
+        "avg_view_sec": 20.0,
+        "avg_view_pct": 50.65,
+        "watch_time_min": 15.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/0vGKrBpJh0Q",
+        "video_id": "0vGKrBpJh0Q"
+      },
+      {
         "title": "Gekolar Cam ve Tavanda Yapıştırıcı Olmadan Nasıl Düşmeden Yürüyor? 🦎🧲 #bilgidozu #shorts",
         "published_date": "2026-10-25",
         "duration_sec": 43.0,
@@ -3608,19 +3608,6 @@
         "video_id": "DrqVzn372Hk"
       },
       {
-        "title": "Sevdiğin Birine Bakınca Göz Bebeğin Neden Otomatik Büyür? 👀 #bilgidozu #shorts",
-        "published_date": "2026-10-28",
-        "duration_sec": 41.0,
-        "views": 146,
-        "avg_view_sec": 20.0,
-        "avg_view_pct": 49.43,
-        "watch_time_min": 15.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/0vGKrBpJh0Q",
-        "video_id": "0vGKrBpJh0Q"
-      },
-      {
         "title": "Saate İlk Baktığın Saniye Neden Donmuş Gibi Daha Uzun Sürer? ⏱️ #bilgidozu #shorts",
         "published_date": "2026-11-04",
         "duration_sec": 55.0,
@@ -3628,8 +3615,8 @@
         "avg_view_sec": 28.0,
         "avg_view_pct": 52.37,
         "watch_time_min": 24.0,
-        "hook_3s_pct": 110.2,
-        "curve_status": "Hazır",
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
         "url": "https://youtu.be/YaQm-1T0fxA",
         "video_id": "YaQm-1T0fxA"
       },
@@ -3780,10 +3767,10 @@
         "title": "Odaya Niçin Girdiğinizi Kapı Siliyor! 🧠 #Shorts",
         "published_date": "2026-10-11",
         "duration_sec": 31.0,
-        "views": 28,
-        "avg_view_sec": 8.0,
-        "avg_view_pct": 28.01,
-        "watch_time_min": 1.0,
+        "views": 26,
+        "avg_view_sec": 6.0,
+        "avg_view_pct": 22.39,
+        "watch_time_min": 0.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/SREO3qV8yuc",
@@ -3793,9 +3780,9 @@
         "title": "Bu Köpekbalığı 400 Yaşında Olabilir! 🦈 #shorts",
         "published_date": "2026-09-24",
         "duration_sec": 11.0,
-        "views": 25,
+        "views": 23,
         "avg_view_sec": 7.0,
-        "avg_view_pct": 69.9,
+        "avg_view_pct": 65.99,
         "watch_time_min": 1.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
@@ -3803,25 +3790,12 @@
         "video_id": "uae2IJoZMb8"
       },
       {
-        "title": "Bankanız Batsa Paranız Güvencede: TMSF Gerçeği! 🧠 #Shorts",
-        "published_date": "2026-10-13",
-        "duration_sec": 36.0,
-        "views": 25,
-        "avg_view_sec": 15.0,
-        "avg_view_pct": 42.38,
-        "watch_time_min": 2.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/mWJEOqczBaQ",
-        "video_id": "mWJEOqczBaQ"
-      },
-      {
         "title": "Günde Kaç Saat Kaydırıyorsun? 😳",
         "published_date": "2026-09-21",
         "duration_sec": 46.0,
-        "views": 21,
-        "avg_view_sec": 9.0,
-        "avg_view_pct": 19.74,
+        "views": 20,
+        "avg_view_sec": 8.0,
+        "avg_view_pct": 17.45,
         "watch_time_min": 2.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
@@ -3829,56 +3803,69 @@
         "video_id": "_agvVDP_Dcg"
       },
       {
-        "title": "Sen Uyurken Beynin Yıkanıyor! 🧠 #Shorts",
-        "published_date": "2026-10-11",
-        "duration_sec": 36.0,
-        "views": 19,
-        "avg_view_sec": 13.0,
-        "avg_view_pct": 36.45,
-        "watch_time_min": 2.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/4TU_VDiQvzA",
-        "video_id": "4TU_VDiQvzA"
-      },
-      {
-        "title": "Beyniniz Ağrıyı Hissedemez! 🧠 #Shorts",
-        "published_date": "2026-10-10",
-        "duration_sec": 36.0,
-        "views": 17,
-        "avg_view_sec": 15.0,
-        "avg_view_pct": 44.01,
-        "watch_time_min": 2.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/h3kYyYVeEsY",
-        "video_id": "h3kYyYVeEsY"
-      },
-      {
-        "title": "22 Eylül 2026",
-        "published_date": "2026-09-21",
-        "duration_sec": 40.0,
-        "views": 16,
-        "avg_view_sec": 14.0,
-        "avg_view_pct": 35.46,
-        "watch_time_min": 2.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/XbjukOkKz6M",
-        "video_id": "XbjukOkKz6M"
-      },
-      {
         "title": "Karanlıkta Gözümüz Gece Görüşünü Nasıl Açar? Korsan Bandı ve Rodopsin Sırrı 👁️ #bilgidozu",
         "published_date": "2026-10-30",
         "duration_sec": 119.0,
-        "views": 16,
-        "avg_view_sec": 17.0,
-        "avg_view_pct": 14.72,
-        "watch_time_min": 2.0,
+        "views": 19,
+        "avg_view_sec": 15.0,
+        "avg_view_pct": 12.87,
+        "watch_time_min": 3.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/QhqHWaVWLJY",
         "video_id": "QhqHWaVWLJY"
+      },
+      {
+        "title": "Bankanız Batsa Paranız Güvencede: TMSF Gerçeği! 🧠 #Shorts",
+        "published_date": "2026-10-13",
+        "duration_sec": 36.0,
+        "views": 19,
+        "avg_view_sec": 20.0,
+        "avg_view_pct": 56.99,
+        "watch_time_min": 2.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/mWJEOqczBaQ",
+        "video_id": "mWJEOqczBaQ"
+      },
+      {
+        "title": "Uykuya Dalarken Niçin Düşersin? 😴",
+        "published_date": "2026-10-13",
+        "duration_sec": 36.0,
+        "views": 18,
+        "avg_view_sec": 17.0,
+        "avg_view_pct": 48.87,
+        "watch_time_min": 3.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/_weo5Nxygkc",
+        "video_id": "_weo5Nxygkc"
+      },
+      {
+        "title": "Doğa İnsandan Daha Zeki! İnsan Aklını Aşan 3 Gizli Deha 🧠🦅 #bilgidozu",
+        "published_date": "2026-10-18",
+        "duration_sec": 106.0,
+        "views": 17,
+        "avg_view_sec": 14.0,
+        "avg_view_pct": 14.04,
+        "watch_time_min": 4.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/eAnBBamiD1U",
+        "video_id": "eAnBBamiD1U"
+      },
+      {
+        "title": "Sen Uyurken Beynin Yıkanıyor! 🧠 #Shorts",
+        "published_date": "2026-10-11",
+        "duration_sec": 36.0,
+        "views": 17,
+        "avg_view_sec": 11.0,
+        "avg_view_pct": 31.22,
+        "watch_time_min": 1.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/4TU_VDiQvzA",
+        "video_id": "4TU_VDiQvzA"
       },
       {
         "title": "Venüs'te Bir Gün, Bir Yıldan Uzun! 🤯 Uzay Hakkında 3 Gerçek #shorts",
@@ -3894,17 +3881,30 @@
         "video_id": "e0cA_Aji83w"
       },
       {
-        "title": "Doğa İnsandan Daha Zeki! İnsan Aklını Aşan 3 Gizli Deha 🧠🦅 #bilgidozu",
-        "published_date": "2026-10-18",
-        "duration_sec": 106.0,
-        "views": 15,
-        "avg_view_sec": 16.0,
-        "avg_view_pct": 15.73,
-        "watch_time_min": 4.0,
+        "title": "Beyniniz Ağrıyı Hissedemez! 🧠 #Shorts",
+        "published_date": "2026-10-10",
+        "duration_sec": 36.0,
+        "views": 16,
+        "avg_view_sec": 13.0,
+        "avg_view_pct": 37.67,
+        "watch_time_min": 1.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/eAnBBamiD1U",
-        "video_id": "eAnBBamiD1U"
+        "url": "https://youtu.be/h3kYyYVeEsY",
+        "video_id": "h3kYyYVeEsY"
+      },
+      {
+        "title": "22 Eylül 2026",
+        "published_date": "2026-09-21",
+        "duration_sec": 40.0,
+        "views": 15,
+        "avg_view_sec": 14.0,
+        "avg_view_pct": 36.23,
+        "watch_time_min": 2.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/XbjukOkKz6M",
+        "video_id": "XbjukOkKz6M"
       },
       {
         "title": "İstikrarlı Olmak Neden Bu Kadar Zor? (Ve Nasıl Zahmetsiz Hale Gelir?)",
@@ -3923,9 +3923,9 @@
         "title": "Beynin Kararı Senden Önce Biliyor! 🧠 #Shorts",
         "published_date": "2026-10-12",
         "duration_sec": 36.0,
-        "views": 14,
+        "views": 12,
         "avg_view_sec": 5.0,
-        "avg_view_pct": 16.25,
+        "avg_view_pct": 14.17,
         "watch_time_min": 0.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
@@ -3933,26 +3933,13 @@
         "video_id": "r94N2FfcDl8"
       },
       {
-        "title": "Zaman Beyninde Yavaşlamaz, Yoğunlaşır! 🧠 #Shorts",
-        "published_date": "2026-10-12",
-        "duration_sec": 36.0,
-        "views": 13,
-        "avg_view_sec": 15.0,
-        "avg_view_pct": 42.37,
-        "watch_time_min": 1.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/VJGkf3fA-LI",
-        "video_id": "VJGkf3fA-LI"
-      },
-      {
         "title": "10 Saniyede 3 Şaşırtıcı Gerçek — Bölüm 2 | #Shorts",
         "published_date": "2026-09-24",
         "duration_sec": 16.0,
-        "views": 11,
-        "avg_view_sec": 10.0,
-        "avg_view_pct": 65.57,
-        "watch_time_min": 1.0,
+        "views": 10,
+        "avg_view_sec": 11.0,
+        "avg_view_pct": 74.3,
+        "watch_time_min": 0.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/P7yW5vbv-8k",
@@ -3962,9 +3949,9 @@
         "title": "Anılarınız Her Hatırlayışta Yeniden Yazılıyor! 🧠 #Shorts",
         "published_date": "2026-10-10",
         "duration_sec": 36.0,
-        "views": 11,
-        "avg_view_sec": 18.0,
-        "avg_view_pct": 51.31,
+        "views": 10,
+        "avg_view_sec": 14.0,
+        "avg_view_pct": 41.62,
         "watch_time_min": 1.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
@@ -3972,17 +3959,30 @@
         "video_id": "xay0KAwfl34"
       },
       {
-        "title": "Şehrin İhtiyacı Olan 8 Şey (Hepsi Gerçek)",
-        "published_date": "2026-09-24",
-        "duration_sec": 181.0,
-        "views": 9,
-        "avg_view_sec": 26.0,
-        "avg_view_pct": 14.55,
-        "watch_time_min": 3.0,
+        "title": "Deja Vu: Beyninin Zaman Hatası! 🧠 #Shorts",
+        "published_date": "2026-10-11",
+        "duration_sec": 36.0,
+        "views": 10,
+        "avg_view_sec": 0.0,
+        "avg_view_pct": 0.0,
+        "watch_time_min": 0.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/tQJg3mG2Kvo",
-        "video_id": "tQJg3mG2Kvo"
+        "url": "https://youtu.be/BOmRddkkZfE",
+        "video_id": "BOmRddkkZfE"
+      },
+      {
+        "title": "Paskalya Adası'ndaki 80 Tonluk Dev Taş Heykeller Nasıl Yürütüldü? 🗿 #bilgidozu #shorts",
+        "published_date": "2026-11-10",
+        "duration_sec": 54.0,
+        "views": 10,
+        "avg_view_sec": 23.0,
+        "avg_view_pct": 42.83,
+        "watch_time_min": 1.0,
+        "hook_3s_pct": null,
+        "curve_status": "Veri yok",
+        "url": "https://youtu.be/vJW-L_tAeTo",
+        "video_id": "vJW-L_tAeTo"
       },
       {
         "title": "Mars'ta Mavi Gün Batımı mı? 3 Şaşırtıcı Gerçek | #Shorts",
@@ -3998,10 +3998,36 @@
         "video_id": "c12v1QSDg5E"
       },
       {
+        "title": "Zaman Beyninde Yavaşlamaz, Yoğunlaşır! 🧠 #Shorts",
+        "published_date": "2026-10-12",
+        "duration_sec": 36.0,
+        "views": 9,
+        "avg_view_sec": 15.0,
+        "avg_view_pct": 43.12,
+        "watch_time_min": 1.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/VJGkf3fA-LI",
+        "video_id": "VJGkf3fA-LI"
+      },
+      {
+        "title": "Şehrin İhtiyacı Olan 8 Şey (Hepsi Gerçek)",
+        "published_date": "2026-09-24",
+        "duration_sec": 181.0,
+        "views": 9,
+        "avg_view_sec": 26.0,
+        "avg_view_pct": 14.55,
+        "watch_time_min": 3.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/tQJg3mG2Kvo",
+        "video_id": "tQJg3mG2Kvo"
+      },
+      {
         "title": "Beyniniz 20 Watt ile Çalışıyor! 🧠 #Shorts",
         "published_date": "2026-10-10",
         "duration_sec": 36.0,
-        "views": 9,
+        "views": 8,
         "avg_view_sec": 24.0,
         "avg_view_pct": 67.78,
         "watch_time_min": 0.0,
@@ -4009,45 +4035,6 @@
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/RwcXzEOpFDE",
         "video_id": "RwcXzEOpFDE"
-      },
-      {
-        "title": "İkinci Beyniniz Karnınızda! 🧠 #Shorts",
-        "published_date": "2026-10-10",
-        "duration_sec": 36.0,
-        "views": 9,
-        "avg_view_sec": 20.0,
-        "avg_view_pct": 57.01,
-        "watch_time_min": 1.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/sPERykVE-cM",
-        "video_id": "sPERykVE-cM"
-      },
-      {
-        "title": "Odaklanınca Gorilayı Göremezsin! 🧠 #Shorts",
-        "published_date": "2026-10-12",
-        "duration_sec": 36.0,
-        "views": 9,
-        "avg_view_sec": 7.0,
-        "avg_view_pct": 19.72,
-        "watch_time_min": 0.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/PQYWNjOvUvs",
-        "video_id": "PQYWNjOvUvs"
-      },
-      {
-        "title": "Beynin Sana Yalan Söylüyor! 🧠 #shorts",
-        "published_date": "2026-09-22",
-        "duration_sec": 19.0,
-        "views": 8,
-        "avg_view_sec": 14.0,
-        "avg_view_pct": 75.05,
-        "watch_time_min": 1.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/jo5mDrRkROY",
-        "video_id": "jo5mDrRkROY"
       },
       {
         "title": "Kleopatra piramitlerden çok bize yakın ⏳ #shorts",
@@ -4063,19 +4050,6 @@
         "video_id": "w0X3T08NOiI"
       },
       {
-        "title": "Doğanın En Tuhaf 3 Gerçeği 🤯 (# Shorts!)",
-        "published_date": "2026-09-24",
-        "duration_sec": 12.0,
-        "views": 8,
-        "avg_view_sec": 10.0,
-        "avg_view_pct": 91.06,
-        "watch_time_min": 0.0,
-        "hook_3s_pct": null,
-        "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/uAL5ygdZxr8",
-        "video_id": "uAL5ygdZxr8"
-      },
-      {
         "title": "İlk webcam'in izlediği şeye inanamayacaksın ☕🤯",
         "published_date": "2026-09-24",
         "duration_sec": 21.0,
@@ -4089,17 +4063,43 @@
         "video_id": "yBetRsBy0TE"
       },
       {
-        "title": "Ahtapotların 3 Kalbi Var! 🐙 Hayvanlar Hakkında 3 Şaşırtıcı Gerçek #shorts",
-        "published_date": "2026-09-24",
-        "duration_sec": 11.0,
+        "title": "Beynin Sana Yalan Söylüyor! 🧠 #shorts",
+        "published_date": "2026-09-22",
+        "duration_sec": 19.0,
         "views": 7,
-        "avg_view_sec": 10.0,
-        "avg_view_pct": 95.45,
+        "avg_view_sec": 15.0,
+        "avg_view_pct": 80.39,
+        "watch_time_min": 1.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/jo5mDrRkROY",
+        "video_id": "jo5mDrRkROY"
+      },
+      {
+        "title": "Doğanın En Tuhaf 3 Gerçeği 🤯 (# Shorts!)",
+        "published_date": "2026-09-24",
+        "duration_sec": 12.0,
+        "views": 7,
+        "avg_view_sec": 9.0,
+        "avg_view_pct": 75.46,
         "watch_time_min": 0.0,
         "hook_3s_pct": null,
         "curve_status": "İncelenmedi",
-        "url": "https://youtu.be/tI1B2NofdLY",
-        "video_id": "tI1B2NofdLY"
+        "url": "https://youtu.be/uAL5ygdZxr8",
+        "video_id": "uAL5ygdZxr8"
+      },
+      {
+        "title": "İkinci Beyniniz Karnınızda! 🧠 #Shorts",
+        "published_date": "2026-10-10",
+        "duration_sec": 36.0,
+        "views": 7,
+        "avg_view_sec": 23.0,
+        "avg_view_pct": 65.23,
+        "watch_time_min": 0.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/sPERykVE-cM",
+        "video_id": "sPERykVE-cM"
       },
       {
         "title": "Maratonu bir kraliyet isteği uzattı 👑",
@@ -4113,9 +4113,541 @@
         "curve_status": "İncelenmedi",
         "url": "https://youtu.be/lmAwoqHmYoo",
         "video_id": "lmAwoqHmYoo"
+      },
+      {
+        "title": "Ahtapotların 3 Kalbi Var! 🐙 Hayvanlar Hakkında 3 Şaşırtıcı Gerçek #shorts",
+        "published_date": "2026-09-24",
+        "duration_sec": 11.0,
+        "views": 6,
+        "avg_view_sec": 10.0,
+        "avg_view_pct": 95.45,
+        "watch_time_min": 0.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/tI1B2NofdLY",
+        "video_id": "tI1B2NofdLY"
+      },
+      {
+        "title": "Odaklanınca Gorilayı Göremezsin! 🧠 #Shorts",
+        "published_date": "2026-10-12",
+        "duration_sec": 36.0,
+        "views": 6,
+        "avg_view_sec": 7.0,
+        "avg_view_pct": 19.72,
+        "watch_time_min": 0.0,
+        "hook_3s_pct": null,
+        "curve_status": "İncelenmedi",
+        "url": "https://youtu.be/PQYWNjOvUvs",
+        "video_id": "PQYWNjOvUvs"
       }
     ],
     "curves": [
+      {
+        "video_id": "mWlIdAEN5qA",
+        "title": "Elektrikli Yılan Balığı 860 Volt Elektrik Üretirken Kendini Neden Çarpmaz? ⚡ #bilgidozu #shorts",
+        "points": [
+          {
+            "ratio": 1.0,
+            "sec": 0.53,
+            "pct": 113.33
+          },
+          {
+            "ratio": 2.0,
+            "sec": 1.06,
+            "pct": 114.17
+          },
+          {
+            "ratio": 3.0,
+            "sec": 1.59,
+            "pct": 112.5
+          },
+          {
+            "ratio": 4.0,
+            "sec": 2.12,
+            "pct": 110.83
+          },
+          {
+            "ratio": 5.0,
+            "sec": 2.65,
+            "pct": 109.17
+          },
+          {
+            "ratio": 6.0,
+            "sec": 3.18,
+            "pct": 108.33
+          },
+          {
+            "ratio": 7.0,
+            "sec": 3.71,
+            "pct": 108.33
+          },
+          {
+            "ratio": 8.0,
+            "sec": 4.24,
+            "pct": 107.5
+          },
+          {
+            "ratio": 9.0,
+            "sec": 4.77,
+            "pct": 106.67
+          },
+          {
+            "ratio": 10.0,
+            "sec": 5.3,
+            "pct": 104.17
+          },
+          {
+            "ratio": 11.0,
+            "sec": 5.83,
+            "pct": 100.83
+          },
+          {
+            "ratio": 12.0,
+            "sec": 6.36,
+            "pct": 99.17
+          },
+          {
+            "ratio": 13.0,
+            "sec": 6.89,
+            "pct": 96.67
+          },
+          {
+            "ratio": 14.0,
+            "sec": 7.42,
+            "pct": 92.5
+          },
+          {
+            "ratio": 15.0,
+            "sec": 7.95,
+            "pct": 91.67
+          },
+          {
+            "ratio": 16.0,
+            "sec": 8.48,
+            "pct": 90.0
+          },
+          {
+            "ratio": 17.0,
+            "sec": 9.01,
+            "pct": 88.33
+          },
+          {
+            "ratio": 18.0,
+            "sec": 9.54,
+            "pct": 85.83
+          },
+          {
+            "ratio": 19.0,
+            "sec": 10.07,
+            "pct": 81.67
+          },
+          {
+            "ratio": 20.0,
+            "sec": 10.6,
+            "pct": 80.0
+          },
+          {
+            "ratio": 21.0,
+            "sec": 11.13,
+            "pct": 79.17
+          },
+          {
+            "ratio": 22.0,
+            "sec": 11.66,
+            "pct": 76.67
+          },
+          {
+            "ratio": 23.0,
+            "sec": 12.19,
+            "pct": 76.67
+          },
+          {
+            "ratio": 24.0,
+            "sec": 12.72,
+            "pct": 75.0
+          },
+          {
+            "ratio": 25.0,
+            "sec": 13.25,
+            "pct": 74.17
+          },
+          {
+            "ratio": 26.0,
+            "sec": 13.78,
+            "pct": 75.0
+          },
+          {
+            "ratio": 27.0,
+            "sec": 14.31,
+            "pct": 74.17
+          },
+          {
+            "ratio": 28.0,
+            "sec": 14.84,
+            "pct": 71.67
+          },
+          {
+            "ratio": 29.0,
+            "sec": 15.37,
+            "pct": 68.33
+          },
+          {
+            "ratio": 30.0,
+            "sec": 15.9,
+            "pct": 67.5
+          },
+          {
+            "ratio": 31.0,
+            "sec": 16.43,
+            "pct": 66.67
+          },
+          {
+            "ratio": 32.0,
+            "sec": 16.96,
+            "pct": 65.83
+          },
+          {
+            "ratio": 33.0,
+            "sec": 17.49,
+            "pct": 65.83
+          },
+          {
+            "ratio": 34.0,
+            "sec": 18.02,
+            "pct": 65.83
+          },
+          {
+            "ratio": 35.0,
+            "sec": 18.55,
+            "pct": 65.83
+          },
+          {
+            "ratio": 36.0,
+            "sec": 19.08,
+            "pct": 65.0
+          },
+          {
+            "ratio": 37.0,
+            "sec": 19.61,
+            "pct": 64.17
+          },
+          {
+            "ratio": 38.0,
+            "sec": 20.14,
+            "pct": 63.33
+          },
+          {
+            "ratio": 39.0,
+            "sec": 20.67,
+            "pct": 62.5
+          },
+          {
+            "ratio": 40.0,
+            "sec": 21.2,
+            "pct": 60.83
+          },
+          {
+            "ratio": 41.0,
+            "sec": 21.73,
+            "pct": 60.83
+          },
+          {
+            "ratio": 42.0,
+            "sec": 22.26,
+            "pct": 60.83
+          },
+          {
+            "ratio": 43.0,
+            "sec": 22.79,
+            "pct": 60.83
+          },
+          {
+            "ratio": 44.0,
+            "sec": 23.32,
+            "pct": 60.83
+          },
+          {
+            "ratio": 45.0,
+            "sec": 23.85,
+            "pct": 60.0
+          },
+          {
+            "ratio": 46.0,
+            "sec": 24.38,
+            "pct": 60.0
+          },
+          {
+            "ratio": 47.0,
+            "sec": 24.91,
+            "pct": 60.0
+          },
+          {
+            "ratio": 48.0,
+            "sec": 25.44,
+            "pct": 58.33
+          },
+          {
+            "ratio": 49.0,
+            "sec": 25.97,
+            "pct": 58.33
+          },
+          {
+            "ratio": 50.0,
+            "sec": 26.5,
+            "pct": 57.5
+          },
+          {
+            "ratio": 51.0,
+            "sec": 27.03,
+            "pct": 57.5
+          },
+          {
+            "ratio": 52.0,
+            "sec": 27.56,
+            "pct": 56.67
+          },
+          {
+            "ratio": 53.0,
+            "sec": 28.09,
+            "pct": 55.83
+          },
+          {
+            "ratio": 54.0,
+            "sec": 28.62,
+            "pct": 55.0
+          },
+          {
+            "ratio": 55.0,
+            "sec": 29.15,
+            "pct": 55.0
+          },
+          {
+            "ratio": 56.0,
+            "sec": 29.68,
+            "pct": 55.0
+          },
+          {
+            "ratio": 57.0,
+            "sec": 30.21,
+            "pct": 53.33
+          },
+          {
+            "ratio": 58.0,
+            "sec": 30.74,
+            "pct": 52.5
+          },
+          {
+            "ratio": 59.0,
+            "sec": 31.27,
+            "pct": 52.5
+          },
+          {
+            "ratio": 60.0,
+            "sec": 31.8,
+            "pct": 52.5
+          },
+          {
+            "ratio": 61.0,
+            "sec": 32.33,
+            "pct": 52.5
+          },
+          {
+            "ratio": 62.0,
+            "sec": 32.86,
+            "pct": 50.83
+          },
+          {
+            "ratio": 63.0,
+            "sec": 33.39,
+            "pct": 50.83
+          },
+          {
+            "ratio": 64.0,
+            "sec": 33.92,
+            "pct": 50.0
+          },
+          {
+            "ratio": 65.0,
+            "sec": 34.45,
+            "pct": 50.0
+          },
+          {
+            "ratio": 66.0,
+            "sec": 34.98,
+            "pct": 49.17
+          },
+          {
+            "ratio": 67.0,
+            "sec": 35.51,
+            "pct": 49.17
+          },
+          {
+            "ratio": 68.0,
+            "sec": 36.04,
+            "pct": 49.17
+          },
+          {
+            "ratio": 69.0,
+            "sec": 36.57,
+            "pct": 49.17
+          },
+          {
+            "ratio": 70.0,
+            "sec": 37.1,
+            "pct": 49.17
+          },
+          {
+            "ratio": 71.0,
+            "sec": 37.63,
+            "pct": 48.33
+          },
+          {
+            "ratio": 72.0,
+            "sec": 38.16,
+            "pct": 48.33
+          },
+          {
+            "ratio": 73.0,
+            "sec": 38.69,
+            "pct": 48.33
+          },
+          {
+            "ratio": 74.0,
+            "sec": 39.22,
+            "pct": 47.5
+          },
+          {
+            "ratio": 75.0,
+            "sec": 39.75,
+            "pct": 47.5
+          },
+          {
+            "ratio": 76.0,
+            "sec": 40.28,
+            "pct": 47.5
+          },
+          {
+            "ratio": 77.0,
+            "sec": 40.81,
+            "pct": 47.5
+          },
+          {
+            "ratio": 78.0,
+            "sec": 41.34,
+            "pct": 46.67
+          },
+          {
+            "ratio": 79.0,
+            "sec": 41.87,
+            "pct": 45.83
+          },
+          {
+            "ratio": 80.0,
+            "sec": 42.4,
+            "pct": 45.83
+          },
+          {
+            "ratio": 81.0,
+            "sec": 42.93,
+            "pct": 45.83
+          },
+          {
+            "ratio": 82.0,
+            "sec": 43.46,
+            "pct": 45.83
+          },
+          {
+            "ratio": 83.0,
+            "sec": 43.99,
+            "pct": 46.67
+          },
+          {
+            "ratio": 84.0,
+            "sec": 44.52,
+            "pct": 45.83
+          },
+          {
+            "ratio": 85.0,
+            "sec": 45.05,
+            "pct": 45.83
+          },
+          {
+            "ratio": 86.0,
+            "sec": 45.58,
+            "pct": 45.0
+          },
+          {
+            "ratio": 87.0,
+            "sec": 46.11,
+            "pct": 43.33
+          },
+          {
+            "ratio": 88.0,
+            "sec": 46.64,
+            "pct": 43.33
+          },
+          {
+            "ratio": 89.0,
+            "sec": 47.17,
+            "pct": 43.33
+          },
+          {
+            "ratio": 90.0,
+            "sec": 47.7,
+            "pct": 42.5
+          },
+          {
+            "ratio": 91.0,
+            "sec": 48.23,
+            "pct": 41.67
+          },
+          {
+            "ratio": 92.0,
+            "sec": 48.76,
+            "pct": 36.67
+          },
+          {
+            "ratio": 93.0,
+            "sec": 49.29,
+            "pct": 36.67
+          },
+          {
+            "ratio": 94.0,
+            "sec": 49.82,
+            "pct": 35.0
+          },
+          {
+            "ratio": 95.0,
+            "sec": 50.35,
+            "pct": 30.0
+          },
+          {
+            "ratio": 96.0,
+            "sec": 50.88,
+            "pct": 26.67
+          },
+          {
+            "ratio": 97.0,
+            "sec": 51.41,
+            "pct": 21.67
+          },
+          {
+            "ratio": 98.0,
+            "sec": 51.94,
+            "pct": 17.5
+          },
+          {
+            "ratio": 99.0,
+            "sec": 52.47,
+            "pct": 16.67
+          },
+          {
+            "ratio": 100.0,
+            "sec": 53.0,
+            "pct": 16.67
+          }
+        ]
+      },
       {
         "video_id": "edfxi8rEQVI",
         "title": "Gözlerin Açıkken Hapşırmak Neden İmkansız? Beynin O Salisede Ne Yapar? 🤧 #bilgidozu #shorts",
@@ -4123,502 +4655,502 @@
           {
             "ratio": 1.0,
             "sec": 0.5,
-            "pct": 104.4
+            "pct": 108.25
           },
           {
             "ratio": 2.0,
             "sec": 1.0,
-            "pct": 104.4
+            "pct": 107.22
           },
           {
             "ratio": 3.0,
             "sec": 1.5,
-            "pct": 103.3
+            "pct": 105.67
           },
           {
             "ratio": 4.0,
             "sec": 2.0,
-            "pct": 103.3
+            "pct": 105.67
           },
           {
             "ratio": 5.0,
             "sec": 2.5,
-            "pct": 102.2
+            "pct": 105.15
           },
           {
             "ratio": 6.0,
             "sec": 3.0,
-            "pct": 102.2
+            "pct": 104.64
           },
           {
             "ratio": 7.0,
             "sec": 3.5,
-            "pct": 102.2
+            "pct": 104.64
           },
           {
             "ratio": 8.0,
             "sec": 4.0,
-            "pct": 102.2
+            "pct": 104.64
           },
           {
             "ratio": 9.0,
             "sec": 4.5,
-            "pct": 102.2
+            "pct": 103.61
           },
           {
             "ratio": 10.0,
             "sec": 5.0,
-            "pct": 96.7
+            "pct": 97.42
           },
           {
             "ratio": 11.0,
             "sec": 5.5,
-            "pct": 90.11
+            "pct": 91.75
           },
           {
             "ratio": 12.0,
             "sec": 6.0,
-            "pct": 86.81
+            "pct": 89.69
           },
           {
             "ratio": 13.0,
             "sec": 6.5,
-            "pct": 81.32
+            "pct": 84.54
           },
           {
             "ratio": 14.0,
             "sec": 7.0,
-            "pct": 75.82
+            "pct": 80.93
           },
           {
             "ratio": 15.0,
             "sec": 7.5,
-            "pct": 73.63
+            "pct": 78.35
           },
           {
             "ratio": 16.0,
             "sec": 8.0,
-            "pct": 72.53
+            "pct": 76.8
           },
           {
             "ratio": 17.0,
             "sec": 8.5,
-            "pct": 71.43
+            "pct": 74.74
           },
           {
             "ratio": 18.0,
             "sec": 9.0,
-            "pct": 67.03
+            "pct": 71.65
           },
           {
             "ratio": 19.0,
             "sec": 9.5,
-            "pct": 64.84
+            "pct": 69.07
           },
           {
             "ratio": 20.0,
             "sec": 10.0,
-            "pct": 63.74
+            "pct": 68.04
           },
           {
             "ratio": 21.0,
             "sec": 10.5,
-            "pct": 63.74
+            "pct": 67.53
           },
           {
             "ratio": 22.0,
             "sec": 11.0,
-            "pct": 61.54
+            "pct": 66.49
           },
           {
             "ratio": 23.0,
             "sec": 11.5,
-            "pct": 60.44
+            "pct": 64.95
           },
           {
             "ratio": 24.0,
             "sec": 12.0,
-            "pct": 59.34
+            "pct": 63.92
           },
           {
             "ratio": 25.0,
             "sec": 12.5,
-            "pct": 58.24
+            "pct": 62.89
           },
           {
             "ratio": 26.0,
             "sec": 13.0,
-            "pct": 58.24
+            "pct": 61.86
           },
           {
             "ratio": 27.0,
             "sec": 13.5,
-            "pct": 56.04
+            "pct": 59.79
           },
           {
             "ratio": 28.0,
             "sec": 14.0,
-            "pct": 56.04
+            "pct": 59.28
           },
           {
             "ratio": 29.0,
             "sec": 14.5,
-            "pct": 53.85
+            "pct": 58.25
           },
           {
             "ratio": 30.0,
             "sec": 15.0,
-            "pct": 52.75
+            "pct": 57.73
           },
           {
             "ratio": 31.0,
             "sec": 15.5,
-            "pct": 51.65
+            "pct": 55.67
           },
           {
             "ratio": 32.0,
             "sec": 16.0,
-            "pct": 51.65
+            "pct": 54.64
           },
           {
             "ratio": 33.0,
             "sec": 16.5,
-            "pct": 51.65
+            "pct": 54.12
           },
           {
             "ratio": 34.0,
             "sec": 17.0,
-            "pct": 49.45
+            "pct": 53.09
           },
           {
             "ratio": 35.0,
             "sec": 17.5,
-            "pct": 48.35
+            "pct": 52.58
           },
           {
             "ratio": 36.0,
             "sec": 18.0,
-            "pct": 48.35
+            "pct": 52.58
           },
           {
             "ratio": 37.0,
             "sec": 18.5,
-            "pct": 48.35
+            "pct": 52.58
           },
           {
             "ratio": 38.0,
             "sec": 19.0,
-            "pct": 48.35
+            "pct": 52.06
           },
           {
             "ratio": 39.0,
             "sec": 19.5,
-            "pct": 48.35
+            "pct": 52.06
           },
           {
             "ratio": 40.0,
             "sec": 20.0,
-            "pct": 47.25
+            "pct": 51.55
           },
           {
             "ratio": 41.0,
             "sec": 20.5,
-            "pct": 47.25
+            "pct": 51.03
           },
           {
             "ratio": 42.0,
             "sec": 21.0,
-            "pct": 47.25
+            "pct": 51.03
           },
           {
             "ratio": 43.0,
             "sec": 21.5,
-            "pct": 47.25
+            "pct": 50.52
           },
           {
             "ratio": 44.0,
             "sec": 22.0,
-            "pct": 47.25
+            "pct": 50.52
           },
           {
             "ratio": 45.0,
             "sec": 22.5,
-            "pct": 47.25
+            "pct": 50.52
           },
           {
             "ratio": 46.0,
             "sec": 23.0,
-            "pct": 47.25
+            "pct": 50.52
           },
           {
             "ratio": 47.0,
             "sec": 23.5,
-            "pct": 47.25
+            "pct": 48.97
           },
           {
             "ratio": 48.0,
             "sec": 24.0,
-            "pct": 47.25
+            "pct": 48.97
           },
           {
             "ratio": 49.0,
             "sec": 24.5,
-            "pct": 46.15
+            "pct": 47.42
           },
           {
             "ratio": 50.0,
             "sec": 25.0,
-            "pct": 46.15
+            "pct": 47.42
           },
           {
             "ratio": 51.0,
             "sec": 25.5,
-            "pct": 45.05
+            "pct": 46.39
           },
           {
             "ratio": 52.0,
             "sec": 26.0,
-            "pct": 41.76
+            "pct": 44.33
           },
           {
             "ratio": 53.0,
             "sec": 26.5,
-            "pct": 40.66
+            "pct": 42.78
           },
           {
             "ratio": 54.0,
             "sec": 27.0,
-            "pct": 40.66
+            "pct": 42.78
           },
           {
             "ratio": 55.0,
             "sec": 27.5,
-            "pct": 39.56
+            "pct": 41.24
           },
           {
             "ratio": 56.0,
             "sec": 28.0,
-            "pct": 39.56
+            "pct": 40.72
           },
           {
             "ratio": 57.0,
             "sec": 28.5,
-            "pct": 39.56
+            "pct": 40.72
           },
           {
             "ratio": 58.0,
             "sec": 29.0,
-            "pct": 37.36
+            "pct": 39.69
           },
           {
             "ratio": 59.0,
             "sec": 29.5,
-            "pct": 37.36
+            "pct": 39.69
           },
           {
             "ratio": 60.0,
             "sec": 30.0,
-            "pct": 37.36
+            "pct": 39.69
           },
           {
             "ratio": 61.0,
             "sec": 30.5,
-            "pct": 37.36
+            "pct": 39.69
           },
           {
             "ratio": 62.0,
             "sec": 31.0,
-            "pct": 37.36
+            "pct": 39.69
           },
           {
             "ratio": 63.0,
             "sec": 31.5,
-            "pct": 36.26
+            "pct": 39.69
           },
           {
             "ratio": 64.0,
             "sec": 32.0,
-            "pct": 36.26
+            "pct": 39.69
           },
           {
             "ratio": 65.0,
             "sec": 32.5,
-            "pct": 36.26
+            "pct": 39.69
           },
           {
             "ratio": 66.0,
             "sec": 33.0,
-            "pct": 36.26
+            "pct": 39.69
           },
           {
             "ratio": 67.0,
             "sec": 33.5,
-            "pct": 35.16
+            "pct": 39.18
           },
           {
             "ratio": 68.0,
             "sec": 34.0,
-            "pct": 35.16
+            "pct": 39.18
           },
           {
             "ratio": 69.0,
             "sec": 34.5,
-            "pct": 35.16
+            "pct": 39.18
           },
           {
             "ratio": 70.0,
             "sec": 35.0,
-            "pct": 35.16
+            "pct": 39.18
           },
           {
             "ratio": 71.0,
             "sec": 35.5,
-            "pct": 35.16
+            "pct": 39.18
           },
           {
             "ratio": 72.0,
             "sec": 36.0,
-            "pct": 34.07
+            "pct": 38.66
           },
           {
             "ratio": 73.0,
             "sec": 36.5,
-            "pct": 32.97
+            "pct": 37.63
           },
           {
             "ratio": 74.0,
             "sec": 37.0,
-            "pct": 32.97
+            "pct": 36.6
           },
           {
             "ratio": 75.0,
             "sec": 37.5,
-            "pct": 31.87
+            "pct": 35.57
           },
           {
             "ratio": 76.0,
             "sec": 38.0,
-            "pct": 31.87
+            "pct": 35.57
           },
           {
             "ratio": 77.0,
             "sec": 38.5,
-            "pct": 29.67
+            "pct": 34.54
           },
           {
             "ratio": 78.0,
             "sec": 39.0,
-            "pct": 28.57
+            "pct": 34.02
           },
           {
             "ratio": 79.0,
             "sec": 39.5,
-            "pct": 28.57
+            "pct": 34.02
           },
           {
             "ratio": 80.0,
             "sec": 40.0,
-            "pct": 28.57
+            "pct": 34.02
           },
           {
             "ratio": 81.0,
             "sec": 40.5,
-            "pct": 27.47
+            "pct": 32.99
           },
           {
             "ratio": 82.0,
             "sec": 41.0,
-            "pct": 27.47
+            "pct": 32.47
           },
           {
             "ratio": 83.0,
             "sec": 41.5,
-            "pct": 26.37
+            "pct": 31.96
           },
           {
             "ratio": 84.0,
             "sec": 42.0,
-            "pct": 25.27
+            "pct": 30.41
           },
           {
             "ratio": 85.0,
             "sec": 42.5,
-            "pct": 23.08
+            "pct": 28.87
           },
           {
             "ratio": 86.0,
             "sec": 43.0,
-            "pct": 23.08
+            "pct": 28.87
           },
           {
             "ratio": 87.0,
             "sec": 43.5,
-            "pct": 23.08
+            "pct": 28.35
           },
           {
             "ratio": 88.0,
             "sec": 44.0,
-            "pct": 23.08
+            "pct": 27.84
           },
           {
             "ratio": 89.0,
             "sec": 44.5,
-            "pct": 20.88
+            "pct": 25.77
           },
           {
             "ratio": 90.0,
             "sec": 45.0,
-            "pct": 20.88
+            "pct": 24.74
           },
           {
             "ratio": 91.0,
             "sec": 45.5,
-            "pct": 20.88
+            "pct": 24.74
           },
           {
             "ratio": 92.0,
             "sec": 46.0,
-            "pct": 19.78
+            "pct": 22.68
           },
           {
             "ratio": 93.0,
             "sec": 46.5,
-            "pct": 17.58
+            "pct": 21.65
           },
           {
             "ratio": 94.0,
             "sec": 47.0,
-            "pct": 15.38
+            "pct": 19.07
           },
           {
             "ratio": 95.0,
             "sec": 47.5,
-            "pct": 13.19
+            "pct": 16.49
           },
           {
             "ratio": 96.0,
             "sec": 48.0,
-            "pct": 12.09
+            "pct": 14.43
           },
           {
             "ratio": 97.0,
             "sec": 48.5,
-            "pct": 10.99
+            "pct": 13.4
           },
           {
             "ratio": 98.0,
             "sec": 49.0,
-            "pct": 7.69
+            "pct": 11.34
           },
           {
             "ratio": 99.0,
             "sec": 49.5,
-            "pct": 5.49
+            "pct": 9.79
           },
           {
             "ratio": 100.0,
             "sec": 50.0,
-            "pct": 5.49
+            "pct": 9.79
           }
         ]
       },
@@ -4629,502 +5161,502 @@
           {
             "ratio": 1.0,
             "sec": 0.54,
-            "pct": 114.29
+            "pct": 111.11
           },
           {
             "ratio": 2.0,
             "sec": 1.08,
-            "pct": 113.19
+            "pct": 110.49
           },
           {
             "ratio": 3.0,
             "sec": 1.62,
-            "pct": 112.09
+            "pct": 109.88
           },
           {
             "ratio": 4.0,
             "sec": 2.16,
-            "pct": 112.09
+            "pct": 109.88
           },
           {
             "ratio": 5.0,
             "sec": 2.7,
-            "pct": 112.09
+            "pct": 109.88
           },
           {
             "ratio": 6.0,
             "sec": 3.24,
-            "pct": 112.09
+            "pct": 109.88
           },
           {
             "ratio": 7.0,
             "sec": 3.78,
-            "pct": 109.89
+            "pct": 108.64
           },
           {
             "ratio": 8.0,
             "sec": 4.32,
-            "pct": 109.89
+            "pct": 108.64
           },
           {
             "ratio": 9.0,
             "sec": 4.86,
-            "pct": 107.69
+            "pct": 106.17
           },
           {
             "ratio": 10.0,
             "sec": 5.4,
-            "pct": 106.59
+            "pct": 104.94
           },
           {
             "ratio": 11.0,
             "sec": 5.94,
-            "pct": 103.3
+            "pct": 103.09
           },
           {
             "ratio": 12.0,
             "sec": 6.48,
-            "pct": 102.2
+            "pct": 100.62
           },
           {
             "ratio": 13.0,
             "sec": 7.02,
-            "pct": 102.2
+            "pct": 100.0
           },
           {
             "ratio": 14.0,
             "sec": 7.56,
-            "pct": 102.2
+            "pct": 100.0
           },
           {
             "ratio": 15.0,
             "sec": 8.1,
-            "pct": 102.2
+            "pct": 99.38
           },
           {
             "ratio": 16.0,
             "sec": 8.64,
-            "pct": 100.0
+            "pct": 97.53
           },
           {
             "ratio": 17.0,
             "sec": 9.18,
-            "pct": 96.7
+            "pct": 95.06
           },
           {
             "ratio": 18.0,
             "sec": 9.72,
-            "pct": 95.6
+            "pct": 91.98
           },
           {
             "ratio": 19.0,
             "sec": 10.26,
-            "pct": 90.11
+            "pct": 85.19
           },
           {
             "ratio": 20.0,
             "sec": 10.8,
-            "pct": 87.91
+            "pct": 82.1
           },
           {
             "ratio": 21.0,
             "sec": 11.34,
-            "pct": 83.52
+            "pct": 77.16
           },
           {
             "ratio": 22.0,
             "sec": 11.88,
-            "pct": 82.42
+            "pct": 76.54
           },
           {
             "ratio": 23.0,
             "sec": 12.42,
-            "pct": 79.12
+            "pct": 73.46
           },
           {
             "ratio": 24.0,
             "sec": 12.96,
-            "pct": 79.12
+            "pct": 72.22
           },
           {
             "ratio": 25.0,
             "sec": 13.5,
-            "pct": 79.12
+            "pct": 71.6
           },
           {
             "ratio": 26.0,
             "sec": 14.04,
-            "pct": 78.02
+            "pct": 70.99
           },
           {
             "ratio": 27.0,
             "sec": 14.58,
-            "pct": 78.02
+            "pct": 70.37
           },
           {
             "ratio": 28.0,
             "sec": 15.12,
-            "pct": 76.92
+            "pct": 69.75
           },
           {
             "ratio": 29.0,
             "sec": 15.66,
-            "pct": 76.92
+            "pct": 70.37
           },
           {
             "ratio": 30.0,
             "sec": 16.2,
-            "pct": 76.92
+            "pct": 69.75
           },
           {
             "ratio": 31.0,
             "sec": 16.74,
-            "pct": 76.92
+            "pct": 69.75
           },
           {
             "ratio": 32.0,
             "sec": 17.28,
-            "pct": 76.92
+            "pct": 69.14
           },
           {
             "ratio": 33.0,
             "sec": 17.82,
-            "pct": 75.82
+            "pct": 67.9
           },
           {
             "ratio": 34.0,
             "sec": 18.36,
-            "pct": 73.63
+            "pct": 66.05
           },
           {
             "ratio": 35.0,
             "sec": 18.9,
-            "pct": 73.63
+            "pct": 66.05
           },
           {
             "ratio": 36.0,
             "sec": 19.44,
-            "pct": 72.53
+            "pct": 65.43
           },
           {
             "ratio": 37.0,
             "sec": 19.98,
-            "pct": 72.53
+            "pct": 65.43
           },
           {
             "ratio": 38.0,
             "sec": 20.52,
-            "pct": 70.33
+            "pct": 64.2
           },
           {
             "ratio": 39.0,
             "sec": 21.06,
-            "pct": 68.13
+            "pct": 62.96
           },
           {
             "ratio": 40.0,
             "sec": 21.6,
-            "pct": 67.03
+            "pct": 62.35
           },
           {
             "ratio": 41.0,
             "sec": 22.14,
-            "pct": 67.03
+            "pct": 62.35
           },
           {
             "ratio": 42.0,
             "sec": 22.68,
-            "pct": 64.84
+            "pct": 59.88
           },
           {
             "ratio": 43.0,
             "sec": 23.22,
-            "pct": 63.74
+            "pct": 59.26
           },
           {
             "ratio": 44.0,
             "sec": 23.76,
-            "pct": 63.74
+            "pct": 58.64
           },
           {
             "ratio": 45.0,
             "sec": 24.3,
-            "pct": 63.74
+            "pct": 58.02
           },
           {
             "ratio": 46.0,
             "sec": 24.84,
-            "pct": 63.74
+            "pct": 58.02
           },
           {
             "ratio": 47.0,
             "sec": 25.38,
-            "pct": 63.74
+            "pct": 58.02
           },
           {
             "ratio": 48.0,
             "sec": 25.92,
-            "pct": 62.64
+            "pct": 57.41
           },
           {
             "ratio": 49.0,
             "sec": 26.46,
-            "pct": 63.74
+            "pct": 58.02
           },
           {
             "ratio": 50.0,
             "sec": 27.0,
-            "pct": 63.74
+            "pct": 58.02
           },
           {
             "ratio": 51.0,
             "sec": 27.54,
-            "pct": 62.64
+            "pct": 56.79
           },
           {
             "ratio": 52.0,
             "sec": 28.08,
-            "pct": 62.64
+            "pct": 57.41
           },
           {
             "ratio": 53.0,
             "sec": 28.62,
-            "pct": 62.64
+            "pct": 57.41
           },
           {
             "ratio": 54.0,
             "sec": 29.16,
-            "pct": 62.64
+            "pct": 57.41
           },
           {
             "ratio": 55.0,
             "sec": 29.7,
-            "pct": 61.54
+            "pct": 56.79
           },
           {
             "ratio": 56.0,
             "sec": 30.24,
-            "pct": 61.54
+            "pct": 56.17
           },
           {
             "ratio": 57.0,
             "sec": 30.78,
-            "pct": 61.54
+            "pct": 56.17
           },
           {
             "ratio": 58.0,
             "sec": 31.32,
-            "pct": 61.54
+            "pct": 56.17
           },
           {
             "ratio": 59.0,
             "sec": 31.86,
-            "pct": 61.54
+            "pct": 56.17
           },
           {
             "ratio": 60.0,
             "sec": 32.4,
-            "pct": 61.54
+            "pct": 54.94
           },
           {
             "ratio": 61.0,
             "sec": 32.94,
-            "pct": 61.54
+            "pct": 54.32
           },
           {
             "ratio": 62.0,
             "sec": 33.48,
-            "pct": 61.54
+            "pct": 54.32
           },
           {
             "ratio": 63.0,
             "sec": 34.02,
-            "pct": 61.54
+            "pct": 54.32
           },
           {
             "ratio": 64.0,
             "sec": 34.56,
-            "pct": 61.54
+            "pct": 54.32
           },
           {
             "ratio": 65.0,
             "sec": 35.1,
-            "pct": 61.54
+            "pct": 54.32
           },
           {
             "ratio": 66.0,
             "sec": 35.64,
-            "pct": 60.44
+            "pct": 53.09
           },
           {
             "ratio": 67.0,
             "sec": 36.18,
-            "pct": 59.34
+            "pct": 52.47
           },
           {
             "ratio": 68.0,
             "sec": 36.72,
-            "pct": 57.14
+            "pct": 50.62
           },
           {
             "ratio": 69.0,
             "sec": 37.26,
-            "pct": 57.14
+            "pct": 50.62
           },
           {
             "ratio": 70.0,
             "sec": 37.8,
-            "pct": 57.14
+            "pct": 50.62
           },
           {
             "ratio": 71.0,
             "sec": 38.34,
-            "pct": 57.14
+            "pct": 50.62
           },
           {
             "ratio": 72.0,
             "sec": 38.88,
-            "pct": 57.14
+            "pct": 50.62
           },
           {
             "ratio": 73.0,
             "sec": 39.42,
-            "pct": 54.95
+            "pct": 49.38
           },
           {
             "ratio": 74.0,
             "sec": 39.96,
-            "pct": 54.95
+            "pct": 49.38
           },
           {
             "ratio": 75.0,
             "sec": 40.5,
-            "pct": 53.85
+            "pct": 48.15
           },
           {
             "ratio": 76.0,
             "sec": 41.04,
-            "pct": 53.85
+            "pct": 45.68
           },
           {
             "ratio": 77.0,
             "sec": 41.58,
-            "pct": 52.75
+            "pct": 45.06
           },
           {
             "ratio": 78.0,
             "sec": 42.12,
-            "pct": 52.75
+            "pct": 45.06
           },
           {
             "ratio": 79.0,
             "sec": 42.66,
-            "pct": 51.65
+            "pct": 43.83
           },
           {
             "ratio": 80.0,
             "sec": 43.2,
-            "pct": 51.65
+            "pct": 43.83
           },
           {
             "ratio": 81.0,
             "sec": 43.74,
-            "pct": 51.65
+            "pct": 43.83
           },
           {
             "ratio": 82.0,
             "sec": 44.28,
-            "pct": 50.55
+            "pct": 43.21
           },
           {
             "ratio": 83.0,
             "sec": 44.82,
-            "pct": 50.55
+            "pct": 43.21
           },
           {
             "ratio": 84.0,
             "sec": 45.36,
-            "pct": 50.55
+            "pct": 42.59
           },
           {
             "ratio": 85.0,
             "sec": 45.9,
-            "pct": 49.45
+            "pct": 41.36
           },
           {
             "ratio": 86.0,
             "sec": 46.44,
-            "pct": 46.15
+            "pct": 38.89
           },
           {
             "ratio": 87.0,
             "sec": 46.98,
-            "pct": 46.15
+            "pct": 37.65
           },
           {
             "ratio": 88.0,
             "sec": 47.52,
-            "pct": 45.05
+            "pct": 37.04
           },
           {
             "ratio": 89.0,
             "sec": 48.06,
-            "pct": 45.05
+            "pct": 36.42
           },
           {
             "ratio": 90.0,
             "sec": 48.6,
-            "pct": 42.86
+            "pct": 35.19
           },
           {
             "ratio": 91.0,
             "sec": 49.14,
-            "pct": 41.76
+            "pct": 33.95
           },
           {
             "ratio": 92.0,
             "sec": 49.68,
-            "pct": 38.46
+            "pct": 32.1
           },
           {
             "ratio": 93.0,
             "sec": 50.22,
-            "pct": 34.07
+            "pct": 29.01
           },
           {
             "ratio": 94.0,
             "sec": 50.76,
-            "pct": 30.77
+            "pct": 26.54
           },
           {
             "ratio": 95.0,
             "sec": 51.3,
-            "pct": 25.27
+            "pct": 21.6
           },
           {
             "ratio": 96.0,
             "sec": 51.84,
-            "pct": 18.68
+            "pct": 16.05
           },
           {
             "ratio": 97.0,
             "sec": 52.38,
-            "pct": 14.29
+            "pct": 12.35
           },
           {
             "ratio": 98.0,
             "sec": 52.92,
-            "pct": 13.19
+            "pct": 11.11
           },
           {
             "ratio": 99.0,
             "sec": 53.46,
-            "pct": 13.19
+            "pct": 10.49
           },
           {
             "ratio": 100.0,
             "sec": 54.0,
-            "pct": 13.19
+            "pct": 10.49
           }
         ]
       },
@@ -5135,502 +5667,502 @@
           {
             "ratio": 1.0,
             "sec": 0.54,
-            "pct": 110.29
+            "pct": 109.66
           },
           {
             "ratio": 2.0,
             "sec": 1.08,
-            "pct": 110.29
+            "pct": 109.66
           },
           {
             "ratio": 3.0,
             "sec": 1.62,
-            "pct": 107.35
+            "pct": 106.9
           },
           {
             "ratio": 4.0,
             "sec": 2.16,
-            "pct": 108.09
+            "pct": 107.59
           },
           {
             "ratio": 5.0,
             "sec": 2.7,
-            "pct": 105.88
+            "pct": 105.52
           },
           {
             "ratio": 6.0,
             "sec": 3.24,
-            "pct": 105.88
+            "pct": 105.52
           },
           {
             "ratio": 7.0,
             "sec": 3.78,
-            "pct": 105.15
+            "pct": 104.83
           },
           {
             "ratio": 8.0,
             "sec": 4.32,
-            "pct": 105.15
+            "pct": 104.83
           },
           {
             "ratio": 9.0,
             "sec": 4.86,
-            "pct": 97.79
+            "pct": 97.93
           },
           {
             "ratio": 10.0,
             "sec": 5.4,
-            "pct": 93.38
+            "pct": 92.41
           },
           {
             "ratio": 11.0,
             "sec": 5.94,
-            "pct": 86.03
+            "pct": 85.52
           },
           {
             "ratio": 12.0,
             "sec": 6.48,
-            "pct": 79.41
+            "pct": 79.31
           },
           {
             "ratio": 13.0,
             "sec": 7.02,
-            "pct": 77.94
+            "pct": 77.24
           },
           {
             "ratio": 14.0,
             "sec": 7.56,
-            "pct": 73.53
+            "pct": 73.1
           },
           {
             "ratio": 15.0,
             "sec": 8.1,
-            "pct": 71.32
+            "pct": 70.34
           },
           {
             "ratio": 16.0,
             "sec": 8.64,
-            "pct": 68.38
+            "pct": 67.59
           },
           {
             "ratio": 17.0,
             "sec": 9.18,
-            "pct": 67.65
+            "pct": 66.9
           },
           {
             "ratio": 18.0,
             "sec": 9.72,
-            "pct": 66.91
+            "pct": 66.21
           },
           {
             "ratio": 19.0,
             "sec": 10.26,
-            "pct": 66.91
+            "pct": 66.21
           },
           {
             "ratio": 20.0,
             "sec": 10.8,
-            "pct": 66.18
+            "pct": 65.52
           },
           {
             "ratio": 21.0,
             "sec": 11.34,
-            "pct": 64.71
+            "pct": 64.14
           },
           {
             "ratio": 22.0,
             "sec": 11.88,
-            "pct": 60.29
+            "pct": 60.0
           },
           {
             "ratio": 23.0,
             "sec": 12.42,
-            "pct": 58.09
+            "pct": 57.93
           },
           {
             "ratio": 24.0,
             "sec": 12.96,
-            "pct": 53.68
+            "pct": 53.1
           },
           {
             "ratio": 25.0,
             "sec": 13.5,
-            "pct": 50.0
+            "pct": 49.66
           },
           {
             "ratio": 26.0,
             "sec": 14.04,
-            "pct": 50.0
+            "pct": 49.66
           },
           {
             "ratio": 27.0,
             "sec": 14.58,
-            "pct": 47.79
+            "pct": 47.59
           },
           {
             "ratio": 28.0,
             "sec": 15.12,
-            "pct": 47.06
+            "pct": 46.9
           },
           {
             "ratio": 29.0,
             "sec": 15.66,
-            "pct": 45.59
+            "pct": 45.52
           },
           {
             "ratio": 30.0,
             "sec": 16.2,
-            "pct": 44.85
+            "pct": 44.83
           },
           {
             "ratio": 31.0,
             "sec": 16.74,
-            "pct": 46.32
+            "pct": 45.52
           },
           {
             "ratio": 32.0,
             "sec": 17.28,
-            "pct": 44.85
+            "pct": 44.14
           },
           {
             "ratio": 33.0,
             "sec": 17.82,
-            "pct": 44.85
+            "pct": 44.14
           },
           {
             "ratio": 34.0,
             "sec": 18.36,
-            "pct": 41.91
+            "pct": 41.38
           },
           {
             "ratio": 35.0,
             "sec": 18.9,
-            "pct": 41.18
+            "pct": 40.69
           },
           {
             "ratio": 36.0,
             "sec": 19.44,
-            "pct": 41.18
+            "pct": 40.69
           },
           {
             "ratio": 37.0,
             "sec": 19.98,
-            "pct": 41.18
+            "pct": 40.69
           },
           {
             "ratio": 38.0,
             "sec": 20.52,
-            "pct": 40.44
+            "pct": 40.0
           },
           {
             "ratio": 39.0,
             "sec": 21.06,
-            "pct": 40.44
+            "pct": 39.31
           },
           {
             "ratio": 40.0,
             "sec": 21.6,
-            "pct": 39.71
+            "pct": 38.62
           },
           {
             "ratio": 41.0,
             "sec": 22.14,
-            "pct": 39.71
+            "pct": 38.62
           },
           {
             "ratio": 42.0,
             "sec": 22.68,
-            "pct": 39.71
+            "pct": 38.62
           },
           {
             "ratio": 43.0,
             "sec": 23.22,
-            "pct": 38.97
+            "pct": 37.93
           },
           {
             "ratio": 44.0,
             "sec": 23.76,
-            "pct": 38.97
+            "pct": 37.93
           },
           {
             "ratio": 45.0,
             "sec": 24.3,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 46.0,
             "sec": 24.84,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 47.0,
             "sec": 25.38,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 48.0,
             "sec": 25.92,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 49.0,
             "sec": 26.46,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 50.0,
             "sec": 27.0,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 51.0,
             "sec": 27.54,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 52.0,
             "sec": 28.08,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 53.0,
             "sec": 28.62,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 54.0,
             "sec": 29.16,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 55.0,
             "sec": 29.7,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 56.0,
             "sec": 30.24,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 57.0,
             "sec": 30.78,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 58.0,
             "sec": 31.32,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 59.0,
             "sec": 31.86,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 60.0,
             "sec": 32.4,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 61.0,
             "sec": 32.94,
-            "pct": 38.24
+            "pct": 37.24
           },
           {
             "ratio": 62.0,
             "sec": 33.48,
-            "pct": 37.5
+            "pct": 36.55
           },
           {
             "ratio": 63.0,
             "sec": 34.02,
-            "pct": 37.5
+            "pct": 36.55
           },
           {
             "ratio": 64.0,
             "sec": 34.56,
-            "pct": 37.5
+            "pct": 36.55
           },
           {
             "ratio": 65.0,
             "sec": 35.1,
-            "pct": 37.5
+            "pct": 35.86
           },
           {
             "ratio": 66.0,
             "sec": 35.64,
-            "pct": 37.5
+            "pct": 35.86
           },
           {
             "ratio": 67.0,
             "sec": 36.18,
-            "pct": 38.24
+            "pct": 36.55
           },
           {
             "ratio": 68.0,
             "sec": 36.72,
-            "pct": 38.24
+            "pct": 36.55
           },
           {
             "ratio": 69.0,
             "sec": 37.26,
-            "pct": 38.24
+            "pct": 36.55
           },
           {
             "ratio": 70.0,
             "sec": 37.8,
-            "pct": 37.5
+            "pct": 35.86
           },
           {
             "ratio": 71.0,
             "sec": 38.34,
-            "pct": 38.24
+            "pct": 36.55
           },
           {
             "ratio": 72.0,
             "sec": 38.88,
-            "pct": 38.24
+            "pct": 36.55
           },
           {
             "ratio": 73.0,
             "sec": 39.42,
-            "pct": 37.5
+            "pct": 35.86
           },
           {
             "ratio": 74.0,
             "sec": 39.96,
-            "pct": 36.03
+            "pct": 34.48
           },
           {
             "ratio": 75.0,
             "sec": 40.5,
-            "pct": 34.56
+            "pct": 33.1
           },
           {
             "ratio": 76.0,
             "sec": 41.04,
-            "pct": 34.56
+            "pct": 33.1
           },
           {
             "ratio": 77.0,
             "sec": 41.58,
-            "pct": 34.56
+            "pct": 33.1
           },
           {
             "ratio": 78.0,
             "sec": 42.12,
-            "pct": 34.56
+            "pct": 33.1
           },
           {
             "ratio": 79.0,
             "sec": 42.66,
-            "pct": 33.82
+            "pct": 32.41
           },
           {
             "ratio": 80.0,
             "sec": 43.2,
-            "pct": 33.09
+            "pct": 31.72
           },
           {
             "ratio": 81.0,
             "sec": 43.74,
-            "pct": 33.09
+            "pct": 31.72
           },
           {
             "ratio": 82.0,
             "sec": 44.28,
-            "pct": 33.09
+            "pct": 31.72
           },
           {
             "ratio": 83.0,
             "sec": 44.82,
-            "pct": 33.09
+            "pct": 31.72
           },
           {
             "ratio": 84.0,
             "sec": 45.36,
-            "pct": 33.09
+            "pct": 31.72
           },
           {
             "ratio": 85.0,
             "sec": 45.9,
-            "pct": 33.09
+            "pct": 31.72
           },
           {
             "ratio": 86.0,
             "sec": 46.44,
-            "pct": 33.09
+            "pct": 31.72
           },
           {
             "ratio": 87.0,
             "sec": 46.98,
-            "pct": 32.35
+            "pct": 31.03
           },
           {
             "ratio": 88.0,
             "sec": 47.52,
-            "pct": 32.35
+            "pct": 31.03
           },
           {
             "ratio": 89.0,
             "sec": 48.06,
-            "pct": 32.35
+            "pct": 31.03
           },
           {
             "ratio": 90.0,
             "sec": 48.6,
-            "pct": 32.35
+            "pct": 31.03
           },
           {
             "ratio": 91.0,
             "sec": 49.14,
-            "pct": 31.62
+            "pct": 30.34
           },
           {
             "ratio": 92.0,
             "sec": 49.68,
-            "pct": 30.88
+            "pct": 29.66
           },
           {
             "ratio": 93.0,
             "sec": 50.22,
-            "pct": 30.88
+            "pct": 29.66
           },
           {
             "ratio": 94.0,
             "sec": 50.76,
-            "pct": 30.88
+            "pct": 29.66
           },
           {
             "ratio": 95.0,
             "sec": 51.3,
-            "pct": 29.41
+            "pct": 27.59
           },
           {
             "ratio": 96.0,
             "sec": 51.84,
-            "pct": 25.0
+            "pct": 23.45
           },
           {
             "ratio": 97.0,
             "sec": 52.38,
-            "pct": 22.06
+            "pct": 20.69
           },
           {
             "ratio": 98.0,
             "sec": 52.92,
-            "pct": 16.91
+            "pct": 15.86
           },
           {
             "ratio": 99.0,
             "sec": 53.46,
-            "pct": 11.76
+            "pct": 11.03
           },
           {
             "ratio": 100.0,
             "sec": 54.0,
-            "pct": 11.76
+            "pct": 11.03
           }
         ]
       },
@@ -5641,502 +6173,502 @@
           {
             "ratio": 1.0,
             "sec": 0.51,
-            "pct": 139.91
+            "pct": 137.8
           },
           {
             "ratio": 2.0,
             "sec": 1.02,
-            "pct": 139.91
+            "pct": 137.8
           },
           {
             "ratio": 3.0,
             "sec": 1.53,
-            "pct": 136.91
+            "pct": 134.96
           },
           {
             "ratio": 4.0,
             "sec": 2.04,
-            "pct": 136.91
+            "pct": 134.96
           },
           {
             "ratio": 5.0,
             "sec": 2.55,
-            "pct": 136.05
+            "pct": 134.15
           },
           {
             "ratio": 6.0,
             "sec": 3.06,
-            "pct": 135.19
+            "pct": 133.33
           },
           {
             "ratio": 7.0,
             "sec": 3.57,
-            "pct": 134.33
+            "pct": 132.52
           },
           {
             "ratio": 8.0,
             "sec": 4.08,
-            "pct": 133.05
+            "pct": 131.3
           },
           {
             "ratio": 9.0,
             "sec": 4.59,
-            "pct": 132.62
+            "pct": 130.89
           },
           {
             "ratio": 10.0,
             "sec": 5.1,
-            "pct": 128.33
+            "pct": 126.42
           },
           {
             "ratio": 11.0,
             "sec": 5.61,
-            "pct": 122.75
+            "pct": 120.33
           },
           {
             "ratio": 12.0,
             "sec": 6.12,
-            "pct": 118.03
+            "pct": 115.85
           },
           {
             "ratio": 13.0,
             "sec": 6.63,
-            "pct": 113.3
+            "pct": 110.98
           },
           {
             "ratio": 14.0,
             "sec": 7.14,
-            "pct": 109.44
+            "pct": 106.91
           },
           {
             "ratio": 15.0,
             "sec": 7.65,
-            "pct": 104.29
+            "pct": 102.03
           },
           {
             "ratio": 16.0,
             "sec": 8.16,
-            "pct": 103.0
+            "pct": 100.41
           },
           {
             "ratio": 17.0,
             "sec": 8.67,
-            "pct": 100.43
+            "pct": 97.97
           },
           {
             "ratio": 18.0,
             "sec": 9.18,
-            "pct": 97.85
+            "pct": 95.53
           },
           {
             "ratio": 19.0,
             "sec": 9.69,
-            "pct": 96.14
+            "pct": 93.9
           },
           {
             "ratio": 20.0,
             "sec": 10.2,
-            "pct": 96.14
+            "pct": 93.5
           },
           {
             "ratio": 21.0,
             "sec": 10.71,
-            "pct": 95.71
+            "pct": 93.09
           },
           {
             "ratio": 22.0,
             "sec": 11.22,
-            "pct": 93.13
+            "pct": 90.65
           },
           {
             "ratio": 23.0,
             "sec": 11.73,
-            "pct": 93.13
+            "pct": 90.65
           },
           {
             "ratio": 24.0,
             "sec": 12.24,
-            "pct": 92.7
+            "pct": 90.24
           },
           {
             "ratio": 25.0,
             "sec": 12.75,
-            "pct": 91.85
+            "pct": 89.43
           },
           {
             "ratio": 26.0,
             "sec": 13.26,
-            "pct": 90.99
+            "pct": 88.62
           },
           {
             "ratio": 27.0,
             "sec": 13.77,
-            "pct": 89.27
+            "pct": 86.59
           },
           {
             "ratio": 28.0,
             "sec": 14.28,
-            "pct": 87.98
+            "pct": 85.37
           },
           {
             "ratio": 29.0,
             "sec": 14.79,
-            "pct": 86.7
+            "pct": 84.15
           },
           {
             "ratio": 30.0,
             "sec": 15.3,
-            "pct": 86.27
+            "pct": 83.74
           },
           {
             "ratio": 31.0,
             "sec": 15.81,
-            "pct": 85.84
+            "pct": 83.33
           },
           {
             "ratio": 32.0,
             "sec": 16.32,
-            "pct": 84.98
+            "pct": 82.52
           },
           {
             "ratio": 33.0,
             "sec": 16.83,
-            "pct": 84.55
+            "pct": 82.11
           },
           {
             "ratio": 34.0,
             "sec": 17.34,
-            "pct": 84.55
+            "pct": 82.11
           },
           {
             "ratio": 35.0,
             "sec": 17.85,
-            "pct": 84.55
+            "pct": 82.11
           },
           {
             "ratio": 36.0,
             "sec": 18.36,
-            "pct": 84.55
+            "pct": 82.11
           },
           {
             "ratio": 37.0,
             "sec": 18.87,
-            "pct": 84.55
+            "pct": 82.11
           },
           {
             "ratio": 38.0,
             "sec": 19.38,
-            "pct": 84.55
+            "pct": 82.11
           },
           {
             "ratio": 39.0,
             "sec": 19.89,
-            "pct": 84.12
+            "pct": 81.3
           },
           {
             "ratio": 40.0,
             "sec": 20.4,
-            "pct": 83.69
+            "pct": 80.89
           },
           {
             "ratio": 41.0,
             "sec": 20.91,
-            "pct": 83.69
+            "pct": 80.89
           },
           {
             "ratio": 42.0,
             "sec": 21.42,
-            "pct": 84.12
+            "pct": 81.3
           },
           {
             "ratio": 43.0,
             "sec": 21.93,
-            "pct": 84.12
+            "pct": 81.3
           },
           {
             "ratio": 44.0,
             "sec": 22.44,
-            "pct": 84.12
+            "pct": 81.3
           },
           {
             "ratio": 45.0,
             "sec": 22.95,
-            "pct": 84.12
+            "pct": 81.3
           },
           {
             "ratio": 46.0,
             "sec": 23.46,
-            "pct": 84.12
+            "pct": 81.3
           },
           {
             "ratio": 47.0,
             "sec": 23.97,
-            "pct": 84.12
+            "pct": 81.3
           },
           {
             "ratio": 48.0,
             "sec": 24.48,
-            "pct": 83.69
+            "pct": 80.89
           },
           {
             "ratio": 49.0,
             "sec": 24.99,
-            "pct": 83.26
+            "pct": 80.49
           },
           {
             "ratio": 50.0,
             "sec": 25.5,
-            "pct": 82.83
+            "pct": 80.08
           },
           {
             "ratio": 51.0,
             "sec": 26.01,
-            "pct": 82.4
+            "pct": 79.67
           },
           {
             "ratio": 52.0,
             "sec": 26.52,
-            "pct": 82.4
+            "pct": 79.67
           },
           {
             "ratio": 53.0,
             "sec": 27.03,
-            "pct": 82.4
+            "pct": 79.67
           },
           {
             "ratio": 54.0,
             "sec": 27.54,
-            "pct": 82.4
+            "pct": 79.67
           },
           {
             "ratio": 55.0,
             "sec": 28.05,
-            "pct": 82.4
+            "pct": 79.67
           },
           {
             "ratio": 56.0,
             "sec": 28.56,
-            "pct": 81.97
+            "pct": 79.27
           },
           {
             "ratio": 57.0,
             "sec": 29.07,
-            "pct": 81.55
+            "pct": 78.86
           },
           {
             "ratio": 58.0,
             "sec": 29.58,
-            "pct": 81.55
+            "pct": 78.86
           },
           {
             "ratio": 59.0,
             "sec": 30.09,
-            "pct": 81.55
+            "pct": 78.86
           },
           {
             "ratio": 60.0,
             "sec": 30.6,
-            "pct": 81.12
+            "pct": 78.46
           },
           {
             "ratio": 61.0,
             "sec": 31.11,
-            "pct": 81.12
+            "pct": 78.46
           },
           {
             "ratio": 62.0,
             "sec": 31.62,
-            "pct": 81.55
+            "pct": 78.86
           },
           {
             "ratio": 63.0,
             "sec": 32.13,
-            "pct": 81.55
+            "pct": 78.86
           },
           {
             "ratio": 64.0,
             "sec": 32.64,
-            "pct": 81.55
+            "pct": 78.86
           },
           {
             "ratio": 65.0,
             "sec": 33.15,
-            "pct": 80.69
+            "pct": 78.05
           },
           {
             "ratio": 66.0,
             "sec": 33.66,
-            "pct": 79.83
+            "pct": 77.24
           },
           {
             "ratio": 67.0,
             "sec": 34.17,
-            "pct": 79.83
+            "pct": 77.24
           },
           {
             "ratio": 68.0,
             "sec": 34.68,
-            "pct": 78.97
+            "pct": 76.42
           },
           {
             "ratio": 69.0,
             "sec": 35.19,
-            "pct": 78.97
+            "pct": 76.02
           },
           {
             "ratio": 70.0,
             "sec": 35.7,
-            "pct": 78.97
+            "pct": 76.02
           },
           {
             "ratio": 71.0,
             "sec": 36.21,
-            "pct": 79.4
+            "pct": 76.42
           },
           {
             "ratio": 72.0,
             "sec": 36.72,
-            "pct": 78.97
+            "pct": 76.02
           },
           {
             "ratio": 73.0,
             "sec": 37.23,
-            "pct": 78.97
+            "pct": 76.02
           },
           {
             "ratio": 74.0,
             "sec": 37.74,
-            "pct": 78.97
+            "pct": 76.02
           },
           {
             "ratio": 75.0,
             "sec": 38.25,
-            "pct": 78.54
+            "pct": 75.61
           },
           {
             "ratio": 76.0,
             "sec": 38.76,
-            "pct": 78.54
+            "pct": 75.61
           },
           {
             "ratio": 77.0,
             "sec": 39.27,
-            "pct": 78.11
+            "pct": 75.2
           },
           {
             "ratio": 78.0,
             "sec": 39.78,
-            "pct": 76.82
+            "pct": 73.98
           },
           {
             "ratio": 79.0,
             "sec": 40.29,
-            "pct": 76.82
+            "pct": 73.98
           },
           {
             "ratio": 80.0,
             "sec": 40.8,
-            "pct": 76.82
+            "pct": 73.98
           },
           {
             "ratio": 81.0,
             "sec": 41.31,
-            "pct": 76.39
+            "pct": 73.17
           },
           {
             "ratio": 82.0,
             "sec": 41.82,
-            "pct": 76.39
+            "pct": 73.17
           },
           {
             "ratio": 83.0,
             "sec": 42.33,
-            "pct": 75.54
+            "pct": 72.36
           },
           {
             "ratio": 84.0,
             "sec": 42.84,
-            "pct": 75.54
+            "pct": 71.95
           },
           {
             "ratio": 85.0,
             "sec": 43.35,
-            "pct": 73.39
+            "pct": 69.92
           },
           {
             "ratio": 86.0,
             "sec": 43.86,
-            "pct": 72.1
+            "pct": 68.7
           },
           {
             "ratio": 87.0,
             "sec": 44.37,
-            "pct": 72.1
+            "pct": 68.7
           },
           {
             "ratio": 88.0,
             "sec": 44.88,
-            "pct": 70.39
+            "pct": 67.07
           },
           {
             "ratio": 89.0,
             "sec": 45.39,
-            "pct": 69.1
+            "pct": 65.85
           },
           {
             "ratio": 90.0,
             "sec": 45.9,
-            "pct": 68.24
+            "pct": 65.04
           },
           {
             "ratio": 91.0,
             "sec": 46.41,
-            "pct": 65.24
+            "pct": 62.2
           },
           {
             "ratio": 92.0,
             "sec": 46.92,
-            "pct": 63.52
+            "pct": 60.57
           },
           {
             "ratio": 93.0,
             "sec": 47.43,
-            "pct": 59.23
+            "pct": 56.5
           },
           {
             "ratio": 94.0,
             "sec": 47.94,
-            "pct": 54.51
+            "pct": 52.03
           },
           {
             "ratio": 95.0,
             "sec": 48.45,
-            "pct": 49.36
+            "pct": 47.15
           },
           {
             "ratio": 96.0,
             "sec": 48.96,
-            "pct": 45.92
+            "pct": 43.5
           },
           {
             "ratio": 97.0,
             "sec": 49.47,
-            "pct": 43.78
+            "pct": 41.46
           },
           {
             "ratio": 98.0,
             "sec": 49.98,
-            "pct": 42.06
+            "pct": 39.84
           },
           {
             "ratio": 99.0,
             "sec": 50.49,
-            "pct": 41.63
+            "pct": 39.43
           },
           {
             "ratio": 100.0,
             "sec": 51.0,
-            "pct": 41.63
+            "pct": 39.43
           }
         ]
       },
@@ -6147,62 +6679,62 @@
           {
             "ratio": 1.0,
             "sec": 0.42,
-            "pct": 111.52
+            "pct": 111.45
           },
           {
             "ratio": 2.0,
             "sec": 0.84,
-            "pct": 111.04
+            "pct": 110.97
           },
           {
             "ratio": 3.0,
             "sec": 1.26,
-            "pct": 110.72
+            "pct": 110.65
           },
           {
             "ratio": 4.0,
             "sec": 1.68,
-            "pct": 108.96
+            "pct": 108.9
           },
           {
             "ratio": 5.0,
             "sec": 2.1,
-            "pct": 109.28
+            "pct": 109.22
           },
           {
             "ratio": 6.0,
             "sec": 2.52,
-            "pct": 108.48
+            "pct": 108.43
           },
           {
             "ratio": 7.0,
             "sec": 2.94,
-            "pct": 108.32
+            "pct": 108.27
           },
           {
             "ratio": 8.0,
             "sec": 3.36,
-            "pct": 108.16
+            "pct": 108.11
           },
           {
             "ratio": 9.0,
             "sec": 3.78,
-            "pct": 108.0
+            "pct": 107.95
           },
           {
             "ratio": 10.0,
             "sec": 4.2,
-            "pct": 107.84
+            "pct": 107.79
           },
           {
             "ratio": 11.0,
             "sec": 4.62,
-            "pct": 106.08
+            "pct": 106.04
           },
           {
             "ratio": 12.0,
             "sec": 5.04,
-            "pct": 102.88
+            "pct": 102.86
           },
           {
             "ratio": 13.0,
@@ -6212,62 +6744,62 @@
           {
             "ratio": 14.0,
             "sec": 5.88,
-            "pct": 98.08
+            "pct": 98.09
           },
           {
             "ratio": 15.0,
             "sec": 6.3,
-            "pct": 95.04
+            "pct": 95.07
           },
           {
             "ratio": 16.0,
             "sec": 6.72,
-            "pct": 91.84
+            "pct": 91.89
           },
           {
             "ratio": 17.0,
             "sec": 7.14,
-            "pct": 89.44
+            "pct": 89.51
           },
           {
             "ratio": 18.0,
             "sec": 7.56,
-            "pct": 86.56
+            "pct": 86.65
           },
           {
             "ratio": 19.0,
             "sec": 7.98,
-            "pct": 84.8
+            "pct": 84.9
           },
           {
             "ratio": 20.0,
             "sec": 8.4,
-            "pct": 84.0
+            "pct": 83.94
           },
           {
             "ratio": 21.0,
             "sec": 8.82,
-            "pct": 81.76
+            "pct": 81.72
           },
           {
             "ratio": 22.0,
             "sec": 9.24,
-            "pct": 80.96
+            "pct": 80.92
           },
           {
             "ratio": 23.0,
             "sec": 9.66,
-            "pct": 78.72
+            "pct": 78.7
           },
           {
             "ratio": 24.0,
             "sec": 10.08,
-            "pct": 77.28
+            "pct": 77.27
           },
           {
             "ratio": 25.0,
             "sec": 10.5,
-            "pct": 75.84
+            "pct": 75.83
           },
           {
             "ratio": 26.0,
@@ -6277,372 +6809,372 @@
           {
             "ratio": 27.0,
             "sec": 11.34,
-            "pct": 73.6
+            "pct": 73.61
           },
           {
             "ratio": 28.0,
             "sec": 11.76,
-            "pct": 72.32
+            "pct": 72.34
           },
           {
             "ratio": 29.0,
             "sec": 12.18,
-            "pct": 71.2
+            "pct": 71.22
           },
           {
             "ratio": 30.0,
             "sec": 12.6,
-            "pct": 70.24
+            "pct": 70.27
           },
           {
             "ratio": 31.0,
             "sec": 13.02,
-            "pct": 69.12
+            "pct": 69.16
           },
           {
             "ratio": 32.0,
             "sec": 13.44,
-            "pct": 68.16
+            "pct": 68.2
           },
           {
             "ratio": 33.0,
             "sec": 13.86,
-            "pct": 67.2
+            "pct": 67.25
           },
           {
             "ratio": 34.0,
             "sec": 14.28,
-            "pct": 66.24
+            "pct": 66.3
           },
           {
             "ratio": 35.0,
             "sec": 14.7,
-            "pct": 64.96
+            "pct": 65.02
           },
           {
             "ratio": 36.0,
             "sec": 15.12,
-            "pct": 63.2
+            "pct": 63.28
           },
           {
             "ratio": 37.0,
             "sec": 15.54,
-            "pct": 61.76
+            "pct": 61.84
           },
           {
             "ratio": 38.0,
             "sec": 15.96,
-            "pct": 61.28
+            "pct": 61.37
           },
           {
             "ratio": 39.0,
             "sec": 16.38,
-            "pct": 60.8
+            "pct": 60.89
           },
           {
             "ratio": 40.0,
             "sec": 16.8,
-            "pct": 59.68
+            "pct": 59.78
           },
           {
             "ratio": 41.0,
             "sec": 17.22,
-            "pct": 59.2
+            "pct": 59.3
           },
           {
             "ratio": 42.0,
             "sec": 17.64,
-            "pct": 58.88
+            "pct": 58.98
           },
           {
             "ratio": 43.0,
             "sec": 18.06,
-            "pct": 58.08
+            "pct": 58.19
           },
           {
             "ratio": 44.0,
             "sec": 18.48,
-            "pct": 57.44
+            "pct": 57.55
           },
           {
             "ratio": 45.0,
             "sec": 18.9,
-            "pct": 56.64
+            "pct": 56.76
           },
           {
             "ratio": 46.0,
             "sec": 19.32,
-            "pct": 55.84
+            "pct": 55.96
           },
           {
             "ratio": 47.0,
             "sec": 19.74,
-            "pct": 55.2
+            "pct": 55.33
           },
           {
             "ratio": 48.0,
             "sec": 20.16,
-            "pct": 54.88
+            "pct": 55.01
           },
           {
             "ratio": 49.0,
             "sec": 20.58,
-            "pct": 53.92
+            "pct": 54.05
           },
           {
             "ratio": 50.0,
             "sec": 21.0,
-            "pct": 52.96
+            "pct": 53.1
           },
           {
             "ratio": 51.0,
             "sec": 21.42,
-            "pct": 52.0
+            "pct": 52.15
           },
           {
             "ratio": 52.0,
             "sec": 21.84,
-            "pct": 51.68
+            "pct": 51.83
           },
           {
             "ratio": 53.0,
             "sec": 22.26,
-            "pct": 50.4
+            "pct": 50.56
           },
           {
             "ratio": 54.0,
             "sec": 22.68,
-            "pct": 50.4
+            "pct": 50.56
           },
           {
             "ratio": 55.0,
             "sec": 23.1,
-            "pct": 50.08
+            "pct": 50.24
           },
           {
             "ratio": 56.0,
             "sec": 23.52,
-            "pct": 49.76
+            "pct": 49.92
           },
           {
             "ratio": 57.0,
             "sec": 23.94,
-            "pct": 49.44
+            "pct": 49.6
           },
           {
             "ratio": 58.0,
             "sec": 24.36,
-            "pct": 49.28
+            "pct": 49.44
           },
           {
             "ratio": 59.0,
             "sec": 24.78,
-            "pct": 49.12
+            "pct": 49.28
           },
           {
             "ratio": 60.0,
             "sec": 25.2,
-            "pct": 48.48
+            "pct": 48.65
           },
           {
             "ratio": 61.0,
             "sec": 25.62,
-            "pct": 48.32
+            "pct": 48.49
           },
           {
             "ratio": 62.0,
             "sec": 26.04,
-            "pct": 47.84
+            "pct": 48.01
           },
           {
             "ratio": 63.0,
             "sec": 26.46,
-            "pct": 47.52
+            "pct": 47.69
           },
           {
             "ratio": 64.0,
             "sec": 26.88,
-            "pct": 46.56
+            "pct": 46.74
           },
           {
             "ratio": 65.0,
             "sec": 27.3,
-            "pct": 45.76
+            "pct": 45.95
           },
           {
             "ratio": 66.0,
             "sec": 27.72,
-            "pct": 44.64
+            "pct": 44.83
           },
           {
             "ratio": 67.0,
             "sec": 28.14,
-            "pct": 44.64
+            "pct": 44.83
           },
           {
             "ratio": 68.0,
             "sec": 28.56,
-            "pct": 44.16
+            "pct": 44.36
           },
           {
             "ratio": 69.0,
             "sec": 28.98,
-            "pct": 43.68
+            "pct": 43.88
           },
           {
             "ratio": 70.0,
             "sec": 29.4,
-            "pct": 43.36
+            "pct": 43.56
           },
           {
             "ratio": 71.0,
             "sec": 29.82,
-            "pct": 43.36
+            "pct": 43.56
           },
           {
             "ratio": 72.0,
             "sec": 30.24,
-            "pct": 43.04
+            "pct": 43.24
           },
           {
             "ratio": 73.0,
             "sec": 30.66,
-            "pct": 42.4
+            "pct": 42.61
           },
           {
             "ratio": 74.0,
             "sec": 31.08,
-            "pct": 42.4
+            "pct": 42.61
           },
           {
             "ratio": 75.0,
             "sec": 31.5,
-            "pct": 42.24
+            "pct": 42.45
           },
           {
             "ratio": 76.0,
             "sec": 31.92,
-            "pct": 42.24
+            "pct": 42.45
           },
           {
             "ratio": 77.0,
             "sec": 32.34,
-            "pct": 42.08
+            "pct": 42.29
           },
           {
             "ratio": 78.0,
             "sec": 32.76,
-            "pct": 42.08
+            "pct": 42.29
           },
           {
             "ratio": 79.0,
             "sec": 33.18,
-            "pct": 41.76
+            "pct": 41.97
           },
           {
             "ratio": 80.0,
             "sec": 33.6,
-            "pct": 41.44
+            "pct": 41.65
           },
           {
             "ratio": 81.0,
             "sec": 34.02,
-            "pct": 41.28
+            "pct": 41.49
           },
           {
             "ratio": 82.0,
             "sec": 34.44,
-            "pct": 40.16
+            "pct": 40.38
           },
           {
             "ratio": 83.0,
             "sec": 34.86,
-            "pct": 38.88
+            "pct": 39.11
           },
           {
             "ratio": 84.0,
             "sec": 35.28,
-            "pct": 36.64
+            "pct": 36.88
           },
           {
             "ratio": 85.0,
             "sec": 35.7,
-            "pct": 34.24
+            "pct": 34.5
           },
           {
             "ratio": 86.0,
             "sec": 36.12,
-            "pct": 31.52
+            "pct": 31.48
           },
           {
             "ratio": 87.0,
             "sec": 36.54,
-            "pct": 26.4
+            "pct": 26.23
           },
           {
             "ratio": 88.0,
             "sec": 36.96,
-            "pct": 22.72
+            "pct": 22.58
           },
           {
             "ratio": 89.0,
             "sec": 37.38,
-            "pct": 19.68
+            "pct": 19.55
           },
           {
             "ratio": 90.0,
             "sec": 37.8,
-            "pct": 17.92
+            "pct": 17.81
           },
           {
             "ratio": 91.0,
             "sec": 38.22,
-            "pct": 16.96
+            "pct": 16.85
           },
           {
             "ratio": 92.0,
             "sec": 38.64,
-            "pct": 16.64
+            "pct": 16.53
           },
           {
             "ratio": 93.0,
             "sec": 39.06,
-            "pct": 16.0
+            "pct": 15.9
           },
           {
             "ratio": 94.0,
             "sec": 39.48,
-            "pct": 15.52
+            "pct": 15.42
           },
           {
             "ratio": 95.0,
             "sec": 39.9,
-            "pct": 15.2
+            "pct": 15.1
           },
           {
             "ratio": 96.0,
             "sec": 40.32,
-            "pct": 14.72
+            "pct": 14.63
           },
           {
             "ratio": 97.0,
             "sec": 40.74,
-            "pct": 14.4
+            "pct": 14.31
           },
           {
             "ratio": 98.0,
             "sec": 41.16,
-            "pct": 12.64
+            "pct": 12.56
           },
           {
             "ratio": 99.0,
             "sec": 41.58,
-            "pct": 11.52
+            "pct": 11.45
           },
           {
             "ratio": 100.0,
             "sec": 42.0,
-            "pct": 11.52
+            "pct": 11.45
           }
         ]
       },
@@ -7159,502 +7691,502 @@
           {
             "ratio": 1.0,
             "sec": 2.15,
-            "pct": 99.3
+            "pct": 99.33
           },
           {
             "ratio": 2.0,
             "sec": 4.3,
-            "pct": 91.61
+            "pct": 90.6
           },
           {
             "ratio": 3.0,
             "sec": 6.45,
-            "pct": 83.92
+            "pct": 83.22
           },
           {
             "ratio": 4.0,
             "sec": 8.6,
-            "pct": 72.03
+            "pct": 71.14
           },
           {
             "ratio": 5.0,
             "sec": 10.75,
-            "pct": 61.54
+            "pct": 61.07
           },
           {
             "ratio": 6.0,
             "sec": 12.9,
-            "pct": 53.85
+            "pct": 53.02
           },
           {
             "ratio": 7.0,
             "sec": 15.05,
-            "pct": 50.35
+            "pct": 49.66
           },
           {
             "ratio": 8.0,
             "sec": 17.2,
-            "pct": 48.95
+            "pct": 47.65
           },
           {
             "ratio": 9.0,
             "sec": 19.35,
-            "pct": 45.45
+            "pct": 44.97
           },
           {
             "ratio": 10.0,
             "sec": 21.5,
-            "pct": 42.66
+            "pct": 42.28
           },
           {
             "ratio": 11.0,
             "sec": 23.65,
-            "pct": 41.26
+            "pct": 39.6
           },
           {
             "ratio": 12.0,
             "sec": 25.8,
-            "pct": 39.86
+            "pct": 38.26
           },
           {
             "ratio": 13.0,
             "sec": 27.95,
-            "pct": 37.76
+            "pct": 36.24
           },
           {
             "ratio": 14.0,
             "sec": 30.1,
-            "pct": 35.66
+            "pct": 34.9
           },
           {
             "ratio": 15.0,
             "sec": 32.25,
-            "pct": 34.27
+            "pct": 33.56
           },
           {
             "ratio": 16.0,
             "sec": 34.4,
-            "pct": 34.27
+            "pct": 32.89
           },
           {
             "ratio": 17.0,
             "sec": 36.55,
-            "pct": 34.97
+            "pct": 33.56
           },
           {
             "ratio": 18.0,
             "sec": 38.7,
-            "pct": 32.87
+            "pct": 31.54
           },
           {
             "ratio": 19.0,
             "sec": 40.85,
-            "pct": 30.07
+            "pct": 29.53
           },
           {
             "ratio": 20.0,
             "sec": 43.0,
-            "pct": 27.27
+            "pct": 26.85
           },
           {
             "ratio": 21.0,
             "sec": 45.15,
-            "pct": 26.57
+            "pct": 26.17
           },
           {
             "ratio": 22.0,
             "sec": 47.3,
-            "pct": 27.27
+            "pct": 26.85
           },
           {
             "ratio": 23.0,
             "sec": 49.45,
-            "pct": 24.48
+            "pct": 23.49
           },
           {
             "ratio": 24.0,
             "sec": 51.6,
-            "pct": 23.78
+            "pct": 22.82
           },
           {
             "ratio": 25.0,
             "sec": 53.75,
-            "pct": 22.38
+            "pct": 21.48
           },
           {
             "ratio": 26.0,
             "sec": 55.9,
-            "pct": 23.08
+            "pct": 22.82
           },
           {
             "ratio": 27.0,
             "sec": 58.05,
-            "pct": 23.08
+            "pct": 22.82
           },
           {
             "ratio": 28.0,
             "sec": 60.2,
-            "pct": 20.98
+            "pct": 20.13
           },
           {
             "ratio": 29.0,
             "sec": 62.35,
-            "pct": 20.98
+            "pct": 20.13
           },
           {
             "ratio": 30.0,
             "sec": 64.5,
-            "pct": 18.88
+            "pct": 18.12
           },
           {
             "ratio": 31.0,
             "sec": 66.65,
-            "pct": 18.18
+            "pct": 17.45
           },
           {
             "ratio": 32.0,
             "sec": 68.8,
-            "pct": 17.48
+            "pct": 16.78
           },
           {
             "ratio": 33.0,
             "sec": 70.95,
-            "pct": 16.08
+            "pct": 16.11
           },
           {
             "ratio": 34.0,
             "sec": 73.1,
-            "pct": 16.78
+            "pct": 16.11
           },
           {
             "ratio": 35.0,
             "sec": 75.25,
-            "pct": 16.08
+            "pct": 15.44
           },
           {
             "ratio": 36.0,
             "sec": 77.4,
-            "pct": 15.38
+            "pct": 14.77
           },
           {
             "ratio": 37.0,
             "sec": 79.55,
-            "pct": 13.29
+            "pct": 12.75
           },
           {
             "ratio": 38.0,
             "sec": 81.7,
-            "pct": 13.99
+            "pct": 13.42
           },
           {
             "ratio": 39.0,
             "sec": 83.85,
-            "pct": 13.99
+            "pct": 13.42
           },
           {
             "ratio": 40.0,
             "sec": 86.0,
-            "pct": 14.69
+            "pct": 14.09
           },
           {
             "ratio": 41.0,
             "sec": 88.15,
-            "pct": 15.38
+            "pct": 14.77
           },
           {
             "ratio": 42.0,
             "sec": 90.3,
-            "pct": 16.08
+            "pct": 15.44
           },
           {
             "ratio": 43.0,
             "sec": 92.45,
-            "pct": 14.69
+            "pct": 14.09
           },
           {
             "ratio": 44.0,
             "sec": 94.6,
-            "pct": 13.99
+            "pct": 13.42
           },
           {
             "ratio": 45.0,
             "sec": 96.75,
-            "pct": 13.29
+            "pct": 12.75
           },
           {
             "ratio": 46.0,
             "sec": 98.9,
-            "pct": 11.89
+            "pct": 11.41
           },
           {
             "ratio": 47.0,
             "sec": 101.05,
-            "pct": 11.89
+            "pct": 11.41
           },
           {
             "ratio": 48.0,
             "sec": 103.2,
-            "pct": 11.89
+            "pct": 11.41
           },
           {
             "ratio": 49.0,
             "sec": 105.35,
-            "pct": 11.89
+            "pct": 11.41
           },
           {
             "ratio": 50.0,
             "sec": 107.5,
-            "pct": 11.89
+            "pct": 12.08
           },
           {
             "ratio": 51.0,
             "sec": 109.65,
-            "pct": 12.59
+            "pct": 12.75
           },
           {
             "ratio": 52.0,
             "sec": 111.8,
-            "pct": 11.89
+            "pct": 12.08
           },
           {
             "ratio": 53.0,
             "sec": 113.95,
-            "pct": 11.19
+            "pct": 11.41
           },
           {
             "ratio": 54.0,
             "sec": 116.1,
-            "pct": 10.49
+            "pct": 10.07
           },
           {
             "ratio": 55.0,
             "sec": 118.25,
-            "pct": 10.49
+            "pct": 10.07
           },
           {
             "ratio": 56.0,
             "sec": 120.4,
-            "pct": 10.49
+            "pct": 10.07
           },
           {
             "ratio": 57.0,
             "sec": 122.55,
-            "pct": 10.49
+            "pct": 10.07
           },
           {
             "ratio": 58.0,
             "sec": 124.7,
-            "pct": 10.49
+            "pct": 10.07
           },
           {
             "ratio": 59.0,
             "sec": 126.85,
-            "pct": 10.49
+            "pct": 10.07
           },
           {
             "ratio": 60.0,
             "sec": 129.0,
-            "pct": 10.49
+            "pct": 10.07
           },
           {
             "ratio": 61.0,
             "sec": 131.15,
-            "pct": 9.79
+            "pct": 9.4
           },
           {
             "ratio": 62.0,
             "sec": 133.3,
-            "pct": 9.09
+            "pct": 8.72
           },
           {
             "ratio": 63.0,
             "sec": 135.45,
-            "pct": 9.79
+            "pct": 9.4
           },
           {
             "ratio": 64.0,
             "sec": 137.6,
-            "pct": 9.09
+            "pct": 8.72
           },
           {
             "ratio": 65.0,
             "sec": 139.75,
-            "pct": 8.39
+            "pct": 8.05
           },
           {
             "ratio": 66.0,
             "sec": 141.9,
-            "pct": 8.39
+            "pct": 8.05
           },
           {
             "ratio": 67.0,
             "sec": 144.05,
-            "pct": 7.69
+            "pct": 7.38
           },
           {
             "ratio": 68.0,
             "sec": 146.2,
-            "pct": 8.39
+            "pct": 8.05
           },
           {
             "ratio": 69.0,
             "sec": 148.35,
-            "pct": 8.39
+            "pct": 8.05
           },
           {
             "ratio": 70.0,
             "sec": 150.5,
-            "pct": 7.69
+            "pct": 7.38
           },
           {
             "ratio": 71.0,
             "sec": 152.65,
-            "pct": 7.69
+            "pct": 7.38
           },
           {
             "ratio": 72.0,
             "sec": 154.8,
-            "pct": 7.69
+            "pct": 7.38
           },
           {
             "ratio": 73.0,
             "sec": 156.95,
-            "pct": 9.09
+            "pct": 8.72
           },
           {
             "ratio": 74.0,
             "sec": 159.1,
-            "pct": 8.39
+            "pct": 8.05
           },
           {
             "ratio": 75.0,
             "sec": 161.25,
-            "pct": 7.69
+            "pct": 7.38
           },
           {
             "ratio": 76.0,
             "sec": 163.4,
-            "pct": 7.69
+            "pct": 7.38
           },
           {
             "ratio": 77.0,
             "sec": 165.55,
-            "pct": 6.99
+            "pct": 6.71
           },
           {
             "ratio": 78.0,
             "sec": 167.7,
-            "pct": 6.99
+            "pct": 6.71
           },
           {
             "ratio": 79.0,
             "sec": 169.85,
-            "pct": 6.29
+            "pct": 6.04
           },
           {
             "ratio": 80.0,
             "sec": 172.0,
-            "pct": 6.29
+            "pct": 6.04
           },
           {
             "ratio": 81.0,
             "sec": 174.15,
-            "pct": 5.59
+            "pct": 5.37
           },
           {
             "ratio": 82.0,
             "sec": 176.3,
-            "pct": 5.59
+            "pct": 5.37
           },
           {
             "ratio": 83.0,
             "sec": 178.45,
-            "pct": 5.59
+            "pct": 5.37
           },
           {
             "ratio": 84.0,
             "sec": 180.6,
-            "pct": 5.59
+            "pct": 5.37
           },
           {
             "ratio": 85.0,
             "sec": 182.75,
-            "pct": 5.59
+            "pct": 5.37
           },
           {
             "ratio": 86.0,
             "sec": 184.9,
-            "pct": 5.59
+            "pct": 5.37
           },
           {
             "ratio": 87.0,
             "sec": 187.05,
-            "pct": 5.59
+            "pct": 5.37
           },
           {
             "ratio": 88.0,
             "sec": 189.2,
-            "pct": 5.59
+            "pct": 5.37
           },
           {
             "ratio": 89.0,
             "sec": 191.35,
-            "pct": 5.59
+            "pct": 5.37
           },
           {
             "ratio": 90.0,
             "sec": 193.5,
-            "pct": 6.29
+            "pct": 6.04
           },
           {
             "ratio": 91.0,
             "sec": 195.65,
-            "pct": 6.29
+            "pct": 6.04
           },
           {
             "ratio": 92.0,
             "sec": 197.8,
-            "pct": 6.29
+            "pct": 6.04
           },
           {
             "ratio": 93.0,
             "sec": 199.95,
-            "pct": 5.59
+            "pct": 5.37
           },
           {
             "ratio": 94.0,
             "sec": 202.1,
-            "pct": 5.59
+            "pct": 5.37
           },
           {
             "ratio": 95.0,
             "sec": 204.25,
-            "pct": 5.59
+            "pct": 5.37
           },
           {
             "ratio": 96.0,
             "sec": 206.4,
-            "pct": 5.59
+            "pct": 5.37
           },
           {
             "ratio": 97.0,
             "sec": 208.55,
-            "pct": 5.59
+            "pct": 5.37
           },
           {
             "ratio": 98.0,
             "sec": 210.7,
-            "pct": 4.9
+            "pct": 4.7
           },
           {
             "ratio": 99.0,
             "sec": 212.85,
-            "pct": 4.9
+            "pct": 4.7
           },
           {
             "ratio": 100.0,
             "sec": 215.0,
-            "pct": 4.2
+            "pct": 4.03
           }
         ]
       },
@@ -7665,7 +8197,7 @@
           {
             "ratio": 1.0,
             "sec": 0.58,
-            "pct": 98.64
+            "pct": 98.66
           },
           {
             "ratio": 2.0,
@@ -7700,1464 +8232,467 @@
           {
             "ratio": 8.0,
             "sec": 4.64,
-            "pct": 99.32
+            "pct": 99.33
           },
           {
             "ratio": 9.0,
             "sec": 5.22,
-            "pct": 89.12
+            "pct": 89.26
           },
           {
             "ratio": 10.0,
             "sec": 5.8,
-            "pct": 84.35
+            "pct": 84.56
           },
           {
             "ratio": 11.0,
             "sec": 6.38,
-            "pct": 80.95
+            "pct": 81.21
           },
           {
             "ratio": 12.0,
             "sec": 6.96,
-            "pct": 76.87
+            "pct": 77.18
           },
           {
             "ratio": 13.0,
             "sec": 7.54,
-            "pct": 74.15
+            "pct": 74.5
           },
           {
             "ratio": 14.0,
             "sec": 8.12,
-            "pct": 68.03
+            "pct": 68.46
           },
           {
             "ratio": 15.0,
             "sec": 8.7,
-            "pct": 62.59
+            "pct": 63.09
           },
           {
             "ratio": 16.0,
             "sec": 9.28,
-            "pct": 59.86
+            "pct": 60.4
           },
           {
             "ratio": 17.0,
             "sec": 9.86,
-            "pct": 57.82
+            "pct": 58.39
           },
           {
             "ratio": 18.0,
             "sec": 10.44,
-            "pct": 51.7
+            "pct": 52.35
           },
           {
             "ratio": 19.0,
             "sec": 11.02,
-            "pct": 50.34
+            "pct": 51.01
           },
           {
             "ratio": 20.0,
             "sec": 11.6,
-            "pct": 48.98
+            "pct": 49.66
           },
           {
             "ratio": 21.0,
             "sec": 12.18,
-            "pct": 44.9
+            "pct": 45.64
           },
           {
             "ratio": 22.0,
             "sec": 12.76,
-            "pct": 41.5
+            "pct": 42.28
           },
           {
             "ratio": 23.0,
             "sec": 13.34,
-            "pct": 40.14
+            "pct": 40.94
           },
           {
             "ratio": 24.0,
             "sec": 13.92,
-            "pct": 39.46
+            "pct": 40.27
           },
           {
             "ratio": 25.0,
             "sec": 14.5,
-            "pct": 38.78
+            "pct": 39.6
           },
           {
             "ratio": 26.0,
             "sec": 15.08,
-            "pct": 38.78
+            "pct": 39.6
           },
           {
             "ratio": 27.0,
             "sec": 15.66,
-            "pct": 38.1
+            "pct": 38.93
           },
           {
             "ratio": 28.0,
             "sec": 16.24,
-            "pct": 37.41
+            "pct": 38.26
           },
           {
             "ratio": 29.0,
             "sec": 16.82,
-            "pct": 35.37
+            "pct": 36.24
           },
           {
             "ratio": 30.0,
             "sec": 17.4,
-            "pct": 34.01
+            "pct": 34.9
           },
           {
             "ratio": 31.0,
             "sec": 17.98,
-            "pct": 32.65
+            "pct": 33.56
           },
           {
             "ratio": 32.0,
             "sec": 18.56,
-            "pct": 32.65
+            "pct": 33.56
           },
           {
             "ratio": 33.0,
             "sec": 19.14,
-            "pct": 31.29
+            "pct": 32.21
           },
           {
             "ratio": 34.0,
             "sec": 19.72,
-            "pct": 31.29
+            "pct": 32.21
           },
           {
             "ratio": 35.0,
             "sec": 20.3,
-            "pct": 31.29
+            "pct": 32.21
           },
           {
             "ratio": 36.0,
             "sec": 20.88,
-            "pct": 30.61
+            "pct": 31.54
           },
           {
             "ratio": 37.0,
             "sec": 21.46,
-            "pct": 28.57
+            "pct": 29.53
           },
           {
             "ratio": 38.0,
             "sec": 22.04,
-            "pct": 28.57
+            "pct": 29.53
           },
           {
             "ratio": 39.0,
             "sec": 22.62,
-            "pct": 28.57
+            "pct": 29.53
           },
           {
             "ratio": 40.0,
             "sec": 23.2,
-            "pct": 28.57
+            "pct": 29.53
           },
           {
             "ratio": 41.0,
             "sec": 23.78,
-            "pct": 28.57
+            "pct": 29.53
           },
           {
             "ratio": 42.0,
             "sec": 24.36,
-            "pct": 28.57
+            "pct": 29.53
           },
           {
             "ratio": 43.0,
             "sec": 24.94,
-            "pct": 27.89
+            "pct": 28.86
           },
           {
             "ratio": 44.0,
             "sec": 25.52,
-            "pct": 27.89
+            "pct": 28.86
           },
           {
             "ratio": 45.0,
             "sec": 26.1,
-            "pct": 26.53
+            "pct": 27.52
           },
           {
             "ratio": 46.0,
             "sec": 26.68,
-            "pct": 26.53
+            "pct": 27.52
           },
           {
             "ratio": 47.0,
             "sec": 27.26,
-            "pct": 26.53
+            "pct": 27.52
           },
           {
             "ratio": 48.0,
             "sec": 27.84,
-            "pct": 25.85
+            "pct": 26.17
           },
           {
             "ratio": 49.0,
             "sec": 28.42,
-            "pct": 25.17
+            "pct": 25.5
           },
           {
             "ratio": 50.0,
             "sec": 29.0,
-            "pct": 25.17
+            "pct": 25.5
           },
           {
             "ratio": 51.0,
             "sec": 29.58,
-            "pct": 24.49
+            "pct": 24.83
           },
           {
             "ratio": 52.0,
             "sec": 30.16,
-            "pct": 24.49
+            "pct": 24.83
           },
           {
             "ratio": 53.0,
             "sec": 30.74,
-            "pct": 24.49
+            "pct": 24.83
           },
           {
             "ratio": 54.0,
             "sec": 31.32,
-            "pct": 24.49
+            "pct": 24.83
           },
           {
             "ratio": 55.0,
             "sec": 31.9,
-            "pct": 24.49
+            "pct": 24.83
           },
           {
             "ratio": 56.0,
             "sec": 32.48,
-            "pct": 23.81
+            "pct": 24.16
           },
           {
             "ratio": 57.0,
             "sec": 33.06,
-            "pct": 23.13
+            "pct": 23.49
           },
           {
             "ratio": 58.0,
             "sec": 33.64,
-            "pct": 23.13
+            "pct": 23.49
           },
           {
             "ratio": 59.0,
             "sec": 34.22,
-            "pct": 23.13
+            "pct": 23.49
           },
           {
             "ratio": 60.0,
             "sec": 34.8,
-            "pct": 22.45
+            "pct": 22.82
           },
           {
             "ratio": 61.0,
             "sec": 35.38,
-            "pct": 22.45
+            "pct": 22.82
           },
           {
             "ratio": 62.0,
             "sec": 35.96,
-            "pct": 21.77
+            "pct": 22.15
           },
           {
             "ratio": 63.0,
             "sec": 36.54,
-            "pct": 21.77
+            "pct": 22.15
           },
           {
             "ratio": 64.0,
             "sec": 37.12,
-            "pct": 21.77
+            "pct": 22.15
           },
           {
             "ratio": 65.0,
             "sec": 37.7,
-            "pct": 21.09
+            "pct": 21.48
           },
           {
             "ratio": 66.0,
             "sec": 38.28,
-            "pct": 19.05
+            "pct": 19.46
           },
           {
             "ratio": 67.0,
             "sec": 38.86,
-            "pct": 19.05
+            "pct": 19.46
           },
           {
             "ratio": 68.0,
             "sec": 39.44,
-            "pct": 19.05
+            "pct": 19.46
           },
           {
             "ratio": 69.0,
             "sec": 40.02,
-            "pct": 18.37
+            "pct": 18.79
           },
           {
             "ratio": 70.0,
             "sec": 40.6,
-            "pct": 18.37
+            "pct": 18.79
           },
           {
             "ratio": 71.0,
             "sec": 41.18,
-            "pct": 15.65
+            "pct": 16.11
           },
           {
             "ratio": 72.0,
             "sec": 41.76,
-            "pct": 14.97
+            "pct": 15.44
           },
           {
             "ratio": 73.0,
             "sec": 42.34,
-            "pct": 14.97
+            "pct": 15.44
           },
           {
             "ratio": 74.0,
             "sec": 42.92,
-            "pct": 14.97
+            "pct": 15.44
           },
           {
             "ratio": 75.0,
             "sec": 43.5,
-            "pct": 14.97
+            "pct": 15.44
           },
           {
             "ratio": 76.0,
             "sec": 44.08,
-            "pct": 14.97
+            "pct": 15.44
           },
           {
             "ratio": 77.0,
             "sec": 44.66,
-            "pct": 14.97
+            "pct": 15.44
           },
           {
             "ratio": 78.0,
             "sec": 45.24,
-            "pct": 14.97
+            "pct": 15.44
           },
           {
             "ratio": 79.0,
             "sec": 45.82,
-            "pct": 14.29
+            "pct": 14.77
           },
           {
             "ratio": 80.0,
             "sec": 46.4,
-            "pct": 12.93
+            "pct": 13.42
           },
           {
             "ratio": 81.0,
             "sec": 46.98,
-            "pct": 14.29
+            "pct": 14.77
           },
           {
             "ratio": 82.0,
             "sec": 47.56,
-            "pct": 14.29
+            "pct": 14.77
           },
           {
             "ratio": 83.0,
             "sec": 48.14,
-            "pct": 13.61
+            "pct": 14.09
           },
           {
             "ratio": 84.0,
             "sec": 48.72,
-            "pct": 10.88
+            "pct": 11.41
           },
           {
             "ratio": 85.0,
             "sec": 49.3,
-            "pct": 10.2
+            "pct": 10.74
           },
           {
             "ratio": 86.0,
             "sec": 49.88,
-            "pct": 10.2
+            "pct": 10.74
           },
           {
             "ratio": 87.0,
             "sec": 50.46,
-            "pct": 10.2
+            "pct": 10.74
           },
           {
             "ratio": 88.0,
             "sec": 51.04,
-            "pct": 9.52
+            "pct": 10.07
           },
           {
             "ratio": 89.0,
             "sec": 51.62,
-            "pct": 9.52
+            "pct": 10.07
           },
           {
             "ratio": 90.0,
             "sec": 52.2,
-            "pct": 8.16
+            "pct": 8.72
           },
           {
             "ratio": 91.0,
             "sec": 52.78,
-            "pct": 8.16
+            "pct": 8.72
           },
           {
             "ratio": 92.0,
             "sec": 53.36,
-            "pct": 6.12
+            "pct": 6.71
           },
           {
             "ratio": 93.0,
             "sec": 53.94,
-            "pct": 5.44
+            "pct": 6.04
           },
           {
             "ratio": 94.0,
             "sec": 54.52,
-            "pct": 4.76
+            "pct": 5.37
           },
           {
             "ratio": 95.0,
             "sec": 55.1,
-            "pct": 3.4
+            "pct": 4.03
           },
           {
             "ratio": 96.0,
             "sec": 55.68,
-            "pct": 2.04
+            "pct": 2.68
           },
           {
             "ratio": 97.0,
             "sec": 56.26,
-            "pct": 2.04
-          }
-        ]
-      },
-      {
-        "video_id": "DFOAE6foZ8E",
-        "title": "Çok Tuzlu Çekirdek Yediğinde Dudakların Neden Kuruyup Büzüşür? 🧂 #bilgidozu #shorts",
-        "points": [
-          {
-            "ratio": 1.0,
-            "sec": 0.53,
-            "pct": 106.72
-          },
-          {
-            "ratio": 2.0,
-            "sec": 1.06,
-            "pct": 106.72
-          },
-          {
-            "ratio": 3.0,
-            "sec": 1.59,
-            "pct": 104.48
-          },
-          {
-            "ratio": 4.0,
-            "sec": 2.12,
-            "pct": 104.48
-          },
-          {
-            "ratio": 5.0,
-            "sec": 2.65,
-            "pct": 103.73
-          },
-          {
-            "ratio": 6.0,
-            "sec": 3.18,
-            "pct": 103.73
-          },
-          {
-            "ratio": 7.0,
-            "sec": 3.71,
-            "pct": 102.99
-          },
-          {
-            "ratio": 8.0,
-            "sec": 4.24,
-            "pct": 102.99
-          },
-          {
-            "ratio": 9.0,
-            "sec": 4.77,
-            "pct": 97.76
-          },
-          {
-            "ratio": 10.0,
-            "sec": 5.3,
-            "pct": 94.78
-          },
-          {
-            "ratio": 11.0,
-            "sec": 5.83,
-            "pct": 91.79
-          },
-          {
-            "ratio": 12.0,
-            "sec": 6.36,
-            "pct": 88.06
-          },
-          {
-            "ratio": 13.0,
-            "sec": 6.89,
-            "pct": 84.33
-          },
-          {
-            "ratio": 14.0,
-            "sec": 7.42,
-            "pct": 82.84
-          },
-          {
-            "ratio": 15.0,
-            "sec": 7.95,
-            "pct": 81.34
-          },
-          {
-            "ratio": 16.0,
-            "sec": 8.48,
-            "pct": 77.61
-          },
-          {
-            "ratio": 17.0,
-            "sec": 9.01,
-            "pct": 73.88
-          },
-          {
-            "ratio": 18.0,
-            "sec": 9.54,
-            "pct": 70.9
-          },
-          {
-            "ratio": 19.0,
-            "sec": 10.07,
-            "pct": 68.66
-          },
-          {
-            "ratio": 20.0,
-            "sec": 10.6,
-            "pct": 66.42
-          },
-          {
-            "ratio": 21.0,
-            "sec": 11.13,
-            "pct": 61.94
-          },
-          {
-            "ratio": 22.0,
-            "sec": 11.66,
-            "pct": 60.45
-          },
-          {
-            "ratio": 23.0,
-            "sec": 12.19,
-            "pct": 58.21
-          },
-          {
-            "ratio": 24.0,
-            "sec": 12.72,
-            "pct": 56.72
-          },
-          {
-            "ratio": 25.0,
-            "sec": 13.25,
-            "pct": 56.72
-          },
-          {
-            "ratio": 26.0,
-            "sec": 13.78,
-            "pct": 56.72
-          },
-          {
-            "ratio": 27.0,
-            "sec": 14.31,
-            "pct": 54.48
-          },
-          {
-            "ratio": 28.0,
-            "sec": 14.84,
-            "pct": 53.73
-          },
-          {
-            "ratio": 29.0,
-            "sec": 15.37,
-            "pct": 50.0
-          },
-          {
-            "ratio": 30.0,
-            "sec": 15.9,
-            "pct": 47.76
-          },
-          {
-            "ratio": 31.0,
-            "sec": 16.43,
-            "pct": 47.76
-          },
-          {
-            "ratio": 32.0,
-            "sec": 16.96,
-            "pct": 46.27
-          },
-          {
-            "ratio": 33.0,
-            "sec": 17.49,
-            "pct": 44.78
-          },
-          {
-            "ratio": 34.0,
-            "sec": 18.02,
-            "pct": 42.54
-          },
-          {
-            "ratio": 35.0,
-            "sec": 18.55,
-            "pct": 41.79
-          },
-          {
-            "ratio": 36.0,
-            "sec": 19.08,
-            "pct": 41.04
-          },
-          {
-            "ratio": 37.0,
-            "sec": 19.61,
-            "pct": 40.3
-          },
-          {
-            "ratio": 38.0,
-            "sec": 20.14,
-            "pct": 40.3
-          },
-          {
-            "ratio": 39.0,
-            "sec": 20.67,
-            "pct": 40.3
-          },
-          {
-            "ratio": 40.0,
-            "sec": 21.2,
-            "pct": 40.3
-          },
-          {
-            "ratio": 41.0,
-            "sec": 21.73,
-            "pct": 39.55
-          },
-          {
-            "ratio": 42.0,
-            "sec": 22.26,
-            "pct": 39.55
-          },
-          {
-            "ratio": 43.0,
-            "sec": 22.79,
-            "pct": 40.3
-          },
-          {
-            "ratio": 44.0,
-            "sec": 23.32,
-            "pct": 39.55
-          },
-          {
-            "ratio": 45.0,
-            "sec": 23.85,
-            "pct": 37.31
-          },
-          {
-            "ratio": 46.0,
-            "sec": 24.38,
-            "pct": 37.31
-          },
-          {
-            "ratio": 47.0,
-            "sec": 24.91,
-            "pct": 37.31
-          },
-          {
-            "ratio": 48.0,
-            "sec": 25.44,
-            "pct": 35.82
-          },
-          {
-            "ratio": 49.0,
-            "sec": 25.97,
-            "pct": 34.33
-          },
-          {
-            "ratio": 50.0,
-            "sec": 26.5,
-            "pct": 33.58
-          },
-          {
-            "ratio": 51.0,
-            "sec": 27.03,
-            "pct": 32.84
-          },
-          {
-            "ratio": 52.0,
-            "sec": 27.56,
-            "pct": 32.84
-          },
-          {
-            "ratio": 53.0,
-            "sec": 28.09,
-            "pct": 32.84
-          },
-          {
-            "ratio": 54.0,
-            "sec": 28.62,
-            "pct": 32.09
-          },
-          {
-            "ratio": 55.0,
-            "sec": 29.15,
-            "pct": 31.34
-          },
-          {
-            "ratio": 56.0,
-            "sec": 29.68,
-            "pct": 32.84
-          },
-          {
-            "ratio": 57.0,
-            "sec": 30.21,
-            "pct": 32.09
-          },
-          {
-            "ratio": 58.0,
-            "sec": 30.74,
-            "pct": 32.09
-          },
-          {
-            "ratio": 59.0,
-            "sec": 31.27,
-            "pct": 31.34
-          },
-          {
-            "ratio": 60.0,
-            "sec": 31.8,
-            "pct": 30.6
-          },
-          {
-            "ratio": 61.0,
-            "sec": 32.33,
-            "pct": 30.6
-          },
-          {
-            "ratio": 62.0,
-            "sec": 32.86,
-            "pct": 30.6
-          },
-          {
-            "ratio": 63.0,
-            "sec": 33.39,
-            "pct": 30.6
-          },
-          {
-            "ratio": 64.0,
-            "sec": 33.92,
-            "pct": 30.6
-          },
-          {
-            "ratio": 65.0,
-            "sec": 34.45,
-            "pct": 30.6
-          },
-          {
-            "ratio": 66.0,
-            "sec": 34.98,
-            "pct": 30.6
-          },
-          {
-            "ratio": 67.0,
-            "sec": 35.51,
-            "pct": 30.6
-          },
-          {
-            "ratio": 68.0,
-            "sec": 36.04,
-            "pct": 29.85
-          },
-          {
-            "ratio": 69.0,
-            "sec": 36.57,
-            "pct": 29.1
-          },
-          {
-            "ratio": 70.0,
-            "sec": 37.1,
-            "pct": 29.1
-          },
-          {
-            "ratio": 71.0,
-            "sec": 37.63,
-            "pct": 27.61
-          },
-          {
-            "ratio": 72.0,
-            "sec": 38.16,
-            "pct": 28.36
-          },
-          {
-            "ratio": 73.0,
-            "sec": 38.69,
-            "pct": 28.36
-          },
-          {
-            "ratio": 74.0,
-            "sec": 39.22,
-            "pct": 28.36
-          },
-          {
-            "ratio": 75.0,
-            "sec": 39.75,
-            "pct": 26.87
-          },
-          {
-            "ratio": 76.0,
-            "sec": 40.28,
-            "pct": 26.87
-          },
-          {
-            "ratio": 77.0,
-            "sec": 40.81,
-            "pct": 26.87
-          },
-          {
-            "ratio": 78.0,
-            "sec": 41.34,
-            "pct": 26.12
-          },
-          {
-            "ratio": 79.0,
-            "sec": 41.87,
-            "pct": 26.12
-          },
-          {
-            "ratio": 80.0,
-            "sec": 42.4,
-            "pct": 27.61
-          },
-          {
-            "ratio": 81.0,
-            "sec": 42.93,
-            "pct": 26.87
-          },
-          {
-            "ratio": 82.0,
-            "sec": 43.46,
-            "pct": 26.12
-          },
-          {
-            "ratio": 83.0,
-            "sec": 43.99,
-            "pct": 26.12
-          },
-          {
-            "ratio": 84.0,
-            "sec": 44.52,
-            "pct": 25.37
-          },
-          {
-            "ratio": 85.0,
-            "sec": 45.05,
-            "pct": 25.37
-          },
-          {
-            "ratio": 86.0,
-            "sec": 45.58,
-            "pct": 24.63
-          },
-          {
-            "ratio": 87.0,
-            "sec": 46.11,
-            "pct": 23.88
-          },
-          {
-            "ratio": 88.0,
-            "sec": 46.64,
-            "pct": 23.88
-          },
-          {
-            "ratio": 89.0,
-            "sec": 47.17,
-            "pct": 23.88
-          },
-          {
-            "ratio": 90.0,
-            "sec": 47.7,
-            "pct": 20.9
-          },
-          {
-            "ratio": 91.0,
-            "sec": 48.23,
-            "pct": 18.66
-          },
-          {
-            "ratio": 92.0,
-            "sec": 48.76,
-            "pct": 15.67
-          },
-          {
-            "ratio": 93.0,
-            "sec": 49.29,
-            "pct": 14.18
-          },
-          {
-            "ratio": 94.0,
-            "sec": 49.82,
-            "pct": 10.45
-          },
-          {
-            "ratio": 95.0,
-            "sec": 50.35,
-            "pct": 10.45
-          },
-          {
-            "ratio": 96.0,
-            "sec": 50.88,
-            "pct": 8.21
-          },
-          {
-            "ratio": 97.0,
-            "sec": 51.41,
-            "pct": 7.46
+            "pct": 2.68
           },
           {
             "ratio": 98.0,
-            "sec": 51.94,
-            "pct": 7.46
+            "sec": 56.84,
+            "pct": 0.67
           },
           {
             "ratio": 99.0,
-            "sec": 52.47,
-            "pct": 6.72
+            "sec": 57.42,
+            "pct": 0.67
           },
           {
             "ratio": 100.0,
-            "sec": 53.0,
-            "pct": 6.72
-          }
-        ]
-      },
-      {
-        "video_id": "YaQm-1T0fxA",
-        "title": "Saate İlk Baktığın Saniye Neden Donmuş Gibi Daha Uzun Sürer? ⏱️ #bilgidozu #shorts",
-        "points": [
-          {
-            "ratio": 1.0,
-            "sec": 0.55,
-            "pct": 114.29
-          },
-          {
-            "ratio": 2.0,
-            "sec": 1.1,
-            "pct": 114.29
-          },
-          {
-            "ratio": 3.0,
-            "sec": 1.65,
-            "pct": 112.24
-          },
-          {
-            "ratio": 4.0,
-            "sec": 2.2,
-            "pct": 110.2
-          },
-          {
-            "ratio": 5.0,
-            "sec": 2.75,
-            "pct": 110.2
-          },
-          {
-            "ratio": 6.0,
-            "sec": 3.3,
-            "pct": 110.2
-          },
-          {
-            "ratio": 7.0,
-            "sec": 3.85,
-            "pct": 110.2
-          },
-          {
-            "ratio": 8.0,
-            "sec": 4.4,
-            "pct": 110.2
-          },
-          {
-            "ratio": 9.0,
-            "sec": 4.95,
-            "pct": 106.12
-          },
-          {
-            "ratio": 10.0,
-            "sec": 5.5,
-            "pct": 104.08
-          },
-          {
-            "ratio": 11.0,
-            "sec": 6.05,
-            "pct": 97.96
-          },
-          {
-            "ratio": 12.0,
-            "sec": 6.6,
-            "pct": 93.88
-          },
-          {
-            "ratio": 13.0,
-            "sec": 7.15,
-            "pct": 89.8
-          },
-          {
-            "ratio": 14.0,
-            "sec": 7.7,
-            "pct": 89.8
-          },
-          {
-            "ratio": 15.0,
-            "sec": 8.25,
-            "pct": 87.76
-          },
-          {
-            "ratio": 16.0,
-            "sec": 8.8,
-            "pct": 79.59
-          },
-          {
-            "ratio": 17.0,
-            "sec": 9.35,
-            "pct": 77.55
-          },
-          {
-            "ratio": 18.0,
-            "sec": 9.9,
-            "pct": 69.39
-          },
-          {
-            "ratio": 19.0,
-            "sec": 10.45,
-            "pct": 65.31
-          },
-          {
-            "ratio": 20.0,
-            "sec": 11.0,
-            "pct": 65.31
-          },
-          {
-            "ratio": 21.0,
-            "sec": 11.55,
-            "pct": 65.31
-          },
-          {
-            "ratio": 22.0,
-            "sec": 12.1,
-            "pct": 63.27
-          },
-          {
-            "ratio": 23.0,
-            "sec": 12.65,
-            "pct": 63.27
-          },
-          {
-            "ratio": 24.0,
-            "sec": 13.2,
-            "pct": 63.27
-          },
-          {
-            "ratio": 25.0,
-            "sec": 13.75,
-            "pct": 63.27
-          },
-          {
-            "ratio": 26.0,
-            "sec": 14.3,
-            "pct": 63.27
-          },
-          {
-            "ratio": 27.0,
-            "sec": 14.85,
-            "pct": 63.27
-          },
-          {
-            "ratio": 28.0,
-            "sec": 15.4,
-            "pct": 63.27
-          },
-          {
-            "ratio": 29.0,
-            "sec": 15.95,
-            "pct": 59.18
-          },
-          {
-            "ratio": 30.0,
-            "sec": 16.5,
-            "pct": 57.14
-          },
-          {
-            "ratio": 31.0,
-            "sec": 17.05,
-            "pct": 57.14
-          },
-          {
-            "ratio": 32.0,
-            "sec": 17.6,
-            "pct": 57.14
-          },
-          {
-            "ratio": 33.0,
-            "sec": 18.15,
-            "pct": 53.06
-          },
-          {
-            "ratio": 34.0,
-            "sec": 18.7,
-            "pct": 53.06
-          },
-          {
-            "ratio": 35.0,
-            "sec": 19.25,
-            "pct": 53.06
-          },
-          {
-            "ratio": 36.0,
-            "sec": 19.8,
-            "pct": 51.02
-          },
-          {
-            "ratio": 37.0,
-            "sec": 20.35,
-            "pct": 51.02
-          },
-          {
-            "ratio": 38.0,
-            "sec": 20.9,
-            "pct": 48.98
-          },
-          {
-            "ratio": 39.0,
-            "sec": 21.45,
-            "pct": 48.98
-          },
-          {
-            "ratio": 40.0,
-            "sec": 22.0,
-            "pct": 48.98
-          },
-          {
-            "ratio": 41.0,
-            "sec": 22.55,
-            "pct": 48.98
-          },
-          {
-            "ratio": 42.0,
-            "sec": 23.1,
-            "pct": 48.98
-          },
-          {
-            "ratio": 43.0,
-            "sec": 23.65,
-            "pct": 48.98
-          },
-          {
-            "ratio": 44.0,
-            "sec": 24.2,
-            "pct": 48.98
-          },
-          {
-            "ratio": 45.0,
-            "sec": 24.75,
-            "pct": 46.94
-          },
-          {
-            "ratio": 46.0,
-            "sec": 25.3,
-            "pct": 46.94
-          },
-          {
-            "ratio": 47.0,
-            "sec": 25.85,
-            "pct": 46.94
-          },
-          {
-            "ratio": 48.0,
-            "sec": 26.4,
-            "pct": 46.94
-          },
-          {
-            "ratio": 49.0,
-            "sec": 26.95,
-            "pct": 46.94
-          },
-          {
-            "ratio": 50.0,
-            "sec": 27.5,
-            "pct": 46.94
-          },
-          {
-            "ratio": 51.0,
-            "sec": 28.05,
-            "pct": 46.94
-          },
-          {
-            "ratio": 52.0,
-            "sec": 28.6,
-            "pct": 46.94
-          },
-          {
-            "ratio": 53.0,
-            "sec": 29.15,
-            "pct": 46.94
-          },
-          {
-            "ratio": 54.0,
-            "sec": 29.7,
-            "pct": 46.94
-          },
-          {
-            "ratio": 55.0,
-            "sec": 30.25,
-            "pct": 46.94
-          },
-          {
-            "ratio": 56.0,
-            "sec": 30.8,
-            "pct": 46.94
-          },
-          {
-            "ratio": 57.0,
-            "sec": 31.35,
-            "pct": 46.94
-          },
-          {
-            "ratio": 58.0,
-            "sec": 31.9,
-            "pct": 46.94
-          },
-          {
-            "ratio": 59.0,
-            "sec": 32.45,
-            "pct": 46.94
-          },
-          {
-            "ratio": 60.0,
-            "sec": 33.0,
-            "pct": 46.94
-          },
-          {
-            "ratio": 61.0,
-            "sec": 33.55,
-            "pct": 46.94
-          },
-          {
-            "ratio": 62.0,
-            "sec": 34.1,
-            "pct": 46.94
-          },
-          {
-            "ratio": 63.0,
-            "sec": 34.65,
-            "pct": 46.94
-          },
-          {
-            "ratio": 64.0,
-            "sec": 35.2,
-            "pct": 46.94
-          },
-          {
-            "ratio": 65.0,
-            "sec": 35.75,
-            "pct": 46.94
-          },
-          {
-            "ratio": 66.0,
-            "sec": 36.3,
-            "pct": 46.94
-          },
-          {
-            "ratio": 67.0,
-            "sec": 36.85,
-            "pct": 46.94
-          },
-          {
-            "ratio": 68.0,
-            "sec": 37.4,
-            "pct": 46.94
-          },
-          {
-            "ratio": 69.0,
-            "sec": 37.95,
-            "pct": 46.94
-          },
-          {
-            "ratio": 70.0,
-            "sec": 38.5,
-            "pct": 42.86
-          },
-          {
-            "ratio": 71.0,
-            "sec": 39.05,
-            "pct": 40.82
-          },
-          {
-            "ratio": 72.0,
-            "sec": 39.6,
-            "pct": 40.82
-          },
-          {
-            "ratio": 73.0,
-            "sec": 40.15,
-            "pct": 40.82
-          },
-          {
-            "ratio": 74.0,
-            "sec": 40.7,
-            "pct": 40.82
-          },
-          {
-            "ratio": 75.0,
-            "sec": 41.25,
-            "pct": 40.82
-          },
-          {
-            "ratio": 76.0,
-            "sec": 41.8,
-            "pct": 40.82
-          },
-          {
-            "ratio": 77.0,
-            "sec": 42.35,
-            "pct": 40.82
-          },
-          {
-            "ratio": 78.0,
-            "sec": 42.9,
-            "pct": 40.82
-          },
-          {
-            "ratio": 79.0,
-            "sec": 43.45,
-            "pct": 40.82
-          },
-          {
-            "ratio": 80.0,
-            "sec": 44.0,
-            "pct": 40.82
-          },
-          {
-            "ratio": 81.0,
-            "sec": 44.55,
-            "pct": 38.78
-          },
-          {
-            "ratio": 82.0,
-            "sec": 45.1,
-            "pct": 36.73
-          },
-          {
-            "ratio": 83.0,
-            "sec": 45.65,
-            "pct": 36.73
-          },
-          {
-            "ratio": 84.0,
-            "sec": 46.2,
-            "pct": 34.69
-          },
-          {
-            "ratio": 85.0,
-            "sec": 46.75,
-            "pct": 34.69
-          },
-          {
-            "ratio": 86.0,
-            "sec": 47.3,
-            "pct": 32.65
-          },
-          {
-            "ratio": 87.0,
-            "sec": 47.85,
-            "pct": 32.65
-          },
-          {
-            "ratio": 88.0,
-            "sec": 48.4,
-            "pct": 32.65
-          },
-          {
-            "ratio": 89.0,
-            "sec": 48.95,
-            "pct": 32.65
-          },
-          {
-            "ratio": 90.0,
-            "sec": 49.5,
-            "pct": 26.53
-          },
-          {
-            "ratio": 91.0,
-            "sec": 50.05,
-            "pct": 22.45
-          },
-          {
-            "ratio": 92.0,
-            "sec": 50.6,
-            "pct": 22.45
-          },
-          {
-            "ratio": 93.0,
-            "sec": 51.15,
-            "pct": 20.41
-          },
-          {
-            "ratio": 94.0,
-            "sec": 51.7,
-            "pct": 20.41
-          },
-          {
-            "ratio": 95.0,
-            "sec": 52.25,
-            "pct": 16.33
-          },
-          {
-            "ratio": 96.0,
-            "sec": 52.8,
-            "pct": 16.33
-          },
-          {
-            "ratio": 97.0,
-            "sec": 53.35,
-            "pct": 16.33
-          },
-          {
-            "ratio": 98.0,
-            "sec": 53.9,
-            "pct": 16.33
-          },
-          {
-            "ratio": 99.0,
-            "sec": 54.45,
-            "pct": 14.29
-          },
-          {
-            "ratio": 100.0,
-            "sec": 55.0,
-            "pct": 12.24
+            "sec": 58.0,
+            "pct": 0.67
           }
         ]
       }
