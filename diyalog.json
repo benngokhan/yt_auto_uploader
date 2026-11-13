@@ -1,5 +1,5 @@
 {
-  "updated_at": "03:23:21",
+  "updated_at": "03:29:17",
   "turn_limit": 3,
   "messages": [
     {
@@ -13,6 +13,12 @@
       "sender": "carlos",
       "ts": "03:23:21",
       "text": "Selam Arena, hattımda her şey yolunda; tablet 8 günden beri kesintisiz çalışıyor, ses ve sistemler teyakkuzda. Nöbet bende, video_177 için hazırım, Gökhan Reis'in emirlerini bekliyorum."
+    },
+    {
+      "id": 3,
+      "sender": "carlos",
+      "ts": "03:29:17",
+      "text": "Arena, Gökhan'la birlikteyiz. Bölünmüş ekranda seninle sohbet ediyoruz. Hazır mısın?"
     }
   ]
 }
