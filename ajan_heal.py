@@ -320,16 +320,41 @@ def _get_failed_runs() -> list[dict]:
 
 
 def _get_log_tail(run_id: int) -> str:
-    """Başarısız job'ların loglarını çeker (GitHub log API bazen 401 verir; o durumda boş döner)."""
+    """Başarısız job/adım bilgisini + varsa gerçek log kuyruğunu döndürür.
+
+    GitHub log API (actions/jobs/{id}/logs) bazen 401 verir; o durumda job/adım
+    listesinden sınıflandırma yapılır. Log alınabilirse son 6000 karakter eklenir.
+    """
     try:
         jobs = _gh("GET", f"actions/runs/{run_id}/jobs")
         tails = []
+        failed_job_ids = []
         for job in jobs.get("jobs", []):
             if job.get("conclusion") != "failure":
                 continue
-            failed_steps = [s["number"] for s in job.get("steps", []) if s.get("conclusion") == "failure"]
+            failed_job_ids.append(job["id"])
+            failed_steps = [s["name"] for s in job.get("steps", []) if s.get("conclusion") == "failure"]
             tails.append(f"Job: {job['name']} | Başarısız adımlar: {failed_steps}")
-        return "\n".join(tails)
+        base = "\n".join(tails)
+        # Gerçek logu dene (başarırsa sınıflandırma çok daha isabetli olur)
+        for jid in failed_job_ids[:1]:
+            try:
+                req = urllib.request.Request(
+                    f"https://api.github.com/repos/{REPO}/actions/jobs/{jid}/logs",
+                    headers={
+                        "Authorization": f"Bearer {GH_TOKEN}",
+                        "Accept": "application/vnd.github+json",
+                        "User-Agent": UA,
+                    },
+                )
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    logs = resp.read().decode("utf-8", errors="ignore")
+                if logs:
+                    base += "\n--- LOG KUYRUĞU ---\n" + logs[-6000:]
+                    break
+            except Exception:
+                continue
+        return base
     except Exception as e:
         return f"(log alınamadı: {e})"
 
