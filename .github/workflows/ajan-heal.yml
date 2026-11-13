@@ -1,0 +1,78 @@
+name: Hata Müdahale Ajanı (GitHub Oto-Onarım)
+
+# Bu workflow, repo'da başarısız olan workflow koşularını otomatik tespit eder,
+# hatayı sınıflandırır ve uygun müdahaleyi yapar:
+#   - model_404  -> motor/uret.py'deki ölü model adlarını günceller + commit atar
+#   - quota_429  -> koşuyu tekrar kuyruğa alır (re-run)
+#   - flaky      -> koşuyu anında tekrar kuyruğa alır (re-run)
+#   - kod_hatasi -> LLM yaması uygular (yalnız .py) + commit atar
+#   - bilinmiyor -> Telegram'a detaylı rapor gönderir
+#
+# Tetikleyiciler:
+#   - workflow_run: başka bir workflow failure ile bitince (anında müdahale)
+#   - schedule: her 30 dakikada bir (kaçan hatalar için)
+#   - workflow_dispatch: elle çalıştırma
+
+on:
+  workflow_run:
+    workflows:
+      - "YouTube Drive Uploader"
+      - "Motor - video üret (elle onaylı)"
+      - "Panel Telemetri & Drive Senkron (30 Dk)"
+      - "Telegram onay buton işçisi"
+      - "API durum ve limit görüntüsü"
+      - "Slot Watchdog"
+      - "Retansiyon Raporu (Ozel Analytics)"
+    types: [completed]
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: ajan-heal
+  cancel-in-progress: false
+
+jobs:
+  heal:
+    # workflow_run tetikleyicisinde yalnız failure'ları işle
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Hata Müdahale Ajanını çalıştır
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python ajan_heal.py
+
+      - name: Ajan durum dosyasını kaydet
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ajan_heal_state.json 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(ajan): müdahale durumunu güncelle [skip ci]"
+            git pull --rebase origin main || true
+            git push origin HEAD:main
+          fi
