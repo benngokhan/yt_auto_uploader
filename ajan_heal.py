@@ -27,6 +27,7 @@ Güvenlik kilitleri:
 from __future__ import annotations
 
 import base64
+import html
 import json
 import os
 import re
@@ -242,6 +243,124 @@ def _classify(log_tail: str) -> str:
     return "bilinmiyor"
 
 
+# ---------------------------------------------------------------- sade Türkçe rapor
+
+# Workflow adları -> sahibin anlayacağı sade isim
+IS_ADLARI = {
+    "YouTube Drive Uploader": "Video yükleme",
+    "Motor - video üret (elle onaylı)": "Video üretimi",
+    "Panel Telemetri & Drive Senkron (30 Dk)": "Panel ve stok güncellemesi",
+    "Telegram onay buton işçisi": "Telegram onay düğmeleri",
+    "API durum ve limit görüntüsü": "API durum kontrolü",
+    "API & Kota": "API ve kota kontrolü",
+    "Slot Watchdog": "Yayın nöbetçisi",
+    "Retansiyon Raporu (Ozel Analytics)": "İzlenme yüzdesi raporu",
+    "Goruntulenme Raporu (yt-dlp)": "Görüntülenme raporu",
+    "Arena 5 Günlük Gözlem Serisi Planla ve Takip Et": "5 günlük plan",
+    "Hata Müdahale Ajanı (GitHub Oto-Onarım)": "Tamirci",
+    "Konu Önerileri": "Konu önerileri",
+    "Offsite Yedek (FTP/FTPS)": "Dış yedek",
+}
+
+# Logda görülen teknik ifade -> sade Türkçe açıklama
+# (sorun, önerilen çözüm, işi kim yapar: "ajan" | "sen")
+HATA_SOZLUGU = [
+    (("401", "unauthorized", "invalid_grant", "invalid credentials", "invalid_token",
+      "token has been expired", "token expired"),
+     "YouTube/Google bağlantısının süresi dolmuş görünüyor.",
+     "Bağlantıyı yenilemek gerekiyor; bunu senin onayınla yapabiliriz.", "sen"),
+    (("quotaexceeded", "quota exceeded", "dailylimitexceeded", "storage quota"),
+     "Günlük kullanım sınırı (kota) dolmuş.",
+     "Kota sıfırlanınca kendiliğinden düzelir; bugün yeni yükleme yapmayalım.", "yok"),
+    (("chat not found", "bot was blocked", "bot is not a member", "forbidden: bot"),
+     "Telegram mesajı gruba ulaşamadı.",
+     "Botun grupta olduğunu ve grup numarasının doğru olduğunu kontrol etmek gerekiyor.", "sen"),
+    (("403", "forbidden", "permission denied", "insufficient permission"),
+     "Bir servis erişim iznini reddetti (403).",
+     "İzinlerin yenilenmesi gerekebilir; otomatik dokunmuyorum.", "sen"),
+    (("429", "too many requests", "resource_exhausted", "rate limit"),
+     "Bir servis 'çok istek' dedi; bu geçici bir sınırdır.",
+     "Kısa süre sonra aynı işi kendim tekrar deniyorum.", "ajan"),
+    (("model not found", "model_not_found", "does not exist", "no such model"),
+     "Yapay zekâ modelinin adı değişmiş; eski ad artık geçerli değil.",
+     "Model adını güncelleyip işi yeniden başlatıyorum.", "ajan"),
+    (("404", "not found"),
+     "Bir dosya veya adres bulunamadı (404).",
+     "Hangi dosyanın eksik olduğuna bakmam gerekiyor; hiçbir şeyi değiştirmedim.", "sen"),
+    (("no space left", "disk full", "enospc", "quota exceeded on disk"),
+     "Sunucuda disk alanı doldu.",
+     "Eski geçici dosyaların temizlenmesi gerekiyor.", "sen"),
+    (("out of memory", "memoryerror", "exit code 137", "killed"),
+     "Sunucunun belleği yetmedi.",
+     "İşi daha küçük parçalarla tekrar denemek gerekiyor.", "sen"),
+    (("invalid workflow", "yaml", "mapping values", "unexpected value", "could not parse"),
+     "Workflow dosyasında yazım hatası var.",
+     "Dosyayı düzeltmem gerekiyor; bu tür değişikliği kendi başıma yapmıyorum.", "sen"),
+    (("context deadline exceeded", "timeout", "timed out", "connection reset",
+      "econnreset", "connection refused", "network is unreachable", "502", "503", "504"),
+     "Bağlantı koptu veya sunucu geçici olarak yanıt vermedi.",
+     "Aynı işi tekrar deniyorum.", "ajan"),
+    (("secret", "not set", "undefined variable", "tanimli degil", "tanımlı değil"),
+     "Gerekli bir anahtar/ayar eksik görünüyor.",
+     "Eksik anahtarın eklenmesi gerekiyor.", "sen"),
+    (("ffmpeg", "codec", "invalid data found", "render"),
+     "Video işleme (render) sırasında sorun çıktı.",
+     "Videoyu yeniden üretmek gerekiyor; otomatik üretim başlatmıyorum.", "sen"),
+    (("traceback", "syntaxerror", "importerror", "modulenotfound",
+      "nameerror", "typeerror", "attributeerror", "keyerror"),
+     "Kodda bir hata var.",
+     "Düzeltmeyi ben deniyorum.", "ajan"),
+]
+
+
+def _is_adi(ad: str) -> str:
+    return IS_ADLARI.get(ad, ad)
+
+
+def _sorun_ozeti(kind: str, log_tail: str) -> tuple[str, str, str]:
+    """(sorun, çözüm, kim) döndürür. kim: 'ajan' | 'sen' | 'yok'."""
+    if kind == "model_404":
+        return ("Yapay zekâ modelinin adı değişmiş; eski ad artık geçerli değil.",
+                "Model adını güncelleyip işi yeniden başlatıyorum.", "ajan")
+    if kind == "quota_429":
+        return ("Bir servis 'çok istek' dedi; bu geçici bir sınırdır.",
+                "Kısa süre sonra aynı işi kendim tekrar deniyorum.", "ajan")
+    if kind == "flaky":
+        return ("Bağlantı koptu veya sunucu geçici olarak yanıt vermedi.",
+                "Aynı işi hemen tekrar deniyorum.", "ajan")
+    if kind == "kod_hatasi":
+        return ("Kodda bir hata var.",
+                "Düzeltmeyi ben deniyorum.", "ajan")
+    low = (log_tail or "").lower()
+    for anahtarlar, sorun, cozum, kim in HATA_SOZLUGU:
+        if any(k in low for k in anahtarlar):
+            return sorun, cozum, kim
+    return ("Tanıdık olmayan bir hata var.",
+            "İncelemem gerekiyor. Bu arada hiçbir şeyi değiştirmedim.", "sen")
+
+
+def _e(metin: str, sinir: int = 400) -> str:
+    """Telegram HTML için kaçış + kısaltma."""
+    metin = " ".join(str(metin).split())
+    if len(metin) > sinir:
+        metin = metin[:sinir - 1] + "…"
+    return html.escape(metin, quote=False)
+
+
+def _kayit_linki(run_url: str) -> str:
+    return f'<a href="{html.escape(run_url, quote=True)}">GitHub\'da gör</a>'
+
+
+def _ek_not(run_name: str) -> str:
+    """İşin türüne göre kısa güvence notu."""
+    if "YouTube Drive Uploader" in run_name:
+        return "\nNot: Studio'da planlı videolar bundan etkilenmez; yalnız sıradaki yükleme etkilenebilir."
+    if any(k in run_name for k in ("Telegram onay", "Panel Telemetri")):
+        return "\nNot: Yayın hattı etkilenmez; bu yalnız bildirim/panel işidir."
+    return ""
+
+
+
 def _extract_json(text: str) -> dict:
     m = re.search(r"\{.*\}", text, re.S)
     if not m:
@@ -435,11 +554,11 @@ def main() -> None:
         # Aksi halde tamamen sessiz geçilir; ne Telegram mesajı ne state commit'i üretilir.
         prev_failed = int(state.get("_health", {}).get("last_failed_count", -1))
         if prev_failed == -1:
-            _tg("✅ <b>Hata Müdahale Ajanı:</b> Çevrimiçi ve nöbette. Şu an hata yok.")
+            _tg("🔧 <b>Tamirci:</b> Nöbetteyim. Şu an sorun yok.")
             state["_health"] = {"last_failed_count": 0, "ts": datetime.now(timezone.utc).isoformat()}
             _state_save(state)
         elif prev_failed > 0:
-            _tg("✅ <b>Hata Müdahale Ajanı:</b> Hatalar temizlendi, sistem sağlıklı.")
+            _tg("✅ <b>Tamirci:</b> Sorunlar temizlendi, sistem sağlıklı.")
             state["_health"] = {"last_failed_count": 0, "ts": datetime.now(timezone.utc).isoformat()}
             _state_save(state)
         else:
@@ -456,6 +575,20 @@ def main() -> None:
         attempts = int(state.get(str(run_id), {}).get("attempts", 0))
         if attempts >= MAX_REPAIR_ATTEMPTS:
             print(f"[{run_id}] deneme hakkı doldu ({attempts}/{MAX_REPAIR_ATTEMPTS}), atlanıyor")
+            # Sahibe yalnız BİR kez haber ver (her taramada tekrar mesaj atmasın)
+            if not state.get(str(run_id), {}).get("gave_up"):
+                kayit = state.setdefault(str(run_id), {})
+                kayit["gave_up"] = True
+                _state_save(state)
+                onceki_tur = kayit.get("kind", "bilinmiyor")
+                sorun, _, _ = _sorun_ozeti(onceki_tur, "")
+                _tg(
+                    f"🔴 <b>{_e(_is_adi(run_name), 60)} — çözemedim</b>\n\n"
+                    f"Sorun: {sorun}\n"
+                    f"Durum: {MAX_REPAIR_ATTEMPTS} kez denedim, olmadı. Artık kendi başıma dokunmuyorum.\n"
+                    f"İstersen bana \"şu hataya bak\" de; logu okuyup sade dille anlatırım.{_ek_not(run_name)}\n"
+                    f"Koşu: {_kayit_linki(run_url)}"
+                )
             continue
 
         # Workflow dosyası artık main'de yoksa (geçici/deneme workflow'u silinmişse)
@@ -480,23 +613,29 @@ def main() -> None:
             if ok:
                 sha = _commit_and_push(f"fix(ajan): ölü model adlarını güncelle [{kind}] [skip ci]")
                 _tg(
-                    f"🛠️ <b>Hata Müdahale Ajanı — Model düzeltildi!</b>\n"
-                    f"Workflow: {run_name}\nDeğişiklik: {detail}\n"
-                    f"Commit: https://github.com/{REPO}/commit/{sha[:8]}\n"
-                    f"Başarısız koşu: {run_url}\n"
-                    f"Koşuyu tekrar başlatıyorum..."
+                    f"🟢 <b>{_e(_is_adi(run_name), 60)} — onarıldı</b>\n\n"
+                    f"Sorun: Yapay zekâ modelinin adı değişmişti.\n"
+                    f"Yaptığım: Eski model adını güncel adla değiştirdim ve işi yeniden başlattım.\n"
+                    f"Koşu: {_kayit_linki(run_url)}"
                 )
                 _rerun(run_id)
             else:
                 _tg(
-                    f"⚠️ <b>Hata Müdahale Ajanı — Model hatası ama düzeltilemedi:</b> {detail}\n"
-                    f"Workflow: {run_name}\nKoşu: {run_url}"
+                    f"🟡 <b>{_e(_is_adi(run_name), 60)} — takıldı</b>\n\n"
+                    f"Sorun: Yapay zekâ modelinin adı değişmişti.\n"
+                    f"Durum: Otomatik düzeltemedim. Bunu benim elle düzeltmem gerekiyor.\n"
+                    f"Sebep: {_e(detail, 160)}\n"
+                    f"Koşu: {_kayit_linki(run_url)}"
                 )
 
         elif kind in ("quota_429", "flaky"):
+            sorun, cozum, _ = _sorun_ozeti(kind, log_tail)
             _tg(
-                f"🔄 <b>Hata Müdahale Ajanı — Geçici hata, koşu tekrar kuyruğa alınıyor:</b>\n"
-                f"Workflow: {run_name} (tip: {kind})\nKoşu: {run_url}"
+                f"🟡 <b>{_e(_is_adi(run_name), 60)} — geçici sorun</b>\n\n"
+                f"Sorun: {sorun}\n"
+                f"Yaptığım: {cozum}\n"
+                f"Senin bir şey yapmana gerek yok.{_ek_not(run_name)}\n"
+                f"Koşu: {_kayit_linki(run_url)}"
             )
             _rerun(run_id)
 
@@ -505,22 +644,31 @@ def main() -> None:
             if ok:
                 sha = _commit_and_push(f"fix(ajan): kod hatası otomatik yaması [{kind}] [skip ci]")
                 _tg(
-                    f"🛠️ <b>Hata Müdahale Ajanı — Kod yaması uygulandı!</b>\n"
-                    f"Workflow: {run_name}\nYama: {detail}\n"
-                    f"Commit: https://github.com/{REPO}/commit/{sha[:8]}\n"
-                    f"Başarısız koşu: {run_url}"
+                    f"🟢 <b>{_e(_is_adi(run_name), 60)} — onarıldı</b>\n\n"
+                    f"Sorun: Kodda küçük bir hata vardı.\n"
+                    f"Düzeltme: {_e(detail, 200)}\n"
+                    f"Yaptığım: Düzeltmeyi uyguladım ve işi yeniden başlattım.\n"
+                    f"Koşu: {_kayit_linki(run_url)}"
                 )
                 _rerun(run_id)
             else:
                 _tg(
-                    f"🚨 <b>Hata Müdahale Ajanı — Kod hatası, otomatik yama başarısız:</b> {detail}\n"
-                    f"Workflow: {run_name}\nKoşu: {run_url}\nLog kuyruğu:\n<code>{log_tail[-800:]}</code>"
+                    f"🔴 <b>{_e(_is_adi(run_name), 60)} — otomatik düzeltemedim</b>\n\n"
+                    f"Sorun: Kodda bir hata var.\n"
+                    f"Durum: Otomatik denedim, olmadı. Artık kendi başıma dokunmuyorum.\n"
+                    f"Sebep: {_e(detail, 200)}\n"
+                    f"İstersen bana \"şu hataya bak\" de; logu okuyup sade dille anlatırım.{_ek_not(run_name)}\n"
+                    f"Koşu: {_kayit_linki(run_url)}"
                 )
 
         else:
+            sorun, cozum, _ = _sorun_ozeti(kind, log_tail)
             _tg(
-                f"🚨 <b>Hata Müdahale Ajanı — Bilinmeyen hata, insan müdahalesi gerekli:</b>\n"
-                f"Workflow: {run_name}\nKoşu: {run_url}\nDetay:\n<code>{log_tail[-800:]}</code>"
+                f"🔴 <b>{_e(_is_adi(run_name), 60)} — beklenmedik hata</b>\n\n"
+                f"Sorun: {sorun}\n"
+                f"Ne yapmalı: {cozum}\n"
+                f"İstersen bana \"şu hataya bak\" de; logu okuyup sade dille anlatırım.{_ek_not(run_name)}\n"
+                f"Koşu: {_kayit_linki(run_url)}"
             )
 
     print("=== Ajan taraması tamamlandı ===")
