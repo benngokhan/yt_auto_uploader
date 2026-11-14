@@ -45,6 +45,19 @@ MAX_REPAIR_ATTEMPTS = 3
 LOOKBACK_HOURS = 24
 UA = "Mozilla/5.0 (BilgiDozu-AjanHeal)"
 
+
+class _NoAuthRedirect(urllib.request.HTTPRedirectHandler):
+    """GitHub log indirme adresi S3'e yönlendiriyor; imzalı adrese
+    Authorization başlığı giderse 401 dönüyor. Yönlendirmede bu başlığı at."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        yeni = super().redirect_request(req, fp, code, msg, headers, newurl)
+        if yeni is not None:
+            for k in ("Authorization", "authorization"):
+                yeni.headers.pop(k, None)
+                yeni.unredirected_hdrs.pop(k, None)
+        return yeni
+
 # ---------------------------------------------------------------- yardımcılar
 
 def _gh(method: str, path: str, body: dict | None = None, timeout: int = 30):
@@ -505,7 +518,8 @@ def _get_log_tail(run_id: int) -> str:
                         "User-Agent": UA,
                     },
                 )
-                with urllib.request.urlopen(req, timeout=30) as resp:
+                opener = urllib.request.build_opener(_NoAuthRedirect())
+                with opener.open(req, timeout=30) as resp:
                     logs = resp.read().decode("utf-8", errors="ignore")
                 if logs:
                     base += "\n--- LOG KUYRUĞU ---\n" + logs[-6000:]
