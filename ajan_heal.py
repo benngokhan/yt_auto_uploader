@@ -243,17 +243,56 @@ def _llm(prompt: str) -> str:
 
 # ---------------------------------------------------------------- hata sınıflandırma
 
+_KURALLAR: list[tuple[str, re.Pattern]] = [
+    ("workflow_bozuk", re.compile(r"invalid workflow file|workflow file issue|mapping values are not allowed|could not parse as yaml")),
+    ("telegram_grup", re.compile(r"chat not found|bot was blocked|not a member of the chat|forbidden: bot|not enough rights")),
+    ("telegram_limit", re.compile(r"request entity too large|file is too big|payload too large|video g[öo]nderilemedi|returned error: 413|\b413\b")),
+    ("yetki_suresi", re.compile(r"invalid_grant|unauthorized|invalid credentials|invalid_token|token has been expired|token expired|\b401\b")),
+    ("izin_yok", re.compile(r"resource not accessible|permission denied|insufficient permission|\b403\b")),
+    ("youtube_kota", re.compile(r"quotaexceeded|dailylimitexceeded|youtube quota")),
+    ("quota_429", re.compile(r"\b429\b|too many requests|resource_exhausted|rate limit")),
+    ("git_cakismasi", re.compile(r"cannot pull with rebase|failed to push some refs|unstaged changes|non-fast-forward|fetch first|could not apply")),
+    ("disk_dolu", re.compile(r"no space left|disk full|enospc")),
+    ("bellek_yetersiz", re.compile(r"out of memory|memoryerror|exit code 137|oom-kill|killed process")),
+    ("ses_hatasi", re.compile(r"ses do[ğg]rulamas[ıi]|seshatasi|ses [üu]retimi|do[ğg]al ses")),
+    ("dosya_bozuk", re.compile(r"badzipfile|file is not a zip|zipfile|corrupt file")),
+    ("arguman_hatasi", re.compile(r"expected one argument|unrecognized arguments|error: argument|invalid choice")),
+    ("drive_hatasi", re.compile(r"googleapiclient|httperror 40[045]|httperror 50[023]|drive'a konamadi|drive hedefi http")),
+    ("render_hatasi", re.compile(r"ffmpeg|codec|invalid data found when processing")),
+    ("eksik_ayar", re.compile(r"input required and not supplied|missing secret|secret not set|undefined variable|tan[ıi]ml[ıi] de[ğg]il")),
+    ("flaky", re.compile(r"connection reset|timed out|timeout|econnreset|service unavailable|\b50[234]\b")),
+    ("kaynak_yok", re.compile(r"\b404\b|not found|no such file")),
+    ("test_hatasi", re.compile(r"failed \(failures=|ran \d+ tests?.{0,40}fail|tests failed")),
+    ("model_hatasi", re.compile(r"gemini ba[şs]ar[ıi]s[ıi]z|llm denemesi ba[şs]ar[ıi]s[ıi]z|model hatas[ıi]")),
+    ("kod_hatasi", re.compile(r"traceback|syntaxerror|importerror|modulenotfound|nameerror|typeerror|attributeerror|keyerror|runtimeerror")),
+]
+_MODEL_IZI = re.compile(r"gemini|model|llm|openrouter|groq|anthropic")
+
+
 def _classify(log_tail: str) -> str:
-    low = log_tail.lower()
-    if "404" in low and ("model" in low or "not found" in low):
-        return "model_404"
-    if "429" in low or "too many requests" in low or "quota" in low or "resource_exhausted" in low:
-        return "quota_429"
-    if any(k in low for k in ("connection reset", "timeout", "timed out", "network", "econnreset", "502", "503", "504")):
-        return "flaky"
-    if any(k in low for k in ("traceback", "syntaxerror", "importerror", "modulenotfound", "nameerror", "typeerror", "attributeerror", "keyerror", "runtimeerror")):
-        return "kod_hatasi"
-    return "bilinmiyor"
+    """Logdaki SON hata ipucuna göre tür belirler.
+
+    Sabit sıra yerine "en son görülen" kural kazanır: bir iş önce 403 alıp
+    sonra 429 ile bitebiliyor; son hata gerçek sebeptir. Eşitlikte üstteki kural.
+    """
+    low = (log_tail or "").lower()
+    if not low:
+        return "bilinmiyor"
+    secilen, konum = "bilinmiyor", -1
+    for kind, rx in _KURALLAR:
+        son = -1
+        for m in rx.finditer(low):
+            son = m.end()
+        if son > konum:
+            secilen, konum = kind, son
+    if secilen in ("kaynak_yok", "bilinmiyor") and "404" in low:
+        if _MODEL_IZI.search(low):
+            return "model_404"
+        if "drive" in low or "googleapis" in low:
+            return "drive_hatasi"
+    if secilen == "bilinmiyor" and ("exit code" in low or "process completed" in low):
+        return "log_yok"
+    return secilen
 
 
 # ---------------------------------------------------------------- sade Türkçe rapor
@@ -344,6 +383,57 @@ def _sorun_ozeti(kind: str, log_tail: str) -> tuple[str, str, str]:
     if kind == "kod_hatasi":
         return ("Kodda bir hata var.",
                 "Düzeltmeyi ben deniyorum.", "ajan")
+    if kind == "workflow_bozuk":
+        return ("İş tanımı dosyasında (workflow) yazım hatası var.",
+                "Dosyayı benim düzeltmem gerekiyor; kendi başıma değiştirmiyorum.", "sen")
+    if kind == "telegram_grup":
+        return ("Telegram mesajı gruba ulaşamadı.",
+                "Botun grupta olduğunu ve grup numarasının doğru olduğunu kontrol etmek gerekiyor.", "sen")
+    if kind == "telegram_limit":
+        return ("Video Telegram'a gönderilemeyecek kadar büyük.",
+                "Sorun değil: video Drive'a ve arşive kondu. Yayın hattı etkilenmedi.", "yok")
+    if kind == "yetki_suresi":
+        return ("YouTube/Google bağlantısının süresi dolmuş görünüyor.",
+                "Bağlantıyı yenilemek gerekiyor; bunu senin onayınla yapabiliriz.", "sen")
+    if kind == "izin_yok":
+        return ("Bir servis erişim iznini reddetti (403).",
+                "İzinlerin yenilenmesi gerekiyor; otomatik dokunmuyorum.", "sen")
+    if kind == "youtube_kota":
+        return ("YouTube'un günlük yükleme sınırı dolmuş.",
+                "Sınır sıfırlanınca kendiliğinden düzelir; bugün yeni yükleme yapmayalım.", "yok")
+    if kind == "git_cakismasi":
+        return ("Aynı anda iki iş dosyaya yazınca kod çakışması oldu.",
+                "İşi kendim yeniden başlatıyorum.", "ajan")
+    if kind == "disk_dolu":
+        return ("Sunucuda disk alanı doldu.",
+                "Eski geçici dosyaların temizlenmesi gerekiyor.", "sen")
+    if kind == "bellek_yetersiz":
+        return ("Sunucunun belleği yetmedi.",
+                "İşi daha küçük parçalarla tekrar denemek gerekiyor.", "sen")
+    if kind == "ses_hatasi":
+        return ("Ses üretimi veya ses doğrulaması başarısız oldu (ses kalitesi tutmadı).",
+                "Videoyu yeniden üretmek gerekiyor; otomatik üretim başlatmıyorum.", "sen")
+    if kind == "dosya_bozuk":
+        return ("Bir dosya bozuk gelmiş (açılamıyor).",
+                "Dosyayı yeniden indirmek/üretmek gerekiyor; hiçbir şeyi değiştirmedim.", "sen")
+    if kind == "drive_hatasi":
+        return ("Google Drive'a yazarken hata çıktı.",
+                "İşi kendim yeniden deniyorum; sürerse Drive ayarlarına bakmam gerekir.", "ajan")
+    if kind == "render_hatasi":
+        return ("Video işleme (render) sırasında sorun çıktı.",
+                "Videoyu yeniden üretmek gerekiyor; otomatik üretim başlatmıyorum.", "sen")
+    if kind == "eksik_ayar":
+        return ("Gerekli bir anahtar/ayar eksik görünüyor.",
+                "Eksik anahtarın eklenmesi gerekiyor.", "sen")
+    if kind == "test_hatasi":
+        return ("Kod testleri geçmedi; bu yüzden yeni sürüm yayına alınmadı.",
+                "Testi düzeltmem gerekiyor; kendi başıma kod değiştirmiyorum.", "sen")
+    if kind == "model_hatasi":
+        return ("Yapay zekâ servisi yanıt vermedi (model tarafı).",
+                "İşi kendim tekrar deniyorum; sürerse anahtarlara bakmam gerekir.", "ajan")
+    if kind == "log_yok":
+        return ("İş hata verdi ama kayıt sebebini yazmamış.",
+                "Kaydın tamamına bakmam gerekiyor; hiçbir şeyi değiştirmedim.", "sen")
     low = (log_tail or "").lower()
     for anahtarlar, sorun, cozum, kim in HATA_SOZLUGU:
         if any(k in low for k in anahtarlar):
@@ -490,6 +580,67 @@ def _get_failed_runs() -> list[dict]:
     return out
 
 
+_ILGI = re.compile(
+    r"(?i)(##\[error\]|traceback|error|exception|httperror|http error \d{3}|\bhttp \d{3}|quota|"
+    r"denied|not found|no space|out of memory|killed|timed out|timeout|cannot |could not|failed|"
+    r"unable|invalid|eksik|hata|başarısız|basarisiz)"
+)
+_GURULTU = re.compile(
+    r"(?i)^\s*(##\[group\]|##\[command\]|##\[warning\]|\[command\]|post job cleanup|"
+    r"cleaning up orphan|node\.js \d+|pythonlocation:|git version|from google|import |def |"
+    r"class |return |if |for |else|elif|try:|except|raise |print\(|echo |set |shopt |pip |"
+    r"python -|sure=|fi|done|then|do|\{|\})"
+)
+
+
+def _log_ozeti(metin: str, sinir: int = 5000) -> str:
+    """Koca logun içinden gerçek hata satırlarını çıkarır.
+
+    GitHub loglarında adımın betiği "##[group]Run ..." bloğunda aynen basılıyor;
+    bu yüzden "son N karakter" çoğu zaman gerçek hata yerine betik satırlarını
+    gösteriyordu. Burada önce betik blokları atılır, sonra ilk hata işaretine kadar
+    olan kısımdan hata satırları/traceback seçilir.
+    """
+    satirlar: list[str] = []
+    grup_icinde = False
+    for ham in metin.splitlines():
+        s = re.sub(r"^\S*Z\s*", "", ham).rstrip()[:300]
+        if "##[group]" in s:
+            grup_icinde = True
+            continue
+        if "##[endgroup]" in s:
+            grup_icinde = False
+            continue
+        kritik = "##[error]" in s or s.lower().startswith("traceback (most recent call last)")
+        if not grup_icinde or kritik:
+            satirlar.append(s)
+
+    # Hata satırından sonrası (temizlik, artifact yükleme) sebep değil.
+    for i, s in enumerate(satirlar):
+        if "##[error]Process completed with exit code" in s:
+            satirlar = satirlar[:i + 1]
+            break
+
+    secili: list[str] = []
+    i = 0
+    while i < len(satirlar):
+        s = satirlar[i]
+        if "traceback (most recent call last)" in s.lower():
+            secili.extend(satirlar[i:i + 25])
+            i += 25
+            continue
+        if s and not _GURULTU.match(s) and _ILGI.search(s):
+            secili.append(s)
+        i += 1
+
+    gorulen: set[str] = set()
+    tekil = [s for s in secili if not (s in gorulen or gorulen.add(s))]
+    if not tekil:
+        tekil = [s for s in satirlar if s.strip()][-30:]
+    metin = "\n".join(tekil[-60:])
+    return metin[-sinir:] if metin else ""
+
+
 def _get_log_tail(run_id: int) -> str:
     """Başarısız job/adım bilgisini + varsa gerçek log kuyruğunu döndürür.
 
@@ -522,7 +673,8 @@ def _get_log_tail(run_id: int) -> str:
                 with opener.open(req, timeout=30) as resp:
                     logs = resp.read().decode("utf-8", errors="ignore")
                 if logs:
-                    base += "\n--- LOG KUYRUĞU ---\n" + logs[-6000:]
+                    ozet = _log_ozeti(logs)
+                    base += "\n--- HATA SATIRLARI ---\n" + (ozet or logs[-4000:])
                     break
             except Exception:
                 continue
@@ -642,7 +794,7 @@ def main() -> None:
                     f"Koşu: {_kayit_linki(run_url)}"
                 )
 
-        elif kind in ("quota_429", "flaky"):
+        elif kind in ("quota_429", "flaky", "git_cakismasi", "drive_hatasi", "model_hatasi"):
             sorun, cozum, _ = _sorun_ozeti(kind, log_tail)
             _tg(
                 f"🟡 <b>{_e(_is_adi(run_name), 60)} — geçici sorun</b>\n\n"
@@ -676,12 +828,25 @@ def main() -> None:
                 )
 
         else:
-            sorun, cozum, _ = _sorun_ozeti(kind, log_tail)
+            sorun, cozum, kim = _sorun_ozeti(kind, log_tail)
+            if kind == "log_yok":
+                baslik = "sebebi kayıtta yok"
+            elif kind == "bilinmiyor":
+                baslik = "tanımadığım bir hata"
+            else:
+                baslik = "sorun var"
+            if kim == "sen":
+                gereken = "Senin bakman gerekiyor."
+            elif kim == "yok":
+                gereken = "Senin bir şey yapmana gerek yok."
+            else:
+                gereken = ""
+            simge = "🟡" if kim == "yok" else "🔴"
             _tg(
-                f"🔴 <b>{_e(_is_adi(run_name), 60)} — beklenmedik hata</b>\n\n"
+                f"{simge} <b>{_e(_is_adi(run_name), 60)} — {baslik}</b>\n\n"
                 f"Sorun: {sorun}\n"
                 f"Ne yapmalı: {cozum}\n"
-                f"İstersen bana \"şu hataya bak\" de; logu okuyup sade dille anlatırım.{_ek_not(run_name)}\n"
+                f"{gereken}{_ek_not(run_name)}\n"
                 f"Koşu: {_kayit_linki(run_url)}"
             )
 
