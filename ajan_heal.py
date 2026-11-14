@@ -390,8 +390,25 @@ def main() -> None:
     print(f"Son {LOOKBACK_HOURS} saatte {len(failed)} başarısız koşu bulundu")
 
     if not failed:
-        _tg("✅ <b>Hata Müdahale Ajanı:</b> Son 24 saatte başarısız koşu yok, her şey yolunda.")
+        # SPAM ENGELİ: "her şey yolunda" mesajı yalnız durum DEĞİŞİNCE gönderilir:
+        #   - ilk çalıştırma (çevrimiçi bildirimi)
+        #   - hatalı -> sağlıklı geçişi (iyileşme bildirimi)
+        # Aksi halde tamamen sessiz geçilir; ne Telegram mesajı ne state commit'i üretilir.
+        prev_failed = int(state.get("_health", {}).get("last_failed_count", -1))
+        if prev_failed == -1:
+            _tg("✅ <b>Hata Müdahale Ajanı:</b> Çevrimiçi ve nöbette. Şu an hata yok.")
+            state["_health"] = {"last_failed_count": 0, "ts": datetime.now(timezone.utc).isoformat()}
+            _state_save(state)
+        elif prev_failed > 0:
+            _tg("✅ <b>Hata Müdahale Ajanı:</b> Hatalar temizlendi, sistem sağlıklı.")
+            state["_health"] = {"last_failed_count": 0, "ts": datetime.now(timezone.utc).isoformat()}
+            _state_save(state)
+        else:
+            print("[ajan] hata yok — sessiz geçiliyor (spam engeli)")
         return
+
+    state["_health"] = {"last_failed_count": len(failed), "ts": datetime.now(timezone.utc).isoformat()}
+    _state_save(state)
 
     for run in failed:
         run_id = run["id"]
