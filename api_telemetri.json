@@ -1,12 +1,12 @@
 {
-  "zaman": "2026-11-13T18:56:53+00:00",
+  "zaman": "2026-11-14T01:04:15+00:00",
   "servisler": [
     {
       "ad": "Pexels",
       "durum": "ok",
-      "kalan": 24825,
+      "kalan": 24817,
       "limit": 25000,
-      "kullanilan": 175,
+      "kullanilan": 183,
       "birim": "istek/ay",
       "reset_iso": "2026-12-12T13:51:48+00:00",
       "yenilenme": "aylık kota · saatlik 200 istek penceresi",
@@ -16,8 +16,8 @@
       "ad": "Gemini · Charon",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1488,
-      "kullanilan": 12,
+      "kalan": 1497,
+      "kullanilan": 3,
       "birim": "istek/gün",
       "model_sayisi": 50,
       "yenilenme": "günlük · her gün TR 10:00 (00:00 Pasifik) sıfırlanır",
@@ -46,9 +46,9 @@
     {
       "ad": "Google Drive",
       "durum": "ok",
-      "kalan": 3639414383,
+      "kalan": 3639414105,
       "limit": 16106127360,
-      "kullanilan": 12466712977,
+      "kullanilan": 12466713255,
       "birim": "bayt",
       "kirilim": [
         {
@@ -88,18 +88,18 @@
     {
       "ad": "GitHub Actions",
       "durum": "ok",
-      "kalan": 1567.2,
+      "kalan": 1579.8,
       "limit": 2000,
-      "kullanilan": 432.8,
+      "kullanilan": 420.2,
       "birim": "dk/ay",
-      "actions_dakika": 432.8,
+      "actions_dakika": 420.2,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1567.2,
-      "api_kalan": 4997,
+      "actions_kalan": 1579.8,
+      "api_kalan": 4996,
       "api_limit": 5000,
       "yenilenme": "aylık 2.000 dk ücretsiz · her ayın 1'inde sıfırlanır",
-      "not_": "Bu ay 500 iş akışı koştu · Saatlik API: 4997/5000"
+      "not_": "Bu ay 500 iş akışı koştu · Saatlik API: 4996/5000"
     },
     {
       "ad": "Telegram Bot",
