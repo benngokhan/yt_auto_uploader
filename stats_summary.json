@@ -1,16 +1,26 @@
 {
- "total": 34352,
- "day_gain": 8,
- "updated": 25,
- "baseline_count": 19,
+ "total": 35444,
+ "day_gain": 39,
+ "updated": 52,
+ "baseline_count": 20,
  "compared_count": 48,
- "unavailable_count": 9,
+ "unavailable_count": 8,
  "dry_run": false,
  "top": [
   {
-   "delta": 2,
+   "delta": 3,
    "title": "Güneşe Dönünce Hapşırıyor musun? Bu Bir Refleks: ACHOO! ☀️ #",
    "file": "video_135.mp4"
+  },
+  {
+   "delta": 3,
+   "title": "Beynin Senden Sakladığı 3 Yanılsama! Özgür İraden Bile Senin",
+   "file": "uzun_video_3.mp4"
+  },
+  {
+   "delta": 2,
+   "title": "Tam Uykuya Dalarken Neden Boşluğa Düşer Gibi Sıçrarsın? 😴⚡ #",
+   "file": "video_34.mp4"
   },
   {
    "delta": 2,
@@ -18,19 +28,9 @@
    "file": "video_31.mp4"
   },
   {
-   "delta": 1,
-   "title": "Su Aslında Şeffaf Değil, Doğal Olarak Mavidir! 💧 #bilgidozu ",
-   "file": "video_6.mp4"
-  },
-  {
-   "delta": 1,
-   "title": "Ormanın Altındaki Gizli İnternet: Ağaçlar Birbiriyle Konuşuy",
-   "file": "video_4.mp4"
-  },
-  {
-   "delta": 1,
-   "title": "Beynin Senden Sakladığı 3 Yanılsama! Özgür İraden Bile Senin",
-   "file": "uzun_video_3.mp4"
+   "delta": 2,
+   "title": "Aynaya Baktığında Bir İnsan Değil, Bir Süpernova Görüyorsun!",
+   "file": "video_5.mp4"
   }
  ]
 }
