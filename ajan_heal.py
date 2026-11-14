@@ -655,7 +655,7 @@ def main() -> None:
                 _tg(
                     f"🔴 <b>{_e(_is_adi(run_name), 60)} — otomatik düzeltemedim</b>\n\n"
                     f"Sorun: Kodda bir hata var.\n"
-                    f"Durum: Otomatik denedim, olmadı. Artık kendi başıma dokunmuyorum.\n"
+                    f"Durum: Otomatik denedim, olmadı. Bu turda başka bir şeyi değiştirmedim.\n"
                     f"Sebep: {_e(detail, 200)}\n"
                     f"İstersen bana \"şu hataya bak\" de; logu okuyup sade dille anlatırım.{_ek_not(run_name)}\n"
                     f"Koşu: {_kayit_linki(run_url)}"
