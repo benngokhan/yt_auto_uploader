@@ -1,0 +1,83 @@
+name: Telegram Bot Test (elle)
+
+# 3 botun gruba yazabildigini dogrulamak icin elle tetiklenir.
+# Hicbir yayin/uretim islemi yapmaz; yalnizca kisa bir test mesaji gonderir.
+
+on:
+  workflow_dispatch:
+    inputs:
+      bot:
+        description: "Hangi bot test edilsin?"
+        required: true
+        type: choice
+        default: "hepsi"
+        options:
+          - "hepsi"
+          - "tamirci"
+          - "icerik"
+          - "onay"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CHAT_ID: ${{ secrets.TELEGRAM_GROUP_CHAT_ID || secrets.TELEGRAM_CHAT_ID }}
+      BOT_SECIM: ${{ inputs.bot }}
+      TOKEN_TAMIRCI: ${{ secrets.TELEGRAM_BOT_TOKEN_TAMIRCI || secrets.TELEGRAM_BOT_TOKEN }}
+      TOKEN_ICERIK: ${{ secrets.TELEGRAM_BOT_TOKEN_ICERIK || secrets.TELEGRAM_BOT_TOKEN }}
+      TOKEN_ONAY: ${{ secrets.TELEGRAM_BOT_TOKEN_ONAY || secrets.TELEGRAM_BOT_TOKEN }}
+    steps:
+      - name: Test mesajlarini gonder
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+
+          chat = (os.getenv("CHAT_ID") or "").strip()
+          secim = (os.getenv("BOT_SECIM") or "hepsi").strip()
+          botlar = {
+              "tamirci": (os.getenv("TOKEN_TAMIRCI") or "").strip(),
+              "icerik": (os.getenv("TOKEN_ICERIK") or "").strip(),
+              "onay": (os.getenv("TOKEN_ONAY") or "").strip(),
+          }
+          if not chat:
+              raise SystemExit("TELEGRAM_GROUP_CHAT_ID (veya TELEGRAM_CHAT_ID) tanimli degil.")
+
+          hatalar = []
+          for ad, token in botlar.items():
+              if secim not in ("hepsi", ad):
+                  continue
+              if not token:
+                  print(f"::warning::{ad} botu icin token yok, atlandi.")
+                  hatalar.append(ad)
+                  continue
+              payload = {
+                  "chat_id": chat,
+                  "text": f"✅ <b>{ad}</b> botu gruba baglandi. Bu bir test mesajidir.",
+                  "parse_mode": "HTML",
+                  "disable_web_page_preview": True,
+              }
+              req = urllib.request.Request(
+                  f"https://api.telegram.org/bot{token}/sendMessage",
+                  data=json.dumps(payload).encode("utf-8"),
+                  headers={"Content-Type": "application/json; charset=utf-8"},
+                  method="POST",
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=15) as r:
+                      d = json.loads(r.read().decode("utf-8"))
+                  if d.get("ok"):
+                      print(f"{ad}: gonderildi")
+                  else:
+                      print(f"::{ 'warning' }::{ad}: API reddetti")
+                      hatalar.append(ad)
+              except Exception as e:
+                  print(f"::warning::{ad}: gonderilemedi ({type(e).__name__})")
+                  hatalar.append(ad)
+
+          if hatalar:
+              raise SystemExit("Basarisiz: " + ", ".join(hatalar))
+          PY

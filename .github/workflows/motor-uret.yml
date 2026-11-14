@@ -179,8 +179,8 @@ jobs:
       - name: Telegram'a onay kartını gönder
         if: success() && inputs.kuru != true
         env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN_ONAY || secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_GROUP_CHAT_ID || secrets.TELEGRAM_CHAT_ID }}
           KONU: ${{ inputs.konu }}
           RUN_ID: ${{ github.run_id }}
           RUN_NO: ${{ github.run_number }}
