@@ -185,6 +185,45 @@ def _llm(prompt: str) -> str:
         except Exception as e:
             print(f"[llm] openrouter hata: {e}")
 
+    # Anahtarsız son yedekler (awesome-free-llm-apis listesinden; kayıt/anahtar gerekmez)
+    try:
+        body = json.dumps({
+            "model": "kilo-auto/free",
+            "temperature": 0.2,
+            "messages": [{"role": "user", "content": prompt}],
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            "https://api.kilo.ai/api/gateway/chat/completions",
+            data=body, method="POST",
+            headers={"Content-Type": "application/json", "User-Agent": UA},
+        )
+        with urllib.request.urlopen(req, timeout=45) as r:
+            d = json.loads(r.read().decode("utf-8"))
+        txt = d["choices"][0]["message"]["content"].strip()
+        if txt:
+            return txt
+    except Exception as e:
+        print(f"[llm] kilo hata: {e}")
+
+    try:
+        body = json.dumps({
+            "model": "gpt-oss:20b",
+            "temperature": 0.2,
+            "messages": [{"role": "user", "content": prompt}],
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            "https://api.llm7.io/v1/chat/completions",
+            data=body, method="POST",
+            headers={"Content-Type": "application/json", "User-Agent": UA},
+        )
+        with urllib.request.urlopen(req, timeout=45) as r:
+            d = json.loads(r.read().decode("utf-8"))
+        txt = d["choices"][0]["message"]["content"].strip()
+        if txt:
+            return txt
+    except Exception as e:
+        print(f"[llm] llm7 hata: {e}")
+
     return ""
 
 
