@@ -134,7 +134,93 @@ TERIM_KURALLARI = (
     "  * Aynı nicelik için farklı sayı veya büyüklük verme (bir yerde 'milyonlarca', başka yerde 'binlerce' deme).\n"
     "  * Doğrulayamadığın kesin sayısal değer yazma; emin değilsen nitel ifade kullan "
     "(ör. 'çok küçük', 'birkaç saniye içinde').\n"
+    "- TEKRAR YOK: Her cümle YENİ bir bilgi versin. Bir cümleyi (özellikle ilk cümleyi) başka kelimelerle "
+    "ikinci kez söyleme; aynı kalıbı ('... kül değil, ... zerrecikleridir' gibi) iki cümlede kullanma.\n"
+    "- YAZIM: Yalnız sözlükte bulunan, doğru yazılmış Türkçe kelimeler kullan; uydurma ya da harfi eksik/fazla "
+    "kelime yazma (ör. 'tüten' yerine 'tütücen', 'zerrecikler' yerine 'zerrcikler' YANLIŞ). Yazdıktan sonra her kelimeyi kontrol et.\n"
 )
+
+
+def _kokler(metin: str) -> set:
+    """Benzerlik ölçümü için kelimelerin ilk 5 harfi (Türkçe ekleri kabaca atar)."""
+    import re as _re
+    return {k[:5] for k in _re.findall(r"[a-zçğıöşü]+", str(metin or "").replace("İ", "i").replace("I", "ı").lower()) if len(k) >= 3}
+
+
+def _benzerlik(a: str, b: str) -> float:
+    """İki cümlenin ortak kelime oranı (0-1); kısa olan cümleye göre ölçülür."""
+    ka, kb = _kokler(a), _kokler(b)
+    if len(ka) < 4 or len(kb) < 4:
+        return 0.0
+    return len(ka & kb) / min(len(ka), len(kb))
+
+
+TEKRAR_ESIGI = 0.7
+
+
+def _tekrar_eden_cumleler(cumleler: list) -> list:
+    """Birbirinin tekrarı olan cümle çiftlerini [(i, j, oran)] olarak döndürür (1'den başlar)."""
+    temiz = [str(c).replace("Daha fazla Bilgi Dozu için takip et!", "") for c in cumleler]
+    return [(i + 1, j + 1, round(_benzerlik(temiz[i], temiz[j]), 2))
+            for i in range(len(temiz)) for j in range(i + 1, len(temiz))
+            if _benzerlik(temiz[i], temiz[j]) >= TEKRAR_ESIGI]
+
+
+def _yazim_denetimi(sahneler: list, ayar: dict) -> int:
+    """Seslendirmeden ÖNCE cümle ve sahne başlıklarındaki yazım hatalarını düzelttirir.
+
+    Yalnız yazım düzeltmesi kabul edilir: metin neredeyse aynı kalmalı (harf düzeyinde küçük fark).
+    Yapay zekâ cümleyi yeniden yazmaya kalkarsa ya da hata olursa özgün metin korunur; üretim durmaz.
+    """
+    import difflib
+    cta = "Daha fazla Bilgi Dozu için takip et!"
+    cumleler = [str(x.get("ses", "")).replace(cta, "").strip() for x in sahneler]
+    basliklar = [[str(x.get("baslik1", "")), str(x.get("baslik2", ""))] for x in sahneler]
+    istem = (
+        "Aşağıdaki Türkçe video metninde YALNIZCA yazım hatalarını düzelt: harfi eksik/fazla ya da uydurma kelimeleri "
+        "doğru Türkçe kelimeyle değiştir (ör. 'tütücen' -> 'tüten', 'ZERRCİKLER' -> 'ZERRECİKLER'). "
+        "Anlamı, kelime sırasını, cümle sayısını ve uzunluğu DEĞİŞTİRME; doğru olan hiçbir şeye dokunma; yeni bilgi ekleme. "
+        "Başlıklar TAM BÜYÜK HARF kalır.\n"
+        f"cumleler: {json.dumps(cumleler, ensure_ascii=False)}\n"
+        f"basliklar: {json.dumps(basliklar, ensure_ascii=False)}\n"
+        'Yalnız JSON döndür: {"cumleler": [...aynı sayıda...], "basliklar": [["SATIR 1", "SATIR 2"], ...aynı sayıda...]}'
+    )
+    try:
+        veri = _llm_json(istem, ayar, "Sen titiz bir Türkçe yazım denetçisisin. Yalnız geçerli JSON döndürürsün.")
+    except (Exception, SystemExit) as h:  # noqa: BLE001 — denetim üretimi asla durdurmaz
+        print(f"Yazım denetimi yapılamadı ({type(h).__name__}); metin olduğu gibi kullanılıyor")
+        return 0
+
+    def _kucuk_fark(eski: str, yeni: str) -> bool:
+        if not yeni or yeni == eski or abs(len(yeni) - len(eski)) > 4:
+            return False
+        if len(yeni.split()) != len(eski.split()):
+            return False
+        return difflib.SequenceMatcher(None, eski.lower(), yeni.lower()).ratio() >= 0.9
+
+    duzeltilen = 0
+    yeni_c = veri.get("cumleler") if isinstance(veri, dict) else None
+    if isinstance(yeni_c, list) and len(yeni_c) == len(sahneler):
+        for x, eski, yeni in zip(sahneler, cumleler, yeni_c):
+            yeni = str(yeni or "").strip()
+            if _kucuk_fark(eski, yeni):
+                x["ses"] = str(x.get("ses", "")).replace(eski, yeni, 1)
+                print(f"  yazım düzeltildi: {eski!r} -> {yeni!r}")
+                duzeltilen += 1
+    yeni_b = veri.get("basliklar") if isinstance(veri, dict) else None
+    if isinstance(yeni_b, list) and len(yeni_b) == len(sahneler):
+        for x, cift in zip(sahneler, yeni_b):
+            if not (isinstance(cift, list) and len(cift) == 2):
+                continue
+            for anahtar, yeni in zip(("baslik1", "baslik2"), cift):
+                eski = str(x.get(anahtar, ""))
+                yeni = tr_upper(str(yeni or "").strip())
+                if _kucuk_fark(eski, yeni):
+                    x[anahtar] = yeni
+                    print(f"  yazım düzeltildi (başlık): {eski!r} -> {yeni!r}")
+                    duzeltilen += 1
+    print(f"Yazım denetimi: {duzeltilen} düzeltme")
+    return duzeltilen
 
 _GENEL_KAYNAK_IZLERI = (
     "doğrulanmış bilimsel", "hakemli bilimsel", "bilimsel araştırma", "bilimsel yayın",
@@ -319,7 +405,8 @@ def _tek_sahne_uzat(konu: str, ses_metni: str, hedef: int = 165, baglam: str = "
              f"Somut bir ayrıntı veya örnek ekle. Uydurma bilgi yok, selamlama yok.\n"
              + TERIM_KURALLARI +
              "- Cümledeki terimleri ve sayıları AYNEN koru; aynı şey için yeni bir ad kullanma, yeni kesin sayı ekleme.\n"
-             + (f"Videonun tamamı (terimler ve sayılar bununla tutarlı kalmalı): {baglam}\n" if baglam else "")
+             + (f"Videonun diğer cümleleri (YALNIZCA terim ve sayı tutarlılığı için; bu cümlelerdeki bilgiyi "
+                f"TEKRAR ETME, onlardan parça kopyalama): {baglam}\n" if baglam else "")
              + f"Yalnızca cümleyi döndür, tırnak/açıklama ekleme.\n\nCümle: {ses_metni}")
 
     def _gemini():
@@ -388,9 +475,12 @@ def _anlatimi_uzat(konu: str, sahneler: list, hedef_toplam: int = 620) -> int:
             pay = max(12, eksik // max(1, len(sahneler)))
             hedef = min(ust_sinir, max(alt_sinir, mevcut + pay))
             if mevcut < hedef - 5:
-                yeni = _tek_sahne_uzat(konu, str(s.get("ses", "")), hedef,
-                                       baglam=" ".join(str(x.get("ses", "")) for x in sahneler))
-                if len(yeni) > mevcut:
+                digerleri = [str(x.get("ses", "")) for x in sahneler if x is not s]
+                yeni = _tek_sahne_uzat(konu, str(s.get("ses", "")), hedef, baglam=" ".join(digerleri))
+                # Uzatılmış cümle başka bir cümlenin tekrarına dönüştüyse kabul edilmez (özgün cümle kalır).
+                if len(yeni) > mevcut and any(_benzerlik(yeni, d) >= TEKRAR_ESIGI for d in digerleri):
+                    print("  uzatma reddedildi: başka bir cümleyi tekrar ediyor")
+                elif len(yeni) > mevcut:
                     s["ses"] = yeni
         print(f"  uzatma turu {tur+1}: "
               f"{len(' '.join(str(x.get('ses','')) for x in sahneler))} karakter")
@@ -600,18 +690,27 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
         raise SystemExit(f"Şablon v2.2 motoru yüklenemedi (motor/shorts_pipeline.py): {h}")
 
     n = max(4, min(8, int(n or 7)))
-    veri = _llm_json(PROMPT_V2.format(konu=konu, n=n, son=n - 1), ayar, _LLM_SISTEM)
-    cumleler = veri.get("cumleler") or veri.get("sahneler") or []
-    if isinstance(cumleler, str):
-        cumleler = [cumleler]
-    duzgun = []
-    for c in cumleler:
-        if isinstance(c, dict):
-            c = c.get("cumle") or c.get("ses") or c.get("metin") or ""
-        c = str(c).strip()
-        if c:
-            duzgun.append(c)
-    cumleler = duzgun
+    istem = PROMPT_V2.format(konu=konu, n=n, son=n - 1)
+    for deneme in range(3):
+        veri = _llm_json(istem, ayar, _LLM_SISTEM)
+        cumleler = veri.get("cumleler") or veri.get("sahneler") or []
+        if isinstance(cumleler, str):
+            cumleler = [cumleler]
+        duzgun = []
+        for c in cumleler:
+            if isinstance(c, dict):
+                c = c.get("cumle") or c.get("ses") or c.get("metin") or ""
+            c = str(c).strip()
+            if c:
+                duzgun.append(c)
+        cumleler = duzgun
+        tekrarlar = _tekrar_eden_cumleler(cumleler[:n])
+        if not tekrarlar:
+            break
+        print(f"Senaryoda tekrar eden cümle var {tekrarlar}; "
+              + ("yeniden isteniyor" if deneme < 2 else "UYARI: 3 denemede de düzelmedi"))
+        istem = (PROMPT_V2.format(konu=konu, n=n, son=n - 1)
+                 + "\nÖNCEKİ DENEMEDE aynı bilgiyi iki cümlede tekrar ettin. Her cümle farklı ve yeni bir bilgi versin.")
     if len(cumleler) < 4:
         raise SystemExit(f"v2 sahne planı: LLM yeterli cümle vermedi ({len(cumleler)}); video üretilmedi.")
     cumleler = cumleler[:n]
@@ -731,7 +830,13 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
             son_yeni += "."
         if "takip et" not in son_yeni.lower():
             sahneler[-1]["ses"] = f"{son_yeni} {kapanis_cta}"
-        anlatim = " ".join(str(x["ses"]).strip() for x in sahneler)
+    _yazim_denetimi(sahneler, ayar)
+    kalan_tekrar = _tekrar_eden_cumleler([x["ses"] for x in sahneler])
+    if kalan_tekrar:
+        print(f"UYARI: senaryoda tekrar eden cümleler kaldı {kalan_tekrar}")
+    for sira, x in enumerate(sahneler, start=1):
+        print(f"  senaryo {sira}: [{x.get('baslik1', '')} / {x.get('baslik2', '')}] {x['ses']}")
+    anlatim = " ".join(str(x["ses"]).strip() for x in sahneler)
     print(f"Anlatım: {len(anlatim)} karakter / {len(sahneler)} cümle")
     if len(anlatim) < 300:
         raise SystemExit(f"Anlatım çok kısa: {len(anlatim)} karakter; video üretilmedi.")
