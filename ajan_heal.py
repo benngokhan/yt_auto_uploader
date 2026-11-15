@@ -83,23 +83,76 @@ def _gh(method: str, path: str, body: dict | None = None, timeout: int = 30):
         raise
 
 
-def _tg(text: str) -> None:
+# Mesajların altına eklenen düğmeler. Basışları tamirci_buton_worker.py işler
+# (Telegram onay işçisiyle aynı 5 dakikalık turda; cevap birkaç dakika gecikebilir).
+_AKTIF_RUN: int | None = None
+
+
+def _dugmeler(run_id: int | None = None) -> dict:
+    satir = []
+    if run_id:
+        satir.append({"text": "🔍 Bu hataya bak", "callback_data": f"bak:{run_id}"})
+    satir.append({"text": "📋 Durum", "callback_data": "durum"})
+    return {"inline_keyboard": [satir]}
+
+
+def _tg_api(method: str, payload: dict) -> dict:
+    """Telegram Bot API çağrısı; hata olursa {} döner (ajan akışını asla düşürmez)."""
     bot = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-    chat = os.getenv("TELEGRAM_CHAT_ID", "").strip()
-    if not bot or not chat:
-        print("[telegram] token/chat yok, bildirim atlandı")
-        return
+    if not bot:
+        print("[telegram] token yok, çağrı atlandı")
+        return {}
     try:
         req = urllib.request.Request(
-            f"https://api.telegram.org/bot{bot}/sendMessage",
-            data=json.dumps({"chat_id": chat, "text": text[:3900], "parse_mode": "HTML"}, ensure_ascii=False).encode("utf-8"),
+            f"https://api.telegram.org/bot{bot}/{method}",
+            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
             headers={"Content-Type": "application/json"},
         )
-        with urllib.request.urlopen(req, timeout=20) as r:
-            r.read()
-        print("[telegram] bildirim gönderildi")
+        with urllib.request.urlopen(req, timeout=25) as r:
+            return json.loads(r.read().decode("utf-8") or "{}")
+    except urllib.error.HTTPError as e:
+        try:
+            ayrinti = e.read().decode("utf-8", "replace")[:200]
+        except Exception:
+            ayrinti = ""
+        print(f"[telegram] {method} hatası: HTTP {e.code} {ayrinti}")
     except Exception as e:
-        print(f"[telegram] bildirim hatası: {e}")
+        print(f"[telegram] {method} hatası: {type(e).__name__}")
+    return {}
+
+
+def _tg(text: str) -> None:
+    chat = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+    if not os.getenv("TELEGRAM_BOT_TOKEN", "").strip() or not chat:
+        print("[telegram] token/chat yok, bildirim atlandı")
+        return
+    r = _tg_api("sendMessage", {
+        "chat_id": chat, "text": text[:3900], "parse_mode": "HTML",
+        "disable_web_page_preview": True, "reply_markup": _dugmeler(_AKTIF_RUN),
+    })
+    if r.get("ok"):
+        print("[telegram] bildirim gönderildi")
+
+
+def _panel_mesaji(state: dict) -> None:
+    """Gruba bir kez 'Durum' düğmeli sabit kontrol mesajı gönderir ve sabitlemeyi dener."""
+    chat = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+    if state.get("_panel") or not chat:
+        return
+    r = _tg_api("sendMessage", {
+        "chat_id": chat, "parse_mode": "HTML", "reply_markup": _dugmeler(),
+        "text": ("🔧 <b>Tamirci — durum düğmesi</b>\n\n"
+                 "Sistemde hata var mı diye sormak için alttaki <b>Durum</b> düğmesine bas.\n"
+                 "Hata mesajlarının altındaki <b>Bu hataya bak</b> düğmesi o hatayı sade dille anlatır.\n"
+                 "Cevap anında gelmez; birkaç dakika içinde bu gruba yazarım."),
+    })
+    if not r.get("ok"):
+        return
+    mid = (r.get("result") or {}).get("message_id")
+    if mid:
+        _tg_api("pinChatMessage", {"chat_id": chat, "message_id": mid, "disable_notification": True})
+    state["_panel"] = {"message_id": mid, "ts": datetime.now(timezone.utc).isoformat()}
+    _state_save(state)
 
 
 def _state_load() -> dict:
@@ -831,7 +884,10 @@ def _commit_and_push(message: str) -> str:
 
 def main() -> None:
     print("=== Bilgi Dozu Hata Müdahale Ajanı başlıyor ===")
+    global _AKTIF_RUN
+    _AKTIF_RUN = None
     state = _state_load()
+    _panel_mesaji(state)
     failed = _get_failed_runs()
     # Yerine taze koşu başlatılmış eski koşular tarihsel artıktır; sayma ve işleme.
     failed = [r for r in failed if not state.get(str(r["id"]), {}).get("devredildi")]
@@ -862,6 +918,7 @@ def main() -> None:
         run_id = run["id"]
         run_name = run["name"]
         run_url = run["html_url"]
+        _AKTIF_RUN = run_id  # bu koşuyla ilgili mesajlara "Bu hataya bak" düğmesi eklenir
         attempts = int(state.get(str(run_id), {}).get("attempts", 0))
         if attempts >= MAX_REPAIR_ATTEMPTS:
             print(f"[{run_id}] deneme hakkı doldu ({attempts}/{MAX_REPAIR_ATTEMPTS}), atlanıyor")
@@ -876,7 +933,7 @@ def main() -> None:
                     f"🔴 <b>{_e(_is_adi(run_name), 60)} — çözemedim</b>\n\n"
                     f"Sorun: {sorun}\n"
                     f"Durum: {MAX_REPAIR_ATTEMPTS} kez denedim, olmadı. Artık kendi başıma dokunmuyorum.\n"
-                    f"İstersen bana \"şu hataya bak\" de; logu okuyup sade dille anlatırım.{_ek_not(run_name)}\n"
+                    f"Alttaki \"Bu hataya bak\" düğmesine basarsan logu okuyup sade dille anlatırım.{_ek_not(run_name)}\n"
                     f"Koşu: {_kayit_linki(run_url)}"
                 )
             continue
@@ -986,7 +1043,7 @@ def main() -> None:
                     f"Sorun: Kodda bir hata var.\n"
                     f"Durum: Otomatik denedim, olmadı. Bu turda başka bir şeyi değiştirmedim.\n"
                     f"Sebep: {_e(detail, 200)}\n"
-                    f"İstersen bana \"şu hataya bak\" de; logu okuyup sade dille anlatırım.{_ek_not(run_name)}\n"
+                    f"Alttaki \"Bu hataya bak\" düğmesine basarsan logu okuyup sade dille anlatırım.{_ek_not(run_name)}\n"
                     f"Koşu: {_kayit_linki(run_url)}"
                 )
 
@@ -1013,6 +1070,7 @@ def main() -> None:
                 f"Koşu: {_kayit_linki(run_url)}"
             )
 
+    _AKTIF_RUN = None
     print("=== Ajan taraması tamamlandı ===")
 
 

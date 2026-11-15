@@ -29,3 +29,16 @@ jobs:
           APPROVAL_FOLDER: 1xyO_jNjbpghfR7CJ1P9DUvkzdb6eC0qf
           WORKBOOK_ID: 1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo
         run: python telegram_onay_worker.py
+      # Tamirci botunun "Durum" / "Bu hataya bak" düğmeleri. Ayrı bot, ayrı token.
+      # Hata verse bile onay işini düşürmez (continue-on-error).
+      - name: Tamirci düğmelerini işle
+        if: always()
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN_TAMIRCI }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_GROUP_CHAT_ID || secrets.TELEGRAM_CHAT_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: python tamirci_buton_worker.py
