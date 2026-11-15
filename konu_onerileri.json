@@ -1,37 +1,37 @@
 {
-  "generated_at": "2026-11-14T04:10:16.694783+00:00",
+  "generated_at": "2026-11-15T05:53:47.765936+00:00",
   "used_count": 214,
   "method": "Drive yükleme tablosu + onay bekleyen metadata + Gemini anlamsal tekrar kontrolü + yerel benzerlik kapısı",
   "suggestions": [
     {
-      "title": "Uçak İnişte Neden Kabin Işıklarını Kapatır? Hayat Kurtaran Gizli Neden! ✈️🌙 #bilgidozu #shorts",
+      "title": "Yanan Bir Mum Söndüğünde Çıkan O Beyaz Dumanı Tekrar Nasıl Ateşlersin? 🕯️💨",
+      "score": 97,
+      "reason": "Görsel olarak çok güçlü, evde hemen denenebilecek şaşırtıcı bir fizik/kimya deneyini ilk saniyede soruyla soruyor.",
+      "duplicate_check": "Geçmişte ateş, mum veya duman deneyleri işlenmedi."
+    },
+    {
+      "title": "Uçak Tuvaletindeki Vakum Sistemi Suyu Neden Sadece 0.5 Saniyede Yutuyor? ✈️🚽",
       "score": 96,
-      "reason": "Uçuş korkusu veya merakı olan herkesin dikkatini çekecek, havacılık güvenliğiyle ilgili somut bir ilk saniye sorusu.",
-      "duplicate_check": "Geçmişte uçak pencerelerindeki delikler ve beyaz renk sebebi işlendi, kabin ışığı güvenliği ilk kez ele alınıyor."
+      "reason": "Her uçak yolcusunun merak ettiği ama mekanizmasını bilmediği güçlü bir mühendislik sırrını ilk saniyede soruyor.",
+      "duplicate_check": "Geçmişte uçak pencerelerindeki delik ve beyaz renk işlendi, tuvalet vakumu işlenmedi."
     },
     {
-      "title": "Sakız Yutunca Mide Onu 7 Yılda mı Sindirir? İşte Gerçek! 🍬 #bilgidozu #shorts",
+      "title": "Çay Kaşığı Şeker Çayda Neden Bir Saniyede Yok Olur? Görünmez Çözünme Sırrı! ☕✨",
       "score": 95,
-      "reason": "Toplumda çok yaygın olan bir şehir efsanesini somut sindirim bilimiyle çürütüyor, ilk saniyede soruyla güçlü merak uyandırıyor.",
-      "duplicate_check": "Geçmiş başlıklarda sindirim sistemi efsaneleri (mide asidi, tatlı midesi) işlendi ancak sakız efsanesi işlenmedi."
+      "reason": "Günlük hayatta herkesin her gün gördüğü ancak moleküler düzeydeki hareketini bilmediği bir olayı somut soruyla ele alıyor.",
+      "duplicate_check": "Geçmiş başlıklarda şeker, çay veya erime mekanizması işlenmedi."
     },
     {
-      "title": "Kedi ve Köpekler Neden Rüyalarında Koşar? Beyinleri Uykuda Ne Görüyor? 🐕🐈 #bilgidozu #shorts",
+      "title": "Futbol Topları Havada Neden Kavis Alarak Gider? Magnus Etkisinin Gizli Gücü! ⚽🌀",
+      "score": 95,
+      "reason": "Spor severlerin bayılacağı, fizik kurallarının topa nasıl yön verdiğini gösteren güçlü görsel bir konu.",
+      "duplicate_check": "Geçmişte golf ve tenis toplarının tüyleri/çukurları işlendi, futbol topunun kavis alma fiziği işlenmedi."
+    },
+    {
+      "title": "Trafik Işıklarındaki Kırmızı Renk Neden Seçildi? Uzaktan En Net Görünen Tonun Sırrı! 🚦🔴",
       "score": 94,
-      "reason": "Evcil hayvan sahiplerinin her gün şahit olduğu görsel bir davranışı nörolojik olarak ele alıyor, yüksek etkileşim potansiyeli var.",
-      "duplicate_check": "Geçmişte kedilerin miyavlaması ve kargaların yüz hafızası işlendi, ancak evcil hayvanların uyku nörolojisi ilk kez işleniyor."
-    },
-    {
-      "title": "Karanlıkta Telefonu Bırakınca Gözlerinde Oluşan O Renkli Leke Nedir? 📱👁️ #bilgidozu #shorts",
-      "score": 93,
-      "reason": "Doğrudan kullanıcının ekran alışkanlığıyla ilgili, göz fotoreseptörlerinin tepkisini anlatan yüksek merakta bir konu.",
-      "duplicate_check": "Geçmişte karanlıkta telefona bakma eylemi rodopsin pigmenti üzerinden işlendi, bu öneri ise ekrandan kalan hayalet renk lekelerine odaklanıyor."
-    },
-    {
-      "title": "Çay ve Kahve Neden Bardağın Kenarından Damlar? Fizik Kurallarına Meydan Okuyan Sır! ☕ #bilgidozu #shorts",
-      "score": 92,
-      "reason": "Günlük hayatta herkesin başına gelen fiziksel bir olayı (Coandă etkisi) somut ve görselleştirilebilir bir dille açıklıyor.",
-      "duplicate_check": "Geçmişte mutfak ve bardak olayları işlendi ancak sıvıların yüzey akış fiziği ve damlama mekanizması ilk kez ele alınıyor."
+      "reason": "Görsel olarak güçlü ve her gün karşılaşılan bir tasarımın fiziksel nedenini sorgulatıyor.",
+      "duplicate_check": "Geçmişte trafik veya renk algısıyla ilgili bu spesifik konu işlenmedi."
     }
   ]
 }
