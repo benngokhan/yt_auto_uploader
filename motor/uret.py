@@ -267,10 +267,15 @@ def _baslik_duzeltme_iste(baslik: str, hatali: list, cumle: str, ayar: dict) -> 
         "YALNIZCA sözlükte bulunmayan kelimeyi, cümleye uyan DOĞRU yazılmış Türkçe kelimeyle değiştir "
         "(ör. 'MUM EYİ' -> 'MUM EVİ', 'ZERRCİKLER' -> 'ZERRECİKLER'). Diğer kelimelere dokunma, kelime sayısını "
         "değiştirme, TAM BÜYÜK HARF yaz.\n"
-        'Yalnız JSON döndür: {"baslik": "DÜZELTİLMİŞ BAŞLIK"}'
+        'Yalnız JSON döndür: {"cumleler": ["DÜZELTİLMİŞ BAŞLIK"]}'
     )
+    # Not: _llm_json yalnız "cumleler" (vb.) anahtarı taşıyan cevabı kabul eder; o yüzden cevap bu anahtarla istenir.
+    # (67. çalıştırmada "baslik" anahtarı istendiği için doğru cevaplar yok sayılmıştı.)
     veri = _llm_json(istem, ayar, "Sen titiz bir Türkçe yazım denetçisisin. Yalnız geçerli JSON döndürürsün.")
-    return tr_upper(str((veri or {}).get("baslik") or "").strip()) if isinstance(veri, dict) else ""
+    liste = veri.get("cumleler") if isinstance(veri, dict) else None
+    if isinstance(liste, str):
+        liste = [liste]
+    return tr_upper(str(liste[0] or "").strip()) if isinstance(liste, list) and liste else ""
 
 
 def _baslik_denetimi(sahneler: list, ayar: dict) -> int:

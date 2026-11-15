@@ -154,7 +154,7 @@ class BaslikDenetimiTestleri(_ArsivOrtami):
 
     def test_duzeltme_kabul_edilir_ve_eski_yeni_loglanir(self):
         sahne = self._sahne()
-        with mock.patch.object(uret, "_llm_json", return_value={"baslik": "mum evi"}) as llm, \
+        with mock.patch.object(uret, "_llm_json", return_value={"cumleler": ["mum evi"]}) as llm, \
                 mock.patch("builtins.print") as yaz:
             self.assertEqual(uret._baslik_denetimi(sahne, {}), 1)
         self.assertEqual(sahne[0]["baslik1"], "MUM EVİ")
@@ -165,14 +165,30 @@ class BaslikDenetimiTestleri(_ArsivOrtami):
         self.assertIn("'MUM EYİ' -> 'MUM EVİ'", self.dosyalar("baslik_denetimi")[0].read_text(encoding="utf-8"))
 
     def test_duzeltilemezse_uretim_durur_baslik_degismez(self):
-        for cevap in ({"baslik": "MUM EYİ"}, {"baslik": "MUM EYYİ"}, {"baslik": "BAL EVİ"},
-                      {"baslik": "MUM EVİ ÇOK GÜZEL OLDU"}, {}):
+        for cevap in ({"cumleler": ["MUM EYİ"]}, {"cumleler": ["MUM EYYİ"]}, {"cumleler": ["BAL EVİ"]},
+                      {"cumleler": ["MUM EVİ ÇOK GÜZEL OLDU"]}, {}):
             sahne = self._sahne()
             with mock.patch.object(uret, "_llm_json", return_value=cevap), mock.patch("builtins.print"):
                 with self.assertRaises(SystemExit, msg=str(cevap)) as h:
                     uret._baslik_denetimi(sahne, {})
             self.assertIn("video üretilmedi", str(h.exception))
             self.assertEqual(sahne[0]["baslik1"], "MUM EYİ")
+
+    def test_gercek_llm_yolundan_gecer(self):
+        """_llm_json'un kendisi (yalnız ağ sahte): cevap biçimi motorun kabul ettiği biçimde olmalı."""
+        class _Yanit(io.BytesIO):
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+
+        def sahte(istek, *a, **k):
+            return _Yanit(json.dumps({"choices": [{"message": {"content": '{"cumleler": ["MUM EVİ"]}'}}]}).encode())
+
+        sahne = self._sahne()
+        ortam = {k: "" for k in ("GEMINI_API_KEY", "OPENROUTER_API_KEY")}
+        ortam["GROQ_API_KEY"] = "sahte-anahtar"
+        with mock.patch.dict(os.environ, ortam), mock.patch("urllib.request.urlopen", sahte), mock.patch("builtins.print"):
+            self.assertEqual(uret._baslik_denetimi(sahne, {}), 1)
+        self.assertEqual(sahne[0]["baslik1"], "MUM EVİ")
 
     def test_yapay_zeka_hatasinda_da_durur(self):
         with mock.patch.object(uret, "_llm_json", side_effect=SystemExit("LLM yok")), mock.patch("builtins.print"):
@@ -195,7 +211,7 @@ class RegresyonKapisiTestleri(_ArsivOrtami):
     @staticmethod
     def _duzelten(istem, ayar, sistem=None):
         if "video başlığında" in istem:
-            return {"baslik": "MUM EVİ"}
+            return {"cumleler": ["MUM EVİ"]}
         c = json.loads(re.search(r"cumleler: (\[.*\])\n", istem).group(1))
         b = json.loads(re.search(r"basliklar: (\[.*\])\n", istem).group(1))
         return {"cumleler": [x.replace("tütcen", "tüten") for x in c], "basliklar": b}
@@ -215,7 +231,7 @@ class RegresyonKapisiTestleri(_ArsivOrtami):
         """Yapay zekâ başlığı hiç düzeltmese de R2 yeşildir; D1 'DÜZELTİLEMEDİ' der ve kilidi etkilemez."""
         def yalniz_govde(istem, ayar, sistem=None):
             if "video başlığında" in istem:
-                return {"baslik": "MUM EYİ"}
+                return {"cumleler": ["MUM EYİ"]}
             return self._duzelten(istem, ayar, sistem)
         with mock.patch.object(uret, "_llm_json", yalniz_govde), mock.patch("builtins.print"):
             sonuc = {s["kod"]: s for s in regresyon.calistir({}, uret)}
@@ -229,7 +245,7 @@ class RegresyonKapisiTestleri(_ArsivOrtami):
     def test_farkli_duzeltme_yesil_gosterilmez(self):
         def baska(istem, ayar, sistem=None):
             if "video başlığında" in istem:
-                return {"baslik": "MUM ERİR"}
+                return {"cumleler": ["MUM ERİR"]}
             return self._duzelten(istem, ayar, sistem)
         with mock.patch.object(uret, "_llm_json", baska), mock.patch("builtins.print"):
             d1 = regresyon.calistir({}, uret)[-1]
