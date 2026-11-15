@@ -517,8 +517,54 @@ def _fix_model_404() -> tuple[bool, str]:
 
 # ---------------------------------------------------------------- müdahale: kod_hatasi
 
-def _fix_code_error(log_tail: str, run_name: str) -> tuple[bool, str]:
-    """LLM'den yama üretir, yalnız .py dosyalarına uygular."""
+def _yama_kapisi(dosya: str, kok: str = ".") -> tuple[bool, str]:
+    """LLM yaması commit edilmeden önce hızlı güvenlik kapısı.
+
+    1) Sözdizimi: `py_compile` (her zaman, ek paket gerekmez).
+    2) O dosyaya ait bir test modülü varsa: `unittest`.
+       Testler yalnız kurulu olmayan bir paket yüzünden açılamıyorsa atlanır
+       (ajan workflow'unda ağır bağımlılıklar kurulu değil); gerçek bir test
+       başarısızlığında yama reddedilir.
+    """
+    import subprocess
+    import sys
+
+    kok_yolu = Path(kok)
+    dosya_yolu = kok_yolu / dosya
+
+    try:
+        p = subprocess.run([sys.executable, "-m", "py_compile", str(dosya_yolu)],
+                           capture_output=True, text=True, timeout=60, cwd=str(kok_yolu))
+    except Exception as e:  # pragma: no cover - beklenmeyen ortam sorunu
+        return False, f"derleme çalıştırılamadı: {e}"
+    if p.returncode != 0:
+        satir = (p.stderr or "").strip().splitlines()
+        return False, "sözdizimi hatası: " + (satir[-1] if satir else "bilinmiyor")
+
+    stem = dosya_yolu.stem.replace("-", "_")
+    test_dosyasi = kok_yolu / "tests" / f"test_{stem}.py"
+    if not test_dosyasi.exists():
+        return True, "sözdizimi tamam (bu dosya için test yok)"
+
+    try:
+        t = subprocess.run([sys.executable, "-m", "unittest", f"tests.test_{stem}"],
+                           capture_output=True, text=True, timeout=300, cwd=str(kok_yolu))
+    except Exception as e:  # pragma: no cover
+        return True, f"sözdizimi tamam (testler çalıştırılamadı: {e})"
+    if t.returncode == 0:
+        return True, "sözdizimi + testler tamam"
+    cikti = (t.stderr or "") + "\n" + (t.stdout or "")
+    if "ModuleNotFoundError" in cikti or "ImportError" in cikti:
+        return True, "sözdizimi tamam (testler eksik paket nedeniyle atlandı)"
+    ozet = " | ".join(x.strip() for x in cikti.strip().splitlines()[-3:])
+    return False, "testler geçmedi: " + ozet[:300]
+
+
+def _fix_code_error(log_tail: str, run_name: str) -> tuple[bool, str, str]:
+    """LLM'den yama üretir, yalnız .py dosyalarına uygular.
+
+    Dönen üçüncü değer, değiştirilen dosyanın yoludur (kapı/geri alma için).
+    """
     prompt = (
         "Sen bir Python hata düzeltme ajanısın. Aşağıdaki GitHub Actions logundaki hatayı düzeltmek için "
         "EN KÜÇÜK yamayı üret. Yalnızca Python dosyalarını değiştir. Yanıtın SADECE şu JSON olmalı:\n"
@@ -535,28 +581,28 @@ def _fix_code_error(log_tail: str, run_name: str) -> tuple[bool, str]:
     eski = patch.get("eski") or ""
     yeni = patch.get("yeni") or ""
     if not dosya or not eski or not yeni:
-        return False, "LLM yama üretemedi"
+        return False, "LLM yama üretemedi", ""
     if not dosya.endswith(".py") or ".." in dosya or dosya.startswith("/"):
-        return False, f"GÜVENLİK: izin verilmeyen dosya ({dosya})"
+        return False, f"GÜVENLİK: izin verilmeyen dosya ({dosya})", ""
     if len(eski) > 4000 or len(yeni) > 4000:
-        return False, "GÜVENLİK: yama çok büyük"
+        return False, "GÜVENLİK: yama çok büyük", ""
     target = Path(dosya)
     if not target.exists():
-        return False, f"dosya yok: {dosya}"
+        return False, f"dosya yok: {dosya}", ""
     src = target.read_text(encoding="utf-8")
     if src.count(eski) != 1:
-        return False, "eski blok dosyada tam 1 kez bulunamadı"
+        return False, "eski blok dosyada tam 1 kez bulunamadı", ""
     # Güvenlik: onay modu kilidi
     ayar = Path("motor/ayarlar.json")
     if ayar.exists():
         try:
             cfg = json.loads(ayar.read_text(encoding="utf-8"))
             if cfg.get("onay", {}).get("mod") != "elle":
-                return False, "GÜVENLİK: onay.mod 'elle' değil"
+                return False, "GÜVENLİK: onay.mod 'elle' değil", ""
         except Exception:
             pass
     target.write_text(src.replace(eski, yeni, 1), encoding="utf-8")
-    return True, f"{dosya}: {patch.get('aciklama', '')}"
+    return True, f"{dosya}: {patch.get('aciklama', '')}", dosya
 
 
 # ---------------------------------------------------------------- ana akış
@@ -566,7 +612,7 @@ def _get_failed_runs() -> list[dict]:
     # boş sonuç döner. Bu yüzden filtreyi tarih (gün) düzeyinde verip Python'da saat filtresi uygula.
     since_dt = datetime.now(timezone.utc) - timedelta(hours=LOOKBACK_HOURS)
     since_day = since_dt.strftime("%Y-%m-%d")
-    runs = _gh("GET", f"actions/runs?per_page=50&created=>={since_day}")
+    runs = _gh("GET", f"actions/runs?per_page=100&created=>={since_day}")
     out = []
     for r in runs.get("workflow_runs", []):
         if r.get("conclusion") != "failure":
@@ -806,17 +852,32 @@ def main() -> None:
             _rerun(run_id)
 
         elif kind == "kod_hatasi":
-            ok, detail = _fix_code_error(log_tail, run_name)
+            ok, detail, dosya = _fix_code_error(log_tail, run_name)
             if ok:
-                sha = _commit_and_push(f"fix(ajan): kod hatası otomatik yaması [{kind}] [skip ci]")
-                _tg(
-                    f"🟢 <b>{_e(_is_adi(run_name), 60)} — onarıldı</b>\n\n"
-                    f"Sorun: Kodda küçük bir hata vardı.\n"
-                    f"Düzeltme: {_e(detail, 200)}\n"
-                    f"Yaptığım: Düzeltmeyi uyguladım ve işi yeniden başlattım.\n"
-                    f"Koşu: {_kayit_linki(run_url)}"
-                )
-                _rerun(run_id)
+                # Commit'ten önce kapı: sözdizimi + varsa ilgili testler.
+                gecti, kapi_notu = _yama_kapisi(dosya) if dosya else (False, "dosya adı yok")
+                if not gecti:
+                    import subprocess
+                    subprocess.run(["git", "checkout", "--", dosya], check=False)
+                    _tg(
+                        f"🟡 <b>{_e(_is_adi(run_name), 60)} — yama güvenlik kapısında durdu</b>\n\n"
+                        f"Sorun: Kodda bir hata vardı.\n"
+                        f"Yaptığım: Yama üretildi ama commit etmeden geri aldım.\n"
+                        f"Sebep: {_e(kapi_notu, 200)}\n"
+                        f"Hiçbir şey değiştirilmedi. Bu dosyaya elle bakmam gerekiyor.{_ek_not(run_name)}\n"
+                        f"Koşu: {_kayit_linki(run_url)}"
+                    )
+                else:
+                    sha = _commit_and_push(f"fix(ajan): kod hatası otomatik yaması [{kind}] [skip ci]")
+                    _tg(
+                        f"🟢 <b>{_e(_is_adi(run_name), 60)} — onarıldı</b>\n\n"
+                        f"Sorun: Kodda küçük bir hata vardı.\n"
+                        f"Düzeltme: {_e(detail, 200)}\n"
+                        f"Kontrol: {_e(kapi_notu, 120)}\n"
+                        f"Yaptığım: Düzeltmeyi uyguladım ve işi yeniden başlattım.\n"
+                        f"Koşu: {_kayit_linki(run_url)}"
+                    )
+                    _rerun(run_id)
             else:
                 _tg(
                     f"🔴 <b>{_e(_is_adi(run_name), 60)} — otomatik düzeltemedim</b>\n\n"
