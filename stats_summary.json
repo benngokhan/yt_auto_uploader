@@ -1,10 +1,10 @@
 {
- "total": 35444,
- "day_gain": 39,
- "updated": 52,
- "baseline_count": 20,
+ "total": 36567,
+ "day_gain": 47,
+ "updated": 54,
+ "baseline_count": 21,
  "compared_count": 48,
- "unavailable_count": 8,
+ "unavailable_count": 7,
  "dry_run": false,
  "top": [
   {
@@ -24,13 +24,13 @@
   },
   {
    "delta": 2,
-   "title": "Gözünde Bir Kör Nokta Var — Beynin Boşluğu Gizliyor! 👁️🧠 #bi",
-   "file": "video_31.mp4"
+   "title": "Sevdiğin Birine Bakınca Göz Bebeğin Neden Otomatik Büyür? 👀 ",
+   "file": "video_83.mp4"
   },
   {
    "delta": 2,
-   "title": "Aynaya Baktığında Bir İnsan Değil, Bir Süpernova Görüyorsun!",
-   "file": "video_5.mp4"
+   "title": "Sabah Uyandığında Boyun Geceye Göre Neden 2 Santim Daha Uzun",
+   "file": "video_150.mp4"
   }
  ]
 }
