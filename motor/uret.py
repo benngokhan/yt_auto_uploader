@@ -149,7 +149,7 @@ def _regresyon_kapisi(ayar: dict) -> None:
     print(metin)
     _arsivle("regresyon_sonuclari", metin + "\n\n" + json.dumps(sonuc, ensure_ascii=False, indent=2))
     if not regresyon.hepsi_yesil(sonuc):
-        kirmizi = ", ".join(x["kod"] for x in sonuc if not x["gecti"])
+        kirmizi = ", ".join(x["kod"] for x in sonuc if not x["gecti"] and x.get("kilit", True))
         raise SystemExit(f"UYARI: regresyon testleri KIRMIZI ({kirmizi}). Video/ses ÜRETİLMEDİ.")
 
 
@@ -250,6 +250,89 @@ def _yazim_denetimi(sahneler: list, ayar: dict) -> int:
                     duzeltilen += 1
     print(f"Yazım denetimi: {duzeltilen} düzeltme")
     return duzeltilen
+
+class BaslikDuzeltilemedi(SystemExit):
+    """Başlıkta sözlükte olmayan kelime kaldı: başlık ekrana basılmaz, üretim durur."""
+
+
+BASLIK_DUZELTME_DENEMESI = 2
+
+
+def _baslik_duzeltme_iste(baslik: str, hatali: list, cumle: str, ayar: dict) -> str:
+    """Yalnız işaretlenen kelime(ler) için yapay zekâdan düzeltme ister; cevabı olduğu gibi (büyük harfle) döndürür."""
+    istem = (
+        "Bir Türkçe video başlığında yazım hatası var. Başlık: " + json.dumps(baslik, ensure_ascii=False) + ". "
+        "Sözlükte bulunmayan kelime(ler): " + json.dumps(hatali, ensure_ascii=False) + ". "
+        "Başlığın ait olduğu cümle: " + json.dumps(cumle, ensure_ascii=False) + ". "
+        "YALNIZCA sözlükte bulunmayan kelimeyi, cümleye uyan DOĞRU yazılmış Türkçe kelimeyle değiştir "
+        "(ör. 'MUM EYİ' -> 'MUM EVİ', 'ZERRCİKLER' -> 'ZERRECİKLER'). Diğer kelimelere dokunma, kelime sayısını "
+        "değiştirme, TAM BÜYÜK HARF yaz.\n"
+        'Yalnız JSON döndür: {"baslik": "DÜZELTİLMİŞ BAŞLIK"}'
+    )
+    veri = _llm_json(istem, ayar, "Sen titiz bir Türkçe yazım denetçisisin. Yalnız geçerli JSON döndürürsün.")
+    return tr_upper(str((veri or {}).get("baslik") or "").strip()) if isinstance(veri, dict) else ""
+
+
+def _baslik_denetimi(sahneler: list, ayar: dict) -> int:
+    """YALNIZ BAŞLIKLAR: önce sözlük (yapay zekâsız), sonra yalnız işaretlenen kelimeler için düzeltme.
+
+    Kural (sahip, 16.11.2026): başlıkta sözlükte olmayan kelime varsa düzeltilir ve loga eski -> yeni yazılır;
+    düzeltilemezse başlık ekrana basılmaz, üretim DURUR. Senaryo gövdesine (cümlelere) dokunmaz.
+    """
+    import sozluk
+    kayit: list[str] = []
+    duzeltilen = 0
+
+    def yaz(satir: str) -> None:
+        print(satir)
+        kayit.append(satir)
+
+    try:
+        for sira, x in enumerate(sahneler, start=1):
+            for anahtar in ("baslik1", "baslik2"):
+                eski = str(x.get(anahtar, ""))
+                try:
+                    hatali = sozluk.bilinmeyenler(eski)
+                except sozluk.SozlukYok as h:
+                    yaz(f"Başlık denetimi YAPILAMADI: sözlük yüklenemedi ({h})")
+                    raise BaslikDuzeltilemedi("Başlık sözlük denetimi yapılamadı (sözlük yok); video üretilmedi.") from h
+                if not hatali:
+                    continue
+                yaz(f"  başlık sözlük denetimi: {sira}. sahne {eski!r} -> sözlükte olmayan kelime: {hatali}")
+                kabul = ""
+                for deneme in range(1, BASLIK_DUZELTME_DENEMESI + 1):
+                    try:
+                        yeni = _baslik_duzeltme_iste(eski, hatali, str(x.get("ses", "")), ayar)
+                    except (Exception, SystemExit) as h:  # noqa: BLE001
+                        yaz(f"    deneme {deneme}: düzeltme alınamadı ({type(h).__name__})")
+                        continue
+                    eski_k, yeni_k = sozluk.kelimeler(eski), sozluk.kelimeler(yeni)
+                    if not yeni or yeni == eski:
+                        neden = "değişiklik yok"
+                    elif len(yeni) > 18:
+                        neden = "18 karakterden uzun"
+                    elif len(yeni_k) != len(eski_k) or any(
+                            e != y for e, y in zip(eski_k, yeni_k) if e not in hatali):
+                        neden = "işaretlenmeyen kelimeler de değiştirilmiş"
+                    elif sozluk.bilinmeyenler(yeni):
+                        neden = f"hâlâ sözlükte olmayan kelime var: {sozluk.bilinmeyenler(yeni)}"
+                    else:
+                        kabul = yeni
+                        break
+                    yaz(f"    deneme {deneme}: öneri {yeni!r} reddedildi ({neden})")
+                if not kabul:
+                    yaz(f"  BAŞLIK DÜZELTİLEMEDİ: {sira}. sahne {eski!r} (sözlükte olmayan: {hatali})")
+                    raise BaslikDuzeltilemedi(
+                        f"Başlık düzeltilemedi: {sira}. sahne {eski!r}, sözlükte olmayan kelime {hatali}. "
+                        "Başlık ekrana basılmadı; video üretilmedi.")
+                x[anahtar] = kabul
+                duzeltilen += 1
+                yaz(f"  başlık düzeltildi: {eski!r} -> {kabul!r} (sözlükte olmayan: {hatali})")
+        yaz(f"Başlık sözlük denetimi: {duzeltilen} düzeltme, tüm başlık kelimeleri sözlükte")
+        return duzeltilen
+    finally:
+        _arsivle("baslik_denetimi", "\n".join(kayit) or "kayıt yok")
+
 
 _GENEL_KAYNAK_IZLERI = (
     "doğrulanmış bilimsel", "hakemli bilimsel", "bilimsel araştırma", "bilimsel yayın",
@@ -876,7 +959,9 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
             sahneler[-1]["ses"] = f"{son_yeni} {kapanis_cta}"
     _arsivle_senaryo("senaryo_2_uzatma_sonrasi", sahneler)
     _yazim_denetimi(sahneler, ayar)
-    _arsivle_senaryo("senaryo_3_yazim_denetimi_sonrasi_SON", sahneler)
+    _arsivle_senaryo("senaryo_3_yazim_denetimi_sonrasi", sahneler)
+    _baslik_denetimi(sahneler, ayar)  # yalnız başlıklar; düzeltilemezse üretim durur
+    _arsivle_senaryo("senaryo_4_baslik_denetimi_sonrasi_SON", sahneler)
     # Yalnız UYARI: metin değişmez, üretim durmaz (motor/senaryo_denetim.py)
     try:
         import senaryo_denetim as _sd

@@ -1,0 +1,3 @@
+# Başlık sözlük denetiminde DOĞRU kabul edilecek ek kelimeler (her satıra bir kelime, küçük/büyük harf fark etmez).
+# Sözlüğün tanımadığı ama doğru olan özel adları / yabancı terimleri buraya ekleyin (ör. marka adı).
+# "#" ile başlayan satırlar yorumdur. Bu dosya şu an bilerek boştur.

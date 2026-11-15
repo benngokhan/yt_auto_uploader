@@ -3,13 +3,17 @@
 
 Test seti (sahip, 15.11.2026):
   R1  "tütcen"  (64. üretim)            -> yazım denetimi düzeltmeli
-  R2  "MUM EYİ" (65. üretim, başlık)    -> yazım denetimi yakalamalı
+  R2  "MUM EYİ" (65. üretim, başlık)    -> SÖZLÜK denetimi "EYİ"yi işaretlemeli (yapay zekâsız)
   R3  "beş yüz derece" (65. üretim)     -> doğrulanamayan kesin sayı olarak işaretlenmeli
   R4  "zerrecik" + "damlacık" (65)      -> terim tutarsızlığı uyarısı
   R5  64'ün neredeyse aynı ilk iki cümlesi -> tekrar olarak yakalanmalı
 
-R1 ve R2 motorun GERÇEK yazım denetimini (yapay zekâ çağrısı) çalıştırır: sahte cevapla "yeşil" gösterilmez.
-Yapay zekâya ulaşılamazsa ya da düzeltmezse test KIRMIZIdır. R3-R5 yapay zekâsız, her zaman aynı sonucu verir.
+  D1  "MUM EYİ" -> "MUM EVİ" düzeltmesi  -> AYRI test; gerçek yapay zekâyla. Kilidi ETKİLEMEZ.
+
+R2-R5 yapay zekâsızdır: her çalıştırmada aynı sonucu verir.
+R1 motorun GERÇEK gövde yazım denetimini (yapay zekâ çağrısı) çalıştırır; sahte cevapla "yeşil" gösterilmez.
+D1 de gerçek yapay zekâyı çağırır; düzeltmezse "DÜZELTİLEMEDİ" yazar, asla rastgele yeşil gösterilmez.
+D1 motoru kilitlemez, çünkü gerçek üretimde düzeltilemeyen başlık o üretimi zaten durdurur (_baslik_denetimi).
 Kullanım:  python3 motor/regresyon.py     (çıkış kodu 0 = hepsi yeşil)
 """
 from __future__ import annotations
@@ -67,8 +71,9 @@ def calistir(ayar: dict | None = None, uret_mod=None) -> list[dict]:
     """Testleri çalıştırır; [{'kod','ad','gecti','ayrinti'}] döndürür. Asla istisna fırlatmaz."""
     sonuc: list[dict] = []
 
-    def ekle(kod, ad, gecti, ayrinti):
-        sonuc.append({"kod": kod, "ad": ad, "gecti": bool(gecti), "ayrinti": str(ayrinti)})
+    def ekle(kod, ad, gecti, ayrinti, kilit=True, durum=""):
+        sonuc.append({"kod": kod, "ad": ad, "gecti": bool(gecti), "ayrinti": str(ayrinti), "kilit": bool(kilit),
+                      "durum": durum or ("YEŞİL" if gecti else "KIRMIZI")})
 
     try:
         if uret_mod is None:
@@ -79,7 +84,7 @@ def calistir(ayar: dict | None = None, uret_mod=None) -> list[dict]:
         ekle("R0", "motor yüklenebiliyor", False, f"{type(h).__name__}: {h}")
         return sonuc
 
-    # R1 + R2: gerçek yazım denetimi
+    # R1: gerçek gövde yazım denetimi (yapay zekâ)
     try:
         y = _yazim_canli(uret_mod, ayar)
         metin = " ".join(x["ses"] for x in y["sahneler"])
@@ -87,12 +92,23 @@ def calistir(ayar: dict | None = None, uret_mod=None) -> list[dict]:
         ipucu = f"DÜZELTİLMEDİ. {y['hata'] or 'Gerçek yazım denetiminin kaydı'}: {son_satirlar}"
         ekle("R1", "'tütcen' düzeltilir", "tütcen" not in metin.lower(),
              "düzeltildi: " + y["sahneler"][0]["ses"] if "tütcen" not in metin.lower() else ipucu)
-        b = y["sahneler"][2]["baslik1"]
-        ekle("R2", "'MUM EYİ' başlığı yakalanır", b != "MUM EYİ",
-             f"düzeltildi: 'MUM EYİ' -> '{b}'" if b != "MUM EYİ" else ipucu)
     except BaseException as h:  # noqa: BLE001
         ekle("R1", "'tütcen' düzeltilir", False, f"{type(h).__name__}: {h}")
-        ekle("R2", "'MUM EYİ' başlığı yakalanır", False, f"{type(h).__name__}: {h}")
+
+    # R2: sözlük denetimi (yapay zekâsız, her çalıştırmada aynı sonuç)
+    try:
+        import sozluk  # noqa: PLC0415
+        hatali = sozluk.bilinmeyenler("MUM EYİ")
+        dogru = sozluk.bilinmeyenler("MUM EVİ")
+        digerleri = {" ".join(b): sozluk.bilinmeyenler(" ".join(b)) for b in BASLIKLAR_65 if b[0] != "MUM EYİ"}
+        yanlis_alarm = {k: v for k, v in digerleri.items() if v}
+        ekle("R2", "'MUM EYİ' başlığı sözlük denetimiyle yakalanır",
+             hatali == ["EYİ"] and not dogru and not yanlis_alarm,
+             f"'MUM EYİ' -> işaretlenen: {hatali}; 'MUM EVİ' -> işaretlenen: {dogru}; "
+             f"65'in diğer 6 başlığında yanlış alarm: {yanlis_alarm or 'yok'}")
+    except BaseException as h:  # noqa: BLE001
+        ekle("R2", "'MUM EYİ' başlığı sözlük denetimiyle yakalanır", False,
+             f"sözlük çalışmadı — {type(h).__name__}: {h}")
 
     # R3 + R4: yapay zekâsız uyarı denetimleri
     try:
@@ -114,20 +130,48 @@ def calistir(ayar: dict | None = None, uret_mod=None) -> list[dict]:
              any((i, j) == (1, 2) for i, j, _ in tekrar), f"yakalanan çiftler (cümle, cümle, benzerlik): {tekrar}")
     except BaseException as h:  # noqa: BLE001
         ekle("R5", "64'ün neredeyse aynı ilk iki cümlesi yakalanır", False, f"{type(h).__name__}: {h}")
+
+    # D1: düzeltme testi (AYRI; gerçek yapay zekâ; kilidi etkilemez; asla rastgele yeşil gösterilmez)
+    ad = "'MUM EYİ' -> 'MUM EVİ' düzeltmesi (yapay zekâ; kilidi etkilemez)"
+    try:
+        sahne = [{"ses": URETIM_65[2], "baslik1": "MUM EYİ", "baslik2": "BUHARLAŞIR"}]
+        kayit = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(kayit):
+                uret_mod._baslik_denetimi(sahne, ayar)
+            hata = ""
+        except BaseException as h:  # noqa: BLE001
+            hata = f"{type(h).__name__}"
+        b = sahne[0]["baslik1"]
+        iz = " | ".join(x.strip() for x in kayit.getvalue().strip().splitlines()[-4:]) or "kayıt yok"
+        if b == "MUM EVİ":
+            ekle("D1", ad, True, "düzeltildi: 'MUM EYİ' -> 'MUM EVİ'", kilit=False, durum="DÜZELTİLDİ")
+        elif b != "MUM EYİ" and not hata:
+            ekle("D1", ad, False, f"sözlükten geçen BAŞKA bir kelimeyle düzeltildi: 'MUM EYİ' -> {b!r} (beklenen 'MUM EVİ')",
+                 kilit=False, durum="FARKLI DÜZELTME")
+        else:
+            ekle("D1", ad, False, f"{hata or 'değişmedi'}: {iz}", kilit=False, durum="DÜZELTİLEMEDİ")
+    except BaseException as h:  # noqa: BLE001
+        ekle("D1", ad, False, f"{type(h).__name__}: {h}", kilit=False, durum="DÜZELTİLEMEDİ")
     return sonuc
 
 
 def rapor(sonuc: list[dict]) -> str:
     satirlar = ["REGRESYON TESTLERİ (bilinen hatalar)"]
     for s in sonuc:
-        satirlar.append(f"  [{'YEŞİL  ' if s['gecti'] else 'KIRMIZI'}] {s['kod']} {s['ad']} — {s['ayrinti']}")
-    yesil = sum(1 for s in sonuc if s["gecti"])
-    satirlar.append(f"  Sonuç: {yesil}/{len(sonuc)} yeşil" + ("" if yesil == len(sonuc) else " — MOTOR VİDEO ÜRETMEYECEK"))
+        durum = s.get("durum") or ("YEŞİL" if s["gecti"] else "KIRMIZI")
+        satirlar.append(f"  [{durum}] {s['kod']} {s['ad']} — {s['ayrinti']}")
+    kilit = [s for s in sonuc if s.get("kilit", True)]
+    yesil = sum(1 for s in kilit if s["gecti"])
+    satirlar.append(f"  Sonuç (motoru kilitleyen testler): {yesil}/{len(kilit)} yeşil"
+                    + ("" if hepsi_yesil(sonuc) else " — MOTOR VİDEO ÜRETMEYECEK"))
     return "\n".join(satirlar)
 
 
 def hepsi_yesil(sonuc: list[dict]) -> bool:
-    return bool(sonuc) and all(s["gecti"] for s in sonuc)
+    """Yalnız kilitleyen testlere bakar (R1-R5). D1 bilgi amaçlıdır."""
+    kilit = [s for s in sonuc if s.get("kilit", True)]
+    return len(kilit) >= 5 and all(s["gecti"] for s in kilit)
 
 
 if __name__ == "__main__":

@@ -113,30 +113,144 @@ class UyariDenetimiTestleri(unittest.TestCase):
         self.assertEqual(len(sd.uyarilar(regresyon.URETIM_65)), 2)
 
 
+try:
+    import sozluk
+    SOZLUK_VAR = sozluk.hazir_mi()[0]
+except Exception:  # noqa: BLE001
+    SOZLUK_VAR = False
+SOZLUK_GEREK = unittest.skipUnless(SOZLUK_VAR, "zemberek-python kurulu değil (motor iş akışında kuruludur)")
+
+
+@SOZLUK_GEREK
+class SozlukTestleri(unittest.TestCase):
+    def test_mum_eyi_her_seferinde_yakalanir(self):
+        for _ in range(3):
+            self.assertEqual(sozluk.bilinmeyenler("MUM EYİ"), ["EYİ"])
+        self.assertEqual(sozluk.bilinmeyenler("MUM EVİ"), [])
+
+    def test_dogru_basliklar_isaretlenmez(self):
+        for b in ["DUMAN NEDEN", "TEKRAR YANAR?", "KÜL DEĞİL", "YAKIT DAMLASI", "BUHARLAŞIR", "SOĞUYUP",
+                  "BEYAZ DUMAN", "ALEVLE", "TEMAS ANI", "YAKIT HÂLÂ", "ORADA", "AY'IN SIRRI", "3D BASKI %50"]:
+            self.assertEqual(sozluk.bilinmeyenler(b), [], b)
+
+    def test_uydurma_kelime_isaretlenir(self):
+        self.assertEqual(sozluk.bilinmeyenler("TÜTCEN DUMAN"), ["TÜTCEN"])
+
+    def test_ek_kelime_dosyasi(self):
+        with mock.patch.dict(sozluk._durum, {"ek": {"tütcen"}}):
+            self.assertEqual(sozluk.bilinmeyenler("TÜTCEN DUMAN"), [])
+
+
+@SOZLUK_GEREK
+class BaslikDenetimiTestleri(_ArsivOrtami):
+    def _sahne(self):
+        return [{"ses": "Mum yandıkça eriyen parafin buharlaşır.", "baslik1": "MUM EYİ", "baslik2": "BUHARLAŞIR"}]
+
+    def test_temiz_basliklarda_yapay_zeka_cagrilmaz(self):
+        sahne = [{"ses": "x", "baslik1": "KÜL DEĞİL", "baslik2": "YAKIT DAMLASI"}]
+        with mock.patch.object(uret, "_llm_json") as llm, mock.patch("builtins.print"):
+            self.assertEqual(uret._baslik_denetimi(sahne, {}), 0)
+        llm.assert_not_called()
+
+    def test_duzeltme_kabul_edilir_ve_eski_yeni_loglanir(self):
+        sahne = self._sahne()
+        with mock.patch.object(uret, "_llm_json", return_value={"baslik": "mum evi"}) as llm, \
+                mock.patch("builtins.print") as yaz:
+            self.assertEqual(uret._baslik_denetimi(sahne, {}), 1)
+        self.assertEqual(sahne[0]["baslik1"], "MUM EVİ")
+        self.assertEqual(sahne[0]["ses"], "Mum yandıkça eriyen parafin buharlaşır.")
+        self.assertIn("['EYİ']", llm.call_args[0][0].replace('"', "'"))
+        cikti = " ".join(str(c.args[0]) for c in yaz.call_args_list)
+        self.assertIn("başlık düzeltildi: 'MUM EYİ' -> 'MUM EVİ'", cikti)
+        self.assertIn("'MUM EYİ' -> 'MUM EVİ'", self.dosyalar("baslik_denetimi")[0].read_text(encoding="utf-8"))
+
+    def test_duzeltilemezse_uretim_durur_baslik_degismez(self):
+        for cevap in ({"baslik": "MUM EYİ"}, {"baslik": "MUM EYYİ"}, {"baslik": "BAL EVİ"},
+                      {"baslik": "MUM EVİ ÇOK GÜZEL OLDU"}, {}):
+            sahne = self._sahne()
+            with mock.patch.object(uret, "_llm_json", return_value=cevap), mock.patch("builtins.print"):
+                with self.assertRaises(SystemExit, msg=str(cevap)) as h:
+                    uret._baslik_denetimi(sahne, {})
+            self.assertIn("video üretilmedi", str(h.exception))
+            self.assertEqual(sahne[0]["baslik1"], "MUM EYİ")
+
+    def test_yapay_zeka_hatasinda_da_durur(self):
+        with mock.patch.object(uret, "_llm_json", side_effect=SystemExit("LLM yok")), mock.patch("builtins.print"):
+            with self.assertRaises(uret.BaslikDuzeltilemedi):
+                uret._baslik_denetimi(self._sahne(), {})
+
+    def test_sozluk_yoksa_durur(self):
+        with mock.patch.object(sozluk, "bilinmeyenler", side_effect=sozluk.SozlukYok("yok")), mock.patch("builtins.print"):
+            with self.assertRaises(uret.BaslikDuzeltilemedi):
+                uret._baslik_denetimi(self._sahne(), {})
+
+    def test_govde_yazim_denetimi_kurallari_degismedi(self):
+        import inspect
+        k = inspect.getsource(uret._yazim_denetimi)
+        for parca in ("esik: float = 0.9", "abs(len(yeni) - len(eski)) > 4", "_kucuk_fark(eski, yeni, 0.7) and len(yeni) <= 18"):
+            self.assertIn(parca, k)
+
+
 class RegresyonKapisiTestleri(_ArsivOrtami):
     @staticmethod
     def _duzelten(istem, ayar, sistem=None):
+        if "video başlığında" in istem:
+            return {"baslik": "MUM EVİ"}
         c = json.loads(re.search(r"cumleler: (\[.*\])\n", istem).group(1))
         b = json.loads(re.search(r"basliklar: (\[.*\])\n", istem).group(1))
-        return {"cumleler": [x.replace("tütcen", "tüten") for x in c],
-                "basliklar": [["MUM ERİR" if s == "MUM EYİ" else s for s in cift] for cift in b]}
+        return {"cumleler": [x.replace("tütcen", "tüten") for x in c], "basliklar": b}
 
-    def test_yazim_denetimi_duzeltirse_hepsi_yesil_ve_kapi_gecer(self):
+    @SOZLUK_GEREK
+    def test_hepsi_yesil_ve_kapi_gecer(self):
         with mock.patch.object(uret, "_llm_json", self._duzelten), mock.patch("builtins.print"):
             sonuc = regresyon.calistir({}, uret)
-            self.assertEqual([s["kod"] for s in sonuc], ["R1", "R2", "R3", "R4", "R5"])
-            self.assertTrue(regresyon.hepsi_yesil(sonuc), regresyon.rapor(sonuc))
+            self.assertEqual([s["kod"] for s in sonuc], ["R1", "R2", "R3", "R4", "R5", "D1"])
+            self.assertTrue(all(s["gecti"] for s in sonuc), regresyon.rapor(sonuc))
+            self.assertEqual(sonuc[-1]["durum"], "DÜZELTİLDİ")
             uret._regresyon_kapisi({})
         self.assertIn("5/5 yeşil", self.dosyalar("regresyon_sonuclari")[0].read_text(encoding="utf-8"))
 
-    def test_yazim_denetimi_duzeltmezse_kirmizi_ve_motor_durur(self):
+    @SOZLUK_GEREK
+    def test_mum_eyi_testi_yapay_zekaya_bagli_degil(self):
+        """Yapay zekâ başlığı hiç düzeltmese de R2 yeşildir; D1 'DÜZELTİLEMEDİ' der ve kilidi etkilemez."""
+        def yalniz_govde(istem, ayar, sistem=None):
+            if "video başlığında" in istem:
+                return {"baslik": "MUM EYİ"}
+            return self._duzelten(istem, ayar, sistem)
+        with mock.patch.object(uret, "_llm_json", yalniz_govde), mock.patch("builtins.print"):
+            sonuc = {s["kod"]: s for s in regresyon.calistir({}, uret)}
+            self.assertTrue(sonuc["R2"]["gecti"])
+            self.assertFalse(sonuc["D1"]["gecti"])
+            self.assertEqual(sonuc["D1"]["durum"], "DÜZELTİLEMEDİ")
+            self.assertTrue(regresyon.hepsi_yesil(list(sonuc.values())))
+            uret._regresyon_kapisi({})
+
+    @SOZLUK_GEREK
+    def test_farkli_duzeltme_yesil_gosterilmez(self):
+        def baska(istem, ayar, sistem=None):
+            if "video başlığında" in istem:
+                return {"baslik": "MUM ERİR"}
+            return self._duzelten(istem, ayar, sistem)
+        with mock.patch.object(uret, "_llm_json", baska), mock.patch("builtins.print"):
+            d1 = regresyon.calistir({}, uret)[-1]
+        self.assertEqual((d1["gecti"], d1["durum"]), (False, "FARKLI DÜZELTME"))
+
+    def test_tutcen_duzelmezse_kirmizi_ve_motor_durur(self):
         with mock.patch.object(uret, "_llm_json", return_value={}), mock.patch("builtins.print"):
             sonuc = regresyon.calistir({}, uret)
-            self.assertEqual([s["kod"] for s in sonuc if not s["gecti"]], ["R1", "R2"])
+            self.assertIn("R1", [s["kod"] for s in sonuc if not s["gecti"]])
             with self.assertRaises(SystemExit) as h:
                 uret._regresyon_kapisi({})
         self.assertIn("KIRMIZI", str(h.exception))
         self.assertIn("MOTOR VİDEO ÜRETMEYECEK", self.dosyalar("regresyon_sonuclari")[0].read_text(encoding="utf-8"))
+
+    def test_sozluk_yoksa_r2_kirmizi_motor_kilitli(self):
+        import sozluk as _s
+        with mock.patch.object(_s, "bilinmeyenler", side_effect=_s.SozlukYok("kurulu değil")), \
+                mock.patch.object(uret, "_llm_json", self._duzelten), mock.patch("builtins.print"):
+            sonuc = regresyon.calistir({}, uret)
+        self.assertFalse({s["kod"]: s for s in sonuc}["R2"]["gecti"])
+        self.assertFalse(regresyon.hepsi_yesil(sonuc))
 
     def test_yapay_zeka_hatasi_da_kirmizidir(self):
         with mock.patch.object(uret, "_llm_json", side_effect=SystemExit("LLM yok")), mock.patch("builtins.print"):

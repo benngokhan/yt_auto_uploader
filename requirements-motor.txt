@@ -5,3 +5,6 @@ faster-whisper>=1.2.0
 soundfile>=0.12
 # Şablon v2.0 motoru (motor/shorts_pipeline.py) ffmpeg yolunu buradan çözer
 imageio-ffmpeg>=0.4.9
+# Başlık sözlük denetimi (motor/sozluk.py). zemberek, pkg_resources kullandığı için setuptools<81 gerekir.
+zemberek-python==0.2.3
+setuptools<81
