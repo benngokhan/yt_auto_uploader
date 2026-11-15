@@ -110,7 +110,7 @@ class UyariDenetimiTestleri(unittest.TestCase):
         self.assertTrue(sd.terim_tutarsizligi_bul(["Parafin zerrecikleri yayılır.", "Küçük damlacıklar oluşur."]))
         self.assertEqual(sd.terim_tutarsizligi_bul(["Parafin zerrecikleri yayılır.", "Bu zerreciğin boyu küçüktür."]), [])
         self.assertEqual(sd.uyarilar(regresyon.URETIM_64), [])
-        self.assertEqual(len(sd.uyarilar(regresyon.URETIM_65)), 2)
+        self.assertEqual(len(sd.uyarilar(regresyon.URETIM_65)), 3)   # kesin sayı + yaklaşık-tek-sayı + terim
 
 
 try:
@@ -220,11 +220,11 @@ class RegresyonKapisiTestleri(_ArsivOrtami):
     def test_hepsi_yesil_ve_kapi_gecer(self):
         with mock.patch.object(uret, "_llm_json", self._duzelten), mock.patch("builtins.print"):
             sonuc = regresyon.calistir({}, uret)
-            self.assertEqual([s["kod"] for s in sonuc], ["R1", "R2", "R3", "R4", "R5", "D1"])
+            self.assertEqual([s["kod"] for s in sonuc], ["R1", "R2", "R7", "R3", "R4", "R6", "R5", "D1"])
             self.assertTrue(all(s["gecti"] for s in sonuc), regresyon.rapor(sonuc))
             self.assertEqual(sonuc[-1]["durum"], "DÜZELTİLDİ")
             uret._regresyon_kapisi({})
-        self.assertIn("5/5 yeşil", self.dosyalar("regresyon_sonuclari")[0].read_text(encoding="utf-8"))
+        self.assertIn("7/7 yeşil", self.dosyalar("regresyon_sonuclari")[0].read_text(encoding="utf-8"))
 
     @SOZLUK_GEREK
     def test_mum_eyi_testi_yapay_zekaya_bagli_degil(self):

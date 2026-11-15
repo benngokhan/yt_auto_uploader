@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,7 +25,37 @@ MOTOR = Path(__file__).resolve().parent
 _durum: dict = {"klasor": None, "sira": 0}
 
 _GIZLI = re.compile(r"ghp_[A-Za-z0-9]{20,}|AIza[0-9A-Za-z_-]{30,}|gsk_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9_-]{20,}"
-                    r"|(?<=key=)[A-Za-z0-9_-]{16,}|(?<=Bearer )[A-Za-z0-9._-]{16,}")
+                    r"|(?<=key=)[A-Za-z0-9_-]{16,}|(?<=Bearer )[A-Za-z0-9._-]{16,}"
+                    r"|org_[A-Za-z0-9]{16,}|ya29\.[A-Za-z0-9._-]{20,}|GOCSPX-[A-Za-z0-9_-]{16,}|1//[A-Za-z0-9_-]{30,}"
+                    r"|\b\d{8,10}:AA[A-Za-z0-9_-]{30,}")
+
+
+class _MaskeliAkis:
+    """sys.stdout/sys.stderr sarmalayıcısı: motorun yazdığı HER satır maskeden geçer (GitHub logu dahil)."""
+
+    def __init__(self, akis):
+        self._akis = akis
+
+    def write(self, s):
+        try:
+            s = maskele(s)
+        except Exception:  # noqa: BLE001
+            pass
+        return self._akis.write(s)
+
+    def __getattr__(self, ad):
+        return getattr(self._akis, ad)
+
+
+def cikti_maskele_kur() -> None:
+    """Motorun konsol çıktısını maskeler (Groq kuruluş kimliği, anahtarlar). Asla istisna fırlatmaz."""
+    try:
+        for ad in ("stdout", "stderr"):
+            akis = getattr(sys, ad)
+            if not isinstance(akis, _MaskeliAkis):
+                setattr(sys, ad, _MaskeliAkis(akis))
+    except Exception:  # noqa: BLE001
+        pass
 
 
 def damga() -> str:
@@ -33,7 +64,8 @@ def damga() -> str:
 
 def maskele(metin: str) -> str:
     metin = _GIZLI.sub("[MASKELENDI]", str(metin))
-    for ad in ("GEMINI_API_KEY", "GROQ_API_KEY", "OPENROUTER_API_KEY", "PEXELS_API_KEY", "PIXABAY_API_KEY"):
+    for ad in ("GEMINI_API_KEY", "GROQ_API_KEY", "OPENROUTER_API_KEY", "PEXELS_API_KEY", "PIXABAY_API_KEY",
+               "TELEGRAM_BOT_TOKEN", "GITHUB_TOKEN"):
         deger = os.getenv(ad, "").strip()
         if len(deger) >= 8:
             metin = metin.replace(deger, "[MASKELENDI]")

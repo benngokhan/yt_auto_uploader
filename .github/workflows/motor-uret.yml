@@ -43,6 +43,8 @@ jobs:
   uret:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: write   # yalnız iki kayıt dosyası için (ses perde kaydı, sözlük notları)
     steps:
       - uses: actions/checkout@v4
 
@@ -262,6 +264,21 @@ jobs:
             --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" --data-urlencode "parse_mode=HTML" \
             --data-urlencode "text@/tmp/yayin_karti.txt" --data-urlencode "reply_markup=${KART}"
 
+
+      - name: Kayıt dosyalarını depoya yaz (ses perde kaydı + sözlük notları)
+        if: always()
+        continue-on-error: true
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add motor/ses_perde_kaydi.csv motor/sozluk_ek_kelimeler.txt 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(motor): ses perde kaydı / sözlük notu (üretim ${GITHUB_RUN_NUMBER}) [skip ci]"
+            git pull --rebase --autostash origin main || true
+            git push origin HEAD:main || echo "UYARI: kayıt dosyaları depoya yazılamadı"
+          else
+            echo "Kayıt dosyalarında değişiklik yok"
+          fi
 
       - name: Üretim arşivini sakla (uretim_XX)
         if: always()

@@ -9,6 +9,8 @@ Bir kelime "bilinen" sayılır, eğer:
   - motor/sozluk_ek_kelimeler.txt dosyasında yazıyorsa (sahibin eklediği özel adlar/yabancı terimler).
 Tek harfli bir kısaltmaya ek getirilerek çıkan çözümler SAYILMAZ (ör. "EYİ" = "E" kısaltması + "-yi";
 65. üretimdeki "MUM EYİ" hatası böyle yakalanır).
+Çözümleyicinin YALNIZ "özel ad" olarak tanıdığı kelimeler ŞÜPHELİ sayılır (ör. "ZERRCİKLER" = "Zerr" özel adı
++ ekler). Gerçek özel adlar sozluk_ek_kelimeler.txt dosyasına yazılarak korunur (sahip kararı, 16.11.2026).
 İçinde rakam olan parçalar (ör. "3D", "100") kelime sayılmaz, denetlenmez.
 """
 from __future__ import annotations
@@ -63,19 +65,53 @@ def kelimeler(metin: str) -> list[str]:
     return [k for k in _KELIME.findall(str(metin or "")) if not any(c.isdigit() for c in k)]
 
 
-def bilinen_mi(kelime: str) -> bool:
+def durum(kelime: str) -> str:
+    """'' = bilinen kelime; aksi hâlde neden: 'sözlükte yok' ya da 'yalnız özel ad olarak tanınıyor'."""
     k = tr_kucuk(str(kelime).replace("’", "'"))
     if not k:
-        return True
-    if k in _ek_kelimeler() or k.split("'")[0] in _ek_kelimeler():
-        return True
+        return ""
+    ek = _ek_kelimeler()
+    if k in ek or k.split("'")[0] in ek:
+        return ""
+    ozel_ad = False
     for c in _cozumleyici().analyze(k).analysis_results:
         kok = str(getattr(c.item, "lemma", "") or "")
-        kisaltma = "Abbreviation" in str(getattr(c.item, "secondary_pos", ""))
-        if kisaltma and len(kok) <= 1 and len(k) > 1:
+        ikincil = str(getattr(c.item, "secondary_pos", ""))
+        if "Abbreviation" in ikincil and len(kok) <= 1 and len(k) > 1:
             continue  # tek harfli kısaltma + ek: gerçek kelime sayılmaz ("eyi" = E + yi)
+        if "ProperNoun" in ikincil:
+            if tr_kucuk(kok) in ek:
+                return ""  # sahibin onayladığı özel ad (ekli hâlleriyle birlikte)
+            ozel_ad = True
+            continue
+        return ""
+    return "yalnız özel ad olarak tanınıyor" if ozel_ad else "sözlükte yok"
+
+
+def bilinen_mi(kelime: str) -> bool:
+    return not durum(kelime)
+
+
+def not_dus(kelime: str, baslik: str = "", neden: str = "") -> bool:
+    """Üretimi durduran kelimeyi ek kelime dosyasına YORUM olarak not eder (kendiliğinden geçerli sayılmaz).
+
+    Kelime gerçekten doğruysa sahip satırın başındaki "# ŞÜPHELİ ..." kısmını silip yalnız kelimeyi bırakır.
+    """
+    import os
+    from datetime import datetime, timezone
+    try:
+        k = tr_kucuk(str(kelime))
+        mevcut = EK_DOSYA.read_text(encoding="utf-8") if EK_DOSYA.exists() else ""
+        if f"ŞÜPHELİ: {k} " in mevcut:
+            return False
+        satir = (f"# ŞÜPHELİ: {k} | {datetime.now(timezone.utc).strftime('%Y-%m-%d')} | "
+                 f"üretim {os.getenv('GITHUB_RUN_NUMBER', '-')} | başlık: {baslik} | {neden} | "
+                 "DOĞRUYSA bu satırı silip yerine yalnız kelimeyi yazın")
+        with EK_DOSYA.open("a", encoding="utf-8") as f:
+            f.write(("" if mevcut.endswith("\n") or not mevcut else "\n") + satir + "\n")
         return True
-    return False
+    except Exception:  # noqa: BLE001
+        return False
 
 
 def bilinmeyenler(metin: str) -> list[str]:

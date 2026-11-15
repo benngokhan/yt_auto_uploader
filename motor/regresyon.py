@@ -8,9 +8,11 @@ Test seti (sahip, 15.11.2026):
   R4  "zerrecik" + "damlacık" (65)      -> terim tutarsızlığı uyarısı
   R5  64'ün neredeyse aynı ilk iki cümlesi -> tekrar olarak yakalanmalı
 
+  R6  "ortalama beş yüz derece"          -> "yaklaşık + tek sayı" ihlali; aralıklı yazım ihlal sayılmaz; kapı durur
+  R7  "ZERRCİKLER" (yalnız özel ad)     -> sözlükte şüpheli; onaylı özel ad (MARS) ve doğru yazım geçer
   D1  "MUM EYİ" -> "MUM EVİ" düzeltmesi  -> AYRI test; gerçek yapay zekâyla. Kilidi ETKİLEMEZ.
 
-R2-R5 yapay zekâsızdır: her çalıştırmada aynı sonucu verir.
+R2-R7 yapay zekâsızdır: her çalıştırmada aynı sonucu verir.
 R1 motorun GERÇEK gövde yazım denetimini (yapay zekâ çağrısı) çalıştırır; sahte cevapla "yeşil" gösterilmez.
 D1 de gerçek yapay zekâyı çağırır; düzeltmezse "DÜZELTİLEMEDİ" yazar, asla rastgele yeşil gösterilmez.
 D1 motoru kilitlemez, çünkü gerçek üretimde düzeltilemeyen başlık o üretimi zaten durdurur (_baslik_denetimi).
@@ -110,18 +112,47 @@ def calistir(ayar: dict | None = None, uret_mod=None) -> list[dict]:
         ekle("R2", "'MUM EYİ' başlığı sözlük denetimiyle yakalanır", False,
              f"sözlük çalışmadı — {type(h).__name__}: {h}")
 
-    # R3 + R4: yapay zekâsız uyarı denetimleri
+    # R7: yalnız özel ad olarak tanınan kelime şüphelidir (yapay zekâsız)
+    try:
+        import sozluk  # noqa: PLC0415
+        d = {k: sozluk.durum(k) for k in ("ZERRCİKLER", "ZERRECİKLER", "MARS'TA", "MARSTA")}
+        ekle("R7", "'ZERRCİKLER' şüpheli sayılır; onaylı özel ad ve doğru yazım geçer",
+             bool(d["ZERRCİKLER"]) and not d["ZERRECİKLER"] and not d["MARS'TA"] and not d["MARSTA"],
+             "; ".join(f"{k} -> {v or 'geçerli'}" for k, v in d.items()))
+    except BaseException as h:  # noqa: BLE001
+        ekle("R7", "'ZERRCİKLER' şüpheli sayılır; onaylı özel ad ve doğru yazım geçer", False,
+             f"sözlük çalışmadı — {type(h).__name__}: {h}")
+
+    # R3 + R4 + R6: yapay zekâsız denetimler
     try:
         import senaryo_denetim as sd  # noqa: PLC0415
         sayilar = sd.kesin_sayi_bul(URETIM_65)
         ekle("R3", "'beş yüz derece' kesin sayı olarak işaretlenir",
              any(s["cumle"] == 5 and "beş yüz derece" in s["ifade"] for s in sayilar), f"işaretlenenler: {sayilar}")
         terimler = sd.terim_tutarsizligi_bul(URETIM_65)
-        ekle("R4", "'zerrecik' + 'damlacık' tutarsızlık uyarısı verir",
-             any({"zerrecik", "damlacık"} <= set(t["terimler"]) for t in terimler), f"uyarılar: {terimler}")
+        def kapi_durur(cumleler):
+            try:
+                with contextlib.redirect_stdout(io.StringIO()):
+                    uret_mod._senaryo_son_kapi([{"ses": c} for c in cumleler])
+                return False
+            except SystemExit:
+                return True
+        durdu65, durdu64 = kapi_durur(URETIM_65), kapi_durur(URETIM_64)
+        ekle("R4", "'zerrecik' + 'damlacık' birlikte geçerse üretim kapısı durur",
+             any({"zerrecik", "damlacık"} <= set(t["terimler"]) for t in terimler) and durdu65 and not durdu64,
+             f"bulunan: {terimler}; 65'in metninde kapı durdu: {durdu65}; 64'ün (tek adlı) metninde durdu: {durdu64}")
+        aralikli = "Bu duman, alevle temas ettiğinde dört yüz seksen ile beş yüz otuz derece arasında ısıya ulaşır."
+        ihlal = sd.yaklasik_tek_sayi_bul(URETIM_65)
+        temiz = sd.yaklasik_tek_sayi_bul([aralikli]) + sd.kesin_sayi_bul([aralikli])
+        kapi = kapi_durur([URETIM_65[4]])
+        ekle("R6", "'ortalama beş yüz derece' sayı kuralı ihlali sayılır; aralıklı yazım geçer",
+             any(s["cumle"] == 5 and s["ifade"] == "beş yüz derece" for s in ihlal) and not temiz
+             and bool(sd.aralik_bul([aralikli])) and kapi,
+             f"ihlal: {ihlal}; aralıklı yazımda ihlal: {temiz or 'yok'}; tek sayılı cümlede kapı durdu: {kapi}")
     except BaseException as h:  # noqa: BLE001
         ekle("R3", "'beş yüz derece' kesin sayı olarak işaretlenir", False, f"{type(h).__name__}: {h}")
-        ekle("R4", "'zerrecik' + 'damlacık' tutarsızlık uyarısı verir", False, f"{type(h).__name__}: {h}")
+        ekle("R4", "'zerrecik' + 'damlacık' birlikte geçerse üretim kapısı durur", False, f"{type(h).__name__}: {h}")
+        ekle("R6", "'ortalama beş yüz derece' sayı kuralı ihlali sayılır; aralıklı yazım geçer", False, f"{type(h).__name__}: {h}")
 
     # R5: tekrar eden başlangıç
     try:
@@ -169,9 +200,9 @@ def rapor(sonuc: list[dict]) -> str:
 
 
 def hepsi_yesil(sonuc: list[dict]) -> bool:
-    """Yalnız kilitleyen testlere bakar (R1-R5). D1 bilgi amaçlıdır."""
+    """Yalnız kilitleyen testlere bakar (R1-R7). D1 bilgi amaçlıdır."""
     kilit = [s for s in sonuc if s.get("kilit", True)]
-    return len(kilit) >= 5 and all(s["gecti"] for s in kilit)
+    return len(kilit) >= 7 and all(s["gecti"] for s in kilit)
 
 
 if __name__ == "__main__":

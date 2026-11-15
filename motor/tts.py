@@ -451,9 +451,13 @@ def _arsiv_ses_olcumu(cikti: Path) -> None:
         satirlar = ["SES ÖLÇÜMÜ (yalnız ölçüm; hiçbir ayar değişmez). Yöntem: motor/ses_olcum.py"]
         olculer = {}
         ham = _SON_HAM_SES.get("yol")
+        perde = None
         if ham:
             olculer["ham_tts"] = ses_olcum.olc(ham)
             satirlar.append("HAM (Gemini'den geldiği gibi)      : " + ses_olcum.satir(olculer["ham_tts"]))
+            perde = ses_olcum.perde_sapmasi(olculer["ham_tts"]["f0_medyan_hz"])
+            olculer["perde_sapmasi"] = perde
+            ses_olcum.perde_kaydet(olculer["ham_tts"])
         kopya = _arsivle("kopyala", "islenmis_tts_muziksiz", cikti)
         if kopya:
             olculer["islenmis_tts"] = ses_olcum.olc(kopya)
@@ -461,6 +465,13 @@ def _arsiv_ses_olcumu(cikti: Path) -> None:
         _arsivle("yaz", "ses_olcumu", "\n".join(satirlar) + "\n\n" + json.dumps(olculer, ensure_ascii=False, indent=2))
         for s in satirlar[1:]:
             print("  [Ölçüm] " + s)
+        if perde:
+            # Yalnız rapor/uyarı: üretim DURMAZ, ses ayarı değişmez (sahip kararı, 16.11.2026).
+            print("  [Perde] " + perde["satir"])
+            if perde["uyari"]:
+                print("UYARI: ses perdesi sapması — " + perde["satir"])
+            _arsivle("yaz", "ses_perde_raporu",
+                     ("UYARI: ses perdesi sapması\n" if perde["uyari"] else "perde taban aralığında\n") + perde["satir"])
     except Exception:  # noqa: BLE001
         pass
 

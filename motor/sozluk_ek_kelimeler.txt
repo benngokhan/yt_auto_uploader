@@ -1,3 +1,70 @@
 # Başlık sözlük denetiminde DOĞRU kabul edilecek ek kelimeler (her satıra bir kelime, küçük/büyük harf fark etmez).
 # Sözlüğün tanımadığı ama doğru olan özel adları / yabancı terimleri buraya ekleyin (ör. marka adı).
 # "#" ile başlayan satırlar yorumdur. Bu dosya şu an bilerek boştur.
+#
+# 16.11.2026: sözlüğün yalnız "özel ad" olarak tanıdığı kelimeler artık şüpheli sayılıyor.
+# Aşağıdakiler bilim kanalında sık geçen GERÇEK özel adlar / yabancı adlardır (başlangıç listesi).
+# Ekli hâlleri de korunur (ör. "mars" yazılıysa "MARS'TA" ve "MARSTA" da geçer).
+türkiye
+anadolu
+istanbul
+ankara
+avrupa
+asya
+afrika
+amerika
+antarktika
+japonya
+çin
+mısır
+roma
+atlantik
+pasifik
+everest
+sahra
+amazon
+nil
+merkür
+venüs
+mars
+jüpiter
+satürn
+uranüs
+neptün
+plüton
+samanyolu
+andromeda
+nasa
+apollo
+hubble
+einstein
+newton
+galileo
+tesla
+edison
+darwin
+curie
+titanik
+çernobil
+google
+youtube
+iphone
+covid
+isveç
+#
+# Sözlüğün tanımadığı ama DOĞRU olan bilim kelimeleri (16.11.2026'da 330 kelimelik denemede bulunanlar).
+# Not: bu bölümdeki kelimeler yalnız yazıldığı hâliyle (ve kesme işaretli ekleriyle) korunur.
+dopamin
+kortizol
+gökkuşağı
+neandertal
+amigdala
+nebula
+kuasar
+pulsar
+mürekkepbalığı
+köpekbalığı
+ateşböceği
+nanometre
+bozon
+# ŞÜPHELİ: eyi | 2026-11-15 | üretim - | başlık: MUM EYİ | sözlükte yok | DOĞRUYSA bu satırı silip yerine yalnız kelimeyi yazın

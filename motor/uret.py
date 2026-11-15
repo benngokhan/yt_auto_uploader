@@ -251,6 +251,254 @@ def _yazim_denetimi(sahneler: list, ayar: dict) -> int:
     print(f"Yazım denetimi: {duzeltilen} düzeltme")
     return duzeltilen
 
+class SenaryoDuzeltilemedi(SystemExit):
+    """Terim birliği ya da sayı kuralı sağlanamadı: üretim durur (sahip kararı, 16.11.2026)."""
+
+
+SENARYO_DUZELTME_DENEMESI = 2
+_CTA = "Daha fazla Bilgi Dozu için takip et!"
+
+# Senaryo yazan yapay zekâya verilen sayı kuralı (16.11.2026). TERIM_KURALLARI'na dokunulmadı; ayrı bir kuraldır.
+SAYI_KURALLARI = (
+    "- YAKLAŞIK SAYI KURALI (ÇOK KRİTİK): 'yaklaşık', 'ortalama', 'civarında' gibi bir sözle verdiğin değeri TEK sayı "
+    "olarak yazma; bilimsel olarak bilinen ARALIĞI 'X ile Y birim arasında' biçiminde yaz (ör. 'dört yüz seksen ile "
+    "beş yüz otuz derece arasında'). Aralığı bilmiyorsan sayı verme, sayısız anlat. Aralık olarak bilinen bir değeri "
+    "tek kesin sayıymış gibi yazma.\n"
+)
+
+
+def _llm_liste(istem: str, ayar: dict, sistem: str = "Sen titiz bir Türkçe bilim editörüsün. Yalnız geçerli JSON döndürürsün.") -> list:
+    """_llm_json'u çağırır, 'cumleler' listesini döndürür (motorun kabul ettiği cevap biçimi)."""
+    veri = _llm_json(istem, ayar, sistem)
+    liste = veri.get("cumleler") if isinstance(veri, dict) else None
+    if isinstance(liste, str):
+        liste = [liste]
+    return [str(x or "").strip() for x in liste] if isinstance(liste, list) else []
+
+
+def _cta_ayir(ses: str) -> tuple[str, str]:
+    ses = str(ses or "")
+    return (ses.replace(_CTA, "").strip(), _CTA) if _CTA in ses else (ses.strip(), "")
+
+
+def _cumle_duzelt(sahneler: list, sira: int, istem: str, uygun_mu, ayar: dict, yaz, etiket: str) -> bool:
+    """Tek cümleyi yapay zekâya düzelttirir; öneri yapay zekâsız `uygun_mu(yeni) -> ''/neden` denetiminden geçmelidir."""
+    import senaryo_denetim as sd
+    x = sahneler[sira - 1]
+    eski, cta = _cta_ayir(x.get("ses", ""))
+    digerleri = [_cta_ayir(y.get("ses", ""))[0] for y in sahneler if y is not x]
+    for deneme in range(1, SENARYO_DUZELTME_DENEMESI + 1):
+        try:
+            liste = _llm_liste(istem + "\nCümle: " + json.dumps(eski, ensure_ascii=False)
+                               + '\nYalnız JSON döndür: {"cumleler": ["DÜZELTİLMİŞ CÜMLE"]}', ayar)
+        except (Exception, SystemExit) as h:  # noqa: BLE001
+            yaz(f"    deneme {deneme}: düzeltme alınamadı ({type(h).__name__})")
+            continue
+        yeni = " ".join((liste[0] if liste else "").split())
+        if not yeni or yeni == eski:
+            neden = "değişiklik yok"
+        elif len(yeni) > len(eski) + 70 or len(yeni) < max(20, len(eski) - 45):
+            neden = "uzunluk çok değişti"
+        elif any(_benzerlik(yeni, d) >= TEKRAR_ESIGI for d in digerleri):
+            neden = "başka bir cümleyi tekrar ediyor"
+        elif sd.terim_tutarsizligi_bul(digerleri + [yeni]) and not sd.terim_tutarsizligi_bul(digerleri + [eski]):
+            neden = "yeni bir terim tutarsızlığı getiriyor"
+        else:
+            neden = uygun_mu(yeni)
+        if not neden:
+            if yeni[-1] not in ".!?":
+                yeni += "."
+            x["ses"] = f"{yeni} {cta}".strip()
+            yaz(f"  {etiket} düzeltildi ({sira}. cümle): {eski!r} -> {yeni!r}")
+            return True
+        yaz(f"    deneme {deneme}: öneri {yeni!r} reddedildi ({neden})")
+    return False
+
+
+def _terim_birligi_sagla(sahneler: list, ayar: dict, asama: str = "") -> int:
+    """Aynı nesne için tek terim: çift adlandırma varsa azınlıktaki terim ana terime çevrilir; olmazsa üretim DURUR."""
+    import senaryo_denetim as sd
+    kayit: list[str] = []
+    duzeltilen = 0
+
+    def yaz(satir: str) -> None:
+        print(satir)
+        kayit.append(satir)
+
+    try:
+        cumleler = [_cta_ayir(x.get("ses", ""))[0] for x in sahneler]
+        for t in sd.terim_tutarsizligi_bul(cumleler):
+            gecen = t["terimler"]
+            ana = sd.ana_terim(gecen)
+            yaz(f"Terim birliği ({asama}): {t['grup']} için birden çok ad var {gecen}; korunacak ad: '{ana}'")
+            for ad, yerler in gecen.items():
+                if ad == ana:
+                    continue
+                for sira in yerler:
+                    def uygun(yeni, _grup=t["grup"], _ana=ana):
+                        kalan = [a for a in sd.grup_terimleri(yeni)[_grup] if a != _ana]
+                        if kalan:
+                            return f"hâlâ başka ad var: {kalan}"
+                        return "" if _ana in sd.grup_terimleri(yeni)[_grup] else f"'{_ana}' adı geçmiyor"
+                    istem = (f"Bu Türkçe video cümlesinde '{ad}' kelimesi geçiyor; videonun geri kalanında aynı şey için "
+                             f"'{ana}' adı kullanılıyor. Cümlede '{ad}' (ve ekli hâlleri) yerine '{ana}' kelimesini, "
+                             "ekleri Türkçe ses uyumuna göre düzelterek yaz. Başka HİÇBİR şeyi değiştirme; yeni bilgi, "
+                             "yeni sayı ekleme.")
+                    if _cumle_duzelt(sahneler, sira, istem, uygun, ayar, yaz, "terim"):
+                        duzeltilen += 1
+                    else:
+                        yaz(f"  TERİM BİRLİĞİ SAĞLANAMADI: {sira}. cümlede '{ad}' kaldı")
+                        raise SenaryoDuzeltilemedi(
+                            f"Terim birliği sağlanamadı: {sira}. cümlede '{ad}', diğer cümlelerde '{ana}'. Video üretilmedi.")
+        kalan = sd.terim_tutarsizligi_bul([_cta_ayir(x.get("ses", ""))[0] for x in sahneler])
+        if kalan:
+            raise SenaryoDuzeltilemedi(f"Terim birliği sağlanamadı: {kalan}. Video üretilmedi.")
+        if duzeltilen or kayit:
+            yaz(f"Terim birliği ({asama}): {duzeltilen} düzeltme, metinde tek ad kaldı")
+        return duzeltilen
+    finally:
+        if kayit:
+            _arsivle("terim_birligi", "\n".join(kayit))
+
+
+def _sayi_denetimi(sahneler: list, ayar: dict) -> int:
+    """Sayı kuralı (16.11.2026):
+
+    1) 'yaklaşık/ortalama/civarında' + TEK sayı (yapay zekâsız bulunur) -> aralığa çevrilir ya da sayı çıkarılır;
+       olmazsa üretim DURUR.
+    2) Kalan birimli kesin sayılar ayrı bir soruyla hakeme sorulur: 'aslında aralık' denirse (ör. 'beş yüz derece'
+       <-> '480-530 derece') cümle aralıkla yeniden yazılır; olmazsa üretim DURUR. Hakem çalışmazsa ya da
+       'kesin/bilinmiyor' derse sayı eskisi gibi yalnız UYARI olarak kalır.
+    """
+    import senaryo_denetim as sd
+    kayit: list[str] = []
+    duzeltilen = 0
+
+    def yaz(satir: str) -> None:
+        print(satir)
+        kayit.append(satir)
+
+    def cumleler():
+        return [_cta_ayir(x.get("ses", ""))[0] for x in sahneler]
+
+    def uygun_yap(sira: int, ifade: str):
+        onceki = {s["ifade"] for s in sd.kesin_sayi_bul([cumleler()[sira - 1]])} - {ifade}
+
+        def uygun(yeni: str) -> str:
+            if sd.yaklasik_tek_sayi_bul([yeni]):
+                return "hâlâ yaklaşık + tek sayı var"
+            fazla = {s["ifade"] for s in sd.kesin_sayi_bul([yeni])} - onceki
+            return f"tek kesin sayı kaldı/eklendi: {sorted(fazla)}" if fazla else ""
+        return uygun
+
+    try:
+        # 1) yaklaşık + tek sayı
+        for _ in range(8):
+            ihlaller = sd.yaklasik_tek_sayi_bul(cumleler())
+            if not ihlaller:
+                break
+            s = ihlaller[0]
+            yaz(f"Sayı kuralı: {s['cumle']}. cümlede yaklaşık değer tek sayıyla verilmiş: '{s['belirtec']} … {s['ifade']}'")
+            istem = (f"Bu Türkçe video cümlesinde '{s['ifade']}' değeri '{s['belirtec']}' sözüyle, yani yaklaşık olarak ama "
+                     "TEK sayıyla verilmiş. Kural: yaklaşık değerler ARALIK olarak yazılır. Bu değerin bilimsel olarak "
+                     "bilinen aralığını 'X ile Y birim arasında' biçiminde, sayıları YAZIYLA yaz (ör. 'dört yüz seksen ile "
+                     "beş yüz otuz derece arasında') ve 'yaklaşık/ortalama/civarında' sözünü kaldır. Aralıktan emin "
+                     "değilsen sayıyı tamamen çıkar ve sayısız anlat (ör. 'çok yüksek bir sıcaklığa'). Başka bilgiyi "
+                     "değiştirme, yeni sayı ekleme.")
+            if _cumle_duzelt(sahneler, s["cumle"], istem, uygun_yap(s["cumle"], s["ifade"]), ayar, yaz, "sayı"):
+                duzeltilen += 1
+            else:
+                yaz(f"  SAYI DÜZELTİLEMEDİ: {s['cumle']}. cümle '{s['ifade']}'")
+                raise SenaryoDuzeltilemedi(
+                    f"Sayı kuralı sağlanamadı: {s['cumle']}. cümlede yaklaşık değer tek sayıyla kaldı ('{s['ifade']}'). "
+                    "Video üretilmedi.")
+
+        # 2) kalan kesin sayılar: hakem sorusu
+        kesinler = sd.kesin_sayi_bul(cumleler())
+        if kesinler:
+            c = cumleler()
+            maddeler = "\n".join(f"{i}) ifade: '{s['ifade']}' — cümle: {c[s['cumle'] - 1]}" for i, s in enumerate(kesinler, start=1))
+            istem = ("Aşağıda bir Türkçe bilim videosunda TEK kesin sayı olarak verilen değerler var. Her biri için karar ver:\n"
+                     "- 'KESİN' : yerleşik sabit ya da herkesçe tek değer olarak kabul edilen, yuvarlanmış yaygın değer "
+                     "(ör. suyun yüz derecede kaynaması).\n"
+                     "- 'ARALIK: X ile Y birim' : gerçekte tek değer değil, koşula göre değişen bir aralık; tek sayı yazmak "
+                     "yanıltıcı (ör. 'ARALIK: 480 ile 530 derece'). Yalnız aralıktan EMİNSEN bunu seç.\n"
+                     "- 'BİLİNMİYOR' : emin değilsin.\n"
+                     f"{maddeler}\n"
+                     f'Yalnız JSON döndür: {{"cumleler": [TAM {len(kesinler)} karar, aynı sırayla]}}')
+            try:
+                kararlar = _llm_liste(istem, ayar, "Sen titiz bir bilim doğrulama editörüsün. Yalnız geçerli JSON döndürürsün.")
+            except (Exception, SystemExit) as h:  # noqa: BLE001
+                kararlar = []
+                yaz(f"Sayı hakemi çalışmadı ({type(h).__name__}); kesin sayılar yalnız uyarı olarak kaldı")
+            if kararlar and len(kararlar) != len(kesinler):
+                yaz(f"Sayı hakemi {len(kesinler)} yerine {len(kararlar)} karar döndürdü; kesin sayılar yalnız uyarı olarak kaldı")
+                kararlar = []
+            for s, karar in zip(kesinler, kararlar):
+                yaz(f"Sayı hakemi: {s['cumle']}. cümle '{s['ifade']}' -> {karar}")
+                if not tr_upper(karar).startswith("ARALIK"):
+                    continue
+                aralik = karar.split(":", 1)[1].strip() if ":" in karar else ""
+                istem = (f"Bu Türkçe video cümlesinde '{s['ifade']}' tek kesin sayı olarak verilmiş; oysa bu değer bir "
+                         f"aralıktır: {aralik or 'bilinen aralık'}. '{s['ifade']}' yerine aralığı 'X ile Y birim arasında' "
+                         "biçiminde, sayıları YAZIYLA yaz. Başka bilgiyi değiştirme, yeni sayı ekleme.")
+                if _cumle_duzelt(sahneler, s["cumle"], istem, uygun_yap(s["cumle"], s["ifade"]), ayar, yaz, "sayı"):
+                    duzeltilen += 1
+                else:
+                    yaz(f"  SAYI DÜZELTİLEMEDİ: {s['cumle']}. cümle '{s['ifade']}' (aralık: {aralik})")
+                    raise SenaryoDuzeltilemedi(
+                        f"Sayı kuralı sağlanamadı: {s['cumle']}. cümlede '{s['ifade']}' tek sayı, bilinen aralık {aralik}. "
+                        "Video üretilmedi.")
+        if kayit:
+            yaz(f"Sayı denetimi: {duzeltilen} düzeltme")
+        return duzeltilen
+    finally:
+        if kayit:
+            _arsivle("sayi_denetimi", "\n".join(kayit))
+
+
+def _senaryo_son_kapi(sahneler: list) -> None:
+    """Yazım denetiminden SONRA yapay zekâsız son bakış: terim çifti ya da yaklaşık+tek sayı kaldıysa üretim DURUR."""
+    import senaryo_denetim as sd
+    c = [_cta_ayir(x.get("ses", ""))[0] for x in sahneler]
+    terim, sayi = sd.terim_tutarsizligi_bul(c), sd.yaklasik_tek_sayi_bul(c)
+    if terim or sayi:
+        raise SenaryoDuzeltilemedi(f"Senaryo son kapıdan geçemedi (terim: {terim}; sayı: {sayi}). Video üretilmedi.")
+    print("Senaryo son kapı: terim birliği ve sayı kuralı sağlanıyor")
+
+
+def _baslik_anlam_denetimi(sahneler: list, ayar: dict) -> list:
+    """Başlıkların ANLAMLI olup olmadığını ayrı bir soruyla denetler. YALNIZ UYARI: metni değiştirmez, durdurmaz."""
+    uyarilar: list[str] = []
+    try:
+        maddeler = "\n".join(
+            f"{i}) başlık: '{x.get('baslik1', '')} / {x.get('baslik2', '')}' — cümle: {_cta_ayir(x.get('ses', ''))[0]}"
+            for i, x in enumerate(sahneler, start=1))
+        istem = ("Aşağıda bir Türkçe bilim videosunun sahne başlıkları (iki satır, '/' ile ayrılmış) ve ait oldukları "
+                 "cümleler var. Her başlık için karar ver: iki satır birlikte okunduğunda ANLAMLI, dilbilgisi düzgün, "
+                 "yarım kalmamış ve cümlesiyle ilgili mi?\n"
+                 "- uygunsa yalnız 'UYGUN' yaz;\n"
+                 "- değilse 'SORUNLU: kısa neden' yaz (ör. 'SORUNLU: ikinci satır yarım kalmış, soru tamamlanmıyor').\n"
+                 f"{maddeler}\n"
+                 f'Yalnız JSON döndür: {{"cumleler": [TAM {len(sahneler)} karar, aynı sırayla]}}')
+        kararlar = _llm_liste(istem, ayar, "Sen titiz bir Türkçe editörsün. Yalnız geçerli JSON döndürürsün.")
+        if len(kararlar) != len(sahneler):
+            print(f"Başlık anlam denetimi: {len(sahneler)} yerine {len(kararlar)} karar geldi; sonuç kullanılmadı")
+            _arsivle("baslik_anlam_denetimi", f"SONUÇ KULLANILMADI: {kararlar}")
+            return []
+        for i, (x, karar) in enumerate(zip(sahneler, kararlar), start=1):
+            if not tr_upper(karar).startswith("UYGUN"):
+                satir = (f"UYARI (başlık anlamı): {i}. sahne '{x.get('baslik1', '')} / {x.get('baslik2', '')}' — "
+                         + (karar.split(":", 1)[1].strip() if ":" in karar else karar))
+                print(satir)
+                uyarilar.append(satir)
+        print(f"Başlık anlam denetimi: {len(uyarilar)} uyarı (yalnız uyarı; üretim durmaz)")
+        _arsivle("baslik_anlam_denetimi", "\n".join(uyarilar) or "tüm başlıklar UYGUN bulundu")
+    except (Exception, SystemExit) as h:  # noqa: BLE001 — bu denetim üretimi asla durdurmaz
+        print(f"Başlık anlam denetimi yapılamadı ({type(h).__name__}); üretim sürüyor")
+    return uyarilar
+
+
 class BaslikDuzeltilemedi(SystemExit):
     """Başlıkta sözlükte olmayan kelime kaldı: başlık ekrana basılmaz, üretim durur."""
 
@@ -303,7 +551,8 @@ def _baslik_denetimi(sahneler: list, ayar: dict) -> int:
                     raise BaslikDuzeltilemedi("Başlık sözlük denetimi yapılamadı (sözlük yok); video üretilmedi.") from h
                 if not hatali:
                     continue
-                yaz(f"  başlık sözlük denetimi: {sira}. sahne {eski!r} -> sözlükte olmayan kelime: {hatali}")
+                nedenler = {k: sozluk.durum(k) for k in hatali}
+                yaz(f"  başlık sözlük denetimi: {sira}. sahne {eski!r} -> şüpheli kelime: {nedenler}")
                 kabul = ""
                 for deneme in range(1, BASLIK_DUZELTME_DENEMESI + 1):
                     try:
@@ -327,6 +576,9 @@ def _baslik_denetimi(sahneler: list, ayar: dict) -> int:
                     yaz(f"    deneme {deneme}: öneri {yeni!r} reddedildi ({neden})")
                 if not kabul:
                     yaz(f"  BAŞLIK DÜZELTİLEMEDİ: {sira}. sahne {eski!r} (sözlükte olmayan: {hatali})")
+                    for k in hatali:   # yanlış alarm olabilir: kelime ek kelime dosyasına NOT olarak düşülür
+                        if sozluk.not_dus(k, eski, nedenler.get(k, "")):
+                            yaz(f"  not düşüldü: {k!r} -> motor/sozluk_ek_kelimeler.txt (doğruysa orada onaylayın)")
                     raise BaslikDuzeltilemedi(
                         f"Başlık düzeltilemedi: {sira}. sahne {eski!r}, sözlükte olmayan kelime {hatali}. "
                         "Başlık ekrana basılmadı; video üretilmedi.")
@@ -506,7 +758,7 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
     raise SystemExit("Sahne planı üretilemedi: tüm LLM sağlayıcıları başarısız.")
 
 
-def _tek_sahne_uzat(konu: str, ses_metni: str, hedef: int = 165, baglam: str = "") -> str:
+def _tek_sahne_uzat(konu: str, ses_metni: str, hedef: int = 165, baglam: str = "", isimler: str = "") -> str:
     """Tek bir sahne cümlesini hedef karakter sayısına genişletir.
 
     Tüm anlatımı tek istekte uzatmak güvenilir değildi (LLM yine kısa yazıyordu).
@@ -520,7 +772,7 @@ def _tek_sahne_uzat(konu: str, ses_metni: str, hedef: int = 165, baglam: str = "
              f"Aşağıdaki Türkçe anlatım cümlesi çok kısa. Aynı bilgiyi koruyarak "
              f"{hedef-8}-{hedef+10} karakterlik TEK bir doğal cümle yaz. "
              f"Somut bir ayrıntı veya örnek ekle. Uydurma bilgi yok, selamlama yok.\n"
-             + TERIM_KURALLARI +
+             + TERIM_KURALLARI + SAYI_KURALLARI + isimler +
              "- Cümledeki terimleri ve sayıları AYNEN koru; aynı şey için yeni bir ad kullanma, yeni kesin sayı ekleme.\n"
              + (f"Videonun diğer cümleleri (YALNIZCA terim ve sayı tutarlılığı için; bu cümlelerdeki bilgiyi "
                 f"TEKRAR ETME, onlardan parça kopyalama): {baglam}\n" if baglam else "")
@@ -593,12 +845,21 @@ def _anlatimi_uzat(konu: str, sahneler: list, hedef_toplam: int = 620) -> int:
             hedef = min(ust_sinir, max(alt_sinir, mevcut + pay))
             if mevcut < hedef - 5:
                 digerleri = [str(x.get("ses", "")) for x in sahneler if x is not s]
-                yeni = _tek_sahne_uzat(konu, str(s.get("ses", "")), hedef, baglam=" ".join(digerleri))
+                try:
+                    import senaryo_denetim as _sdu
+                    _isimler = _sdu.isimlendirme_listesi([str(x.get("ses", "")) for x in sahneler])
+                    _cift = lambda c: bool(_sdu.terim_tutarsizligi_bul(digerleri + [c]))  # noqa: E731
+                except Exception:  # noqa: BLE001
+                    _isimler, _cift = "", (lambda c: False)
+                yeni = _tek_sahne_uzat(konu, str(s.get("ses", "")), hedef, baglam=" ".join(digerleri), isimler=_isimler)
                 # Uzatılmış cümle başka bir cümlenin tekrarına dönüştüyse kabul edilmez (özgün cümle kalır).
                 _eski_ses = str(s.get("ses", ""))
                 if len(yeni) > mevcut and any(_benzerlik(yeni, d) >= TEKRAR_ESIGI for d in digerleri):
                     print("  uzatma reddedildi: başka bir cümleyi tekrar ediyor")
                     _karar = "REDDEDİLDİ (başka bir cümleyi tekrar ediyor)"
+                elif len(yeni) > mevcut and _cift(yeni) and not _cift(_eski_ses):
+                    print("  uzatma reddedildi: aynı şey için farklı bir ad getiriyor")
+                    _karar = "REDDEDİLDİ (farklı terim getiriyor)"
                 elif len(yeni) > mevcut:
                     s["ses"] = yeni
                     _karar = "KABUL"
@@ -626,7 +887,7 @@ PROMPT_V2 = (
     "- Son cümle (8-11 kelime): net özet sonuç + izleyiciyi düşünmeye çağıran kısa soru.\n"
     "- Selamlama, 'abone olun', 'takip et' YASAK (motor kendi ekler).\n"
     "- Kısaltma, parantez, üç nokta kullanma. Sesli okunduğunda doğal ve rahat aksın.\n"
-    + TERIM_KURALLARI +
+    + TERIM_KURALLARI + SAYI_KURALLARI +
     "- 'sahne_basliklari': TAM {n} elemanlı dizi. Her cümle için dilbilgisi düzgün, vurucu 2 satır TAM BÜYÜK HARF başlık (her satır EN FAZLA 18 karakter, kelime ortasından bölünmez) ve anlamına uygun ikon ('?', '▼', '⚡', '▲', '!', '✔'). Örnek: "
     "{{\"ikon\":\"?\",\"satir1\":\"ATEŞİN VARKEN\",\"satir2\":\"NEDEN ÜŞÜRSÜN?\"}}, "
     "{{\"ikon\":\"⚡\",\"satir1\":\"BEYNİN TERMOSTAT\",\"satir2\":\"OYUNU OYNUYOR!\"}}.\n"
@@ -951,6 +1212,7 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     anlatim = " ".join(str(x["ses"]).strip() for x in sahneler)
     print(f"Anlatım (ilk): {len(anlatim)} karakter / {len(sahneler)} cümle")
     _arsivle_senaryo("senaryo_1_plan_sonrasi", sahneler)
+    _terim_birligi_sagla(sahneler, ayar, "uzatma öncesi")   # isimlendirme listesi tek ada inmeli
     # Dengeli orta tempo (~13.1 krk/sn genel akış) ile 39-44 sn video için ideal metin 480-545 karakterdir
     if len(anlatim) < 485 and len(sahneler) >= 2:
         kapanis_cta = "Daha fazla Bilgi Dozu için takip et!"
@@ -963,10 +1225,15 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         if "takip et" not in son_yeni.lower():
             sahneler[-1]["ses"] = f"{son_yeni} {kapanis_cta}"
     _arsivle_senaryo("senaryo_2_uzatma_sonrasi", sahneler)
+    _terim_birligi_sagla(sahneler, ayar, "uzatma sonrası")  # düzeltilemezse üretim durur
+    _sayi_denetimi(sahneler, ayar)                           # düzeltilemezse üretim durur
+    _arsivle_senaryo("senaryo_2b_terim_ve_sayi_sonrasi", sahneler)
     _yazim_denetimi(sahneler, ayar)
     _arsivle_senaryo("senaryo_3_yazim_denetimi_sonrasi", sahneler)
     _baslik_denetimi(sahneler, ayar)  # yalnız başlıklar; düzeltilemezse üretim durur
     _arsivle_senaryo("senaryo_4_baslik_denetimi_sonrasi_SON", sahneler)
+    _senaryo_son_kapi(sahneler)                              # yapay zekâsız son bakış; ihlal varsa üretim durur
+    _baslik_anlam_denetimi(sahneler, ayar)                   # yalnız uyarı
     # Yalnız UYARI: metin değişmez, üretim durmaz (motor/senaryo_denetim.py)
     try:
         import senaryo_denetim as _sd
@@ -1239,6 +1506,7 @@ def main() -> int:
     ayar = ayar_yukle()
     try:
         import arsiv
+        arsiv.cikti_maskele_kur()   # konsola/GitHub loguna yazılan her satır maskeden geçer
         arsiv.baslat(a.konu, {"argumanlar": {k: v for k, v in vars(a).items()}})
     except Exception:  # noqa: BLE001
         pass
