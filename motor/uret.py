@@ -823,9 +823,10 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     import kapak as kapak_mod
     kapak_bilgi = kapak_mod.kapak_metni_hazirla(a.konu, sahneler, metadata)
     kapak_mod.kapak_uret(
-        parallelar[0],
+        _kapak_gorseli_sec(a.konu, parallelar),
         hedef_kapak,
         satirlar=kapak_bilgi["satirlar"],
+        vurgu_satiri=kapak_bilgi.get("vurgu"),
         kategori=kapak_bilgi["kategori"],
         alt_aciklama=kapak_bilgi["alt_aciklama"],
     )
@@ -846,6 +847,54 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     return 0
 
 
+def _kapak_gorseli_sec(konu: str, yollar: list) -> Path:
+    """Kapak arka planı: sahne görselleri içinden konuyu en doğru ve net göstereni seçer.
+
+    Eskiden her zaman 1. sahnenin görseli kullanılıyordu (ör. mum konusunda çakmak fotoğrafı kapağa çıktı).
+    Seçimi Gemini görsellere bakarak yapar; anahtar yoksa ya da hata olursa eski davranış (1. görsel) sürer.
+    """
+    yollar = [Path(y) for y in yollar]
+    key = os.getenv("GEMINI_API_KEY", "").strip()
+    if len(yollar) < 2 or not key:
+        return yollar[0]
+    try:
+        import base64, io, urllib.request
+        from PIL import Image
+        parcalar = [{"text": (
+            f"Konu: {konu}\nAşağıda numaralı {len(yollar)} dikey fotoğraf var. Bir YouTube Shorts kapağının arka planı için "
+            "konunun ana nesnesini EN DOĞRU ve EN NET gösteren fotoğrafı seç. Konuyla ilgisiz ya da yanıltıcı nesne gösteren "
+            "(ör. mum konusunda çakmak), bulanık, yazı/logo içeren fotoğrafı seçme; koyu ve sinematik olanı tercih et. "
+            'Yalnız JSON döndür: {"secim": numara}')}]
+        for i, y in enumerate(yollar, start=1):
+            im = Image.open(y).convert("RGB")
+            im.thumbnail((384, 384))
+            tampon = io.BytesIO()
+            im.save(tampon, "JPEG", quality=80)
+            parcalar.append({"text": f"Fotoğraf {i}:"})
+            parcalar.append({"inline_data": {"mime_type": "image/jpeg", "data": base64.b64encode(tampon.getvalue()).decode()}})
+        with urllib.request.urlopen("https://generativelanguage.googleapis.com/v1beta/models?key=" + key, timeout=60) as r:
+            modeller = json.load(r).get("models", [])
+        uygun = [m["name"].split("/", 1)[-1] for m in modeller
+                 if "generateContent" in m.get("supportedGenerationMethods", []) and "flash" in m.get("name", "").lower()
+                 and not any(x in m.get("name", "").lower() for x in ("tts", "image", "live", "omni", "1.5-"))]
+        model = sorted(uygun, key=lambda x: (("preview" not in x), x), reverse=True)[0]
+        govde = {"contents": [{"parts": parcalar}],
+                 "generationConfig": {"responseMimeType": "application/json", "temperature": 0.0}}
+        istek = urllib.request.Request(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}",
+            data=json.dumps(govde).encode(), headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(istek, timeout=120) as r:
+            metin = json.load(r)["candidates"][0]["content"]["parts"][0]["text"]
+        secim = int(json.loads(metin)["secim"])
+        if 1 <= secim <= len(yollar):
+            print(f"Kapak görseli: {secim}. sahne seçildi ({len(yollar)} aday)")
+            return yollar[secim - 1]
+        print(f"Kapak görseli seçimi geçersiz ({secim}); 1. sahne kullanılıyor")
+    except Exception as e:  # noqa: BLE001 — kapak seçimi üretimi asla durdurmaz
+        print(f"Kapak görseli seçilemedi ({type(e).__name__}); 1. sahne kullanılıyor")
+    return yollar[0]
+
+
 def yayin_bilgisi_uret(konu: str, sahneler: list[dict]) -> dict:
     """Onay kartı, standart kapak ve Excel için eksiksiz YouTube yayın metadatası üretir."""
     import urllib.request, urllib.error, re
@@ -854,9 +903,17 @@ def yayin_bilgisi_uret(konu: str, sahneler: list[dict]) -> dict:
               '{"baslik":"70 karakteri geçmeyen merak uyandırıcı başlık","aciklama":"2 kısa paragraf, doğrulanmamış iddia yok",'
               '"hashtag":"3-5 hashtag","etiketler":"virgülle 8-12 arama etiketi","sabit_yorum":"doğal, konuya özel tek soru ve emoji",'
               '"kategori":"kategori","konu_ozeti":"tek cümle",'
-              '"kapak_satirlari":["1. SATIR (<=14 harf)","2. SATIR (<=14 harf)","3. VURUCU SATIR? (<=14 harf)"],'
-              '"kapak_kategori":"NÖROBİLİM veya İNSAN & BİLİM veya FİZİK & BİLİM veya DOĞA & BİLİM veya UZAY & EVREN veya TARİH & BİLİM",'
-              '"kapak_alt":"en fazla 90 karakterlik tek cümle mekanizma özeti"}. '
+              '"kapak_satirlari":["1. SATIR","2. SATIR","3. SATIR?"],"kapak_vurgu":2,'
+              '"kapak_kategori":"KONUYA ÖZEL ALAN ETİKETİ","kapak_alt":"tek cümle"}. '
+              'KAPAK KURALLARI: kapak_satirlari, videonun cevapladığı TEK merak sorusunun sırayla 3 satıra bölünmüş hâlidir; '
+              'satırlar art arda okununca tek düzgün Türkçe soru cümlesi olmalı (ör. ["YUTKUNUNCA GELEN","KULAKTAKİ KLİK","SESİ NEDİR?"]). '
+              'İki ayrı cümle veya slogan yazma (YANLIŞ: ["BEYAZ DUMAN","YAKIT MIDIR?","ALEV İNİYOR"]); soru işareti yalnız son satırın sonunda olur. '
+              'Her satır TAM BÜYÜK HARF, 8-16 karakter, kelime bölünmez. '
+              'kapak_vurgu: konunun anahtar kavramını taşıyan satırın numarası (1, 2 veya 3); o satır sarı yazılır. '
+              'kapak_kategori: konunun bilim alanını anlatan, konuya özel kısa etiket; "X & Y" biçiminde, en fazla 20 karakter '
+              '(ör. ANATOMİ & AKUSTİK, KİMYA & YANMA, FİZİK & OPTİK); konu insan vücudu değilse İNSAN yazma. '
+              'kapak_alt: yanlış bilineni düzelten veya mekanizmayı söyleyen, en fazla 90 karakterlik tek cümle '
+              '(ör. "Çene kemiği değil: Östaki borusunun basıncı eşitleme sesidir."). '
               'Abartılı garanti, sahte bilgi ve genel/geçici metin kullanma.')
     text=None; errors=[]
     groq=os.getenv("GROQ_API_KEY","").strip()

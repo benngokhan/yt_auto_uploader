@@ -133,20 +133,53 @@ def uc_satir_baslik(baslik_veya_satirlar: str | list[str]) -> list[str]:
     return en_iyi or [" ".join(kelimeler[:2]), " ".join(kelimeler[2:4]), " ".join(kelimeler[4:])]
 
 
+_KATEGORI_KURALLARI = (
+    ("NÖROBİLİM", ("BEYİN", "NÖRO", "ZİHİN", "UYKU", "RÜYA", "HAFIZA", "PSİKO", "GÖZ", "GÖRME", "KÖR", "RETİNA", "RODOPSİN", "SİNİR")),
+    ("İNSAN & BİLİM", ("VÜCUT", "KAS", "KAN", "KALP", "MİDE", "DERİ", "PARMAK", "FİZYOLOJİ", "TIP", "İNSAN", "BAĞIŞIK")),
+    ("UZAY & EVREN", ("UZAY", "EVREN", "KARA DELİK", "GEZEGEN", "GÜNEŞ", "AY", "YILDIZ", "ASTRONOMİ")),
+    ("TARİH & BİLİM", ("TARİH", "ANTİK", "ROMA", "MISIR", "PİRAMİT", "ARKEOLOJİ", "HEYKEL")),
+    ("DOĞA & BİLİM", ("HAYVAN", "OKYANUS", "DENİZ", "DOĞA", "BİTKİ", "AĞAÇ", "BALIK", "KUŞ")),
+)
+_GENEL_KATEGORILER = {"BİLİM", "BİLİM VE TEKNOLOJİ", "BİLİM & TEKNOLOJİ", "EĞİTİM", "GENEL", "KATEGORİ", "SHORTS", "BİLGİ DOZU"}
+_HARF = "A-ZÇĞİIÖŞÜ"
+
+
+def ozel_kategori(ham: str) -> str:
+    """Yapay zekânın verdiği konuya özel etiketi ('ANATOMİ & AKUSTİK' gibi) doğrular; uygun değilse boş döner."""
+    etiket = re.sub(r"\s+", " ", tr_upper(ham).replace(" VE ", " & ")).strip(" .:-")
+    if not (4 <= len(etiket) <= 20) or etiket in _GENEL_KATEGORILER:
+        return ""
+    if not re.fullmatch(rf"[{_HARF}]+(?: [{_HARF}]+)?(?: & [{_HARF}]+(?: [{_HARF}]+)?)?", etiket):
+        return ""
+    return etiket
+
+
+def _kelime_var(metin: str, anahtar: str) -> bool:
+    # Kısa anahtarlar (KAN, KAS, AY, TIP…) yalnız tam kelime olarak sayılır:
+    # 'yaKAN', 'KANıt', 'KASım' gibi kelimeler yanlış kategoriye götürmesin.
+    if len(anahtar) <= 3:
+        return re.search(rf"(?<![{_HARF}]){re.escape(anahtar)}(?![{_HARF}])", metin) is not None
+    return re.search(rf"(?<![{_HARF}]){re.escape(anahtar)}", metin) is not None
+
+
 def kategori_etiketi_sec(konu: str, ham_kategori: str = "") -> str:
-    """Sağ üst köşe için standart kısa Bilgi Dozu kategori etiketi üretir."""
-    birlesik = tr_upper(f"{ham_kategori} {konu}")
-    if any(k in birlesik for k in ("BEYİN", "NÖRO", "ZİHİN", "UYKU", "RÜYA", "HAFIZA", "PSİKO", "GÖZ", "GÖRME", "KÖR", "RETİNA", "RODOPSİN", "SİNİR")):
-        return "NÖROBİLİM"
-    if any(k in birlesik for k in ("VÜCUT", "KAS", "KAN", "KALP", "MİDE", "DERİ", "PARMAK", "FİZYOLOJİ", "TIP", "İNSAN", "BAĞIŞIK")):
-        return "İNSAN & BİLİM"
-    if any(k in birlesik for k in ("UZAY", "EVREN", "KARA DELİK", "GEZEGEN", "GÜNEŞ", "AY ", "YILDIZ", "ASTRONOMİ")):
-        return "UZAY & EVREN"
-    if any(k in birlesik for k in ("TARİH", "ANTİK", "ROMA", "MISIR", "PİRAMİT", "ARKEOLOJİ", "HEYKEL")):
-        return "TARİH & BİLİM"
-    if any(k in birlesik for k in ("HAYVAN", "OKYANUS", "DENİZ", "DOĞA", "BİTKİ", "AĞAÇ", "BALIK", "KUŞ")):
-        return "DOĞA & BİLİM"
+    """Sağ üst köşe etiketi: önce konuya özel etiket, yoksa konudan standart Bilgi Dozu etiketi."""
+    ozel = ozel_kategori(ham_kategori)
+    if ozel:
+        return ozel
+    metin = tr_upper(konu)
+    for etiket, anahtarlar in _KATEGORI_KURALLARI:
+        if any(_kelime_var(metin, k) for k in anahtarlar):
+            return etiket
     return "FİZİK & BİLİM"
+
+
+def baslik_tek_cumle_mi(satirlar: list) -> bool:
+    """Kapak başlığı birlikte okununca TEK cümle/soru mu? (Ara satırda '?', '!' veya '.' varsa iki ayrı söz demektir.)"""
+    temiz = [str(x or "").strip() for x in satirlar if str(x or "").strip()]
+    if not (2 <= len(temiz) <= 3) or any(len(x) > 18 for x in temiz):
+        return False
+    return not any(re.search(r"[?!.:]", x) for x in temiz[:-1])
 
 
 def alt_aciklama_hazirla(konu_ozeti: str = "", aciklama: str = "") -> str:
@@ -171,19 +204,26 @@ def kapak_metni_hazirla(konu: str, sahneler: list[dict] | None = None, metadata:
     """Motor çıktısından standart kapak alanlarını (3 satır başlık, kategori, alt açıklama) üretir."""
     md = metadata or {}
     ham_satirlar = md.get("kapak_satirlari")
-    kaynak_baslik = ham_satirlar if isinstance(ham_satirlar, list) and len(ham_satirlar) >= 2 else (md.get("baslik") or konu)
-    satirlar = uc_satir_baslik(kaynak_baslik)
-    kategori = kategori_etiketi_sec(
-        f"{konu} {md.get('aciklama') or ''}",
-        str(md.get("kapak_kategori") or md.get("kategori") or ""),
-    )
+    yz_basligi = isinstance(ham_satirlar, list) and baslik_tek_cumle_mi(ham_satirlar)
+    # İki ayrı söz ("YAKIT MIDIR? / ALEV İNİYOR") kabul edilmez: konu sorusunun kendisi 3 satıra bölünür.
+    satirlar = uc_satir_baslik(ham_satirlar if yz_basligi else konu)
+    # Sarı satır: anahtar kavramı taşıyan satır (yapay zekâ 1-3 arası numara verir); yoksa son satır.
+    vurgu = None
+    if yz_basligi:
+        try:
+            v = int(md.get("kapak_vurgu")) - 1
+            if 0 <= v < len(satirlar):
+                vurgu = v
+        except (TypeError, ValueError):
+            vurgu = None
+    kategori = kategori_etiketi_sec(konu, str(md.get("kapak_kategori") or ""))
     alt = alt_aciklama_hazirla(
         str(md.get("kapak_alt") or md.get("konu_ozeti") or ""),
         str(md.get("aciklama") or ""),
     )
     if not alt and sahneler and len(sahneler) >= 2:
         alt = alt_aciklama_hazirla(str(sahneler[1].get("ses") or ""))
-    return {"satirlar": satirlar, "kategori": kategori, "alt_aciklama": alt}
+    return {"satirlar": satirlar, "kategori": kategori, "alt_aciklama": alt, "vurgu": vurgu}
 
 
 def _satirlar(draw, satirlar, punto, ust, alt) -> list[tuple[ImageFont.FreeTypeFont, str, tuple, int]]:
