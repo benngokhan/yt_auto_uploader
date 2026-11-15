@@ -31,5 +31,15 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@users.noreply.github.com
           git add konu_onerileri.json
-          git diff --cached --quiet || git commit -m 'Konu önerilerini gerçek geçmişe göre güncelle [skip ci]'
-          git push
+          if git diff --cached --quiet; then echo "değişiklik yok"; exit 0; fi
+          git commit -m 'Konu önerilerini gerçek geçmişe göre güncelle [skip ci]'
+          # Aynı anda başka bir iş push edebilir; birkaç kez pull --rebase ile dene.
+          ok=0
+          for i in 1 2 3; do
+            if git pull --rebase --autostash origin main && git push origin HEAD:main; then
+              ok=1; break
+            fi
+            echo "push denemesi $i başarısız, 8 sn sonra tekrar..."
+            sleep 8
+          done
+          [ "$ok" = 1 ] || { echo "::error::main'e push yapılamadı"; exit 1; }
