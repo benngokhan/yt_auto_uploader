@@ -22,7 +22,8 @@
     "attempts": 3,
     "kind": "git_cakismasi",
     "ts": "2026-11-15T05:48:45.265359+00:00",
-    "gave_up": true
+    "gave_up": true,
+    "devredildi": true
   },
   "43679426814": {
     "attempts": 1,
