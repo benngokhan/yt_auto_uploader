@@ -191,12 +191,12 @@ def _yazim_denetimi(sahneler: list, ayar: dict) -> int:
         print(f"Yazım denetimi yapılamadı ({type(h).__name__}); metin olduğu gibi kullanılıyor")
         return 0
 
-    def _kucuk_fark(eski: str, yeni: str) -> bool:
+    def _kucuk_fark(eski: str, yeni: str, esik: float = 0.9) -> bool:
         if not yeni or yeni == eski or abs(len(yeni) - len(eski)) > 4:
             return False
         if len(yeni.split()) != len(eski.split()):
             return False
-        return difflib.SequenceMatcher(None, eski.lower(), yeni.lower()).ratio() >= 0.9
+        return difflib.SequenceMatcher(None, eski.lower(), yeni.lower()).ratio() >= esik
 
     duzeltilen = 0
     yeni_c = veri.get("cumleler") if isinstance(veri, dict) else None
@@ -215,7 +215,7 @@ def _yazim_denetimi(sahneler: list, ayar: dict) -> int:
             for anahtar, yeni in zip(("baslik1", "baslik2"), cift):
                 eski = str(x.get(anahtar, ""))
                 yeni = tr_upper(str(yeni or "").strip())
-                if _kucuk_fark(eski, yeni):
+                if _kucuk_fark(eski, yeni, 0.7) and len(yeni) <= 18:
                     x[anahtar] = yeni
                     print(f"  yazım düzeltildi (başlık): {eski!r} -> {yeni!r}")
                     duzeltilen += 1
