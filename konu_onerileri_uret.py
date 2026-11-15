@@ -14,6 +14,27 @@ except Exception:
 BOOK=os.getenv('WORKBOOK_ID','1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo')       # active.sav81@gmail.com / baslik.xlsx
 APPROVAL=os.getenv('APPROVAL_FOLDER','1xyO_jNjbpghfR7CJ1P9DUvkzdb6eC0qf')  # active.sav81@gmail.com / Onay_Bekleyen
 
+_GROQ_MODEL={}
+def groq_model(anahtar):
+ """Canlı Groq model listesinden JSON uyumlu (reasoning olmayan) bir model seçer.
+ Hardcoded model adı ölünce iş durmasın diye her koşuda liste tazelenir."""
+ if _GROQ_MODEL.get('m'):return _GROQ_MODEL['m']
+ secilen='llama-3.3-70b-versatile'
+ try:
+  req=urllib.request.Request('https://api.groq.com/openai/v1/models',
+   headers={'Authorization':'Bearer '+anahtar,'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0 Safari/537.36'})
+  with urllib.request.urlopen(req,timeout=45) as r:
+   canli=[m.get('id') for m in json.load(r).get('data',[]) if m.get('id')]
+  atla=('gpt-oss','deepseek-r1','qwq','guard','whisper','tts','vision','playai','orpheus','compound','allam','safeguard')
+  temiz=[m for m in canli if not any(x in m.lower() for x in atla)]
+  tercih=([m for m in temiz if 'llama-3.3-70b' in m]
+          or [m for m in temiz if 'llama-4' in m or 'llama-3.1-8b' in m]
+          or [m for m in temiz if 'llama' in m] or temiz or canli)
+  if tercih:secilen=tercih[0]
+ except Exception as e:
+  print('Groq model listesi alinamadi:',type(e).__name__)
+ _GROQ_MODEL['m']=secilen
+ return secilen
 def norm(s):
  s=str(s or '').lower();s=re.sub(r'#\S+',' ',s);s=re.sub(r'[^a-zçğıöşü0-9 ]',' ',s);return ' '.join(s.split())
 def sim(a,b):
@@ -48,7 +69,7 @@ def main():
  groq=os.getenv('GROQ_API_KEY','').strip()
  if groq:
   try:
-   gb={'model':'llama-3.3-70b-versatile','temperature':0.8,'response_format':{'type':'json_object'},'messages':[{'role':'user','content':prompt}]}
+   gb={'model':groq_model(groq),'temperature':0.8,'response_format':{'type':'json_object'},'messages':[{'role':'user','content':prompt}]}
    req=urllib.request.Request('https://api.groq.com/openai/v1/chat/completions',data=json.dumps(gb).encode(),headers={'Content-Type':'application/json','Authorization':'Bearer '+groq,'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0 Safari/537.36'})
    with urllib.request.urlopen(req,timeout=180) as r:text=json.load(r)['choices'][0]['message']['content']
    print('provider groq')
