@@ -43,6 +43,9 @@ GH_TOKEN = os.getenv("GITHUB_TOKEN", "")
 STATE_FILE = Path("ajan_heal_state.json")
 MAX_REPAIR_ATTEMPTS = 3
 LOOKBACK_HOURS = 24
+# Aynı workflow için taze koşu (workflow_dispatch) sınırı: sonsuz döngü/spam engeli.
+MAX_FRESH_RUNS = 3
+FRESH_WINDOW_HOURS = 6
 UA = "Mozilla/5.0 (BilgiDozu-AjanHeal)"
 
 
@@ -738,6 +741,79 @@ def _rerun(run_id: int) -> bool:
         return False
 
 
+def _girdisiz_dispatch_var(wf_yaml: str) -> bool:
+    """Workflow elle başlatılabiliyor (workflow_dispatch) VE girdi (inputs) istemiyorsa True.
+
+    Girdi isteyen workflow'lar taze başlatılmaz: özgün girdiler bilinmeden başlatmak
+    farklı bir iş yaptırabilir (ör. yanlış video). Onlarda eski usul re-run kullanılır.
+    """
+    satirlar = wf_yaml.splitlines()
+    for i, satir in enumerate(satirlar):
+        m = re.match(r"^(\s*)workflow_dispatch\s*:(.*)$", satir)
+        if not m:
+            continue
+        girinti = len(m.group(1))
+        for alt in satirlar[i + 1:]:
+            if not alt.strip() or alt.lstrip().startswith("#"):
+                continue
+            if len(alt) - len(alt.lstrip()) <= girinti:
+                break
+            if alt.strip().startswith("inputs"):
+                return False
+        return True
+    return False
+
+
+def _taze_hak_var(state: dict, wf_path: str) -> bool:
+    """Bu workflow için son FRESH_WINDOW_HOURS içinde taze koşu hakkı kaldı mı?"""
+    sinir = datetime.now(timezone.utc) - timedelta(hours=FRESH_WINDOW_HOURS)
+    kayitlar = state.setdefault("_taze", {})
+    yeni = []
+    for ts in kayitlar.get(wf_path, []):
+        try:
+            if datetime.fromisoformat(ts) >= sinir:
+                yeni.append(ts)
+        except Exception:
+            continue
+    kayitlar[wf_path] = yeni
+    return len(yeni) < MAX_FRESH_RUNS
+
+
+def _restart(run: dict, state: dict) -> str:
+    """Başarısız işi yeniden başlatır. Dönüş: "taze" | "rerun" | "limit" | "hata".
+
+    NEDEN: "re-run" koşuyu ESKİ commit ve ESKİ workflow dosyasıyla tekrarlar. Depo o
+    arada ilerlediyse (git çakışması) ya da hata bir commit ile düzeltildiyse re-run
+    aynı hatayı tekrar üretir. Bu yüzden mümkünse main üzerinde TAZE koşu başlatılır.
+    """
+    run_id = run["id"]
+    wf_path = run.get("path", "")
+    uygun = False
+    if wf_path:
+        try:
+            icerik = _gh("GET", f"contents/{wf_path}?ref=main")
+            import base64
+            uygun = _girdisiz_dispatch_var(base64.b64decode(icerik.get("content", "")).decode("utf-8", "replace"))
+        except Exception as e:
+            print(f"[restart] workflow okunamadı: {e}")
+    if not uygun:
+        return "rerun" if _rerun(run_id) else "hata"
+    if not _taze_hak_var(state, wf_path):
+        print(f"[restart] {wf_path}: {FRESH_WINDOW_HOURS} saatte {MAX_FRESH_RUNS} taze koşu sınırı doldu")
+        return "limit"
+    try:
+        _gh("POST", f"actions/workflows/{wf_path.rsplit('/', 1)[-1]}/dispatches", {"ref": "main"})
+    except Exception as e:
+        print(f"[restart] taze koşu başlatılamadı ({e}); re-run deneniyor")
+        return "rerun" if _rerun(run_id) else "hata"
+    state["_taze"][wf_path].append(datetime.now(timezone.utc).isoformat())
+    # Eski koşu "failure" olarak kalır; tekrar tekrar işlenmesin diye devredildi işaretle.
+    state.setdefault(str(run_id), {})["devredildi"] = True
+    _state_save(state)
+    print(f"[restart] {wf_path}: main üzerinde taze koşu başlatıldı (eski koşu {run_id} devredildi)")
+    return "taze"
+
+
 def _commit_and_push(message: str) -> str:
     """Değişen dosyaları commit edip push eder; commit SHA döndürür."""
     import subprocess
@@ -757,6 +833,8 @@ def main() -> None:
     print("=== Bilgi Dozu Hata Müdahale Ajanı başlıyor ===")
     state = _state_load()
     failed = _get_failed_runs()
+    # Yerine taze koşu başlatılmış eski koşular tarihsel artıktır; sayma ve işleme.
+    failed = [r for r in failed if not state.get(str(r["id"]), {}).get("devredildi")]
     print(f"Son {LOOKBACK_HOURS} saatte {len(failed)} başarısız koşu bulundu")
 
     if not failed:
@@ -830,7 +908,7 @@ def main() -> None:
                     f"Yaptığım: Eski model adını güncel adla değiştirdim ve işi yeniden başlattım.\n"
                     f"Koşu: {_kayit_linki(run_url)}"
                 )
-                _rerun(run_id)
+                _restart(run, state)
             else:
                 _tg(
                     f"🟡 <b>{_e(_is_adi(run_name), 60)} — takıldı</b>\n\n"
@@ -840,7 +918,31 @@ def main() -> None:
                     f"Koşu: {_kayit_linki(run_url)}"
                 )
 
-        elif kind in ("quota_429", "flaky", "git_cakismasi", "drive_hatasi", "model_hatasi"):
+        elif kind == "git_cakismasi":
+            sorun, cozum, _ = _sorun_ozeti(kind, log_tail)
+            sonuc = _restart(run, state)
+            if sonuc == "limit":
+                kayit = state.setdefault(str(run_id), {})
+                kayit["attempts"] = MAX_REPAIR_ATTEMPTS
+                kayit["gave_up"] = True
+                _state_save(state)
+                _tg(
+                    f"🔴 <b>{_e(_is_adi(run_name), 60)} — çözemedim</b>\n\n"
+                    f"Sorun: {sorun}\n"
+                    f"Durum: {MAX_FRESH_RUNS} kez sıfırdan başlattım, yine olmadı. Artık kendi başıma dokunmuyorum.\n"
+                    f"Bu işin kaydetme adımına elle bakılması gerekiyor.{_ek_not(run_name)}\n"
+                    f"Koşu: {_kayit_linki(run_url)}"
+                )
+            else:
+                _tg(
+                    f"🟡 <b>{_e(_is_adi(run_name), 60)} — geçici sorun</b>\n\n"
+                    f"Sorun: {sorun}\n"
+                    f"Yaptığım: {cozum}\n"
+                    f"Senin bir şey yapmana gerek yok.{_ek_not(run_name)}\n"
+                    f"Koşu: {_kayit_linki(run_url)}"
+                )
+
+        elif kind in ("quota_429", "flaky", "drive_hatasi", "model_hatasi"):
             sorun, cozum, _ = _sorun_ozeti(kind, log_tail)
             _tg(
                 f"🟡 <b>{_e(_is_adi(run_name), 60)} — geçici sorun</b>\n\n"
@@ -877,7 +979,7 @@ def main() -> None:
                         f"Yaptığım: Düzeltmeyi uyguladım ve işi yeniden başlattım.\n"
                         f"Koşu: {_kayit_linki(run_url)}"
                     )
-                    _rerun(run_id)
+                    _restart(run, state)
             else:
                 _tg(
                     f"🔴 <b>{_e(_is_adi(run_name), 60)} — otomatik düzeltemedim</b>\n\n"
