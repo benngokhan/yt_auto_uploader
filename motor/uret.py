@@ -124,6 +124,41 @@ def groq_model() -> str:
     return secilen
 
 
+# Senaryo yazan yapay zekâya verilen "terim birliği ve bilimsel tutarlılık" kuralları.
+# Hem senaryo planında hem cümle uzatmada kullanılır (tek kaynak).
+TERIM_KURALLARI = (
+    "- TERİM BİRLİĞİ VE BİLİMSEL TUTARLILIK (ÇOK KRİTİK):\n"
+    "  * Her olguyu ve maddeyi TEK bir terimle an, video boyunca değiştirme "
+    "(ör. 'parafin zerrecikleri' dediysen sonradan 'karbon parçacığı' veya 'kül' deme).\n"
+    "  * Yanmış artık (kül) ile yakıt maddesini birbirine karıştırma; külün tutuşabileceğini ima eden cümle kurma.\n"
+    "  * Aynı nicelik için farklı sayı veya büyüklük verme (bir yerde 'milyonlarca', başka yerde 'binlerce' deme).\n"
+    "  * Doğrulayamadığın kesin sayısal değer yazma; emin değilsen nitel ifade kullan "
+    "(ör. 'çok küçük', 'birkaç saniye içinde').\n"
+)
+
+_GENEL_KAYNAK_IZLERI = (
+    "doğrulanmış bilimsel", "hakemli bilimsel", "bilimsel araştırma", "bilimsel yayın",
+    "bilimsel kaynak", "araştırma arşivi", "çeşitli kaynak", "genel kaynak", "yoksa boş",
+)
+GORSEL_TEMSILI_NOTU = "Görseller temsilidir."
+
+
+def _kaynak_temizle(ham) -> str:
+    """Senaryodan gelen kaynak satırını düzenler; gerçek kaynak yoksa BOŞ döner.
+
+    Kural (sahip): kaynak her videonun kendi senaryosundan gelir. Yapay zekâ kaynak
+    vermediyse ya da genel geçer bir ifade yazdıysa ekranda kaynak gösterilmez.
+    """
+    metin = " ".join(str(ham or "").split())
+    govde = metin.split(":", 1)[1].strip() if metin.lower().startswith("kaynak") and ":" in metin else metin
+    govde = govde.strip(" .…-–—•")
+    if len(govde) < 3 or govde.lower() in {"yok", "bilinmiyor", "belirsiz", "none", "null"}:
+        return ""
+    if any(iz in govde.lower() for iz in _GENEL_KAYNAK_IZLERI):
+        return ""
+    return f"Kaynak: {govde}"[:54].strip()
+
+
 def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
     """LLM'den sahne sahne plan alır: ses metni + üst başlık + altyazı vurguları."""
     if ayar.get("sahneler_sablon"):
@@ -159,7 +194,8 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
         "Selamlama ve 'abone olun' YASAK. Sabit kapanış cümlesini ve takip butonunu video motoru ekler, sen yazma.\n"
         "Uzunluk: toplam anlatım boşluklar dahil 620-700 Türkçe karakter (4 sahne, 38-42 sn) olmalı; "
         "her sahne 150-185 karakter olmalı. Cümleler doğal, bilgi yoğun ve sesli okumada 38-42 saniyeye uygun olmalı. "
-        "'Bakacağız' kelimesini ve sert slogan tonunu kullanma."
+        "'Bakacağız' kelimesini ve sert slogan tonunu kullanma.\n"
+        + TERIM_KURALLARI
     )
 
     def _cagir(url, govde, basliklar):
@@ -267,7 +303,7 @@ def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
     raise SystemExit("Sahne planı üretilemedi: tüm LLM sağlayıcıları başarısız.")
 
 
-def _tek_sahne_uzat(konu: str, ses_metni: str, hedef: int = 165) -> str:
+def _tek_sahne_uzat(konu: str, ses_metni: str, hedef: int = 165, baglam: str = "") -> str:
     """Tek bir sahne cümlesini hedef karakter sayısına genişletir.
 
     Tüm anlatımı tek istekte uzatmak güvenilir değildi (LLM yine kısa yazıyordu).
@@ -280,8 +316,11 @@ def _tek_sahne_uzat(konu: str, ses_metni: str, hedef: int = 165) -> str:
     istek = (f"Konu: {konu}\n"
              f"Aşağıdaki Türkçe anlatım cümlesi çok kısa. Aynı bilgiyi koruyarak "
              f"{hedef-8}-{hedef+10} karakterlik TEK bir doğal cümle yaz. "
-             f"Somut bir ayrıntı, sayı veya örnek ekle. Uydurma bilgi yok, selamlama yok. "
-             f"Yalnızca cümleyi döndür, tırnak/açıklama ekleme.\n\nCümle: {ses_metni}")
+             f"Somut bir ayrıntı veya örnek ekle. Uydurma bilgi yok, selamlama yok.\n"
+             + TERIM_KURALLARI +
+             "- Cümledeki terimleri ve sayıları AYNEN koru; aynı şey için yeni bir ad kullanma, yeni kesin sayı ekleme.\n"
+             + (f"Videonun tamamı (terimler ve sayılar bununla tutarlı kalmalı): {baglam}\n" if baglam else "")
+             + f"Yalnızca cümleyi döndür, tırnak/açıklama ekleme.\n\nCümle: {ses_metni}")
 
     def _gemini():
         k = os.getenv("GEMINI_API_KEY", "").strip()
@@ -349,7 +388,8 @@ def _anlatimi_uzat(konu: str, sahneler: list, hedef_toplam: int = 620) -> int:
             pay = max(12, eksik // max(1, len(sahneler)))
             hedef = min(ust_sinir, max(alt_sinir, mevcut + pay))
             if mevcut < hedef - 5:
-                yeni = _tek_sahne_uzat(konu, str(s.get("ses", "")), hedef)
+                yeni = _tek_sahne_uzat(konu, str(s.get("ses", "")), hedef,
+                                       baglam=" ".join(str(x.get("ses", "")) for x in sahneler))
                 if len(yeni) > mevcut:
                     s["ses"] = yeni
         print(f"  uzatma turu {tur+1}: "
@@ -372,12 +412,13 @@ PROMPT_V2 = (
     "- Son cümle (8-11 kelime): net özet sonuç + izleyiciyi düşünmeye çağıran kısa soru.\n"
     "- Selamlama, 'abone olun', 'takip et' YASAK (motor kendi ekler).\n"
     "- Kısaltma, parantez, üç nokta kullanma. Sesli okunduğunda doğal ve rahat aksın.\n"
+    + TERIM_KURALLARI +
     "- 'sahne_basliklari': TAM {n} elemanlı dizi. Her cümle için dilbilgisi düzgün, vurucu 2 satır TAM BÜYÜK HARF başlık (her satır EN FAZLA 18 karakter, kelime ortasından bölünmez) ve anlamına uygun ikon ('?', '▼', '⚡', '▲', '!', '✔'). Örnek: "
     "{{\"ikon\":\"?\",\"satir1\":\"ATEŞİN VARKEN\",\"satir2\":\"NEDEN ÜŞÜRSÜN?\"}}, "
     "{{\"ikon\":\"⚡\",\"satir1\":\"BEYNİN TERMOSTAT\",\"satir2\":\"OYUNU OYNUYOR!\"}}.\n"
     "- 'kapak_baslik': TAM 2 elemanlı dizi; her satır TAM BÜYÜK HARF, 10-18 karakter arası.\n"
-    "- 'kaynak': Konunun gerçek bilimsel kurum veya hakemli dergi kaynağı, 'Kaynak: ...' biçiminde ve EN FAZLA 46 karakter (ör. 'Kaynak: Harvard Medical School • Nature', uydurma yıl/sayı YASAK).\n"
-    "Yalnız JSON döndür: {{\"kapak_baslik\": [\"SATIR 1\", \"SATIR 2\"], \"kaynak\": \"Kaynak: ...\", \"cumleler\": [\"cümle 1\", ...], \"sahne_basliklari\": [{{\"ikon\": \"?\", \"satir1\": \"...\", \"satir2\": \"...\"}}, ...]}}"
+    "- 'kaynak': YALNIZCA bu senaryodaki bilginin gerçekten dayandığı ve adından emin olduğun gerçek bilimsel kurum veya hakemli dergi; 'Kaynak: ...' biçiminde ve EN FAZLA 46 karakter (ör. 'Kaynak: Harvard Medical School • Nature'). Uydurma kurum/yıl/sayı YASAK. 'Bilimsel araştırmalar', 'hakemli arşiv' gibi genel geçer ifade YASAK. Emin olduğun gerçek bir kaynak yoksa boş bırak: \"\".\n"
+    "Yalnız JSON döndür: {{\"kapak_baslik\": [\"SATIR 1\", \"SATIR 2\"], \"kaynak\": \"Kaynak: ... (yoksa boş)\", \"cumleler\": [\"cümle 1\", ...], \"sahne_basliklari\": [{{\"ikon\": \"?\", \"satir1\": \"...\", \"satir2\": \"...\"}}, ...]}}"
 )
 
 
@@ -589,12 +630,8 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
             for c in cumleler[1:]
         ]
 
-    ham_kaynak = str(veri.get("kaynak") or "").strip()
-    if ham_kaynak and not ham_kaynak.lower().startswith("kaynak"):
-        ham_kaynak = f"Kaynak: {ham_kaynak}"
-    if not ham_kaynak or "doğrulanmış bilimsel" in ham_kaynak.lower():
-        ham_kaynak = "Kaynak: Hakemli Bilimsel Araştırma Arşivi"
-    ham_kaynak = ham_kaynak[:54].strip()
+    # Kaynak yalnız bu videonun senaryosundan gelir; gerçek kaynak yoksa gösterilmez (boş kalır).
+    ham_kaynak = _kaynak_temizle(veri.get("kaynak"))
 
     # Saf 3D Kapanış Ekranı (v2.2): başlıklar saf cümlelerden çözüldükten SONRA son sahneye sabit CTA eklenir;
     # "Daha fazla Bilgi Dozu..." başlar başlamaz ekran kararır ve tam "takip et!" dendiğinde fare tıklar.
@@ -605,7 +642,7 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
             son_c += "?"
         cumleler[-1] = f"{son_c} {kapanis_cta}"
 
-    print(f"Şablon v2.2 planı: {len(cumleler)} cümle (+ Saf 3D Kapanış CTA), kapak=[{k_l1} / {k_l2}], {ham_kaynak}")
+    print(f"Şablon v2.2 planı: {len(cumleler)} cümle (+ Saf 3D Kapanış CTA), kapak=[{k_l1} / {k_l2}], {ham_kaynak or 'kaynak yok (gösterilmeyecek)'}")
     return [{"ses": c,
              "baslik1": b.get("line1", ""),
              "baslik2": b.get("line2", ""),
@@ -738,9 +775,12 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     shutil.copyfile(tek_wav, vdir / "vo_raw.wav")
     (vdir / "script.txt").write_text(anlatim + "\n", encoding="utf-8")
 
-    konu_kaynak = str(sahneler[0].get("kaynak") or ayar.get("kaynak_satiri") or "Kaynak: Hakemli Bilimsel Araştırma Arşivi")
-    if "doğrulanmış bilimsel" in konu_kaynak.lower():
-        konu_kaynak = "Kaynak: Hakemli Bilimsel Araştırma Arşivi"
+    # Künye: kaynak bu videonun kendi senaryosundan; yoksa kaynak satırı gösterilmez.
+    konu_kaynak = _kaynak_temizle(sahneler[0].get("kaynak"))
+    # Stok fotoğraflar (Pexels/Pixabay) konuyu temsil eder; olayın kendi görüntüsü değildir.
+    gorsel_notu = (GORSEL_TEMSILI_NOTU
+                   if str((ayar.get("gorsel") or {}).get("kaynak", "pexels")).lower() in ("pexels", "pixabay", "auto", "stok")
+                   else "Görseller bilimsel arşivden işlenmiştir.")
 
     cfg = {
         "title": [[sahneler[0]["baslik1"], "g"], [sahneler[0]["baslik2"]]],
@@ -752,7 +792,7 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         "sentence_pause": float((ayar.get("miks") or {}).get("cumle_arasi_es_sn", 0.54)),
         "outro_hold": 1.45,
         "note1": konu_kaynak,
-        "note2": "Görseller bilimsel arşivden işlenmiştir.",
+        "note2": gorsel_notu,
         "scenes": [f"s{i}.jpg" for i in range(1, len(sahneler) + 1)],
     }
     cfg_yolu = calisma / "shorts_config.json"

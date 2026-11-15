@@ -537,9 +537,12 @@ def build_static_overlay(
     d.rounded_rectangle([S_(78) * SS, S_(48) * SS, S_(1038) * SS - 1, S_(56) * SS - 1], radius=S_(4) * SS, fill=(58, 58, 58, 235))
 
     # 2. Alt kaynak & görsel notu: y=1751 (görsel notu) & y=1790 (Kaynak: ...)
-    s1 = N_(note2_txt or "Görseller bilimsel arşivden işlenmiştir.")
-    s2 = N_(note1_txt or "Kaynak: Hakemli Bilimsel Araştırma Arşivi")
-    for y_line, stxt in ((S_(1751), s1), (S_(1790), s2)):
+    # Boş satır çizilmez: gerçek kaynak yoksa kaynak satırı GÖSTERİLMEZ, görsel notu alt satıra iner.
+    s1 = N_(note2_txt or "")
+    s2 = N_(note1_txt or "")
+    satirlar = [t for t in (s1, s2) if t.strip()]
+    y_ler = (S_(1751), S_(1790)) if len(satirlar) == 2 else (S_(1790),)
+    for y_line, stxt in zip(y_ler, satirlar):
         sz_ss = S_(27) * SS
         f_src_ss = load_font("Poppins-Regular.ttf", sz_ss)
         while (d.textbbox((0, 0), stxt, font=f_src_ss)[2] - d.textbbox((0, 0), stxt, font=f_src_ss)[0]) > (W - S_(84)) * SS and sz_ss > S_(18) * SS:
@@ -1711,8 +1714,9 @@ def render_video(vdir_arg: str, explicit_cfg_path: str | None = None):
         for ti in range(-1, len(ch["tokens"]))
     }
 
-    note1_txt = str(cfg.get("note1") or "Kaynak: Hakemli Bilimsel Araştırma Arşivi")
-    note2_txt = str(cfg.get("note2") or "Görseller bilimsel arşivden işlenmiştir.")
+    # Anahtar config'te varsa (boş olsa bile) aynen kullanılır; yalnız hiç verilmemişse eski varsayılan.
+    note1_txt = str(cfg["note1"] or "") if "note1" in cfg else "Kaynak: Hakemli Bilimsel Araştırma Arşivi"
+    note2_txt = str(cfg["note2"] or "") if "note2" in cfg else "Görseller bilimsel arşivden işlenmiştir."
     static_ov = build_static_overlay(note1_txt=note1_txt, note2_txt=note2_txt)
 
     t_endcard = float(tl.get("cta_start", max(1.0, total_dur - 2.6)))

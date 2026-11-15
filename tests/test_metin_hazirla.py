@@ -58,6 +58,14 @@ class MetinHazirlikTestleri(unittest.TestCase):
             ("24/7 açık", "yedi gün yirmi dört saat açık"),
         ])
 
+    def test_sahibin_istedigi_ornekler(self):
+        # 15.11.2026 kontrol listesi: %50, 14:30, 2,5 milimetre, 10 km, 30 dk, vb., vs.
+        self._esit([("%50", "yüzde elli"), ("14:30", "on dört otuz"), ("2,5 milimetre", "iki virgül beş milimetre"),
+                    ("10 km", "on kilometre"), ("30 dk", "otuz dakika"),
+                    ("kara vb. yüzeyler", "kara vesaire yüzeyler"), ("ısı, ışık vs. ölçüldü", "ısı, ışık vesaire ölçüldü")])
+        self.assertEqual(m.hazirla("elma, armut vb.", AYAR), "elma, armut vesaire.")
+        self.assertEqual(m.hazirla("ısı, ışık vs.", AYAR), "ısı, ışık vesaire.")
+
     def test_harfe_bitisik_rakamlar_dokunulmaz(self):
         for x in ("B12 vitamini", "H2O", "5G", "4K video", "COVID-19", "A4 kâğıt"):
             with self.subTest(girdi=x):
