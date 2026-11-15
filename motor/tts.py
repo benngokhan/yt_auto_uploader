@@ -220,6 +220,15 @@ def _ton_zinciri(ses: dict) -> list[str]:
     ]
 
 
+def _arsivle(islev: str, *a, **k):
+    """Üretim arşivine yazar (motor/arsiv.py). Yalnız kayıt: sese, isteğe ve ayarlara DOKUNMAZ; hata olursa susar."""
+    try:
+        import arsiv
+        return getattr(arsiv, islev)(*a, **k)
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
     """Onaylı doğal Gemini erkek anlatıcı (Charon); tane tane belgesel diksiyonu + adaptif hız tavanı + netlik EQ."""
     import re, shutil, time, urllib.error, wave
@@ -249,6 +258,12 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
     }
     veri_bytes = json.dumps(govde).encode()
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_adi}:generateContent?key={anahtar}"
+    # Arşiv: Gemini'ye giden istek gövdesi BAYTI BAYTINA (adres anahtarsız yazılır).
+    _arsivle("yaz_bayt", "gemini_tts_istek_govdesi_KESIN", veri_bytes, "json")
+    _arsivle("yaz", "gemini_tts_istek_bilgisi",
+             f"adres: https://generativelanguage.googleapis.com/v1beta/models/{model_adi}:generateContent?key=[ANAHTAR]\n"
+             f"yöntem: POST\nbaşlık: Content-Type: application/json\ngövde: gemini_tts_istek_govdesi_KESIN dosyası "
+             f"({len(veri_bytes)} bayt)\n\nGövdedeki 'text' alanı (okunur hâli):\n{prompt}")
     son_hata: Exception | None = None
     raw: bytes | None = None
     for deneme, bekle in enumerate((0, 12, 25, 45), start=1):
@@ -277,6 +292,10 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
         cikti.unlink(missing_ok=True)
         raise SesHatasi(f"Gemini doğal ses üretimi başarısız: {str(son_hata)[:180]}") from son_hata
 
+    # Arşiv: Gemini'den gelen ham ses, hiçbir işlem uygulanmadan (24 kHz, 16-bit, mono).
+    _ham_arsiv = _arsivle("pcm_wav_yaz", "ham_tts_gemini_ISLENMEMIS", raw, 24000)
+    if _ham_arsiv:
+        _SON_HAM_SES["yol"] = _ham_arsiv
     ham_yol = cikti.with_suffix(".ham24k.wav")
     pcm = np.frombuffer(raw, dtype="<i2").astype(np.float32) / 32768.0
 
@@ -422,6 +441,30 @@ def _ses_kontrol(ayar: dict) -> None:
         raise SesHatasi(f"Ses kimliği Charon olmalı, ayarda: {vid!r}")
 
 
+_SON_HAM_SES: dict = {}
+
+
+def _arsiv_ses_olcumu(cikti: Path) -> None:
+    """Arşiv: işlenmiş sesi kopyalar, ham ve işlenmiş sesin perdesini ÖLÇER (yalnız ölçüm)."""
+    try:
+        import ses_olcum
+        satirlar = ["SES ÖLÇÜMÜ (yalnız ölçüm; hiçbir ayar değişmez). Yöntem: motor/ses_olcum.py"]
+        olculer = {}
+        ham = _SON_HAM_SES.get("yol")
+        if ham:
+            olculer["ham_tts"] = ses_olcum.olc(ham)
+            satirlar.append("HAM (Gemini'den geldiği gibi)      : " + ses_olcum.satir(olculer["ham_tts"]))
+        kopya = _arsivle("kopyala", "islenmis_tts_muziksiz", cikti)
+        if kopya:
+            olculer["islenmis_tts"] = ses_olcum.olc(kopya)
+            satirlar.append("İŞLENMİŞ (hız/EQ sonrası, müziksiz): " + ses_olcum.satir(olculer["islenmis_tts"]))
+        _arsivle("yaz", "ses_olcumu", "\n".join(satirlar) + "\n\n" + json.dumps(olculer, ensure_ascii=False, indent=2))
+        for s in satirlar[1:]:
+            print("  [Ölçüm] " + s)
+    except Exception:  # noqa: BLE001
+        pass
+
+
 def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
     """Sesi üretir. Hizalama hazırsa döndürür; yoksa None (çağıran Whisper'a düşer)."""
     cikti = Path(cikti)
@@ -430,7 +473,9 @@ def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
 
     # Motordan bağımsız TEK metin hazırlığı: sayılar yazıya, kısaltmalar açık hâle.
     # Yalnız sese giden metin değişir; altyazı senaryodaki özgün yazımı kullanır.
+    _arsivle("yaz", "tts_metni_1_on_isleme_ONCESI", metin)
     metin = metin_hazirla.hazirla(metin, ayar)
+    _arsivle("yaz", "tts_metni_2_on_isleme_SONRASI", metin)
 
     if saglayici == "speechify":
         return _speechify(metin, cikti, ayar)
@@ -448,5 +493,6 @@ def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
         # Gemini kotası dolarsa üretim DURUR; video yanlış sesle çıkmaz.
         _gemini_tts(metin, cikti, ayar)
         _ses_kontrol(ayar)
+        _arsiv_ses_olcumu(cikti)
         return None
     raise SesHatasi(f"Desteklenmeyen ses sağlayıcısı: {saglayici!r}")

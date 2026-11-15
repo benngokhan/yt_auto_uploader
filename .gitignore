@@ -28,3 +28,6 @@ motor/cikti/
 
 # Drive'a yüklenen büyük dosyalar (geçici)
 paylas/
+
+# Üretim arşivi (kanıt dosyaları; artifact olarak saklanır)
+motor/cikti_arsiv/

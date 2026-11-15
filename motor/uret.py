@@ -124,6 +124,35 @@ def groq_model() -> str:
     return secilen
 
 
+def _arsivle(ad: str, icerik, uzanti: str = "txt") -> None:
+    """Üretim arşivine yazar (motor/arsiv.py). Yalnız kayıt; üretimi asla etkilemez."""
+    try:
+        import arsiv
+        arsiv.yaz(ad, icerik, uzanti)
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def _arsivle_senaryo(ad: str, sahneler: list) -> None:
+    try:
+        _arsivle(ad, "\n".join(f"{i}. [{x.get('baslik1', '')} / {x.get('baslik2', '')}] {x.get('ses', '')}"
+                               for i, x in enumerate(sahneler, start=1)))
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def _regresyon_kapisi(ayar: dict) -> None:
+    """Bilinen hata testlerini çalıştırır; biri kırmızıysa uyarır ve üretimi DURDURUR (sahip, 15.11.2026)."""
+    import regresyon
+    sonuc = regresyon.calistir(ayar, sys.modules[__name__])
+    metin = regresyon.rapor(sonuc)
+    print(metin)
+    _arsivle("regresyon_sonuclari", metin + "\n\n" + json.dumps(sonuc, ensure_ascii=False, indent=2))
+    if not regresyon.hepsi_yesil(sonuc):
+        kirmizi = ", ".join(x["kod"] for x in sonuc if not x["gecti"])
+        raise SystemExit(f"UYARI: regresyon testleri KIRMIZI ({kirmizi}). Video/ses ÜRETİLMEDİ.")
+
+
 # Senaryo yazan yapay zekâya verilen "terim birliği ve bilimsel tutarlılık" kuralları.
 # Hem senaryo planında hem cümle uzatmada kullanılır (tek kaynak).
 TERIM_KURALLARI = (
@@ -478,10 +507,17 @@ def _anlatimi_uzat(konu: str, sahneler: list, hedef_toplam: int = 620) -> int:
                 digerleri = [str(x.get("ses", "")) for x in sahneler if x is not s]
                 yeni = _tek_sahne_uzat(konu, str(s.get("ses", "")), hedef, baglam=" ".join(digerleri))
                 # Uzatılmış cümle başka bir cümlenin tekrarına dönüştüyse kabul edilmez (özgün cümle kalır).
+                _eski_ses = str(s.get("ses", ""))
                 if len(yeni) > mevcut and any(_benzerlik(yeni, d) >= TEKRAR_ESIGI for d in digerleri):
                     print("  uzatma reddedildi: başka bir cümleyi tekrar ediyor")
+                    _karar = "REDDEDİLDİ (başka bir cümleyi tekrar ediyor)"
                 elif len(yeni) > mevcut:
                     s["ses"] = yeni
+                    _karar = "KABUL"
+                else:
+                    _karar = "KULLANILMADI (daha uzun değil)"
+                _arsivle("senaryo_uzatma_adimi",
+                         f"tur: {tur + 1}\nhedef karakter: {hedef}\nkarar: {_karar}\n\nÖNCE:\n{_eski_ses}\n\nYAPAY ZEKÂNIN ÖNERDİĞİ:\n{yeni}")
         print(f"  uzatma turu {tur+1}: "
               f"{len(' '.join(str(x.get('ses','')) for x in sahneler))} karakter")
     return len(" ".join(str(x.get("ses", "")) for x in sahneler))
@@ -550,7 +586,10 @@ def _llm_json(istem: str, ayar: dict, sistem: str | None = None) -> dict:
                 son_hata = e
         raise son_hata
 
+    _arsivle("llm_istek", f"SİSTEM:\n{sistem}\n\nİSTEM:\n{istem}")
+
     def _ayikla(metin):
+        _arsivle("llm_ham_cevap", metin or "(boş cevap)")
         metin = (metin or "").strip()
         if not metin:
             return {}
@@ -705,6 +744,10 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
                 duzgun.append(c)
         cumleler = duzgun
         tekrarlar = _tekrar_eden_cumleler(cumleler[:n])
+        _arsivle(f"senaryo_ham_deneme{deneme + 1}",
+                 "\n".join(f"{i}. {c}" for i, c in enumerate(cumleler, start=1))
+                 + f"\n\ntekrar denetimi (cümle, cümle, benzerlik): {tekrarlar or 'tekrar yok'}"
+                 + ("\nKARAR: yeniden yazdırılacak" if tekrarlar and deneme < 2 else ""))
         if not tekrarlar:
             break
         print(f"Senaryoda tekrar eden cümle var {tekrarlar}; "
@@ -819,6 +862,7 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     sahneler = sahne_plani_v2(a.konu, sahne_sayisi, ayar)
     anlatim = " ".join(str(x["ses"]).strip() for x in sahneler)
     print(f"Anlatım (ilk): {len(anlatim)} karakter / {len(sahneler)} cümle")
+    _arsivle_senaryo("senaryo_1_plan_sonrasi", sahneler)
     # Dengeli orta tempo (~13.1 krk/sn genel akış) ile 39-44 sn video için ideal metin 480-545 karakterdir
     if len(anlatim) < 485 and len(sahneler) >= 2:
         kapanis_cta = "Daha fazla Bilgi Dozu için takip et!"
@@ -830,7 +874,18 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
             son_yeni += "."
         if "takip et" not in son_yeni.lower():
             sahneler[-1]["ses"] = f"{son_yeni} {kapanis_cta}"
+    _arsivle_senaryo("senaryo_2_uzatma_sonrasi", sahneler)
     _yazim_denetimi(sahneler, ayar)
+    _arsivle_senaryo("senaryo_3_yazim_denetimi_sonrasi_SON", sahneler)
+    # Yalnız UYARI: metin değişmez, üretim durmaz (motor/senaryo_denetim.py)
+    try:
+        import senaryo_denetim as _sd
+        _uy = _sd.uyarilar([x["ses"] for x in sahneler])
+        for _u in _uy:
+            print(f"UYARI (denetim): {_u}")
+        _arsivle("senaryo_uyarilari", "\n".join(_uy) or "uyarı yok")
+    except Exception as _dh:  # noqa: BLE001
+        print(f"Senaryo uyarı denetimi çalışmadı ({type(_dh).__name__})")
     kalan_tekrar = _tekrar_eden_cumleler([x["ses"] for x in sahneler])
     if kalan_tekrar:
         print(f"UYARI: senaryoda tekrar eden cümleler kaldı {kalan_tekrar}")
@@ -917,6 +972,7 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     metadata = yayin_bilgisi_uret(a.konu, sahneler)
     (calisma / "yayin_bilgisi.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
     print("Yayın bilgileri hazır")
+    _arsivle("yayin_bilgileri", json.dumps(metadata, ensure_ascii=False, indent=2), "json")
 
     onay_dir = calisma / "onay_bekleyen"
     onay_dir.mkdir(parents=True, exist_ok=True)
@@ -1091,6 +1147,12 @@ def main() -> int:
     a = ap.parse_args()
 
     ayar = ayar_yukle()
+    try:
+        import arsiv
+        arsiv.baslat(a.konu, {"argumanlar": {k: v for k, v in vars(a).items()}})
+    except Exception:  # noqa: BLE001
+        pass
+    _regresyon_kapisi(ayar)
     if ayar.get("sahneler_sablon"):
         # ŞABLON v2.0: 7 sahne, 38-45 sn (onaylı video_187..196 standardı)
         sahne_sayisi = int(ayar.get("sahne_sayisi") or 7)

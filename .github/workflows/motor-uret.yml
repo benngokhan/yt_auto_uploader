@@ -107,7 +107,12 @@ jobs:
           [ "$MOTOR_KURU" = "true" ] && ARGS="$ARGS --kuru"
           [ "$MOTOR_SADECE_SES" = "true" ] && ARGS="$ARGS --sadece-ses"
           echo "Komut: python motor/uret.py $ARGS"
-          eval python motor/uret.py $ARGS
+          # Arşiv: tüm konsol çıktısı uretim_XX klasörüne de yazılır (çıkış kodu korunur).
+          set -o pipefail
+          ARSIV="motor/cikti_arsiv/uretim_${GITHUB_RUN_NUMBER}"
+          mkdir -p "$ARSIV"
+          export PYTHONUNBUFFERED=1
+          eval python motor/uret.py $ARGS 2>&1 | tee "$ARSIV/00_konsol_logu_$(date -u +%Y%m%dT%H%M%SZ).txt"
 
       - name: Videoyu Drive'a koy (Onay Bekleyen Videolar)
         if: success() && inputs.kuru != true
@@ -257,6 +262,15 @@ jobs:
             --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" --data-urlencode "parse_mode=HTML" \
             --data-urlencode "text@/tmp/yayin_karti.txt" --data-urlencode "reply_markup=${KART}"
 
+
+      - name: Üretim arşivini sakla (uretim_XX)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uretim_${{ github.run_number }}_arsiv
+          path: motor/cikti_arsiv/
+          if-no-files-found: warn
+          retention-days: 90
 
       - name: Videoyu indirilebilir yap
         if: success()
