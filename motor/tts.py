@@ -25,6 +25,8 @@ from pathlib import Path
 
 import soundfile as sf
 
+import metin_hazirla
+
 SPEECHIFY_URL = "https://api.sws.speechify.com/v1/audio/speech"
 
 
@@ -206,6 +208,18 @@ def _xtts(metin: str, cikti: Path, ayar: dict) -> None:
 
 
 
+def _ton_zinciri(ses: dict) -> list[str]:
+    """Ton ayarı (uğultu kesme + 2 bant EQ): ayarlar.json -> ses.ton"""
+    ton = ses.get("ton") or {}
+    b1 = ton.get("bant1") or {}
+    b2 = ton.get("bant2") or {}
+    return [
+        f"highpass=f={float(ton.get('alt_kesim_hz', 75)):g}",
+        f"equalizer=f={float(b1.get('hz', 280)):g}:t=q:width={float(b1.get('genislik', 1.2)):g}:g={float(b1.get('kazanc_db', -1.2)):g}",
+        f"equalizer=f={float(b2.get('hz', 3300)):g}:t=q:width={float(b2.get('genislik', 1.1)):g}:g={float(b2.get('kazanc_db', 1.8)):g}",
+    ]
+
+
 def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
     """Onaylı doğal Gemini erkek anlatıcı (Charon); tane tane belgesel diksiyonu + adaptif hız tavanı + netlik EQ."""
     import re, shutil, time, urllib.error, wave
@@ -267,12 +281,19 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
     pcm = np.frombuffer(raw, dtype="<i2").astype(np.float32) / 32768.0
 
     # Gemini cümle aralarında 0.55 sn'den uzun ölü sessizlik bıraktıysa konuşmaya dokunmadan 0.50 sn'ye daralt
-    f_len = 480  # 20 ms @ 24 kHz
+    # Sessizlik kısaltma ayarları: ayarlar.json -> ses.sessizlik_kisaltma
+    _sk = ses.get("sessizlik_kisaltma") or {}
+    sk_esik_db = float(_sk.get("esik_db", -44.0))
+    sk_cerceve_ms = float(_sk.get("cerceve_ms", 20))
+    sk_en_uzun = int(_sk.get("en_uzun_sessizlik_cerceve", 26))
+    sk_bas = int(_sk.get("korunan_bas_cerceve", 13))
+    sk_son = int(_sk.get("korunan_son_cerceve", 13))
+    f_len = int(round(24000 * sk_cerceve_ms / 1000.0))  # 20 ms @ 24 kHz = 480 örnek
     nf = len(pcm) // f_len
     if nf > 10:
         f_blok = pcm[: nf * f_len].reshape(nf, f_len)
         f_rms = np.sqrt(np.mean(f_blok * f_blok, axis=1) + 1e-12)
-        sessiz_mi = f_rms < (10.0 ** (-44.0 / 20.0))
+        sessiz_mi = f_rms < (10.0 ** (sk_esik_db / 20.0))
         parcalar: list[np.ndarray] = []
         i_f = 0
         while i_f < nf:
@@ -287,9 +308,9 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
                 while j_f < nf and sessiz_mi[j_f]:
                     j_f += 1
                 run_f = j_f - i_f
-                if run_f > 26:  # > 0.52 sn saf sessizlik -> baştan 13 + sondan 13 çerçeve (0.52 sn) koru
-                    parcalar.append(pcm[i_f * f_len : (i_f + 13) * f_len])
-                    parcalar.append(pcm[(j_f - 13) * f_len : j_f * f_len])
+                if run_f > sk_en_uzun:  # > 0.52 sn saf sessizlik -> baştan 13 + sondan 13 çerçeve (0.52 sn) koru
+                    parcalar.append(pcm[i_f * f_len : (i_f + sk_bas) * f_len])
+                    parcalar.append(pcm[(j_f - sk_son) * f_len : j_f * f_len])
                 else:
                     parcalar.append(pcm[i_f * f_len : j_f * f_len])
                 i_f = j_f
@@ -337,11 +358,7 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
             ffmpeg_bin = None
 
     if ffmpeg_bin:
-        zincir = [
-            "highpass=f=75",
-            "equalizer=f=280:t=q:width=1.2:g=-1.2",
-            "equalizer=f=3300:t=q:width=1.1:g=1.8",
-        ]
+        zincir = _ton_zinciri(ses)
         if atempo < 0.995:
             zincir.append(f"atempo={atempo:.3f}")
         try:
@@ -410,6 +427,10 @@ def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
     cikti = Path(cikti)
     cikti.parent.mkdir(parents=True, exist_ok=True)
     saglayici = (ayar.get("ses", {}).get("saglayici") or "").lower()
+
+    # Motordan bağımsız TEK metin hazırlığı: sayılar yazıya, kısaltmalar açık hâle.
+    # Yalnız sese giden metin değişir; altyazı senaryodaki özgün yazımı kullanır.
+    metin = metin_hazirla.hazirla(metin, ayar)
 
     if saglayici == "speechify":
         return _speechify(metin, cikti, ayar)

@@ -103,11 +103,23 @@ BADGE_BEVEL = (142, 156, 16, 255)
 DARK_TEXT = BTN_TXT
 PURE_WHITE = WHITE
 
+def _miks_ayarlari() -> dict:
+    """Ses miks ayarları: motor/ayarlar.json -> "miks". Dosya/bölüm yoksa onaylı değerler kullanılır."""
+    try:
+        with open(os.path.join(HERE, "ayarlar.json"), encoding="utf-8") as _f:
+            _m = json.load(_f).get("miks")
+        return _m if isinstance(_m, dict) else {}
+    except Exception:
+        return {}
+
+
+_MIKS = _miks_ayarlari()
+
 DEFAULT_INTRO_LEAD = 1.45
-DEFAULT_SENT_PAUSE = 0.54
+DEFAULT_SENT_PAUSE = float(_MIKS.get("cumle_arasi_es_sn", 0.54))          # cümle arası es süresi
 DEFAULT_OUTRO_HOLD = endcard_v2.OUTRO_HOLD_SEC
-DUCK_FLOOR = 0.135
-TARGET_LUFS = -14.2
+DUCK_FLOOR = float(_MIKS.get("muzik_kisma_tabani", 0.135))                # konuşma sırasında müzik seviyesi (1.0 = tam)
+TARGET_LUFS = float(_MIKS.get("hedef_ses_yuksekligi_lufs", -14.2))        # son miks ses yüksekliği hedefi
 
 
 # ---------------------------------------------------------------- Türkçe & Font Yardımcıları
