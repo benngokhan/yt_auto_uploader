@@ -327,7 +327,7 @@ def telegram():
                   birim="istek/sn",
                   bot="@" + str(d.get("username", "")),
                   yenilenme="anlık · günlük kota sınırı yok",
-                  not_="Onay kartları ve yayın bildirimleri aktif")
+                  not_="Yayın bildirimleri aktif")
     except Exception as e:
         return hata("Telegram Bot", e)
 
