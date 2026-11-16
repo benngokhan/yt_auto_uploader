@@ -1,6 +1,196 @@
 {
-  "youtube_count": 98,
-  "candidate_count": 0,
+  "youtube_count": 106,
+  "candidate_count": 29,
   "method": "Süre ±3 sn + 12 kare algısal dHash; düşük çözünürlüklü YouTube kopyasıyla karşılaştırma",
-  "results": []
+  "results": [
+    {
+      "name": "bilgi_dozu_suda_parmaklar_neden_burusur_shorts.mp4",
+      "target_id": "17QRp5wCTjjuJSwBtKQGAgSG6jeu1umKN",
+      "status": "drive_dosyasi_yok",
+      "matches": []
+    },
+    {
+      "name": "final.mp4",
+      "target_id": "1evpjy4TQGOn7-mxe9M4t-aerDfKJLHLt",
+      "status": "drive_dosyasi_yok",
+      "matches": []
+    },
+    {
+      "name": "ilk_video_parmak_ucu.mp4",
+      "target_id": "1XjGOa578Nx240aCdshadS81W4dSVCs16",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 41.0
+    },
+    {
+      "name": "ONAY_10_final.mp4",
+      "target_id": "1_fo57ynH5Ff3ZFN47jikeD21xw3j_iIB",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 42.2
+    },
+    {
+      "name": "ONAY_14_final.mp4",
+      "target_id": "196Jzalt8JrvP2xdzTeG_9viPpHZUHXeq",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 45.77
+    },
+    {
+      "name": "ONAY_16_final.mp4",
+      "target_id": "1c1XGPHxHuHh1jO7hrkagHBR-SILYCPg9",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 42.8
+    },
+    {
+      "name": "ONAY_18_final.mp4",
+      "target_id": "1nIXzJ9ZQUXqRexBgNCAtlWcr0wG-Mqtq",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 41.18
+    },
+    {
+      "name": "ONAY_20_final.mp4",
+      "target_id": "1v9xRhaE0XgoADtTJSI1CLgIr8_WvAMyn",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 40.0
+    },
+    {
+      "name": "ONAY_21_final.mp4",
+      "target_id": "1DKHto6HmroAWFFzQEQJgBFUUHYPB3EjV",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 40.4
+    },
+    {
+      "name": "ONAY_28_final.mp4",
+      "target_id": "1Hcue4urxN0hsbx4nplfrW-mZc4P_U1KG",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 41.2
+    },
+    {
+      "name": "ONAY_5_final.mp4",
+      "target_id": "1kitsqkviPcwbLpH4alQpqL27GDyHbVk3",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 40.4
+    },
+    {
+      "name": "ONAY_6_final.mp4",
+      "target_id": "12cGZ58ewOhbXH1SrVO4lqjhkxzTJ6HM5",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 42.1
+    },
+    {
+      "name": "ONAY_8_final.mp4",
+      "target_id": "175oDd9GTTkTIeDdH7MtMzIkHMNgn7TvT",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 41.3
+    },
+    {
+      "name": "ONAY_9_final.mp4",
+      "target_id": "1oFdNQn-MewQS-7ejSTbJOiHNIMaexUyd",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 39.6
+    },
+    {
+      "name": "uzun_video_14.mp4",
+      "target_id": "1YdyWLqz-HbBvYyHcSu3fAXxtkGGyC3iF",
+      "status": "drive_dosyasi_yok",
+      "matches": []
+    },
+    {
+      "name": "uzun_video_15.mp4",
+      "target_id": "1oJ4hQA4fuGcORn92Pecb03Q2m5eatuCw",
+      "status": "drive_dosyasi_yok",
+      "matches": []
+    },
+    {
+      "name": "uzun_video_16.mp4",
+      "target_id": "1d44fE3x8lBSMHILVQs9xm3yjGpVeNbV6",
+      "status": "drive_dosyasi_yok",
+      "matches": []
+    },
+    {
+      "name": "uzun_video_18.mp4",
+      "target_id": "1KocBZxQuMMJAlysUG3vgIX1nbGfIYRXt",
+      "status": "drive_dosyasi_yok",
+      "matches": []
+    },
+    {
+      "name": "uzun_video_19.mp4",
+      "target_id": "1jeme9b9oqNkucpxrZEDIk4ts8OdjhJYN",
+      "status": "drive_dosyasi_yok",
+      "matches": []
+    },
+    {
+      "name": "uzun_video_20.mp4",
+      "target_id": "1Fz0SoFnBX4ULOg_j1GL7SOq2pQDe7__4",
+      "status": "drive_dosyasi_yok",
+      "matches": []
+    },
+    {
+      "name": "uzun_video_21.mp4",
+      "target_id": "1aDPhnRXltV7qPVcVnq2vwoqy5DwwDRYz",
+      "status": "drive_dosyasi_yok",
+      "matches": []
+    },
+    {
+      "name": "uzun_video_22 (arşiv kopyası).mp4",
+      "target_id": "1mjd4z6NOwRbAYRuUZyMd3cT_IeaqM-U2",
+      "status": "drive_dosyasi_yok",
+      "matches": []
+    },
+    {
+      "name": "uzun_video_22.mp4",
+      "target_id": "1v7NJbO692Lp55qjSqycja_CJooyBvUXm",
+      "status": "drive_dosyasi_yok",
+      "matches": []
+    },
+    {
+      "name": "video_171.mp4",
+      "target_id": "1dSMVFJzrWqMtuRQwELF9RD1pDD5h_GFr",
+      "status": "drive_dosyasi_yok",
+      "matches": []
+    },
+    {
+      "name": "video_172.mp4",
+      "target_id": "1uenxAEdlpHYl-OL7MvAN9luKbO711uH5",
+      "status": "drive_dosyasi_yok",
+      "matches": []
+    },
+    {
+      "name": "video_173.mp4",
+      "target_id": "1B29wk44IWhyc6BUH7-7vKd6ctaN3rW-M",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 43.12
+    },
+    {
+      "name": "video_174.mp4",
+      "target_id": "1z8q9Aj2wCDGmkAikBvOicP8ZhtBMLhxF",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 44.24
+    },
+    {
+      "name": "video_175.mp4",
+      "target_id": "1EalOn2FqjDBdPD-dQ8uEn2qwj9z1QCbe",
+      "status": "arsivde_eslesme_yok",
+      "matches": [],
+      "duration": 45.12
+    },
+    {
+      "name": "video_178.mp4",
+      "target_id": "1ScYqDyK1w4UmKsBSpwQlss_v_FNUtoxH",
+      "status": "drive_dosyasi_yok",
+      "matches": []
+    }
+  ]
 }
