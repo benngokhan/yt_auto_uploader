@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-17 02:06:17",
-  "generated_at_iso": "2026-11-17T02:06:17.533876+03:00",
+  "generated_at": "2026-11-17 02:59:39",
+  "generated_at_iso": "2026-11-17T02:59:39.080482+03:00",
   "folders": {
     "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
     "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
@@ -504,6 +504,13 @@
         "mimeType": "application/vnd.google-apps.folder",
         "size": 0,
         "modifiedTime": "2026-11-11T17:35:10.794Z"
+      },
+      {
+        "id": "1coEZ9DThCkTSQtwJy9zezzeaUQP-WSoL",
+        "name": "visual_pipeline_sorun_ve_islem_ozeti.md",
+        "mimeType": "text/markdown",
+        "size": 4647,
+        "modifiedTime": "2026-11-16T23:31:48.183Z"
       }
     ]
   },
