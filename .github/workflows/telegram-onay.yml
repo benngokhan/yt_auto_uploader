@@ -2,7 +2,8 @@ name: Telegram onay buton işçisi
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/5 * * * *'
+    # Kota tasarrufu: 5 dk -> 15 dk (onay gecikmesi en fazla 15 dk; elle tetikleme de var)
+    - cron: '*/15 * * * *'
 concurrency:
   group: telegram-onay-isci
   cancel-in-progress: false

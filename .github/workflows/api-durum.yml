@@ -2,7 +2,8 @@ name: API durum ve limit görüntüsü
 on:
   workflow_dispatch:
   schedule:
-    - cron: '7 * * * *'
+    # Kota tasarrufu: saatlik -> 6 saatte bir (api-kota ile çakışmasın diye farklı dakika)
+    - cron: '47 */6 * * *'
 permissions:
   contents: write
   actions: read

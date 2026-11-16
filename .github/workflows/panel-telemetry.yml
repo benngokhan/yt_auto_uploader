@@ -1,10 +1,11 @@
 name: Panel Telemetri & Drive Senkron (30 Dk)
-# Admin Paneli için her 30 dakikada bir (0 YouTube API kotası ile) Google Drive YOUTUBE_OTOMASYON
+# Admin Paneli için saatte bir (0 YouTube API kotası ile) Google Drive YOUTUBE_OTOMASYON
 # klasörlerini, CEO yükleme tablosunu ve Özel Retansiyon Raporunu tarayıp panel_telemetry.json günceller.
+# Not: Kota tasarrufu için 30 dk -> 60 dk (aylık Actions kotası dolduğu için).
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "21 * * * *"
   workflow_dispatch:
     inputs:
       push_table_to_drive:
