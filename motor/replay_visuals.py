@@ -90,28 +90,28 @@ def main() -> int:
     if not scenario_match:
         raise SystemExit(f"#71 first narration sentence did not match the requested scenario: {first_sentence}")
 
-    # Deliberately concrete, scene-specific searches based on the approved narration.
-    query_pairs = [
-        ("airplane toilet", "airplane lavatory"),
-        ("airplane toilet flush", "toilet flush mechanism"),
-        ("aircraft cabin pressure gauge", "pressure gauge"),
-        ("aircraft vacuum toilet pipe", "vacuum pipe pressure"),
-        ("airplane toilet waste tank", "aircraft waste tank"),
-        ("airplane vacuum toilet flush", "vacuum flush toilet"),
-        ("aircraft lavatory toilet", "airplane bathroom"),
-    ]
+    # Three live, directly relevant scene searches. Other scenes intentionally stay blank
+    # rather than spending quota on weakly related stock or fabricating a score.
+    live_queries = {
+        0: "toilet flush",
+        2: "pressure gauge",
+        5: "toilet siphon mechanism",
+    }
     scenes = []
     for i, row in enumerate(rows):
-        q1, q2 = query_pairs[min(i, len(query_pairs) - 1)]
+        query = live_queries.get(i, "")
         scenes.append({
             "ses": row["narration"],
-            "gorsel": q1,
-            "gorsel_anahtar": q1,
-            "gorsel_alternatif": q2,
+            "gorsel": query,
+            "gorsel_anahtar": query,
+            "gorsel_alternatif": "",
         })
 
     os.environ["MOTOR_VISUAL_QA_PASSED"] = "1"
+    # The approved source is Pexels; keep the live replay to three small real requests.
+    os.environ.pop("PIXABAY_API_KEY", None)
     import gorsel_uret
+    gorsel_uret.MAX_CANDIDATES_PER_QUERY = 4
 
     assets = out / "visual_selection"
     selected_paths = gorsel_uret.sahneler_icin_gorseller(scenes, assets, yedek_sorgular=[])

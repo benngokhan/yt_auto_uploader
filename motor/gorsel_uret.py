@@ -558,7 +558,22 @@ def _visual_text_scores(scene_text: str, candidates: list[dict]) -> list[float |
             data=json.dumps(body).encode("utf-8"),
             headers={"Content-Type": "application/json"})
         try:
-            with urllib.request.urlopen(req, timeout=90) as response:
+            response = None
+            for attempt in range(3):
+                try:
+                    response = urllib.request.urlopen(req, timeout=90)
+                    break
+                except urllib.error.HTTPError as http_error:
+                    if http_error.code not in (429, 503) or attempt == 2:
+                        raise
+                    try:
+                        retry_after = float(http_error.headers.get("Retry-After", 2 ** (attempt + 1)))
+                    except (TypeError, ValueError):
+                        retry_after = float(2 ** (attempt + 1))
+                    time.sleep(min(max(retry_after, 1.0), 15.0))
+            if response is None:
+                raise RuntimeError("Gemini Vision retry loop ended without a response")
+            with response:
                 answer = json.load(response)["candidates"][0]["content"]["parts"][0]["text"]
             parsed = json.loads(answer)
             raw = parsed.get("scores") if isinstance(parsed, dict) else None
