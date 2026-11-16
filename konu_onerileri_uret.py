@@ -61,9 +61,18 @@ def main():
     raw=d.files().get_media(fileId=f['id']).execute();j=json.loads(raw.decode());used += [j.get('baslik',''),j.get('konu_ozeti','')]
    except Exception:pass
  used=[x for x in used if norm(x)]
+ # Prompt'u kucuk tut: Groq istegi 413 (Payload Too Large) ile reddediliyordu.
+ # Her kaydi 140 karaktere kirp, toplam gecmisi ~40 KB ile sinirla. Tekrar
+ # denetimi yerel benzerlik kapisinda (asagida) tam liste ile yapilmaya devam eder.
+ hist=[];boyut=0
+ for x in reversed(used):
+  parca=x[:140]
+  if boyut+len(parca)>40000:break
+  hist.append(parca);boyut+=len(parca)+1
+ hist.reverse()
  prompt=("Bilgi Dozu Türkçe YouTube Shorts kanalı için 12 yeni konu öner. Geçmiş başlıklarla aynı bilgi, olay, deney, hayvan özelliği veya yalnızca farklı kelimelerle tekrar kesinlikle yasak. "
          "Somut, doğrulanabilir, güçlü görseli olan ve ilk saniyede merak uyandıran soru biçimi kullan. Sağlık tavsiyesi ve yanıltıcı iddia kullanma. "
-         "Yalnız JSON döndür: {\"suggestions\":[{\"title\":\"...\",\"score\":0-100,\"reason\":\"...\",\"duplicate_check\":\"hangi geçmiş alanlardan farklı\"}]}.\nGEÇMİŞ:\n"+'\n'.join(used[-500:]))
+         "Yalnız JSON döndür: {\"suggestions\":[{\"title\":\"...\",\"score\":0-100,\"reason\":\"...\",\"duplicate_check\":\"hangi geçmiş alanlardan farklı\"}]}.\nGEÇMİŞ:\n"+'\n'.join(hist))
  body={'contents':[{'parts':[{'text':prompt}]}],'generationConfig':{'responseMimeType':'application/json','temperature':0.85}}
  text=None; errors=[]
  groq=os.getenv('GROQ_API_KEY','').strip()
