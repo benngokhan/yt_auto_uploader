@@ -29,7 +29,7 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
 HEDEF = (1350, 2400)  # Tam 9:16 dikey, Ken Burns zoom için yüksek keskinlik
 SEMANTIC_THRESHOLD = 0.62
-SEMANTIC_MODEL = "gemini-2.5-flash"
+SEMANTIC_MODEL = "gemini-3.8-flash"
 MAX_CANDIDATES_PER_QUERY = 8
 VISUAL_QA_ENV = "MOTOR_VISUAL_QA_PASSED"
 
