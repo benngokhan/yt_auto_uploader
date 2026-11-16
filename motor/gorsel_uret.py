@@ -571,8 +571,20 @@ def _visual_text_scores(scene_text: str, candidates: list[dict]) -> list[float |
                     scores[i] = score
             return scores
         except Exception as exc:  # noqa: BLE001 — fail closed
+            # Keep actionable API diagnostics without ever logging the request URL/key.
+            if isinstance(exc, urllib.error.HTTPError):
+                status = int(exc.code)
+                try:
+                    error_data = json.loads(exc.read().decode("utf-8", errors="replace"))
+                    detail = str((error_data.get("error") or {}).get("message") or "")
+                except Exception:
+                    detail = ""
+                detail = detail.replace(key, "[redacted]")[:240]
+                summary = f"HTTPError:{status}" + (f":{detail}" if detail else "")
+            else:
+                summary = type(exc).__name__
             for hit in candidates:
-                hit["_vision_error"] = f"vision_judge:{type(exc).__name__}"
+                hit["_vision_error"] = f"vision_judge:{summary}"
             return [None] * len(candidates)
 
 
