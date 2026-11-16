@@ -586,16 +586,36 @@ def _visual_text_scores(scene_text: str, candidates: list[dict]) -> list[float |
                     scores[i] = score
             return scores
         except Exception as exc:  # noqa: BLE001 — fail closed
-            # Keep actionable API diagnostics without ever logging the request URL/key.
+            # Keep only safe quota metadata; never log the request URL or API key.
             if isinstance(exc, urllib.error.HTTPError):
-                status = int(exc.code)
+                safe_error = {"http_status": int(exc.code)}
                 try:
                     error_data = json.loads(exc.read().decode("utf-8", errors="replace"))
-                    detail = str((error_data.get("error") or {}).get("message") or "")
+                    api_error = error_data.get("error") or {}
+                    safe_error["status"] = api_error.get("status")
+                    message = str(api_error.get("message") or "").replace(key, "[redacted]")
+                    safe_error["message"] = message[:700]
+                    safe_details = []
+                    for detail in api_error.get("details") or []:
+                        kind = str(detail.get("@type") or "")
+                        if "QuotaFailure" in kind:
+                            violations = []
+                            for violation in detail.get("violations") or []:
+                                violations.append({k: violation[k] for k in
+                                    ("quotaMetric", "quotaId", "quotaDimensions", "quotaValue", "subject", "description")
+                                    if k in violation})
+                            safe_details.append({"type": "QuotaFailure", "violations": violations})
+                        elif "ErrorInfo" in kind:
+                            metadata = detail.get("metadata") or {}
+                            allow = ("consumer", "service", "method", "reason", "quota_metric", "quota_limit",
+                                     "quota_location", "quota_unit", "quota_value", "model")
+                            safe_details.append({"type": "ErrorInfo", "reason": detail.get("reason"),
+                                                 "metadata": {k: metadata[k] for k in allow if k in metadata}})
+                    if safe_details:
+                        safe_error["details"] = safe_details
                 except Exception:
-                    detail = ""
-                detail = detail.replace(key, "[redacted]")[:240]
-                summary = f"HTTPError:{status}" + (f":{detail}" if detail else "")
+                    pass
+                summary = json.dumps(safe_error, ensure_ascii=False, separators=(",", ":"))[:1800]
             else:
                 summary = type(exc).__name__
             for hit in candidates:

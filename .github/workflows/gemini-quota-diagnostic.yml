@@ -1,0 +1,29 @@
+name: Gemini Vision quota diagnostic
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Minimal dependencies
+        run: pip install -q numpy Pillow
+      - name: One real Pexels candidate + one Gemini Vision request
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY || secrets.PEXELS_KEY || secrets.PEXELS_API }}
+        run: python motor/gemini_quota_diagnostic.py
+      - name: Upload safe diagnostic result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gemini-quota-diagnostic-${{ github.run_number }}
+          path: gemini_quota_diagnostic.json
+          if-no-files-found: warn
+          retention-days: 7
