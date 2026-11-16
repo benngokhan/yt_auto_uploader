@@ -9,9 +9,11 @@ name: Hata Müdahale Ajanı (GitHub Oto-Onarım)
 #   - bilinmiyor -> Telegram'a detaylı rapor gönderir
 #
 # Tetikleyiciler:
-#   - workflow_run: başka bir workflow failure ile bitince (anında müdahale)
-#   - schedule: her 30 dakikada bir (kaçan hatalar için)
+#   - workflow_run: yalnız en kritik işler failure ile bitince (anında müdahale)
+#   - schedule: saatlik (kaçan hatalar için)
 #   - workflow_dispatch: elle çalıştırma
+# Not: Kota tasarrufu için izleme listesi 17'den 5'e düşürüldü, cron 30 dk -> 60 dk.
+#       Kalan işlerin hataları schedule taramasında yakalanır.
 
 on:
   workflow_run:
@@ -19,23 +21,11 @@ on:
       - "YouTube Drive Uploader"
       - "Motor - video üret (elle onaylı)"
       - "Motor · Senaryo + Sabit Ses Paketi"
-      - "Panel Telemetri & Drive Senkron (30 Dk)"
-      - "Telegram onay buton işçisi"
-      - "API durum ve limit görüntüsü"
-      - "API & Kota"
       - "Slot Watchdog"
-      - "Retansiyon Raporu (Ozel Analytics)"
-      - "Analizli konu önerilerini güncelle"
-      - "Kapak Yükle (Panel)"
-      - "Goruntulenme Raporu (yt-dlp)"
-      - "Yayınlanmamış videoları YouTube arşiviyle karşılaştır"
-      - "Arena 5 Günlük Gözlem Serisi Planla ve Takip Et"
-      - "Dosya -> Drive (genel)"
-      - "MD -> Drive (CEO klasörü)"
-      - "Offsite Yedek (FTP/FTPS)"
+      - "API & Kota"
     types: [completed]
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "13 * * * *"
   workflow_dispatch: {}
 
 permissions:
