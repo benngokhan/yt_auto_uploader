@@ -12,9 +12,12 @@ Karar (kullanıcı):
 """
 from __future__ import annotations
 
+import base64
+import io
 import json
 import os
 import re
+import tempfile
 import time
 import urllib.error
 import urllib.parse
@@ -25,6 +28,18 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
 HEDEF = (1350, 2400)  # Tam 9:16 dikey, Ken Burns zoom için yüksek keskinlik
+SEMANTIC_THRESHOLD = 0.62
+SEMANTIC_MODEL = "gemini-2.5-flash"
+MAX_CANDIDATES_PER_QUERY = 8
+VISUAL_QA_ENV = "MOTOR_VISUAL_QA_PASSED"
+
+
+def semantic_score_passes(score: float | None) -> bool:
+    """Tek fail-closed eşik: yok/bozuk skor veya alt eşik, görsel seçimini engeller."""
+    try:
+        return score is not None and 0.0 <= float(score) <= 1.0 and float(score) >= SEMANTIC_THRESHOLD
+    except (TypeError, ValueError):
+        return False
 PEXELS_URL = "https://api.pexels.com/v1/search"
 PIXABAY_URL = "https://pixabay.com/api/"
 
@@ -201,7 +216,7 @@ def _puanla(hit: dict, sorgu: str) -> float:
     return puan
 
 
-def pexels_ara(sorgu: str, anahtar: str, adet: int = 40) -> list[dict]:
+def pexels_ara(sorgu: str, anahtar: str, adet: int = MAX_CANDIDATES_PER_QUERY) -> list[dict]:
     """Pexels API üzerinden dikey ve yüksek çözünürlüklü fotoğrafları puana göre döndürür."""
     baslik = {"Authorization": anahtar}
     sonuclar: dict[int, dict] = {}
@@ -248,6 +263,8 @@ def pexels_ara(sorgu: str, anahtar: str, adet: int = 40) -> list[dict]:
                     "likes": 120,
                     "downloads": 4000,
                     "indir_url": indir_url,
+                    "preview_url": src.get("medium") or src.get("small") or indir_url,
+                    "source_page_url": str(p.get("url") or ""),
                 },
             )
         if len(sonuclar) >= 8:
@@ -255,7 +272,7 @@ def pexels_ara(sorgu: str, anahtar: str, adet: int = 40) -> list[dict]:
     return sorted(sonuclar.values(), key=lambda h: _puanla(h, sorgu), reverse=True)
 
 
-def pixabay_ara(sorgu: str, anahtar: str, adet: int = 60) -> list[dict]:
+def pixabay_ara(sorgu: str, anahtar: str, adet: int = MAX_CANDIDATES_PER_QUERY) -> list[dict]:
     """Pixabay yedek fotoğraf araması."""
     temel = {
         "key": anahtar,
@@ -286,72 +303,34 @@ def pixabay_ara(sorgu: str, anahtar: str, adet: int = 60) -> list[dict]:
             kopya["uid"] = f"pixabay:{hid}"
             kopya["kaynak"] = "pixabay"
             kopya["indir_url"] = indir_url
+            kopya["preview_url"] = h.get("previewURL") or h.get("webformatURL") or indir_url
+            kopya["source_page_url"] = str(h.get("pageURL") or "")
             sonuclar.setdefault(int(hid), kopya)
         if len(sonuclar) >= 8:
             break
     return sorted(sonuclar.values(), key=lambda h: _puanla(h, sorgu), reverse=True)
 
 
-def _sorgu_adaylari(sahne: dict, yedek: list[str], ana_konu: str, sahne_sirasi: int = 0) -> list[str]:
-    """Sahnenin kendi somut nesnesini DAİMA en başta arar; genel yedekler yalnızca en sonda denenir."""
-    def _temiz(x: str) -> str:
+def _sorgu_adaylari(sahne: dict, yedek: list[str] | None = None, ana_konu: str = "", sahne_sirasi: int = 0) -> list[str]:
+    """Yalnız sahnenin kendi somut aramalarını döndürür; genel/atmosferik yedek yoktur."""
+    def temiz(x: str) -> str:
         return " ".join(str(x or "").replace(",", " ").split())
 
-    soyut = {
-        "communication", "communicate", "dance", "dancing", "waggle",
-        "collection", "process", "concept", "how", "why", "secret",
-    }
-
-    def _somut(x: str) -> str:
-        return " ".join(w for w in _temiz(x).split() if w.lower() not in soyut)
-
-    detay = _somut(sahne.get("gorsel"))
-    anahtar = _somut(sahne.get("gorsel_anahtar") or "")
-    alternatif = _somut(sahne.get("gorsel_alternatif") or "")
-    anchor = _somut(ana_konu)
-
-    cekirdek = anahtar or detay
-    adaylar: list[str] = []
-    if cekirdek:
-        adaylar.append(cekirdek)
-        oz_kelimeler = [w for w in cekirdek.split() if w.lower() not in _SUS_KELIMELER]
-        if len(oz_kelimeler) >= 2 and " ".join(oz_kelimeler[-2:]).lower() != cekirdek.lower():
-            adaylar.append(" ".join(oz_kelimeler[-2:]))
-    if detay and detay != cekirdek:
-        adaylar.append(detay)
-    if alternatif and alternatif != cekirdek:
-        adaylar.append(alternatif)
-        alt_oz = [w for w in alternatif.split() if w.lower() not in _SUS_KELIMELER]
-        if len(alt_oz) >= 2 and " ".join(alt_oz[-2:]).lower() != alternatif.lower():
-            adaylar.append(" ".join(alt_oz[-2:]))
-    if cekirdek and anchor and cekirdek.lower()[:18] not in anchor.lower():
-        adaylar.append(f"{cekirdek} {anchor}")
-
-    # Genel konu yedekleri YALNIZCA sahnenin kendi sorguları sonuç vermezse en sonda denenir
-    temiz_yedek = [_temiz(y) for y in yedek if _temiz(y)]
-    if temiz_yedek:
-        kaydir = sahne_sirasi % len(temiz_yedek)
-        adaylar += temiz_yedek[kaydir:] + temiz_yedek[:kaydir]
-
-    gorulen: set[str] = set()
-    sonuc: list[str] = []
-    for a in adaylar:
-        anahtar_kelime = " ".join(sorted({k.lower() for k in a.split()}))
-        if not anahtar_kelime or anahtar_kelime in gorulen:
-            continue
-        gorulen.add(anahtar_kelime)
-        sonuc.append(a)
-    return sonuc[:8]
+    soyut = {"communication", "communicate", "dance", "dancing", "waggle", "collection", "process", "concept", "how", "why", "secret"}
+    sorgular = []
+    for raw in (sahne.get("gorsel_anahtar"), sahne.get("gorsel"), sahne.get("gorsel_alternatif")):
+        q = " ".join(w for w in temiz(raw).split() if w.lower() not in soyut)
+        if q and q.lower() not in {x.lower() for x in sorgular}:
+            sorgular.append(q)
+    return sorgular[:4]
 
 
-def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str, gevsek: bool = False) -> bool:
-    """Görsel gerçekten sahnenin ana nesnesini gösteriyor ve ham kusur taşımıyor mu?"""
+def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str = "", gevsek: bool = False) -> bool:
+    """Yalnız fotoğraf/kalite/yasak içerik ön elemesi; konu uyumunu görsel hakem puanlar."""
     ham_etiket = str(hit.get("tags", "")).lower()
     if any(ifade in ham_etiket for ifade in _YASAK_IFADELER):
         return False
     etiketler = _kelimeler(ham_etiket, sus_at=False)
-    if not etiketler:
-        return False
     if etiketler & _yasak_etiket_seti(sorgu, ana_konu):
         return False
     if str(hit.get("type", "photo")) != "photo":
@@ -359,26 +338,7 @@ def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str, gevsek: bool = False)
     par = _avg_parlaklik(hit.get("avg_color", ""))
     if not gevsek and par is not None and par > 232:
         return False
-
-    cekirdek = _kelimeler(sorgu) or _kelimeler(ana_konu)
-    if not cekirdek:
-        return _puanla(hit, sorgu) >= 4.0
-
-    ortak = len(cekirdek & etiketler)
-    kok_ortak = 0
-    if ortak == 0:
-        kok_c = {w[:4] for w in cekirdek if len(w) >= 4}
-        kok_e = {w[:4] for w in etiketler if len(w) >= 4}
-        kok_ortak = len(kok_c & kok_e)
-
-    if gevsek:
-        return (ortak + kok_ortak) >= 1 and _puanla(hit, sorgu) >= 3.5
-
-    # Pexels alt metinlerinde çoğul/tekil farkı sık olduğundan kök eşleşmesini katı modda da tanı
-    etkin_ortak = ortak + (1 if kok_ortak >= 1 and hit.get("kaynak") == "pexels" else 0)
-    gerekli = 1 if len(cekirdek) <= 4 else 2
-    return etkin_ortak >= gerekli and _puanla(hit, sorgu) >= 5.5
-
+    return True
 
 def _ham_kusurlu_mu(im: Image.Image) -> tuple[bool, str]:
     """İndirilen ham görseli piksel düzeyinde denetler:
@@ -550,141 +510,243 @@ def _adaylardan_indir_ve_dogrula(
     return None
 
 
+def _visual_text_scores(scene_text: str, candidates: list[dict]) -> list[float | None]:
+    """Gemini Vision ile gerçek aday piksellerini sahne cümlesine göre 0..1 puanlar.
+
+    Bu puan CLIP cosine benzeri otomatik bir görsel-metin uygunluk puanıdır; hata halinde
+    None döner ve fail-closed davranılır (aday görsel seçilmez).
+    """
+    key = (os.getenv("GEMINI_API_KEY") or "").strip()
+    if not key:
+        return [None] * len(candidates)
+    if not candidates:
+        return []
+
+    parts: list[dict] = [{"text": (
+        "Sahne metni: " + scene_text + "\n"
+        "Her numaralı fotoğrafı, sahne metninde anlatılan somut nesne/eylem/mekanizmayı gerçekten gösterip göstermediğine göre puanla. "
+        "Renk, sinematik görünüm veya yalnızca genel bilim havası alaka değildir. "
+        "0 = ilgisiz/yanıltıcı, 0.5 = kısmi veya yalnızca dolaylı, 1 = sahneyi doğrudan ve açıkça gösteriyor. "
+        "Sadece geçerli JSON döndür: {\"scores\":[0.0, ...]} ; sıra görsellerin numarasıyla aynı ve her puan 0 ile 1 arasında olsun."
+    )}]
+    valid_indices: list[int] = []
+    with tempfile.TemporaryDirectory(prefix="visual-fit-") as td:
+        for i, hit in enumerate(candidates):
+            url = str(hit.get("preview_url") or hit.get("indir_url") or "")
+            if not url:
+                continue
+            tmp = Path(td) / f"candidate_{i + 1}.img"
+            try:
+                _indir(url, tmp)
+                with Image.open(tmp) as im:
+                    im = im.convert("RGB")
+                    im.thumbnail((384, 384), Image.Resampling.LANCZOS)
+                    buf = io.BytesIO()
+                    im.save(buf, format="JPEG", quality=78, optimize=True)
+                parts.append({"text": f"Aday fotoğraf {i + 1}:"})
+                parts.append({"inline_data": {"mime_type": "image/jpeg", "data": base64.b64encode(buf.getvalue()).decode("ascii")}})
+                valid_indices.append(i)
+            except Exception as exc:  # noqa: BLE001
+                hit["_vision_error"] = f"image_fetch:{type(exc).__name__}"
+        if not valid_indices:
+            return [None] * len(candidates)
+
+        body = {"contents": [{"parts": parts}],
+                "generationConfig": {"responseMimeType": "application/json", "temperature": 0}}
+        req = urllib.request.Request(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{SEMANTIC_MODEL}:generateContent?key={key}",
+            data=json.dumps(body).encode("utf-8"),
+            headers={"Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=90) as response:
+                answer = json.load(response)["candidates"][0]["content"]["parts"][0]["text"]
+            parsed = json.loads(answer)
+            raw = parsed.get("scores") if isinstance(parsed, dict) else None
+            if not isinstance(raw, list) or len(raw) != len(valid_indices):
+                return [None] * len(candidates)
+            scores: list[float | None] = [None] * len(candidates)
+            for i, val in zip(valid_indices, raw):
+                score = float(val)
+                if 0.0 <= score <= 1.0:
+                    scores[i] = score
+            return scores
+        except Exception as exc:  # noqa: BLE001 — fail closed
+            for hit in candidates:
+                hit["_vision_error"] = f"vision_judge:{type(exc).__name__}"
+            return [None] * len(candidates)
+
+
+def _provider_page_url_ok(provider: str, url: str) -> bool:
+    try:
+        parsed = urllib.parse.urlparse(str(url or ""))
+        host = (parsed.hostname or "").lower().rstrip(".")
+        domain = "pexels.com" if provider == "pexels" else "pixabay.com" if provider == "pixabay" else ""
+        return parsed.scheme == "https" and bool(domain) and (host == domain or host.endswith("." + domain))
+    except Exception:
+        return False
+
+
+def _gorsel_kalite_logunu_yaz(klasor: Path, log: dict) -> None:
+    """Her çalıştırmada hem sahne klasörüne hem üretim arşivine seçim kanıtı yazar."""
+    hedef = klasor / "gorsel_secim_raporu.json"
+    try:
+        hedef.write_text(json.dumps(log, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception as exc:  # noqa: BLE001
+        print(f"[görsel log uyarısı] yerel JSON yazılamadı: {type(exc).__name__}")
+    try:
+        import arsiv
+        arsiv.yaz_json("gorsel_secim_raporu", log)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[görsel log uyarısı] üretim arşivi yazılamadı: {type(exc).__name__}")
+
+
 def sahneler_icin_gorseller(
     sahneler: list[dict],
     klasor: Path,
     yedek_sorgular: list[str] | None = None,
-) -> list[Path]:
-    """Her sahne için Pexels (birincil) / Pixabay (yedek) üzerinden görsel indirir,
-    anti-ham piksel denetiminden geçirir ve sinematik 9:16 PNG olarak kaydeder."""
-    pexels_key = (
-        os.getenv("PEXELS_API_KEY")
-        or os.getenv("PEXELS_KEY")
-        or os.getenv("PEXELS_API")
-        or ""
-    ).strip()
+) -> list[Path | None]:
+    """Sahneye özel fotoğrafları görsel-metin hakeminden geçirir; yetersiz sahne None kalır."""
+    if os.getenv(VISUAL_QA_ENV) != "1":
+        raise SystemExit("Görselli üretim kilitli: görsel regresyon kapısı başarıyla çalıştırılmamış.")
+    pexels_key = (os.getenv("PEXELS_API_KEY") or os.getenv("PEXELS_KEY") or os.getenv("PEXELS_API") or "").strip()
     pixabay_key = os.getenv("PIXABAY_API_KEY", "").strip()
-
-    if not pexels_key and not pixabay_key:
-        raise SystemExit("PEXELS_API_KEY (veya PIXABAY_API_KEY) yok — görseller indirilemedi, üretim durdu.")
-
-    saglayicilar: list[tuple[str, str, object]] = []
+    providers: list[tuple[str, str, object]] = []
     if pexels_key:
-        saglayicilar.append(("pexels", pexels_key, pexels_ara))
+        providers.append(("pexels", pexels_key, pexels_ara))
     if pixabay_key:
-        saglayicilar.append(("pixabay", pixabay_key, pixabay_ara))
-
-    aktif_adlar = " -> ".join(ad for ad, _, _ in saglayicilar)
-    print(f"Görsel sağlayıcı sırası: {aktif_adlar} (anti-ham piksel filtresi + koyu sinematik işleme aktif)")
+        providers.append(("pixabay", pixabay_key, pixabay_ara))
 
     klasor.mkdir(parents=True, exist_ok=True)
-    yedek = yedek_sorgular or []
+    used: set[str] = set()
+    paths: list[Path | None] = []
+    report = {
+        "version": 1,
+        "semantic_model": SEMANTIC_MODEL,
+        "threshold": SEMANTIC_THRESHOLD,
+        "provider_order": [p[0] for p in providers],
+        "scenes": [],
+    }
 
-    kullanilan: set[str] = set()
-    kullanilan_sorgular: set[str] = set()
-    yollar: list[Path] = []
-    ana_konu = str((sahneler[0] if sahneler else {}).get("gorsel") or "").strip()
+    for scene_index, scene in enumerate(sahneler, start=1):
+        scene_text = str(scene.get("ses") or "").strip()
+        queries = _sorgu_adaylari(scene)
+        scene_log = {
+            "scene_index": scene_index,
+            "scene_text": scene_text,
+            "queries": [],
+            "selected": None,
+            "fallback": "plain_background",
+        }
+        selected_path: Path | None = None
+        selected_hit: dict | None = None
+        selected_query = ""
+        selected_provider = ""
 
-    for i, sahne in enumerate(sahneler, start=1):
-        secim: tuple[str, dict] | None = None
-        denenen: list[str] = []
-        ham = klasor / f"ham_{i:02d}.jpg"
-        ham_aday_sorgular = _sorgu_adaylari(sahne, yedek, ana_konu, sahne_sirasi=i - 1)
-        # Daha önce başka bir sahnede seçilmiş yedek sorguyu sona at ki 7 sahnede çeşitlilik korunsun
-        aday_sorgular = (
-            [q for q in ham_aday_sorgular if q.lower() not in kullanilan_sorgular]
-            + [q for q in ham_aday_sorgular if q.lower() in kullanilan_sorgular]
-        )
-
-        tekiller: list[str] = []
-        for s_q in aday_sorgular:
-            for w_q in s_q.split():
-                if len(w_q) >= 4 and w_q.lower() not in _SUS_KELIMELER and w_q.lower() not in tekiller:
-                    tekiller.append(w_q.lower())
-
-        # Önce Pexels'te (katı -> gevşek), bulunamazsa Pixabay'de (katı -> gevşek) dene
-        for sag_adi, sag_key, ara_fn in saglayicilar:
-            if secim:
-                break
-            try:
-                # 1. Aşama: Katı nesne + anti-ham piksel denetimi
-                for sorgu in aday_sorgular:
-                    denenen.append(f"{sag_adi}:{sorgu}")
-                    uygunlar = [
-                        h for h in ara_fn(sorgu, sag_key)
-                        if str(h.get("uid") or f"{sag_adi}:{h['id']}") not in kullanilan
-                        and _yeterince_uygun(h, sorgu, ana_konu, gevsek=False)
-                    ]
-                    if uygunlar:
-                        secim = _adaylardan_indir_ve_dogrula(uygunlar, sorgu, ham, kullanilan, siki_piksel=True)
-                        if secim:
-                            break
-
-                # 2. Aşama: Kök/tekil kelime eşleşmeli gevşek arama + anti-ham piksel denetimi
-                if not secim:
-                    for sorgu in (aday_sorgular + tekiller[:4]):
-                        etiket_s = f"{sag_adi}~{sorgu}"
-                        if etiket_s not in denenen:
-                            denenen.append(etiket_s)
-                        uygunlar = [
-                            h for h in ara_fn(sorgu, sag_key)
-                            if str(h.get("uid") or f"{sag_adi}:{h['id']}") not in kullanilan
-                            and _yeterince_uygun(h, sorgu, ana_konu, gevsek=True)
-                        ]
-                        if uygunlar:
-                            secim = _adaylardan_indir_ve_dogrula(uygunlar, sorgu, ham, kullanilan, siki_piksel=True)
-                            if secim:
-                                break
-            except SystemExit as e:
-                # Birincil sağlayıcıda geçici sorun olursa yedek sağlayıcıya şans ver
-                if len(saglayicilar) > 1 and sag_adi != saglayicilar[-1][0]:
-                    print(f"  [uyarı] {sag_adi} geçici hata verdi, yedek kaynağa geçiliyor: {e}")
+        for query in queries:
+            query_log = {"query": query, "provider_results": []}
+            for provider, api_key, search_fn in providers:
+                provider_log = {"provider": provider, "returned_candidate_count": 0, "candidates": []}
+                query_log["provider_results"].append(provider_log)
+                try:
+                    hits = search_fn(query, api_key, adet=MAX_CANDIDATES_PER_QUERY)
+                except TypeError:
+                    hits = search_fn(query, api_key)
+                except Exception as exc:  # noqa: BLE001
+                    provider_log["error"] = f"{type(exc).__name__}: {exc}"
                     continue
-                raise
+                provider_log["returned_candidate_count"] = len(hits)
+                try:
+                    scores = _visual_text_scores(scene_text, hits)
+                except Exception as exc:  # noqa: BLE001 — semantic failure must fail closed
+                    scores = [None] * len(hits)
+                    for hit in hits:
+                        hit["_vision_error"] = f"vision_judge:{type(exc).__name__}"
+                if len(scores) != len(hits):
+                    scores = [None] * len(hits)
+                scored = []
+                for hit, score in zip(hits, scores):
+                    heuristic = float(_puanla(hit, query))
+                    record = {
+                        "uid": str(hit.get("uid") or f"{provider}:{hit.get('id','') }"),
+                        "provider": provider,
+                        "search_query": query,
+                        "candidate_tags": str(hit.get("tags") or ""),
+                        "heuristic_tag_score": round(heuristic, 3),
+                        "semantic_similarity": None if score is None else round(float(score), 4),
+                        "image_url": str(hit.get("indir_url") or hit.get("fullHDURL") or hit.get("largeImageURL") or ""),
+                        "source_page_url": str(hit.get("source_page_url") or ""),
+                        "selected": False,
+                        "rejection_reason": None,
+                    }
+                    is_duplicate = record["uid"] in used
+                    if is_duplicate:
+                        record["rejection_reason"] = "duplicate_visual_already_used"
+                    elif not _yeterince_uygun(hit, query, scene_text, gevsek=True):
+                        record["rejection_reason"] = "provider_metadata_or_photo_quality_filter"
+                    elif score is None:
+                        record["rejection_reason"] = str(hit.get("_vision_error") or "semantic_score_unavailable_fail_closed")
+                    elif not semantic_score_passes(score):
+                        record["rejection_reason"] = "semantic_similarity_below_threshold"
+                    elif not record["image_url"] or not _provider_page_url_ok(provider, record["source_page_url"]):
+                        record["rejection_reason"] = "missing_or_invalid_provider_source_url"
+                    scored.append((hit, score, record))
+                    provider_log["candidates"].append(record)
 
-        # 3. Aşama: Koyu bilimsel atmosfer yedeği (üretimin 0 görselle çökmesini önler)
-        if not secim:
-            for gen_sorgu in (
-                "dark laboratory microscope",
-                "cosmos galaxy nebula",
-                "physics light prism",
-                "deep ocean bioluminescence",
-            ):
-                if secim:
-                    break
-                for sag_adi, sag_key, ara_fn in saglayicilar:
-                    denenen.append(f"{sag_adi}:{gen_sorgu}")
+                eligible = [x for x in scored if semantic_score_passes(x[1])
+                            and x[2]["rejection_reason"] is None]
+                eligible.sort(key=lambda x: (float(x[1]), x[2]["heuristic_tag_score"]), reverse=True)
+                for hit, score, record in eligible:
+                    uid = record["uid"]
+                    raw = klasor / f"ham_{scene_index:02d}.jpg"
                     try:
-                        uygunlar = [
-                            h for h in ara_fn(gen_sorgu, sag_key)
-                            if str(h.get("uid") or f"{sag_adi}:{h['id']}") not in kullanilan
-                            and str(h.get("type", "photo")) == "photo"
-                            and not (_kelimeler(h.get("tags", ""), sus_at=False) & _YASAK_ETIKET_KESIN)
-                        ]
-                    except SystemExit:
-                        continue
-                    if uygunlar:
-                        secim = _adaylardan_indir_ve_dogrula(uygunlar, gen_sorgu, ham, kullanilan, siki_piksel=False)
-                        if secim:
-                            break
+                        _indir(record["image_url"], raw)
+                        with Image.open(raw) as im:
+                            im.load()
+                            defective, reason = _ham_kusurlu_mu(im)
+                            if defective:
+                                record["rejection_reason"] = f"pixel_filter:{reason}"
+                                raw.unlink(missing_ok=True)
+                                continue
+                        selected_path = klasor / f"sahne_{scene_index:02d}.png"
+                        with Image.open(raw) as im:
+                            sinematik_isle(dikey_kirp(im.convert("RGB")), tohum=20261100 + scene_index).save(selected_path, format="PNG")
+                        raw.unlink(missing_ok=True)
+                        record["selected"] = True
+                        record["rejection_reason"] = None
+                        selected_hit, selected_query, selected_provider = hit, query, provider
+                        used.add(uid)
+                        break
+                    except Exception as exc:  # noqa: BLE001
+                        raw.unlink(missing_ok=True)
+                        record["rejection_reason"] = f"download_or_pixel_error:{type(exc).__name__}"
+                if selected_path:
+                    break
+            scene_log["queries"].append(query_log)
+            if selected_path:
+                break
 
-        if not secim or not ham.exists():
-            raise SystemExit(
-                f"Sahne {i} için uygun görsel bulunamadı (denenen: {denenen}) — üretim durdu."
-            )
+        if selected_path and selected_hit:
+            scene_log["selected"] = {
+                "provider": selected_provider,
+                "search_query": selected_query,
+                "uid": str(selected_hit.get("uid") or f"{selected_provider}:{selected_hit.get('id','')}"),
+                "semantic_similarity": next(
+                    (c["semantic_similarity"] for q in scene_log["queries"]
+                     for p in q["provider_results"] for c in p["candidates"] if c.get("selected")), None),
+                "image_url": str(selected_hit.get("indir_url") or selected_hit.get("fullHDURL") or selected_hit.get("largeImageURL") or ""),
+                "source_page_url": str(selected_hit.get("source_page_url") or ""),
+            }
+            scene_log["fallback"] = None
+            print(f"  görsel {scene_index}: {selected_provider} / sorgu={selected_query!r} / puan={scene_log['selected']['semantic_similarity']} / {scene_log['selected']['source_page_url']}")
+        else:
+            reason = "no_scene_specific_query" if not queries else "no_candidate_passed_semantic_threshold_or_pixel_checks"
+            scene_log["fallback_reason"] = reason
+            print(f"  sahne {scene_index}: görsel seçilmedi ({reason}); düz zemin + metin kullanılacak.")
+        paths.append(selected_path)
+        report["scenes"].append(scene_log)
+        _gorsel_kalite_logunu_yaz(klasor, report)
 
-        sorgu, hit = secim
-        uid = str(hit.get("uid") or f"{hit.get('kaynak', 'stok')}:{hit['id']}")
-        kullanilan.add(uid)
-        kullanilan_sorgular.add(sorgu.lower())
-
-        png = klasor / f"sahne_{i:02d}.png"
-        with Image.open(ham) as im:
-            sinematik_isle(dikey_kirp(im.convert("RGB")), tohum=20261100 + i).save(png, quality=95)
-        ham.unlink(missing_ok=True)
-        yollar.append(png)
-        print(
-            f"  görsel {i}: {uid} ({hit.get('imageWidth')}x{hit.get('imageHeight')}) "
-            f"/ sorgu={sorgu!r} / açıklama={str(hit.get('tags'))[:65]}"
-        )
-    return yollar
+    if not providers:
+        report["provider_error"] = "PEXELS_API_KEY and PIXABAY_API_KEY are both missing"
+        _gorsel_kalite_logunu_yaz(klasor, report)
+    return paths

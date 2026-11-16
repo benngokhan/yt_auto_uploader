@@ -85,6 +85,11 @@ jobs:
       - name: Varlıklar (fontlar + fon müziği)
         run: python motor/varlik_hazirla.py
 
+      - name: Görsel seçim regresyon kapısı (A-D)
+        run: |
+          python -m unittest discover -s tests -p 'test_pexels_gorsel_pipeline.py' -v
+          echo "MOTOR_VISUAL_QA_PASSED=1" >> "$GITHUB_ENV"
+
       - name: Üret
         env:
           # Kullanıcı 7 Kasım 2026'da para kazanmanın kapalı olduğunu belirterek

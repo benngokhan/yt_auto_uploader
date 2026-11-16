@@ -36,6 +36,7 @@ import subprocess
 import sys
 import tempfile
 import unicodedata
+import urllib.parse
 import wave
 from pathlib import Path
 
@@ -520,9 +521,25 @@ def render_3d_lime_pill(
     return base
 
 
+def _verified_source_url_format(value: str) -> str:
+    """Son çizim kapısı: yalnız HTTPS ve bilinen bilimsel/kurumsal alan adları."""
+    raw = str(value or "").strip()
+    try:
+        parsed = urllib.parse.urlparse(raw)
+        host = (parsed.hostname or "").lower().rstrip(".")
+    except Exception:
+        return ""
+    allowed = ("nasa.gov", "boeing.com", "doi.org", "pubmed.ncbi.nlm.nih.gov", "ncbi.nlm.nih.gov",
+               "nature.com", "science.org", "aaas.org", "nejm.org", "thelancet.com", "pnas.org",
+               "aps.org", "arxiv.org", "who.int", "cdc.gov", "nih.gov", "esa.int")
+    if parsed.scheme != "https" or not any(host == d or host.endswith("." + d) for d in allowed):
+        return ""
+    return raw
+
+
 def build_static_overlay(
-    note1_txt: str = "Kaynak: Hakemli Bilimsel Araştırma Arşivi",
-    note2_txt: str = "Görseller bilimsel arşivden işlenmiştir.",
+    note1_txt: str = "",
+    note2_txt: str = "",
 ) -> Image.Image:
     """sablon_v2/build_v2_shorts.py birebir statik arayüz katmanı:
     - y=48..56, x=78..1038 üst ilerleme çubuğu zemini (#3A3A3A)
@@ -545,7 +562,7 @@ def build_static_overlay(
     for y_line, stxt in zip(y_ler, satirlar):
         sz_ss = S_(27) * SS
         f_src_ss = load_font("Poppins-Regular.ttf", sz_ss)
-        while (d.textbbox((0, 0), stxt, font=f_src_ss)[2] - d.textbbox((0, 0), stxt, font=f_src_ss)[0]) > (W - S_(84)) * SS and sz_ss > S_(18) * SS:
+        while (d.textbbox((0, 0), stxt, font=f_src_ss)[2] - d.textbbox((0, 0), stxt, font=f_src_ss)[0]) > (W - S_(84)) * SS and sz_ss > S_(12) * SS:
             sz_ss -= 2
             f_src_ss = load_font("Poppins-Regular.ttf", sz_ss)
         sbb = d.textbbox((0, 0), stxt, font=f_src_ss)
@@ -1714,10 +1731,24 @@ def render_video(vdir_arg: str, explicit_cfg_path: str | None = None):
         for ti in range(-1, len(ch["tokens"]))
     }
 
-    # Anahtar config'te varsa (boş olsa bile) aynen kullanılır; yalnız hiç verilmemişse eski varsayılan.
-    note1_txt = str(cfg["note1"] or "") if "note1" in cfg else "Kaynak: Hakemli Bilimsel Araştırma Arşivi"
-    note2_txt = str(cfg["note2"] or "") if "note2" in cfg else "Görseller bilimsel arşivden işlenmiştir."
-    static_ov = build_static_overlay(note1_txt=note1_txt, note2_txt=note2_txt)
+    # Kaynak satırı yalnızca doğrulanmış HTTPS URL'sinden; stok görsel kredisi sahneye göre yazılır.
+    source_url = _verified_source_url_format(cfg.get("source_url") or "")
+    visual_credits = cfg.get("visual_credits") or []
+    static_overlays = []
+    for scene_index in range(len(scenes)):
+        credit = visual_credits[scene_index] if scene_index < len(visual_credits) else None
+        if isinstance(credit, dict):
+            provider = str(credit.get("provider") or "").lower()
+            url = str(credit.get("url") or "").strip()
+            host_ok = ((provider == "pexels" and url.lower().startswith(("https://www.pexels.com/", "https://pexels.com/")))
+                       or (provider == "pixabay" and url.lower().startswith(("https://pixabay.com/", "https://www.pixabay.com/"))))
+            note2 = f"Görsel temsildir • {provider.capitalize()}: {url}" if host_ok and url.startswith("https://") else ""
+        else:
+            note2 = ""
+        note1 = f"Kaynak URL: {source_url}" if source_url else ""
+        static_overlays.append(build_static_overlay(note1_txt=note1, note2_txt=note2))
+    if not static_overlays:
+        static_overlays = [build_static_overlay()]
 
     t_endcard = float(tl.get("cta_start", max(1.0, total_dur - 2.6)))
     click_delay = float(tl.get("cta_click_delay", 1.25))
@@ -1763,8 +1794,10 @@ def render_video(vdir_arg: str, explicit_cfg_path: str | None = None):
 
         if ui_mul > 0.02:
             if ui_mul >= 0.99:
+                static_ov = static_overlays[min(cur_si, len(static_overlays) - 1)]
                 frame = Image.alpha_composite(frame, static_ov)
             else:
+                static_ov = static_overlays[min(cur_si, len(static_overlays) - 1)]
                 r_s, g_s, b_s, a_s = static_ov.split()
                 st_faded = Image.merge("RGBA", (r_s, g_s, b_s, a_s.point(lambda p: int(p * ui_mul))))
                 frame = Image.alpha_composite(frame, st_faded)

@@ -23,6 +23,9 @@ import json
 import os
 import subprocess
 import sys
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
 
 KOK = Path(__file__).resolve().parent.parent          # repo kökü
@@ -598,20 +601,46 @@ _GENEL_KAYNAK_IZLERI = (
 GORSEL_TEMSILI_NOTU = "Görseller temsilidir."
 
 
-def _kaynak_temizle(ham) -> str:
-    """Senaryodan gelen kaynak satırını düzenler; gerçek kaynak yoksa BOŞ döner.
+def _kaynak_temizle(ham, *, kaynaksiz_etiket: str = "") -> str:
+    """Yalnız erişilebilir HTTPS kaynak URL'sini kabul eder; kurum adını tek başına asla göstermez."""
+    import ipaddress
+    from urllib.parse import urlparse
 
-    Kural (sahip): kaynak her videonun kendi senaryosundan gelir. Yapay zekâ kaynak
-    vermediyse ya da genel geçer bir ifade yazdıysa ekranda kaynak gösterilmez.
-    """
-    metin = " ".join(str(ham or "").split())
-    govde = metin.split(":", 1)[1].strip() if metin.lower().startswith("kaynak") and ":" in metin else metin
-    govde = govde.strip(" .…-–—•")
-    if len(govde) < 3 or govde.lower() in {"yok", "bilinmiyor", "belirsiz", "none", "null"}:
+    raw = " ".join(str(ham or "").split()).strip()
+    label = " ".join(str(kaynaksiz_etiket or "").split()).strip()
+    if not raw:
+        if label:
+            print(f"UYARI (kaynak doğrulama): URL'siz kaynak alanı ekrana yazılmadı: {label}")
         return ""
-    if any(iz in govde.lower() for iz in _GENEL_KAYNAK_IZLERI):
+    if raw.lower().startswith("kaynak:"):
+        raw = raw.split(":", 1)[1].strip()
+    parsed = urlparse(raw)
+    allowed_domains = (
+        "nasa.gov", "boeing.com", "doi.org", "pubmed.ncbi.nlm.nih.gov", "ncbi.nlm.nih.gov",
+        "nature.com", "science.org", "aaas.org", "nejm.org", "thelancet.com", "pnas.org",
+        "aps.org", "arxiv.org", "who.int", "cdc.gov", "nih.gov", "esa.int",
+    )
+    host = (parsed.hostname or "").lower().rstrip(".")
+    try:
+        ipaddress.ip_address(host)
+        host_ok = False
+    except ValueError:
+        host_ok = any(host == domain or host.endswith("." + domain) for domain in allowed_domains)
+    if parsed.scheme != "https" or not host_ok or not parsed.path.startswith("/"):
+        print(f"UYARI (kaynak doğrulama): güvenilir HTTPS kaynak URL'si yok; alan gizlendi: {label or raw[:100]}")
         return ""
-    return f"Kaynak: {govde}"[:54].strip()
+    try:
+        request = urllib.request.Request(raw, headers={"User-Agent": "BilgiDozuSourceVerifier/1.0"})
+        with urllib.request.urlopen(request, timeout=8) as response:
+            final = urlparse(response.geturl())
+            final_host = (final.hostname or "").lower().rstrip(".")
+            if response.status < 200 or response.status >= 400 or final.scheme != "https" or not any(
+                    final_host == d or final_host.endswith("." + d) for d in allowed_domains):
+                raise ValueError("URL güvenli/başarılı bir kaynak sayfasına yönlenmedi")
+        return raw
+    except Exception as exc:  # noqa: BLE001 — doğrulanamayan kaynak ekrana çıkmaz
+        print(f"UYARI (kaynak doğrulama): kaynak URL doğrulanamadı ({type(exc).__name__}); alan gizlendi: {label or raw[:100]}")
+        return ""
 
 
 def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
@@ -892,8 +921,9 @@ PROMPT_V2 = (
     "{{\"ikon\":\"?\",\"satir1\":\"ATEŞİN VARKEN\",\"satir2\":\"NEDEN ÜŞÜRSÜN?\"}}, "
     "{{\"ikon\":\"⚡\",\"satir1\":\"BEYNİN TERMOSTAT\",\"satir2\":\"OYUNU OYNUYOR!\"}}.\n"
     "- 'kapak_baslik': TAM 2 elemanlı dizi; her satır TAM BÜYÜK HARF, 10-18 karakter arası.\n"
-    "- 'kaynak': YALNIZCA bu senaryodaki bilginin gerçekten dayandığı ve adından emin olduğun gerçek bilimsel kurum veya hakemli dergi; 'Kaynak: ...' biçiminde ve EN FAZLA 46 karakter (ör. 'Kaynak: Harvard Medical School • Nature'). Uydurma kurum/yıl/sayı YASAK. 'Bilimsel araştırmalar', 'hakemli arşiv' gibi genel geçer ifade YASAK. Emin olduğun gerçek bir kaynak yoksa boş bırak: \"\".\n"
-    "Yalnız JSON döndür: {{\"kapak_baslik\": [\"SATIR 1\", \"SATIR 2\"], \"kaynak\": \"Kaynak: ... (yoksa boş)\", \"cumleler\": [\"cümle 1\", ...], \"sahne_basliklari\": [{{\"ikon\": \"?\", \"satir1\": \"...\", \"satir2\": \"...\"}}, ...]}}"
+    "- 'kaynak_url': yalnızca bu senaryodaki bilgiyi gerçekten destekleyen birincil/akademik sayfanın tam HTTPS URL'si; kurum/dergi adı tek başına kaynak değildir. Emin değilsen boş bırak. URL ayrıca erişilebilirlik ve alan adı denetiminden geçecek.\n"
+    "- 'kaynak': eski kaynak adı alanı; kaynak_url yoksa yalnızca denetim uyarısında kalır ve ekrana yazılmaz.\n"
+    "Yalnız JSON döndür: {{\"kapak_baslik\": [\"SATIR 1\", \"SATIR 2\"], \"kaynak_url\": \"https://... (yoksa boş)\", \"kaynak\": \"isteğe bağlı kurum adı\", \"cumleler\": [\"cümle 1\", ...], \"sahne_basliklari\": [{{\"ikon\": \"?\", \"satir1\": \"...\", \"satir2\": \"...\"}}, ...]}}"
 )
 
 
@@ -1121,8 +1151,8 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
             for c in cumleler[1:]
         ]
 
-    # Kaynak yalnız bu videonun senaryosundan gelir; gerçek kaynak yoksa gösterilmez (boş kalır).
-    ham_kaynak = _kaynak_temizle(veri.get("kaynak"))
+    # Yalnız allowlist'te, erişilebilir HTTPS URL'si doğrulanmışsa kaynak gösterilir.
+    ham_kaynak = _kaynak_temizle(veri.get("kaynak_url"), kaynaksiz_etiket=str(veri.get("kaynak") or ""))
 
     # Saf 3D Kapanış Ekranı (v2.2): başlıklar saf cümlelerden çözüldükten SONRA son sahneye sabit CTA eklenir;
     # "Daha fazla Bilgi Dozu..." başlar başlamaz ekran kararır ve tam "takip et!" dendiğinde fare tıklar.
@@ -1165,16 +1195,13 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict]
         "3) YASAK SORGULAR: Kamerayla çekilemeyen soyut molekül/bakteri adları ('vitamin molecule', 'retinal pigment', 'bacteria', 'protein') YASAK (bunlar kozmetik şişesi döndürür; yerine 'laboratory pipette' veya 'scientist microscope' yaz)! "
         "'texture', 'pattern', 'abstract', 'background' kelimeleri YASAK (kağıt dokusu döndürür)! "
         "Gündelik stok klişeleri ('mobile phone', 'hand holding phone', 'person texting', 'person in bed', 'man', 'woman', 'office', 'window') YASAK!\n"
-        f"Yalnız JSON döndür: {{\"sahneler_gorsel\": [{{\"ana\": \"2-3 kelimelik gerçek fotoğraflanabilir bilim nesnesi\", \"alternatif\": \"farklı 2-3 kelimelik bilim nesnesi\"}}, ...], "
-        f"\"yedekler\": [\"scientist microscope\", \"laboratory test tube\", \"optical glass lens\", \"brain mri scan\"]}}. "
+        f"Yalnız JSON döndür: {{\"sahneler_gorsel\": [{{\"ana\": \"bu sahnenin metnindeki somut nesne/eylem\", \"alternatif\": \"aynı sahneyle doğrudan ilgili başka somut nesne\"}}, ...]}}. "
         f"\"sahneler_gorsel\" dizisi TAM {n} elemanlı olacak."
     )
     veri = _llm_json(istem, ayar, _LLM_SISTEM)
     ham_liste = veri.get("sahneler_gorsel") or veri.get("aramalar") or []
-    yedekler = [str(x).strip() for x in (veri.get("yedekler") or []) if str(x).strip()]
-    if not yedekler:
-        yedekler = ["microscope lens", "light prism", "water droplets macro", "laboratory glassware"]
-
+    # Genel bilim/atmosfer yedeği bilinçli olarak yok: sahneye uygun terim yoksa görsel seçilmez.
+    yedekler: list[str] = []
     sahneler_q: list[dict] = []
     for item in ham_liste[:n]:
         if isinstance(item, dict):
@@ -1183,14 +1210,12 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict]
         else:
             ana = str(item).strip()
             alt = ""
-        if ana:
-            sahneler_q.append({"ana": ana, "alternatif": alt})
+        sahneler_q.append({"ana": ana, "alternatif": alt})
 
     while len(sahneler_q) < n:
-        y = yedekler[len(sahneler_q) % len(yedekler)]
-        sahneler_q.append({"ana": y, "alternatif": "science laboratory"})
+        sahneler_q.append({"ana": "", "alternatif": ""})
 
-    print(f"Görsel aramaları ({len(sahneler_q)}): {[x['ana'] for x in sahneler_q]} | yedekler={yedekler}")
+    print(f"Görsel aramaları ({len(sahneler_q)}): {[x['ana'] for x in sahneler_q]} | genel yedek yok")
     return sahneler_q, yedekler
 
 
@@ -1280,24 +1305,34 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         [{"gorsel": ar["ana"], "gorsel_anahtar": ar["ana"], "gorsel_alternatif": ar.get("alternatif", ""), "ses": s["ses"]}
          for s, ar in zip(sahneler, aramalar)],
         gorsel_klasoru, yedek_sorgular=yedekler)
-    if len(parallelar) < len(sahneler):
-        raise SystemExit(f"Görsel sayısı yetersiz: {len(parallelar)} < {len(sahneler)}")
+    if len(parallelar) != len(sahneler):
+        raise SystemExit(f"Görsel seçim sonucu sahne sayısıyla uyuşmuyor: {len(parallelar)} != {len(sahneler)}")
 
     # 3) ONAYLI sablon_v2 MOTORU (shorts_pipeline + endcard_v2)
     vdir = calisma / "v2"
     vdir.mkdir(parents=True, exist_ok=True)
+    from PIL import Image
     for i, p in enumerate(parallelar, start=1):
-        with Image.open(p) as im_p:
-            im_p.convert("RGB").save(vdir / f"s{i}.jpg", "JPEG", quality=94)
+        hedef_sahne = vdir / f"s{i}.jpg"
+        if p is None:
+            # Görsel seçilmediyse düz zemin; başlık ve altyazı render motorunda yine görünür.
+            Image.new("RGB", (1080, 1920), (10, 17, 23)).save(hedef_sahne, "JPEG", quality=94)
+        else:
+            with Image.open(p) as im_p:
+                im_p.convert("RGB").save(hedef_sahne, "JPEG", quality=94)
+    secim_raporu_yolu = gorsel_klasoru / "gorsel_secim_raporu.json"
+    try:
+        secim_raporu = json.loads(secim_raporu_yolu.read_text(encoding="utf-8"))
+    except Exception:
+        secim_raporu = {"scenes": []}
     shutil.copyfile(tek_wav, vdir / "vo_raw.wav")
     (vdir / "script.txt").write_text(anlatim + "\n", encoding="utf-8")
 
     # Künye: kaynak bu videonun kendi senaryosundan; yoksa kaynak satırı gösterilmez.
-    konu_kaynak = _kaynak_temizle(sahneler[0].get("kaynak"))
-    # Stok fotoğraflar (Pexels/Pixabay) konuyu temsil eder; olayın kendi görüntüsü değildir.
-    gorsel_notu = (GORSEL_TEMSILI_NOTU
-                   if str((ayar.get("gorsel") or {}).get("kaynak", "pexels")).lower() in ("pexels", "pixabay", "auto", "stok")
-                   else "Görseller bilimsel arşivden işlenmiştir.")
+    kaynak_url = str(sahneler[0].get("kaynak") or "")
+    konu_kaynak = f"Kaynak URL: {kaynak_url}" if kaynak_url else ""
+    # Görsel açıklaması ve sağlayıcı linkleri her sahne için ayrı üretilecek.
+    gorsel_notu = ""
 
     cfg = {
         "title": [[sahneler[0]["baslik1"], "g"], [sahneler[0]["baslik2"]]],
@@ -1310,6 +1345,12 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         "outro_hold": 1.45,
         "note1": konu_kaynak,
         "note2": gorsel_notu,
+        "source_url": kaynak_url,
+        "visual_credits": [
+            ({"provider": row["selected"]["provider"], "url": row["selected"]["source_page_url"],
+              "representative": True} if row.get("selected") else None)
+            for row in (secim_raporu.get("scenes") or [])
+        ],
         "scenes": [f"s{i}.jpg" for i in range(1, len(sahneler) + 1)],
     }
     cfg_yolu = calisma / "shorts_config.json"
@@ -1340,8 +1381,10 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     # Standart Bilgi Dozu dikey kapak şablonu (kapak_176..196 ile birebir uyumlu)
     import kapak as kapak_mod
     kapak_bilgi = kapak_mod.kapak_metni_hazirla(a.konu, sahneler, metadata)
+    gercek_kapak_adaylari = [p for p in parallelar if p is not None]
+    kapak_arka = _kapak_gorseli_sec(a.konu, gercek_kapak_adaylari) if gercek_kapak_adaylari else (vdir / "s1.jpg")
     kapak_mod.kapak_uret(
-        _kapak_gorseli_sec(a.konu, parallelar),
+        kapak_arka,
         hedef_kapak,
         satirlar=kapak_bilgi["satirlar"],
         vurgu_satiri=kapak_bilgi.get("vurgu"),
@@ -1608,6 +1651,8 @@ def main() -> int:
         return 0
 
     # ---------------------------------------------------------- 4) görseller
+    if os.getenv("MOTOR_VISUAL_QA_PASSED") != "1":
+        raise SystemExit("Görselli üretim kilitli: A-D görsel test kapısı yeşil değil.")
     import gorsel_uret
     import altyazi
 
@@ -1635,13 +1680,19 @@ def main() -> int:
 
     scene_cfg = []
     for i, (s, hiz) in enumerate(zip(sahneler, hizalamalar)):
-        img = Image.open(parallelar[i]).convert("RGB")
+        scene_image = parallelar[i]
+        is_plain = scene_image is None
+        if is_plain:
+            scene_image = gorsel_klasoru / f"duz_zemin_{i + 1:02d}.png"
+            Image.new("RGB", (1080, 1920), (10, 17, 23)).save(scene_image, "PNG")
+        img = Image.open(scene_image).convert("RGB")
         bgr = np.array(img)[:, :, ::-1].copy()
-        bgr = re_.apply_teal_orange_cinematic(bgr)
-        bgr = re_.add_bioluminescent_particles(bgr, seed=i)
+        if not is_plain:
+            bgr = re_.apply_teal_orange_cinematic(bgr)
+            bgr = re_.add_bioluminescent_particles(bgr, seed=i)
         plates.append(bgr)
         scene_cfg.append({
-            "img": str(parallelar[i]),
+            "img": str(scene_image),
             # 38–42 sn / 4 sahne: efekt hissedilmeyecek kadar yavaş, akıcı hareket.
             "zoom": (1.00, 1.04),
             "pan_x": (0.0, 0.0),
@@ -1656,7 +1707,7 @@ def main() -> int:
     cikti = calisma / "final.mp4"
     re_.render_video_master(
         str(cikti), scene_cfg, vo_files, plates,
-        ayar.get("kaynak_satiri", ""),
+        "",  # doğrulanmış kaynak URL'si yoksa kaynak satırı gösterilmez
         is_wide=False,
         target_min_dur=ayar.get("sure", {}).get("min", 38),
         target_max_dur=ayar.get("sure", {}).get("max", 42),
@@ -1671,7 +1722,7 @@ def main() -> int:
         parallelar[0], kapak_yolu,
         satirlar=[k.upper() for k in kapak_satirlari],
         kategori=ayar.get("kategori", "BİLİM").upper(),
-        alt_aciklama=f"{a.konu} · {ayar.get('kaynak_satiri', '')}".strip(" ·"),
+        alt_aciklama=f"{a.konu}",
     )
     print(f"Kapak hazır: {kapak_yolu}")
     metadata = yayin_bilgisi_uret(a.konu, sahneler)
@@ -1703,7 +1754,7 @@ def main() -> int:
         "\n\n".join(s["ses"] for s in sahneler),
         "#bilgidozu #shorts", "bilgidozu, shorts, bilgi dozu",
         "Sen bunu biliyor muydun? 👇", ayar.get("kategori", "Bilim"),
-        ayar.get("kaynak_satiri", ""))
+        "")
     print(f"Teslim tamam: {dosya_adi}")
     return 0
 
