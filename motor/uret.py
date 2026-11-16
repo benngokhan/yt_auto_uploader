@@ -921,7 +921,7 @@ PROMPT_V2 = (
     "{{\"ikon\":\"?\",\"satir1\":\"ATEŞİN VARKEN\",\"satir2\":\"NEDEN ÜŞÜRSÜN?\"}}, "
     "{{\"ikon\":\"⚡\",\"satir1\":\"BEYNİN TERMOSTAT\",\"satir2\":\"OYUNU OYNUYOR!\"}}.\n"
     "- 'kapak_baslik': TAM 2 elemanlı dizi; her satır TAM BÜYÜK HARF, 10-18 karakter arası.\n"
-    "- 'kaynak_url': yalnızca bu senaryodaki bilgiyi gerçekten destekleyen birincil/akademik sayfanın tam HTTPS URL'si; kurum/dergi adı tek başına kaynak değildir. Emin değilsen boş bırak. URL ayrıca erişilebilirlik ve alan adı denetiminden geçecek.\n"
+    "- 'kaynak_url': yalnızca bu senaryodaki bilgiyi gerçekten destekleyen birincil/akademik sayfanın tam HTTPS URL'si; kurum/dergi adı tek başına kaynak değildir; gerçek bir kaynak yoksa boş bırak; genel geçer ifade YASAK. Emin değilsen boş bırak. URL ayrıca erişilebilirlik ve alan adı denetiminden geçecek.\n"
     "- 'kaynak': eski kaynak adı alanı; kaynak_url yoksa yalnızca denetim uyarısında kalır ve ekrana yazılmaz.\n"
     "Yalnız JSON döndür: {{\"kapak_baslik\": [\"SATIR 1\", \"SATIR 2\"], \"kaynak_url\": \"https://... (yoksa boş)\", \"kaynak\": \"isteğe bağlı kurum adı\", \"cumleler\": [\"cümle 1\", ...], \"sahne_basliklari\": [{{\"ikon\": \"?\", \"satir1\": \"...\", \"satir2\": \"...\"}}, ...]}}"
 )

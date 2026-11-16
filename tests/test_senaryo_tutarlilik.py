@@ -64,8 +64,19 @@ class SenaryoKurallariTestleri(unittest.TestCase):
 
     def test_kaynak_yalniz_gercekse_gosterilir(self):
         t = self.uret._kaynak_temizle
-        self.assertEqual(t("Kaynak: NASA • Nature"), "Kaynak: NASA • Nature")
-        self.assertEqual(t("Harvard Medical School"), "Kaynak: Harvard Medical School")
+        # Kurum/dergi etiketi tek başına doğrulanmış kaynak değildir.
+        self.assertEqual(t("Kaynak: NASA • Nature"), "")
+        self.assertEqual(t("Harvard Medical School"), "")
+
+        class _Yanit:
+            status = 200
+            def __enter__(self): return self
+            def __exit__(self, *args): return False
+            def geturl(self): return "https://www.nasa.gov/"
+
+        with mock.patch("urllib.request.urlopen", return_value=_Yanit()):
+            self.assertEqual(t("https://www.nasa.gov/"), "https://www.nasa.gov/")
+
         for bos in ("", None, "Kaynak: ...", "Kaynak: yok", "Kaynak: ... (yoksa boş)",
                     "Kaynak: Hakemli Bilimsel Araştırma Arşivi", "Kaynak: doğrulanmış bilimsel yayınlar",
                     "Kaynak: Çeşitli kaynaklar", "Bilimsel araştırmalar"):
