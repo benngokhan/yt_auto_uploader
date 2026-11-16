@@ -45,6 +45,29 @@ def _make_textured_photo(w=1200, h=1800, base_rgb=(45, 70, 95), bright_border=Fa
 
 
 class PexelsGorselPipelineTests(unittest.TestCase):
+    def test_visual_judge_retries_a_transient_timeout(self):
+        import io
+        import json
+
+        response_body = {
+            "candidates": [{"content": {"parts": [{"text": "{\"scores\":[0.91]}"}]}}]
+        }
+        response = io.BytesIO(json.dumps(response_body).encode("utf-8"))
+
+        def fake_download(_url, path):
+            Image.new("RGB", (64, 64), (35, 70, 95)).save(path, format="JPEG")
+
+        candidate = {"preview_url": "https://images.example.test/candidate.jpg"}
+        with mock.patch.dict(os.environ, {"GEMINI_API_KEY": "fixture-key"}), \
+             mock.patch.object(gorsel_uret, "_indir", side_effect=fake_download), \
+             mock.patch("urllib.request.urlopen", side_effect=[TimeoutError("fixture timeout"), response]) as call, \
+             mock.patch.object(gorsel_uret.time, "sleep") as sleep:
+            scores = gorsel_uret._visual_text_scores("A pressure gauge.", [candidate])
+
+        self.assertEqual(scores, [0.91])
+        self.assertEqual(call.call_count, 2)
+        sleep.assert_called_once_with(2.0)
+
     def test_scene_own_query_always_precedes_shorter_fallbacks(self):
         adaylar = gorsel_uret._sorgu_adaylari(
             {"gorsel": "retina cell microscope", "gorsel_anahtar": "retina cell microscope"},

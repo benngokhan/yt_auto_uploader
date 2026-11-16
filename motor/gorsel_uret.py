@@ -571,6 +571,12 @@ def _visual_text_scores(scene_text: str, candidates: list[dict]) -> list[float |
                     except (TypeError, ValueError):
                         retry_after = float(2 ** (attempt + 1))
                     time.sleep(min(max(retry_after, 1.0), 15.0))
+                except TimeoutError:
+                    if attempt == 2:
+                        raise
+                    # A timed-out scoring request has no publishing side effect; retry is bounded
+                    # to the same three-attempt ceiling already used for HTTP 429/503.
+                    time.sleep(min(float(2 ** (attempt + 1)), 15.0))
             if response is None:
                 raise RuntimeError("Gemini Vision retry loop ended without a response")
             with response:
