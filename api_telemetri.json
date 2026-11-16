@@ -1,12 +1,12 @@
 {
-  "zaman": "2026-11-15T18:49:36+00:00",
+  "zaman": "2026-11-16T18:14:24+00:00",
   "servisler": [
     {
       "ad": "Pexels",
       "durum": "ok",
-      "kalan": 24754,
+      "kalan": 24742,
       "limit": 25000,
-      "kullanilan": 246,
+      "kullanilan": 258,
       "birim": "istek/ay",
       "reset_iso": "2026-12-12T13:51:48+00:00",
       "yenilenme": "aylık kota · saatlik 200 istek penceresi",
@@ -16,8 +16,8 @@
       "ad": "Gemini · Charon",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1489,
-      "kullanilan": 11,
+      "kalan": 1484,
+      "kullanilan": 16,
       "birim": "istek/gün",
       "model_sayisi": 50,
       "yenilenme": "günlük · her gün TR 10:00 (00:00 Pasifik) sıfırlanır",
@@ -46,9 +46,9 @@
     {
       "ad": "Google Drive",
       "durum": "ok",
-      "kalan": 3627771577,
+      "kalan": 3606166730,
       "limit": 16106127360,
-      "kullanilan": 12478355783,
+      "kullanilan": 12499960630,
       "birim": "bayt",
       "kirilim": [
         {
@@ -59,14 +59,14 @@
         },
         {
           "ad": "Ana Klasör & baslik.xlsx (Bilgi_Dozu_Yeni_Shorts)",
-          "boyut": 301523333,
-          "dosya": 70,
+          "boyut": 323128180,
+          "dosya": 75,
           "sahip": "active.sav81@gmail.com, galtundal81@gmail.com"
         },
         {
           "ad": "Onay Bekleyenler (Onay_Bekleyen)",
-          "boyut": 23209459,
-          "dosya": 7,
+          "boyut": 44814306,
+          "dosya": 12,
           "sahip": "galtundal81@gmail.com"
         }
       ],
@@ -88,18 +88,18 @@
     {
       "ad": "GitHub Actions",
       "durum": "ok",
-      "kalan": 1864.3,
+      "kalan": 1868.2,
       "limit": 2000,
-      "kullanilan": 135.7,
+      "kullanilan": 131.8,
       "birim": "dk/ay",
-      "actions_dakika": 135.7,
+      "actions_dakika": 131.8,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1864.3,
-      "api_kalan": 4997,
+      "actions_kalan": 1868.2,
+      "api_kalan": 4999,
       "api_limit": 5000,
       "yenilenme": "aylık 2.000 dk ücretsiz · her ayın 1'inde sıfırlanır",
-      "not_": "Bu ay 500 iş akışı koştu · Saatlik API: 4997/5000"
+      "not_": "Bu ay 500 iş akışı koştu · Saatlik API: 4999/5000"
     },
     {
       "ad": "Telegram Bot",
@@ -108,9 +108,9 @@
       "kalan": 30,
       "kullanilan": 0,
       "birim": "istek/sn",
-      "bot": "@tamirciAJAN_bot",
+      "bot": "@Bilgindozlu_bot",
       "yenilenme": "anlık · günlük kota sınırı yok",
-      "not_": "Onay kartları ve yayın bildirimleri aktif"
+      "not_": "Yayın bildirimleri aktif"
     }
   ],
   "secretler": [
