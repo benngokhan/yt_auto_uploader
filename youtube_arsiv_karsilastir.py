@@ -43,9 +43,13 @@ def main():
    tid=s.get('shortcutDetails',{}).get('targetId');row={'name':s['name'],'target_id':tid,'status':'incelenemedi','matches':[]}
    if not tid:results.append(row);continue
    p=td/f'c{idx}.mp4';req=d.files().get_media(fileId=tid)
-   with p.open('wb') as f:
-    dl=MediaIoBaseDownload(f,req);done=False
-    while not done:_,done=dl.next_chunk()
+   # Drive'dan silinmis aday (404) tum isi durdurmasin: atla ve devam et.
+   try:
+    with p.open('wb') as f:
+     dl=MediaIoBaseDownload(f,req);done=False
+     while not done:_,done=dl.next_chunk()
+   except Exception as e:
+    row['status']='drive_dosyasi_yok';print(idx,s['name'],'drive_dosyasi_yok',type(e).__name__,flush=True);results.append(row);continue
    dur=duration(p);h=hashes(p);row['duration']=round(dur,2)
    for v in archive:
     if abs(v['duration']-dur)>3:continue
