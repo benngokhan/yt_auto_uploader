@@ -1,12 +1,12 @@
 {
-  "zaman": "2026-11-16T19:17:29+00:00",
+  "zaman": "2026-11-17T01:30:15+00:00",
   "servisler": [
     {
       "ad": "Pexels",
       "durum": "ok",
-      "kalan": 24733,
+      "kalan": 24677,
       "limit": 25000,
-      "kullanilan": 267,
+      "kullanilan": 323,
       "birim": "istek/ay",
       "reset_iso": "2026-12-12T13:51:48+00:00",
       "yenilenme": "aylık kota · saatlik 200 istek penceresi",
@@ -16,8 +16,8 @@
       "ad": "Gemini · Charon",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1480,
-      "kullanilan": 20,
+      "kalan": 1498,
+      "kullanilan": 2,
       "birim": "istek/gün",
       "model_sayisi": 50,
       "yenilenme": "günlük · her gün TR 10:00 (00:00 Pasifik) sıfırlanır",
@@ -46,27 +46,27 @@
     {
       "ad": "Google Drive",
       "durum": "ok",
-      "kalan": 3606166730,
+      "kalan": 3594499608,
       "limit": 16106127360,
-      "kullanilan": 12499960630,
+      "kullanilan": 12511627752,
       "birim": "bayt",
       "kirilim": [
         {
           "ad": "Video + Kapak Kuyruğu (video kapak)",
-          "boyut": 233888680,
+          "boyut": 233703220,
           "dosya": 52,
           "sahip": "active.sav81@gmail.com, galtundal81@gmail.com"
         },
         {
           "ad": "Ana Klasör & baslik.xlsx (Bilgi_Dozu_Yeni_Shorts)",
-          "boyut": 323128180,
-          "dosya": 75,
+          "boyut": 334799949,
+          "dosya": 79,
           "sahip": "active.sav81@gmail.com, galtundal81@gmail.com"
         },
         {
           "ad": "Onay Bekleyenler (Onay_Bekleyen)",
-          "boyut": 44814306,
-          "dosya": 12,
+          "boyut": 56666888,
+          "dosya": 15,
           "sahip": "galtundal81@gmail.com"
         }
       ],
@@ -88,14 +88,14 @@
     {
       "ad": "GitHub Actions",
       "durum": "ok",
-      "kalan": 1867.4,
+      "kalan": 1765.7,
       "limit": 2000,
-      "kullanilan": 132.6,
+      "kullanilan": 234.3,
       "birim": "dk/ay",
-      "actions_dakika": 132.6,
+      "actions_dakika": 234.3,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1867.4,
+      "actions_kalan": 1765.7,
       "api_kalan": 4999,
       "api_limit": 5000,
       "yenilenme": "aylık 2.000 dk ücretsiz · her ayın 1'inde sıfırlanır",
