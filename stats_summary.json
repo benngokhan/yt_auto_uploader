@@ -1,12 +1,17 @@
 {
- "total": 38298,
- "day_gain": 56,
- "updated": 56,
+ "total": 38695,
+ "day_gain": 58,
+ "updated": 57,
  "baseline_count": 23,
  "compared_count": 48,
  "unavailable_count": 5,
  "dry_run": false,
  "top": [
+  {
+   "delta": 4,
+   "title": "Karanlıkta Gözümüz Gece Görüşünü Nasıl Açar? Korsan Bandı ve",
+   "file": "uzun_video_17.mp4"
+  },
   {
    "delta": 3,
    "title": "Vücudundaki Hücrelerin Yarısından Fazlası Aslında Bakteri! 🦠",
@@ -16,11 +21,6 @@
    "delta": 3,
    "title": "Ormanın Altındaki Gizli İnternet: Ağaçlar Birbiriyle Konuşuy",
    "file": "video_4.mp4"
-  },
-  {
-   "delta": 3,
-   "title": "Karanlıkta Gözümüz Gece Görüşünü Nasıl Açar? Korsan Bandı ve",
-   "file": "uzun_video_17.mp4"
   },
   {
    "delta": 3,
