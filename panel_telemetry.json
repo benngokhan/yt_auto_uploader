@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-17 10:43:18",
-  "generated_at_iso": "2026-11-17T10:43:18.375800+03:00",
+  "generated_at": "2026-11-17 11:58:07",
+  "generated_at_iso": "2026-11-17T11:58:07.046235+03:00",
   "folders": {
     "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
     "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
@@ -418,8 +418,8 @@
         "id": "1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo",
         "name": "baslik.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 106314,
-        "modifiedTime": "2026-11-15T17:10:23.728Z"
+        "size": 106313,
+        "modifiedTime": "2026-11-17T08:58:05.027Z"
       },
       {
         "id": "1YjYzlPGzBlkFCH6baStgv1DOOdttaFzU",
@@ -2743,10 +2743,10 @@
       "row": 2,
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-15 20:10",
+      "updated_at": "2026-11-17 11:58",
       "error_message": "",
-      "jobs_done": 101,
-      "last_action": "video_179.mp4 yayınlandı (https://youtu.be/4kiDwnoj9yE)"
+      "jobs_done": 102,
+      "last_action": "video_180.mp4 yayınlandı (https://youtu.be/B10GT7UKesA)"
     },
     {
       "row": 3,
@@ -2797,25 +2797,25 @@
       "row": 8,
       "name": "Kapak İşçisi (Drive Hazır Kapak -> YouTube)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-15 20:10",
+      "updated_at": "2026-11-17 11:58",
       "error_message": "",
-      "jobs_done": 101,
-      "last_action": "video_179.mp4 için hazır Drive kapağı uygulandı"
+      "jobs_done": 102,
+      "last_action": "video_180.mp4 için hazır Drive kapağı uygulandı"
     },
     {
       "row": 9,
       "name": "Yorumcu (Sabit Yorum İşçisi)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-15 20:10",
+      "updated_at": "2026-11-17 11:58",
       "error_message": "",
-      "jobs_done": 101,
-      "last_action": "video_179.mp4 altına ilk sabit yorum yazıldı"
+      "jobs_done": 102,
+      "last_action": "video_180.mp4 altına ilk sabit yorum yazıldı"
     },
     {
       "row": 10,
       "name": "Analitik çekici (YouTube API)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-15 20:10",
+      "updated_at": "2026-11-17 11:58",
       "error_message": "",
       "jobs_done": 30,
       "last_action": "30 videonun gerçek görüntülenme ve yorum verisi güncellendi"
