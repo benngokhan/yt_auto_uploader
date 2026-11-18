@@ -1,37 +1,37 @@
 {
-  "generated_at": "2026-11-16T19:28:07.711293+00:00",
+  "generated_at": "2026-11-18T04:14:45.386622+00:00",
   "used_count": 220,
   "method": "Drive yükleme tablosu + onay bekleyen metadata + Gemini anlamsal tekrar kontrolü + yerel benzerlik kapısı",
   "suggestions": [
     {
-      "title": "Kuşlar Yüksek Gerilim Hattına Konunca Neden Çarpılmaz? 🦅⚡",
+      "title": "Yıldırım Çarpıp Hayatta Kalanların Teninde Neden 'Lichtenberg Çiçekleri' Çıkar? ⚡ #bilgidozu #shorts",
       "score": 96,
-      "reason": "Fizik kurallarını merkeze alan, ilk saniyede görsel olarak canlandırılabilen güçlü bir soru sunar.",
-      "duplicate_check": "Geçmişteki yılan balığı veya yıldırım konularından tamamen farklı bir elektrik fiziği konusudur."
+      "reason": "Yıldırımın aşağıdan yukarıya çaktığı daha önce işlendi. Ancak yıldırımzedelerin vücudunda oluşan kalıcı elektrik damar izleri (Lichtenberg figürleri) görsel olarak çok güçlü ve tamamen farklı bir konu.",
+      "duplicate_check": "Geçmişte yıldırımın yönü işlendi, vücutta bıraktığı fraktal izler yeni."
     },
     {
-      "title": "Sakız Yutunca Midede 7 Yıl Kalır Efsanesi Neden Yalan? 🍬",
+      "title": "Denizanası Ömrünü Tersine Çevirip Bebekliğe Nasıl Geri Dönüyor? 🪼🔄 #bilgidozu #shorts",
+      "score": 96,
+      "reason": "Tardigrad ve ölümsüzlük kavramlarına kısmen değinildi ancak 'Turritopsis dohrnii' adlı denizanasının hücre transdiferansiyasyonu ile yaşlılıktan bebekliğe dönme döngüsü hiç işlenmedi.",
+      "duplicate_check": "Geçmişte tardigrad ve genel ölümsüzlük unsurları vardı, denizanasının hücresel tersine dönme döngüsü yeni."
+    },
+    {
+      "title": "Uçak Camındaki O Minik Delik Kabinin Patlamasını Nasıl Engelliyor? ✈️ #bilgidozu #shorts",
       "score": 95,
-      "reason": "Günlük hayatta herkesin duyduğu ama bilmediği popüler bir miti somut sindirim süreciyle çürütür.",
-      "duplicate_check": "Geçmiş başlıklardaki sakız, sindirim veya mide asidi konularından farklıdır."
+      "reason": "Uçak pencereleriyle ilgili daha önce 'minik delik' değinilmişti ancak deliğin fiziksel olarak kabin patlamasını nasıl engellediği ve basınç eşitleme mekanizması işlenmedi. Güçlü bir havacılık merakı uyandırır.",
+      "duplicate_check": "Geçmişte uçak penceresi deliği sadece varlık olarak soruldu, basınç fiziği işlenmedi."
     },
     {
-      "title": "Sıcak Su Soğuk Sudan Neden Daha Hızlı Buz Tutar? 🧊",
+      "title": "Ayna Karşısında Kendi Gözlerine Yakından Bakınca Yüzün Neden Canavarlaşıyor? 🪞 #bilgidozu #shorts",
       "score": 95,
-      "reason": "Mantığa tamamen ters gelen Mpemba etkisini güçlü bir çelişkiyle sunar.",
-      "duplicate_check": "Geçmişteki buzun kayganlığı veya kurbağanın donması konularından tamamen farklı bir termodinamik yasadır."
+      "reason": "Aynalar ve optik yanılsamalar işlendi (Süpernova, kör nokta). Ancak psikolojide 'Troxler Solması' ve aynada yüz distorsiyonu (Trouxler etkisi) ilk saniyede çok güçlü merak uyandırır.",
+      "duplicate_check": "Geçmişte ayna ve optik yanılsamalar verildi, nörolojik yüz distorsiyonu (ayna illüzyonu) yeni."
     },
     {
-      "title": "Kuş Sürülerinin Havada Çarpışmadan Dans Etmesinin Sırrı Ne? 🐦",
+      "title": "Kediler Hırıltıyla Sadece Mutluluğu Değil Kırık Kemikleri Nasıl İyileştiriyor? 🐈 #bilgidozu #shorts",
       "score": 94,
-      "reason": "Görsel olarak büyüleyici bir doğa olayının arkasındaki matematiksel senkronizasyonu açıklar.",
-      "duplicate_check": "Geçmişteki göçmen kuş veya böcek avlama konularından sürü dinamikleriyle ayrılır."
-    },
-    {
-      "title": "Hapşırırken Gözlerimizi Neden İstemsizce Kapatırız? 🤧",
-      "score": 93,
-      "reason": "Vücudun kontrol edemediği evrensel bir refleksi bilimsel kanıtla masaya yatırır.",
-      "duplicate_check": "Geçmişteki 'açıkken hapşırmak imkansız' başlığından farklı olarak göz kapama nedenine odaklanır."
+      "reason": "Geçmişte kedilerin mırıldamasına değinildi ancak hırıltı frekansının kemik yoğunluğunu ve iyileşmesini tetikleyen biyolojik bio-akustik frekans olduğu hiç anlatılmadı.",
+      "duplicate_check": "Geçmişte kedi mırıldaması sadece duygu durumu olarak verildi, kemik iyileştirme frekansı yeni."
     }
   ]
 }
