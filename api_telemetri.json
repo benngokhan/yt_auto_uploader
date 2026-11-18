@@ -1,12 +1,12 @@
 {
-  "zaman": "2026-11-17T19:20:22+00:00",
+  "zaman": "2026-11-18T01:35:50+00:00",
   "servisler": [
     {
       "ad": "Pexels",
       "durum": "ok",
-      "kalan": 24668,
+      "kalan": 24665,
       "limit": 25000,
-      "kullanilan": 332,
+      "kullanilan": 335,
       "birim": "istek/ay",
       "reset_iso": "2026-12-12T13:51:48+00:00",
       "yenilenme": "aylık kota · saatlik 200 istek penceresi",
@@ -16,8 +16,8 @@
       "ad": "Gemini · Charon",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1490,
-      "kullanilan": 10,
+      "kalan": 1498,
+      "kullanilan": 2,
       "birim": "istek/gün",
       "model_sayisi": 50,
       "yenilenme": "günlük · her gün TR 10:00 (00:00 Pasifik) sıfırlanır",
@@ -31,7 +31,7 @@
       "kullanilan": 1,
       "birim": "istek/gün",
       "yenilenme": "günlük kota · her gece 00:00 UTC sıfırlanır",
-      "not_": "Hızlı senaryo ve başlık motoru (Model: openai/gpt-oss-20b"
+      "not_": "Hızlı senaryo ve başlık motoru (Model: openai/gpt-oss-120b"
     },
     {
       "ad": "Pixabay (Yedek)",
@@ -77,25 +77,25 @@
     {
       "ad": "YouTube Data API",
       "durum": "ok",
-      "kalan": 8300,
+      "kalan": 10000,
       "limit": 10000,
-      "kullanilan": 1700,
+      "kullanilan": 0,
       "birim": "birim/gün",
-      "bugun_yukleme": 1,
+      "bugun_yukleme": 0,
       "yenilenme": "günlük · her gün TR 10:00 sıfırlanır",
       "not_": "Her Shorts yüklemesi ≈ 1700 birim (günde ~5 yükleme kapasitesi)"
     },
     {
       "ad": "GitHub Actions",
       "durum": "ok",
-      "kalan": 1755.8,
+      "kalan": 1753.8,
       "limit": 2000,
-      "kullanilan": 244.2,
+      "kullanilan": 246.2,
       "birim": "dk/ay",
-      "actions_dakika": 244.2,
+      "actions_dakika": 246.2,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1755.8,
+      "actions_kalan": 1753.8,
       "api_kalan": 4999,
       "api_limit": 5000,
       "yenilenme": "aylık 2.000 dk ücretsiz · her ayın 1'inde sıfırlanır",
