@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-18 17:18:55",
-  "generated_at_iso": "2026-11-18T17:18:55.241547+03:00",
+  "generated_at": "2026-11-18 20:09:24",
+  "generated_at_iso": "2026-11-18T20:09:24.276819+03:00",
   "folders": {
     "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
     "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
@@ -32,12 +32,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 20,
+    "ready_shorts": 19,
     "ready_longs": 0,
-    "total_ready": 20,
-    "days_of_stock": 20,
-    "next_short": "video_182.mp4",
-    "next_short_title": "Deniz Kabuğunu Kulağına Tutunca Duyduğun Ses Aslında Ne? 🐚👂 #bilgidozu #shorts",
+    "total_ready": 19,
+    "days_of_stock": 19,
+    "next_short": "video_183.mp4",
+    "next_short_title": "Kutup Ayılarının Kürkü Aslında Beyaz Değil, Derisi Simsiyah! 🐻‍❄️🔬 #bilgidozu #shorts",
     "next_long": null,
     "next_long_title": "",
     "missing_covers": []
@@ -418,8 +418,8 @@
         "id": "1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo",
         "name": "baslik.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 106260,
-        "modifiedTime": "2026-11-17T17:29:55.361Z"
+        "size": 106360,
+        "modifiedTime": "2026-11-18T17:09:22.923Z"
       },
       {
         "id": "1YjYzlPGzBlkFCH6baStgv1DOOdttaFzU",
@@ -1351,9 +1351,9 @@
       "file_name": "video_182.mp4",
       "number": 182,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Deniz Kabuğunu Kulağına Tutunca Duyduğun Ses Aslında Ne? 🐚👂 #bilgidozu #shorts",
       "description": "💬 Dürüst olalım: Küçükken deniz kabuğunu kulağına dayayıp 'gerçekten denizin sesi geliyor!' diye heyecanlanmayan var mı? 😄🐚 Peki sen kan akışı efsanesine inanmış mıydın? 👇\n\nDeniz kabuğunu kulağına dayadığında duyduğun o uğultu ne okyanusun sesi, ne de kulağındaki kan akışıdır! Eğer kan akışı efsanesi doğru olsaydı, koşup nabzını hızlandırdığında kabuğun içindeki sesin de şiddetlenmesi gerekirdi. Üstelik tamamen ses yalıtımlı sağır bir odaya (anekoik oda) girdiğinde kabuk anında buz gibi sessizleşir. Akustik fizikçilerine göre kıvrımlı kabuk boşluğu, ortamdaki fark edilmeyen minik hava titreşimlerini yakalayıp büyüten doğal bir Helmholtz yankı odasıdır.\n\n💬 Peki sen çocukken deniz kabuğunun içinde gerçekten okyanus sesi var sanmış mıydın? Yoruma yaz! 👇\n\n📚 Kaynak: University of Salford Acoustics • Scientific American\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #fizik #akustik #bilim #ilginçbilgiler",
       "tags": [
@@ -1371,7 +1371,7 @@
       ],
       "category_name": "Fizik ve Akustik",
       "pinned_comment": "Dürüst olalım: Küçükken deniz kabuğunu kulağına dayayıp 'gerçekten denizin sesi geliyor!' diye heyecanlanmayan var mı? 😄🐚 Peki sen kan akışı efsanesine inanmış mıydın? 👇",
-      "youtube_url": "",
+      "youtube_url": "https://youtu.be/_J95OOCW488",
       "has_drive_video": true,
       "drive_video_id": "1BASkZQ5R3roeLI5Jqb4XfTmlQlFPVe7f",
       "drive_video_size_mb": 6.93,
@@ -2743,10 +2743,10 @@
       "row": 2,
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-17 20:29",
+      "updated_at": "2026-11-18 20:09",
       "error_message": "",
       "jobs_done": 103,
-      "last_action": "video_181.mp4 yayınlandı (https://youtu.be/faFs-QeAvLI)"
+      "last_action": "video_182.mp4 yayınlandı (https://youtu.be/_J95OOCW488)"
     },
     {
       "row": 3,
@@ -2797,25 +2797,25 @@
       "row": 8,
       "name": "Kapak İşçisi (Drive Hazır Kapak -> YouTube)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-17 20:29",
+      "updated_at": "2026-11-18 20:09",
       "error_message": "",
       "jobs_done": 103,
-      "last_action": "video_181.mp4 için hazır Drive kapağı uygulandı"
+      "last_action": "video_182.mp4 için hazır Drive kapağı uygulandı"
     },
     {
       "row": 9,
       "name": "Yorumcu (Sabit Yorum İşçisi)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-17 20:29",
+      "updated_at": "2026-11-18 20:09",
       "error_message": "",
       "jobs_done": 103,
-      "last_action": "video_181.mp4 altına ilk sabit yorum yazıldı"
+      "last_action": "video_182.mp4 altına ilk sabit yorum yazıldı"
     },
     {
       "row": 10,
       "name": "Analitik çekici (YouTube API)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-17 20:29",
+      "updated_at": "2026-11-18 20:09",
       "error_message": "",
       "jobs_done": 30,
       "last_action": "30 videonun gerçek görüntülenme ve yorum verisi güncellendi"
