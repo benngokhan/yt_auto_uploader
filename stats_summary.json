@@ -1,16 +1,26 @@
 {
- "total": 38695,
- "day_gain": 58,
- "updated": 57,
- "baseline_count": 23,
+ "total": 39826,
+ "day_gain": 62,
+ "updated": 58,
+ "baseline_count": 24,
  "compared_count": 48,
- "unavailable_count": 5,
+ "unavailable_count": 4,
  "dry_run": false,
  "top": [
   {
-   "delta": 4,
+   "delta": 6,
    "title": "Karanlıkta Gözümüz Gece Görüşünü Nasıl Açar? Korsan Bandı ve",
    "file": "uzun_video_17.mp4"
+  },
+  {
+   "delta": 4,
+   "title": "Utandığında Neden Sadece Yüzün ve Kulakların Kızarır? 😳 #bil",
+   "file": "video_100.mp4"
+  },
+  {
+   "delta": 4,
+   "title": "Beynin Senden Sakladığı 3 Yanılsama! Özgür İraden Bile Senin",
+   "file": "uzun_video_3.mp4"
   },
   {
    "delta": 3,
@@ -21,16 +31,6 @@
    "delta": 3,
    "title": "Ormanın Altındaki Gizli İnternet: Ağaçlar Birbiriyle Konuşuy",
    "file": "video_4.mp4"
-  },
-  {
-   "delta": 3,
-   "title": "Güneşe Dönünce Hapşırıyor musun? Bu Bir Refleks: ACHOO! ☀️ #",
-   "file": "video_135.mp4"
-  },
-  {
-   "delta": 3,
-   "title": "Beynin Senden Sakladığı 3 Yanılsama! Özgür İraden Bile Senin",
-   "file": "uzun_video_3.mp4"
   }
  ]
 }
