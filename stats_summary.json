@@ -1,16 +1,21 @@
 {
- "total": 39826,
- "day_gain": 62,
- "updated": 58,
- "baseline_count": 24,
+ "total": 40939,
+ "day_gain": 65,
+ "updated": 59,
+ "baseline_count": 25,
  "compared_count": 48,
  "unavailable_count": 4,
  "dry_run": false,
  "top": [
   {
-   "delta": 6,
+   "delta": 7,
    "title": "Karanlıkta Gözümüz Gece Görüşünü Nasıl Açar? Korsan Bandı ve",
    "file": "uzun_video_17.mp4"
+  },
+  {
+   "delta": 5,
+   "title": "Beynin Senden Sakladığı 3 Yanılsama! Özgür İraden Bile Senin",
+   "file": "uzun_video_3.mp4"
   },
   {
    "delta": 4,
@@ -19,18 +24,13 @@
   },
   {
    "delta": 4,
-   "title": "Beynin Senden Sakladığı 3 Yanılsama! Özgür İraden Bile Senin",
-   "file": "uzun_video_3.mp4"
+   "title": "Baldır Kasların Aslında İkinci Kalbin! Kanı Kalbe Nasıl Taşı",
+   "file": "video_132.mp4"
   },
   {
    "delta": 3,
    "title": "Vücudundaki Hücrelerin Yarısından Fazlası Aslında Bakteri! 🦠",
    "file": "video_86.mp4"
-  },
-  {
-   "delta": 3,
-   "title": "Ormanın Altındaki Gizli İnternet: Ağaçlar Birbiriyle Konuşuy",
-   "file": "video_4.mp4"
   }
  ]
 }
