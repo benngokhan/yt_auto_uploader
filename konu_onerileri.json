@@ -1,37 +1,37 @@
 {
-  "generated_at": "2026-11-18T04:14:45.386622+00:00",
+  "generated_at": "2026-11-19T11:49:55.392895+00:00",
   "used_count": 220,
   "method": "Drive yükleme tablosu + onay bekleyen metadata + Gemini anlamsal tekrar kontrolü + yerel benzerlik kapısı",
   "suggestions": [
     {
-      "title": "Yıldırım Çarpıp Hayatta Kalanların Teninde Neden 'Lichtenberg Çiçekleri' Çıkar? ⚡ #bilgidozu #shorts",
+      "title": "Işık Hızında Giden Bir Arabanın Farlarını Yaksan Ne Olur? 🚗💡",
+      "score": 98,
+      "reason": "Einstein'ın görelilik teorisini popüler bilime uyarlayan, görsel potansiyeli yüksek ve izleyicide zihinsel bir patlama yaratan konu.",
+      "duplicate_check": "Işık hızı ve özel görelilik teorisi daha önce işlenmedi."
+    },
+    {
+      "title": "Dünya Bir Anda Dursaydı Okyanuslar Neden Kara Parçalarını Yutardı? 🌍🌊",
+      "score": 97,
+      "reason": "Dünyanın dönme hareketinin ani durması senaryosuyla muazzam bir görsel hayal gücü ve felaket bilimi potansiyeli sunuyor.",
+      "duplicate_check": "Dünyanın hızı işlendi ancak dönme hareketinin ani duruşunun okyanuslara etkisi işlenmedi."
+    },
+    {
+      "title": "Uçaklar Neden Yıldırım Çarpınca Düşmez? Faraday Kafesinin Görünmez Kalkanı! ✈️⚡",
       "score": 96,
-      "reason": "Yıldırımın aşağıdan yukarıya çaktığı daha önce işlendi. Ancak yıldırımzedelerin vücudunda oluşan kalıcı elektrik damar izleri (Lichtenberg figürleri) görsel olarak çok güçlü ve tamamen farklı bir konu.",
-      "duplicate_check": "Geçmişte yıldırımın yönü işlendi, vücutta bıraktığı fraktal izler yeni."
+      "reason": "Havacılık güvenliğiyle ilgili en büyük korkulardan birini bilimsel bir prensiple (Faraday kafesi) açıklayarak anında güven ve merak uyandırır.",
+      "duplicate_check": "Yıldırımlar ve uçak pencereleri işlendi ancak Faraday kafesi ve uçaklara yıldırım düşmesi işlenmedi."
     },
     {
-      "title": "Denizanası Ömrünü Tersine Çevirip Bebekliğe Nasıl Geri Dönüyor? 🪼🔄 #bilgidozu #shorts",
-      "score": 96,
-      "reason": "Tardigrad ve ölümsüzlük kavramlarına kısmen değinildi ancak 'Turritopsis dohrnii' adlı denizanasının hücre transdiferansiyasyonu ile yaşlılıktan bebekliğe dönme döngüsü hiç işlenmedi.",
-      "duplicate_check": "Geçmişte tardigrad ve genel ölümsüzlük unsurları vardı, denizanasının hücresel tersine dönme döngüsü yeni."
-    },
-    {
-      "title": "Uçak Camındaki O Minik Delik Kabinin Patlamasını Nasıl Engelliyor? ✈️ #bilgidozu #shorts",
+      "title": "Sakız Yutunca Midede 7 Yıl Kalır mı? İşte Sindirimin Gerçeği! 🍬🔬",
       "score": 95,
-      "reason": "Uçak pencereleriyle ilgili daha önce 'minik delik' değinilmişti ancak deliğin fiziksel olarak kabin patlamasını nasıl engellediği ve basınç eşitleme mekanizması işlenmedi. Güçlü bir havacılık merakı uyandırır.",
-      "duplicate_check": "Geçmişte uçak penceresi deliği sadece varlık olarak soruldu, basınç fiziği işlenmedi."
+      "reason": "Günlük hayatta herkesin çocukluğundan beri duyduğu yaygın bir efsaneyi somut ve bilimsel bir dille çürütüyor, ilk saniyede güçlü merak uyandırıyor.",
+      "duplicate_check": "Sindirim sistemi, mide asidi veya sakız efsaneleri daha önce işlenmedi."
     },
     {
-      "title": "Ayna Karşısında Kendi Gözlerine Yakından Bakınca Yüzün Neden Canavarlaşıyor? 🪞 #bilgidozu #shorts",
+      "title": "Neden Soğuk Havada Telefonların Şarjı Aniden Biter? 📱🔋",
       "score": 95,
-      "reason": "Aynalar ve optik yanılsamalar işlendi (Süpernova, kör nokta). Ancak psikolojide 'Troxler Solması' ve aynada yüz distorsiyonu (Trouxler etkisi) ilk saniyede çok güçlü merak uyandırır.",
-      "duplicate_check": "Geçmişte ayna ve optik yanılsamalar verildi, nörolojik yüz distorsiyonu (ayna illüzyonu) yeni."
-    },
-    {
-      "title": "Kediler Hırıltıyla Sadece Mutluluğu Değil Kırık Kemikleri Nasıl İyileştiriyor? 🐈 #bilgidozu #shorts",
-      "score": 94,
-      "reason": "Geçmişte kedilerin mırıldamasına değinildi ancak hırıltı frekansının kemik yoğunluğunu ve iyileşmesini tetikleyen biyolojik bio-akustik frekans olduğu hiç anlatılmadı.",
-      "duplicate_check": "Geçmişte kedi mırıldaması sadece duygu durumu olarak verildi, kemik iyileştirme frekansı yeni."
+      "reason": "Akıllı telefon kullanıcılarının her kış yaşadığı pratik bir sorunun kimya tabanlı gerçek sebebini gözler önüne seriyor.",
+      "duplicate_check": "Batarya kimyası ve soğuk hava etkisi geçmiş başlıklarda bulunmuyor."
     }
   ]
 }
