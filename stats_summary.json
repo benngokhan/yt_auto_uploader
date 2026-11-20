@@ -1,14 +1,19 @@
 {
- "total": 40939,
- "day_gain": 65,
- "updated": 59,
+ "total": 41048,
+ "day_gain": 70,
+ "updated": 58,
  "baseline_count": 25,
  "compared_count": 48,
  "unavailable_count": 4,
  "dry_run": false,
  "top": [
   {
-   "delta": 7,
+   "delta": 8,
+   "title": "Baldır Kasların Aslında İkinci Kalbin! Kanı Kalbe Nasıl Taşı",
+   "file": "video_132.mp4"
+  },
+  {
+   "delta": 6,
    "title": "Karanlıkta Gözümüz Gece Görüşünü Nasıl Açar? Korsan Bandı ve",
    "file": "uzun_video_17.mp4"
   },
@@ -21,11 +26,6 @@
    "delta": 4,
    "title": "Utandığında Neden Sadece Yüzün ve Kulakların Kızarır? 😳 #bil",
    "file": "video_100.mp4"
-  },
-  {
-   "delta": 4,
-   "title": "Baldır Kasların Aslında İkinci Kalbin! Kanı Kalbe Nasıl Taşı",
-   "file": "video_132.mp4"
   },
   {
    "delta": 3,
