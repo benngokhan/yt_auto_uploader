@@ -6,6 +6,7 @@ import textwrap
 import unittest
 import urllib.request
 from pathlib import Path
+from datetime import datetime as RealDateTime, timezone
 from unittest.mock import patch
 
 import slot_guard
@@ -24,8 +25,14 @@ class Reply:
     def read(self,*args): return self.body
 
 class WatchdogDispatchTests(unittest.TestCase):
-    def run_script(self, *, info, existing_log='', claims='', runs=(), fail_get=False):
+    def run_script(self, *, info, existing_log='', claims='', runs=(), fail_get=False,
+                   now='2026-10-30T11:30:00+00:00'):
         calls=[]
+        frozen_now=RealDateTime.fromisoformat(now)
+        class FrozenDateTime(RealDateTime):
+            @classmethod
+            def now(cls, tz=None):
+                return frozen_now.astimezone(tz) if tz else frozen_now.replace(tzinfo=None)
         with tempfile.TemporaryDirectory() as tmp:
             p=Path(tmp); (p/'uploaded.txt').write_text(existing_log,encoding='utf-8')
             (p/'slot_claims.txt').write_text(claims,encoding='utf-8')
@@ -44,6 +51,7 @@ class WatchdogDispatchTests(unittest.TestCase):
                 with patch.dict(os.environ,env,clear=False), \
                      patch.object(slot_guard,'watchdog_slot',return_value=info), \
                      patch.object(urllib.request,'urlopen',side_effect=fake_urlopen), \
+                     patch('datetime.datetime',FrozenDateTime), \
                      patch('sys.stdout',new_callable=io.StringIO):
                     try: exec(compile(watchdog_script(),'<watchdog>','exec'),{})
                     except SystemExit as exc:
@@ -86,6 +94,24 @@ class WatchdogDispatchTests(unittest.TestCase):
         self.assertEqual(calls,[])
         self.assertIn('alert=true',output)
         self.assertIn('doğrulanamadı',output)
+
+    def test_completed_failed_run_before_reservation_is_rescued_within_window(self):
+        key='2026-10-30T09:30Z'
+        run={'name':'YouTube Drive Uploader','event':'schedule','status':'completed',
+             'conclusion':'failure','created_at':'2026-10-30T09:31:00Z'}
+        calls,output=self.run_script(info=(key,'short','tescil'),runs=[run])
+        self.assertEqual(len(calls),1)
+        self.assertEqual(calls[0]['inputs']['recovery_slot'],key)
+        self.assertIn('failure',output)
+        self.assertIn('alert=true',output)
+
+    def test_rescue_is_blocked_after_six_hour_cutoff(self):
+        key='2026-10-30T09:30Z'
+        calls,output=self.run_script(info=(key,'short','tescil'),
+                                     now='2026-10-30T16:00:00+00:00')
+        self.assertEqual(calls,[])
+        self.assertIn('6 saatlik kurtarma sınırı aşıldı',output)
+        self.assertIn('alert=true',output)
 
     def test_started_scheduled_run_blocks_rescue(self):
         key='2026-10-30T09:30Z'

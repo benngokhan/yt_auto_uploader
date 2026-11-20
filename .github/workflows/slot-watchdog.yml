@@ -65,8 +65,13 @@ jobs:
                   except Exception:
                       continue
                   if slot - timedelta(minutes=25) <= created <= now:
-                      out.append((created, r.get("event"), r.get("status")))
-              return sorted(out)
+                      out.append({
+                      "created": created,
+                      "event": r.get("event"),
+                      "status": r.get("status"),
+                      "conclusion": r.get("conclusion"),
+                  })
+              return sorted(out, key=lambda run: run["created"])
 
           api_error = None
           try:
@@ -80,19 +85,29 @@ jobs:
           if api_error:
               run_info = f"GitHub işçi durumu doğrulanamadı ({api_error})."
           elif rlist:
-              c, ev, st = rlist[-1]
-              run_info = f"Run {c.strftime('%H:%M')} UTC ({ev}, {st}) — video yine de yayinda degil."
+              latest = rlist[-1]
+              detail = f", {latest['conclusion']}" if latest.get("conclusion") else ""
+              run_info = (
+                  f"Run {latest['created'].strftime('%H:%M')} UTC "
+                  f"({latest['event']}, {latest['status']}{detail}) — video yine de yayinda degil."
+              )
           else:
               run_info = "Run BASLAMADI (cron gecikmesi)."
 
           rescue = ""
           claimed = slot_claimed("slot_claims.txt", key)
+          active_run = any(run.get("status") != "completed" for run in rlist)
+          too_late = (now - slot) > timedelta(hours=6)
           if api_error:
               rescue = "Durum belirsiz; çift yayını önlemek için otomatik telafi durduruldu."
           elif claimed:
               rescue = "Slot ayrılmış fakat yayın kaydı yok; çift yayını önlemek için otomatik tekrar durduruldu."
-          elif kind == "tescil" and not rlist:
-              # Gecikmeli cron ve telafi, upload öncesi aynı kalıcı slotu ayırır.
+          elif kind == "tescil" and too_late:
+              rescue = "6 saatlik kurtarma sınırı aşıldı; geç yayın riskine karşı otomatik tekrar yapılmadı."
+          elif kind == "tescil" and active_run:
+              rescue = "Yayın çalışması hâlâ aktif; çift tetiklemeyi önlemek için kurtarma bekletildi."
+          elif kind == "tescil":
+              # A failed/completed run before reservation has no claim; safely retry within the 6h window.
               try:
                   durl = f"https://api.github.com/repos/{os.environ['REPO']}/actions/workflows/youtube-drive-uploader.yml/dispatches"
                   req = urllib.request.Request(
