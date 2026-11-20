@@ -1,37 +1,37 @@
 {
-  "generated_at": "2026-11-19T11:49:55.392895+00:00",
+  "generated_at": "2026-11-20T11:50:19.217466+00:00",
   "used_count": 220,
   "method": "Drive yükleme tablosu + onay bekleyen metadata + Gemini anlamsal tekrar kontrolü + yerel benzerlik kapısı",
   "suggestions": [
     {
-      "title": "Işık Hızında Giden Bir Arabanın Farlarını Yaksan Ne Olur? 🚗💡",
-      "score": 98,
-      "reason": "Einstein'ın görelilik teorisini popüler bilime uyarlayan, görsel potansiyeli yüksek ve izleyicide zihinsel bir patlama yaratan konu.",
-      "duplicate_check": "Işık hızı ve özel görelilik teorisi daha önce işlenmedi."
-    },
-    {
-      "title": "Dünya Bir Anda Dursaydı Okyanuslar Neden Kara Parçalarını Yutardı? 🌍🌊",
+      "title": "Balonun Üzerine Bir Damla Portakal Kabuğu Sıkınca Neden Patlar?",
       "score": 97,
-      "reason": "Dünyanın dönme hareketinin ani durması senaryosuyla muazzam bir görsel hayal gücü ve felaket bilimi potansiyeli sunuyor.",
-      "duplicate_check": "Dünyanın hızı işlendi ancak dönme hareketinin ani duruşunun okyanuslara etkisi işlenmedi."
+      "reason": "Kimyasal tepkimeyle anında gerçekleşen patlama anı sayesinde mükemmel bir görsel potansiyel barındırıyor.",
+      "duplicate_check": "Geçmiş başlıklarda portakal, limon suyu veya balon patlatma kimyası daha önce hiç işlenmedi."
     },
     {
-      "title": "Uçaklar Neden Yıldırım Çarpınca Düşmez? Faraday Kafesinin Görünmez Kalkanı! ✈️⚡",
+      "title": "Güneş Tutulmasında Kuşlar Neden Aniden Sessizleşip Yuvasına Uçar?",
       "score": 96,
-      "reason": "Havacılık güvenliğiyle ilgili en büyük korkulardan birini bilimsel bir prensiple (Faraday kafesi) açıklayarak anında güven ve merak uyandırır.",
-      "duplicate_check": "Yıldırımlar ve uçak pencereleri işlendi ancak Faraday kafesi ve uçaklara yıldırım düşmesi işlenmedi."
+      "reason": "Doğanın en çarpıcı olaylarından birini ve hayvanların instinktif tepkisini güçlü bir görselle sunuyor.",
+      "duplicate_check": "Geçmiş başlıklarda güneş tutulması ve kuşların bu konudaki davranışları daha önce ele alınmadı."
     },
     {
-      "title": "Sakız Yutunca Midede 7 Yıl Kalır mı? İşte Sindirimin Gerçeği! 🍬🔬",
+      "title": "Sakız Yutunca Midede 7 Yıl Kalır Efsanesi Neden Tamamen Yalan?",
       "score": 95,
-      "reason": "Günlük hayatta herkesin çocukluğundan beri duyduğu yaygın bir efsaneyi somut ve bilimsel bir dille çürütüyor, ilk saniyede güçlü merak uyandırıyor.",
-      "duplicate_check": "Sindirim sistemi, mide asidi veya sakız efsaneleri daha önce işlenmedi."
+      "reason": "Günlük hayatta herkesin çocukken duyduğu yaygın bir mite odaklanıyor ve ilk saniyede merak uyandırıyor.",
+      "duplicate_check": "Geçmiş başlıklarda sindirim, mide asidi veya sakız hakkında hiçbir içerik bulunmuyor."
     },
     {
-      "title": "Neden Soğuk Havada Telefonların Şarjı Aniden Biter? 📱🔋",
+      "title": "Uçak İniş Yaparken Işıklar Neden Tamamen Kapatılır?",
       "score": 95,
-      "reason": "Akıllı telefon kullanıcılarının her kış yaşadığı pratik bir sorunun kimya tabanlı gerçek sebebini gözler önüne seriyor.",
-      "duplicate_check": "Batarya kimyası ve soğuk hava etkisi geçmiş başlıklarda bulunmuyor."
+      "reason": "Uçak yolculuğu yapan herkesin merak ettiği ama güvenlik odaklı teknik bir detayı açıklıyor.",
+      "duplicate_check": "Geçmiş başlıklarda uçak pencerelerindeki delikler işlendi ancak iniş sırasındaki kabin ışıklandırması işlenmedi."
+    },
+    {
+      "title": "Kedi ve Köpekler Su İçerken Diliyle Suyu Nasıl Havaya Kaldırır?",
+      "score": 94,
+      "reason": "Evcil hayvan sahiplerinin her gün gördüğü ama fiziksel mekanizmasını bilmediği büyüleyici bir akışkanlar dinamiği.",
+      "duplicate_check": "Geçmiş başlıklarda kedi ve köpeklerin su içme fiziği, dil hareketleri veya akışkanlar mekaniği işlenmedi."
     }
   ]
 }
