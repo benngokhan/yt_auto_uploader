@@ -2,9 +2,21 @@ import os
 import json
 import subprocess
 import time
+from pathlib import Path
+
 import numpy as np
 import cv2
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
+
+try:
+    from .subtitle_utils import SubtitleFitError, clean_subtitle_block
+except ImportError:
+    from subtitle_utils import SubtitleFitError, clean_subtitle_block
+
+MOTOR_DIR = Path(__file__).resolve().parent
+WORKSPACE_ROOT = MOTOR_DIR.parent
+TEMP_DIR = WORKSPACE_ROOT / ".agent_tmp"
+OUTPUT_DIR = MOTOR_DIR / "cikti" / "renders"
 
 W, H = 1080, 1920
 FPS = 60
@@ -271,18 +283,23 @@ def make_upper_title_band(emoji_char, line1, line2):
 def make_subtitle_band(text_multiline, highlight_words):
     """Returns BGRA band of shape (240, 1080, 4) placed at y_offset = 1250."""
     band_h = 240
+    text_multiline = clean_subtitle_block(
+        text_multiline, max_lines=2, max_chars_per_line=42
+    )
     txt_layer = Image.new("RGBA", (W, band_h), (0, 0, 0, 0))
     sh_layer = Image.new("RGBA", (W, band_h), (0, 0, 0, 0))
     d_txt = ImageDraw.Draw(txt_layer)
     d_sh = ImageDraw.Draw(sh_layer)
 
     lines = text_multiline.split("\n")
-    font = ImageFont.truetype(FONT_BOLD_PATH, 40)
-    # Check width fit
-    for ln in lines:
-        if (font.getbbox(ln)[2] - font.getbbox(ln)[0]) > (W - 130):
-            font = ImageFont.truetype(FONT_BOLD_PATH, 35)
+    font = None
+    for size in (40, 38, 36, 34, 32, 30, 28, 26):
+        candidate = ImageFont.truetype(FONT_BOLD_PATH, size)
+        if all(candidate.getlength(line) <= W - 130 for line in lines):
+            font = candidate
             break
+    if font is None:
+        raise SubtitleFitError("subtitle does not fit in the visible frame")
 
     hl_set = {w.lower().strip(",.!?:;") for w in highlight_words}
     line_h = 54
@@ -409,9 +426,11 @@ def render_ken_burns(scene_idx, local_progress):
 
 # 5. Measured stems: music baseline 2 LU below speech; automatically duck
 # the music when the narrator talks, then release smoothly, with 3s fade-out.
-from pilot_engine.audio_balance import mix_speech_and_music
+from audio_balance import mix_speech_and_music
 print("Mixing measured speech + automatic music ducking...")
-master_audio_path = "/home/user/assets/audio/master_mix.wav"
+TEMP_DIR.mkdir(parents=True, exist_ok=True)
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+master_audio_path = str(TEMP_DIR / "master_mix_build_shorts_video.wav")
 mix_speech_and_music(
     scenes_meta, "/home/user/assets/audio/ambient_science_bgm.wav",
     TOTAL_DUR, master_audio_path,
@@ -419,7 +438,7 @@ mix_speech_and_music(
 print("Master audio mixed successfully:", master_audio_path)
 
 # 6. Stream all 60fps 1080x1920 frames directly into FFmpeg H.264 encoder + mux master audio!
-output_mp4 = "/home/user/bilgi_dozu_suda_parmaklar_neden_burusur_shorts.mp4"
+output_mp4 = str(OUTPUT_DIR / "bilgi_dozu_suda_parmaklar_neden_burusur_shorts.mp4")
 ffmpeg_cmd = [
     "ffmpeg", "-y",
     "-f", "rawvideo",
@@ -442,7 +461,8 @@ ffmpeg_cmd = [
 
 print(f"Rendering {TOTAL_FRAMES} frames at 1080x1920 @ 60fps -> {output_mp4} ...")
 t_render = time.time()
-log_f = open("/tmp/ffmpeg_render.log", "w")
+log_path = TEMP_DIR / f"ffmpeg_render_{os.getpid()}.log"
+log_f = log_path.open("w", encoding="utf-8")
 proc = subprocess.Popen(ffmpeg_cmd, stdin=subprocess.PIPE, stderr=log_f)
 
 half_cd = CROSS_DISSOLVE / 2.0  # 0.25s either side of scene boundary
@@ -522,7 +542,7 @@ proc.stdin.close()
 ret = proc.wait()
 log_f.close()
 if ret != 0:
-    print("FFmpeg error:", open("/tmp/ffmpeg_render.log").read()[-1500:])
+    print("FFmpeg error:", log_path.read_text(encoding="utf-8", errors="replace")[-1500:])
     raise SystemExit(ret)
 
 print(f"DONE in {time.time() - t_render:.1f}s! Saved {output_mp4} ({os.path.getsize(output_mp4)/(1024*1024):.2f} MB)")

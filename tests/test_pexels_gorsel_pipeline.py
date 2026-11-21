@@ -26,7 +26,7 @@ def _import_uret_without_persisting_quota_counter():
     return uret
 
 
-def _make_textured_photo(w=1200, h=1800, base_rgb=(45, 70, 95), bright_border=False) -> Image.Image:
+def _make_textured_photo(w=1200, h=1800, base_rgb=(145, 170, 190), bright_border=False) -> Image.Image:
     rng = np.random.default_rng(42)
     yy, xx = np.mgrid[0:h, 0:w]
     arr = np.zeros((h, w, 3), dtype=np.float32)
@@ -107,15 +107,32 @@ class PexelsGorselPipelineTests(unittest.TestCase):
         self.assertTrue(gorsel_uret._yeterince_uygun(pexels_hit, "water droplet", "water droplet", gevsek=False))
         self.assertFalse(gorsel_uret._yeterince_uygun(white_cutout, "water droplet", "water droplet", gevsek=False))
 
-    def test_anti_raw_pixel_guard_filters_white_studio_and_accepts_textured(self):
-        clean_im = _make_textured_photo(1080, 1620, base_rgb=(40, 65, 88), bright_border=False)
+    def test_anti_raw_pixel_guard_filters_white_studio_dark_and_accepts_textured(self):
+        clean_im = _make_textured_photo(1080, 1620, base_rgb=(150, 170, 190), bright_border=False)
         bad_im = _make_textured_photo(1080, 1620, base_rgb=(120, 120, 120), bright_border=True)
+        dark_im = _make_textured_photo(1080, 1620, base_rgb=(12, 18, 25), bright_border=False)
 
         kusur_clean, neden_clean = gorsel_uret._ham_kusurlu_mu(clean_im)
         kusur_bad, neden_bad = gorsel_uret._ham_kusurlu_mu(bad_im)
+        kusur_dark, neden_dark = gorsel_uret._ham_kusurlu_mu(dark_im)
         self.assertFalse(kusur_clean, neden_clean)
         self.assertTrue(kusur_bad)
         self.assertIn("beyaz_studyo_kesim", neden_bad)
+        self.assertTrue(kusur_dark)
+        self.assertIn("karanlik_gorsel", neden_dark)
+
+    def test_live_gemini_score_gate_rejects_absent_invalid_and_wrong_origin(self):
+        self.assertTrue(gorsel_uret._record_score_passes({
+            "score_origin": "live_gemini_vision", "semantic_similarity": 0.62,
+        }))
+        for record in (
+            {"score_origin": "live_gemini_vision", "semantic_similarity": 0.6199},
+            {"score_origin": "live_gemini_vision", "semantic_similarity": float("nan")},
+            {"score_origin": "live_gemini_vision", "semantic_similarity": None},
+            {"score_origin": "pexels_metadata_overlap_proxy", "semantic_similarity": 0.99},
+        ):
+            with self.subTest(record=record):
+                self.assertFalse(gorsel_uret._record_score_passes(record))
 
     def test_dikey_kirp_and_sinematik_isle_tame_bright_raw_photo(self):
         # Parlak gündüz fotoğrafı bile koyu-sinematik pozlamaya çekilmeli

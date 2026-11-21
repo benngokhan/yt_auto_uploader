@@ -131,7 +131,8 @@ class TasinanSesAyarlariTestleri(unittest.TestCase):
             for saglayici, ad in (("gemini_tts", "_gemini_tts"), ("edge", "_edge_tts"),
                                   ("xtts", "_xtts"), ("elevenlabs", "_elevenlabs")):
                 with self.subTest(saglayici=saglayici), mock.patch.object(tts, ad) as motor, \
-                        mock.patch.object(tts, "_ses_kontrol"):
+                        mock.patch.object(tts, "_ses_kontrol"), \
+                        mock.patch.object(tts, "_normalize_generated_audio"):
                     tts.uret("%50 ve 13 km", Path(gecici) / "a.wav", {"ses": {"saglayici": saglayici}})
                     self.assertEqual(motor.call_args[0][0], "Yüzde elli ve on üç kilometre")
 

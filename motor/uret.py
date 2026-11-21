@@ -905,17 +905,14 @@ def _anlatimi_uzat(konu: str, sahneler: list, hedef_toplam: int = 620) -> int:
 # ── ŞABLON v2.2 (sablon_v2 / video_196 Birebir Master Şablon) ───────────────
 PROMPT_V2 = (
     "Konu: {konu}\n\n"
-    "Bilgi Dozu YouTube Shorts için TANE TANE, YAVAŞ VE ÇOK ANLAŞILIR okunacak Türkçe bilimsel seslendirme metni, her sahnenin 2 satırlık vurucu üst başlığı ve gerçek bilimsel kaynağını yaz. Kurallar:\n"
-    "- TAM {n} cümle yaz. Her cümle 8-12 kelimeden oluşan (58-74 karakterlik), sade ve duru tek bir cümle olsun!\n"
-    "- HIZ VE DİKSİYON KURALI (ÇOK KRİTİK): Anlatıcının acele etmeden, tane tane okuyabilmesi için {n} cümlenin toplam uzunluğu KESİNLİKLE 430-505 karakter (58-68 kelime) arasında olsun (530 karakteri ASLA geçme!).\n"
-    "- KELİME SEÇİMİ KURALI (ÇOK KRİTİK): Tekerleme gibi zor telaffuz edilen ağır akademik/yabancı kelimeler ('fotoreseptörlerdeki', 'rodopsinin', 'rejenerasyonu', 'biyolüminesans', 'nörotransmitterlerin', 'indirger') YASAK! Bunların yerine kulağın tek seferde şıp diye anlayacağı günlük, sade Türkçe karşılıklar kullan ('gözdeki ışık hücreleri', 'gece görüş boyası', 'yenilenmesi', 'sıfıra düşürür'). Kelimelere üst üste uzun ekler yığma; doğal nefes yerlerine virgül koy.\n"
-    "- 1. cümle: KANCA (8-11 kelime). Merak uyandıran net soru.\n"
-    "- 2. cümle: PROBLEM/DURUM (9-12 kelime), yaygın yanılgıyı yıkan sade cümle.\n"
-    "- 3-{son}: BİLİMSEL AÇIKLAMA (her biri 9-12 kelime). Her cümlede TEK somut mekanizma ve mümkünse TEK gerçek bilimsel sayı "
-    "(uydurma sayı YASAK, yalnızca doğrulanmış gerçek değer).\n"
-    "- Son cümle (8-11 kelime): net özet sonuç + izleyiciyi düşünmeye çağıran kısa soru.\n"
-    "- Selamlama, 'abone olun', 'takip et' YASAK (motor kendi ekler).\n"
-    "- Kısaltma, parantez, üç nokta kullanma. Sesli okunduğunda doğal ve rahat aksın.\n"
+    "Bilgi Dozu için 6 bilgi sahnesi + motorun ekleyeceği 1 CTA sahnesinden oluşan kısa Türkçe bilim Shorts metni yaz.\n"
+    "- 'cumleler' dizisine TAM {content_scenes} kısa bilgi cümlesi yaz; CTA cümlesini yazma. Motor 7. sahneye 'Daha fazla Bilgi Dozu için takip et!' ekler.\n"
+    "- Her bilgi cümlesi tek cümle, yaklaşık 3-5 kelime ve 18-30 karakter olsun. Toplam bilgi metni yaklaşık 120-175 karakter olsun; motor CTA'sı ile toplam ses metni 160-220 karakteri aşmasın.\n"
+    "- Her sahne 2-3 saniyeye sığmalı. Gereksiz giriş, bağlaç, tekrar ve dolgu sözü kullanma; bir cümlede tek net bilgi ver.\n"
+    "- KELİME SEÇİMİ: Tekerleme gibi zor akademik/yabancı kelimeler ('fotoreseptörlerdeki', 'rodopsinin', 'rejenerasyonu', 'biyolüminesans') YASAK; kulağın hemen anlayacağı sade Türkçe kullan.\n"
+    "- 1. cümle merak uyandıran kısa soru. 2-{son} cümleler yeni ve somut bilimsel ayrıntılar olsun; uydurma sayı verme.\n"
+    "- 'sahne_basliklari' TAM {content_scenes} elemanlı olsun; motor CTA başlığını ayrıca ekler. Başlıklar vurucu, TAM BÜYÜK HARF ve satır başına en fazla 18 karakter olsun.\n"
+    "- Kısaltma, parantez ve üç nokta kullanma. Selamlama veya CTA ekleme.\n"
     + TERIM_KURALLARI + SAYI_KURALLARI +
     "- 'sahne_basliklari': TAM {n} elemanlı dizi. Her cümle için dilbilgisi düzgün, vurucu 2 satır TAM BÜYÜK HARF başlık (her satır EN FAZLA 18 karakter, kelime ortasından bölünmez) ve anlamına uygun ikon ('?', '▼', '⚡', '▲', '!', '✔'). Örnek: "
     "{{\"ikon\":\"?\",\"satir1\":\"ATEŞİN VARKEN\",\"satir2\":\"NEDEN ÜŞÜRSÜN?\"}}, "
@@ -1107,8 +1104,9 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
     except Exception as h:
         raise SystemExit(f"Şablon v2.2 motoru yüklenemedi (motor/shorts_pipeline.py): {h}")
 
-    n = max(4, min(8, int(n or 7)))
-    istem = PROMPT_V2.format(konu=konu, n=n, son=n - 1)
+    n = 7
+    content_scenes = n - 1
+    istem = PROMPT_V2.format(konu=konu, n=n, son=n - 1, content_scenes=content_scenes)
     for deneme in range(3):
         veri = _llm_json(istem, ayar, _LLM_SISTEM)
         cumleler = veri.get("cumleler") or veri.get("sahneler") or []
@@ -1122,7 +1120,7 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
             if c:
                 duzgun.append(c)
         cumleler = duzgun
-        tekrarlar = _tekrar_eden_cumleler(cumleler[:n])
+        tekrarlar = _tekrar_eden_cumleler(cumleler[:content_scenes])
         _arsivle(f"senaryo_ham_deneme{deneme + 1}",
                  "\n".join(f"{i}. {c}" for i, c in enumerate(cumleler, start=1))
                  + f"\n\ntekrar denetimi (cümle, cümle, benzerlik): {tekrarlar or 'tekrar yok'}"
@@ -1131,39 +1129,38 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
             break
         print(f"Senaryoda tekrar eden cümle var {tekrarlar}; "
               + ("yeniden isteniyor" if deneme < 2 else "UYARI: 3 denemede de düzelmedi"))
-        istem = (PROMPT_V2.format(konu=konu, n=n, son=n - 1)
+        istem = (PROMPT_V2.format(konu=konu, n=n, son=n - 1, content_scenes=content_scenes)
                  + "\nÖNCEKİ DENEMEDE aynı bilgiyi iki cümlede tekrar ettin. Her cümle farklı ve yeni bir bilgi versin.")
-    if len(cumleler) < 4:
-        raise SystemExit(f"v2 sahne planı: LLM yeterli cümle vermedi ({len(cumleler)}); video üretilmedi.")
-    cumleler = cumleler[:n]
+    if len(cumleler) < content_scenes:
+        raise SystemExit(
+            f"v2 planı tam 6 kısa bilgi cümlesi ister; LLM {len(cumleler)} verdi, video üretilmedi."
+        )
+    cumleler = cumleler[:content_scenes]
+    if any("takip et" in line.lower() for line in cumleler):
+        raise SystemExit("v2 planı CTA'yı yazmamalı; son sahneye motor ekler.")
+    kapanis_cta = "Daha fazla Bilgi Dozu için takip et!"
+    cumleler.append(kapanis_cta)
 
     k_l1, k_l2 = _konu_iki_satir(konu, veri.get("kapak_baslik"))
     llm_basliklar = veri.get("sahne_basliklari")
     cfg = {"title": [[k_l1, "g"], [k_l2]]}
-    if isinstance(llm_basliklar, list) and len(llm_basliklar) >= len(cumleler):
-        cfg["scene_headlines"] = llm_basliklar[:len(cumleler)]
+    if isinstance(llm_basliklar, list) and len(llm_basliklar) >= content_scenes:
+        cfg["scene_headlines"] = llm_basliklar[:content_scenes] + [
+            {"icon": "?", "line1": "DAHA FAZLA", "line2": "BİLGİ DOZU"}
+        ]
     try:
         basliklar = _sp.resolve_scene_headlines(cfg, cumleler, len(cumleler))
     except Exception as h:
         print(f"Başlık çözümleyici uyarısı: {type(h).__name__}; yedek başlık kullanılıyor")
         basliklar = [{"icon": "?", "line1": k_l1, "line2": k_l2}] + [
             {"icon": "!", "line1": tr_upper(c.split()[0] if c.split() else ""), "line2": "BİLİM"}
-            for c in cumleler[1:]
-        ]
+            for c in cumleler[1:-1]
+        ] + [{"icon": "?", "line1": "DAHA FAZLA", "line2": "BİLGİ DOZU"}]
 
     # Yalnız allowlist'te, erişilebilir HTTPS URL'si doğrulanmışsa kaynak gösterilir.
     ham_kaynak = _kaynak_temizle(veri.get("kaynak_url"), kaynaksiz_etiket=str(veri.get("kaynak") or ""))
 
-    # Saf 3D Kapanış Ekranı (v2.2): başlıklar saf cümlelerden çözüldükten SONRA son sahneye sabit CTA eklenir;
-    # "Daha fazla Bilgi Dozu..." başlar başlamaz ekran kararır ve tam "takip et!" dendiğinde fare tıklar.
-    kapanis_cta = "Daha fazla Bilgi Dozu için takip et!"
-    if "takip et" not in cumleler[-1].lower():
-        son_c = cumleler[-1].rstrip()
-        if son_c and son_c[-1] not in ".!?":
-            son_c += "?"
-        cumleler[-1] = f"{son_c} {kapanis_cta}"
-
-    print(f"Şablon v2.2 planı: {len(cumleler)} cümle (+ Saf 3D Kapanış CTA), kapak=[{k_l1} / {k_l2}], {ham_kaynak or 'kaynak yok (gösterilmeyecek)'}")
+    print(f"Şablon v2.2 planı: {len(cumleler)} sahne (6 kısa bilgi + tek sahne CTA), kapak=[{k_l1} / {k_l2}], {ham_kaynak or 'kaynak yok (gösterilmeyecek)'}")
     return [{"ses": c,
              "baslik1": b.get("line1", ""),
              "baslik2": b.get("line2", ""),
@@ -1219,47 +1216,73 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict]
     return sahneler_q, yedekler
 
 
+def _copy_arena_voice_audio(scene_lines: list[str], work_dir: Path) -> Path:
+    """Copy caller-supplied Arena audio and bind its declared source to the narration.
+
+    The handoff records a caller attestation, not cryptographic proof of provider
+    origin; the downstream manifest preserves that distinction.
+    """
+    import hashlib
+    import shutil
+    from shorts_acceptance import sha256_file
+
+    source_value = os.getenv("MIRA_ARENA_AUDIO_FILE", "").strip()
+    voice_id = os.getenv("MIRA_ARENA_VOICE_ID", "").strip()
+    language = os.getenv("MIRA_ARENA_VOICE_LANGUAGE", "tr").strip()
+    if not source_value or not voice_id:
+        raise SystemExit(
+            "Shorts v2 has no legacy-TTS fallback. Supply MIRA_ARENA_AUDIO_FILE and "
+            "MIRA_ARENA_VOICE_ID from a live Arena narration."
+        )
+    if not voice_id.startswith("voice-") or language not in {"tr", "tr-TR"}:
+        raise SystemExit("Arena voice ID/language provenance is invalid; v2 audio import stopped.")
+    source = Path(source_value).expanduser().resolve()
+    if not source.is_file() or source.stat().st_size == 0:
+        raise SystemExit("MIRA_ARENA_AUDIO_FILE is missing or empty; legacy TTS is disabled for v2.")
+
+    work_dir.mkdir(parents=True, exist_ok=True)
+    raw_wav = work_dir / "vo_raw.wav"
+    if source != raw_wav.resolve():
+        shutil.copyfile(source, raw_wav)
+    narration = " ".join(" ".join(str(line).split()) for line in scene_lines)
+    manifest = {
+        "provider": "arena.generate_speech",
+        "generation": "caller_supplied",
+        "provenance_status": "caller_attested_unverified",
+        "voice_id": voice_id,
+        "language": language,
+        "narration_sha256": hashlib.sha256(narration.encode("utf-8")).hexdigest(),
+        "audio_sha256": sha256_file(raw_wav),
+        "source_filename": source.name,
+    }
+    (work_dir / "voice_provenance_v2.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    return raw_wav
+
+
 def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     """ŞABLON v2.2 üretim hattı: sahne planı -> tek istek ses -> görseller ->
     shorts_pipeline.py all (MİRA v2.2 + Saf 3D Kapanış) -> kapak -> onay."""
     import shutil
     from PIL import Image
-    import tts
+    from shorts_acceptance import SHORTS_VERSION, TEMPLATE_VERSION, validate_script
 
-    re_ = sys.modules.get("render_engine") or motor_hazirla(ayar)
-    kok = KOK / "motor"
-    calisma = kok / "cikti" / "son"
-    if calisma.exists():
-        shutil.rmtree(calisma, ignore_errors=True)
-    calisma.mkdir(parents=True, exist_ok=True)
+    if int(sahne_sayisi) != 7:
+        raise SystemExit("Shorts v2 tam 7 sahne ister; legacy/TTS yoluna geçiş yapılmadı.")
+    calisma = MOTOR / "cikti" / "son"
 
-    sahneler = sahne_plani_v2(a.konu, sahne_sayisi, ayar)
-    anlatim = " ".join(str(x["ses"]).strip() for x in sahneler)
-    print(f"Anlatım (ilk): {len(anlatim)} karakter / {len(sahneler)} cümle")
+    sahneler = sahne_plani_v2(a.konu, 7, ayar)
     _arsivle_senaryo("senaryo_1_plan_sonrasi", sahneler)
-    _terim_birligi_sagla(sahneler, ayar, "uzatma öncesi")   # isimlendirme listesi tek ada inmeli
-    # Dengeli orta tempo (~13.1 krk/sn genel akış) ile 39-44 sn video için ideal metin 480-545 karakterdir
-    if len(anlatim) < 485 and len(sahneler) >= 2:
-        kapanis_cta = "Daha fazla Bilgi Dozu için takip et!"
-        son_ham = str(sahneler[-1]["ses"]).replace(kapanis_cta, "").strip()
-        sahneler[-1]["ses"] = son_ham
-        _anlatimi_uzat(a.konu, sahneler, hedef_toplam=475)
-        son_yeni = str(sahneler[-1]["ses"]).rstrip()
-        if son_yeni and son_yeni[-1] not in ".!?":
-            son_yeni += "."
-        if "takip et" not in son_yeni.lower():
-            sahneler[-1]["ses"] = f"{son_yeni} {kapanis_cta}"
-    _arsivle_senaryo("senaryo_2_uzatma_sonrasi", sahneler)
-    _terim_birligi_sagla(sahneler, ayar, "uzatma sonrası")  # düzeltilemezse üretim durur
-    _sayi_denetimi(sahneler, ayar)                           # düzeltilemezse üretim durur
-    _arsivle_senaryo("senaryo_2b_terim_ve_sayi_sonrasi", sahneler)
+    _terim_birligi_sagla(sahneler, ayar, "kısa v2 planı")
+    _sayi_denetimi(sahneler, ayar)
+    _arsivle_senaryo("senaryo_2_terim_ve_sayi_sonrasi", sahneler)
     _yazim_denetimi(sahneler, ayar)
     _arsivle_senaryo("senaryo_3_yazim_denetimi_sonrasi", sahneler)
-    _baslik_denetimi(sahneler, ayar)  # yalnız başlıklar; düzeltilemezse üretim durur
+    _baslik_denetimi(sahneler, ayar)
     _arsivle_senaryo("senaryo_4_baslik_denetimi_sonrasi_SON", sahneler)
-    _senaryo_son_kapi(sahneler)                              # yapay zekâsız son bakış; ihlal varsa üretim durur
-    _baslik_anlam_denetimi(sahneler, ayar)                   # yalnız uyarı
-    # Yalnız UYARI: metin değişmez, üretim durmaz (motor/senaryo_denetim.py)
+    _senaryo_son_kapi(sahneler)
+    _baslik_anlam_denetimi(sahneler, ayar)
     try:
         import senaryo_denetim as _sd
         _uy = _sd.uyarilar([x["ses"] for x in sahneler])
@@ -1268,65 +1291,108 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         _arsivle("senaryo_uyarilari", "\n".join(_uy) or "uyarı yok")
     except Exception as _dh:  # noqa: BLE001
         print(f"Senaryo uyarı denetimi çalışmadı ({type(_dh).__name__})")
-    kalan_tekrar = _tekrar_eden_cumleler([x["ses"] for x in sahneler])
-    if kalan_tekrar:
-        print(f"UYARI: senaryoda tekrar eden cümleler kaldı {kalan_tekrar}")
+
+    script_lines = [" ".join(str(x.get("ses") or "").split()) for x in sahneler]
+    if script_lines[-1] != _CTA or any(_CTA in line for line in script_lines[:-1]):
+        raise SystemExit("Shorts v2 tam altı içerik cümlesi ve sabit 7. sahne CTA'sı ister.")
+    script_check = validate_script(sahneler, topic=a.konu)
+    anlatim = script_check["narration"]
+    if not 80 <= len(anlatim) <= 240:
+        raise SystemExit(
+            f"V2 anlatım uzunluğu 80–240 karakter olmalı ({len(anlatim)}); "
+            "7 sahne için uzatma veya legacy TTS uygulanmadı."
+        )
     for sira, x in enumerate(sahneler, start=1):
         print(f"  senaryo {sira}: [{x.get('baslik1', '')} / {x.get('baslik2', '')}] {x['ses']}")
-    anlatim = " ".join(str(x["ses"]).strip() for x in sahneler)
-    print(f"Anlatım: {len(anlatim)} karakter / {len(sahneler)} cümle")
-    if len(anlatim) < 300:
-        raise SystemExit(f"Anlatım çok kısa: {len(anlatim)} karakter; video üretilmedi.")
+    print(f"Anlatım: {len(anlatim)} karakter / {len(sahneler)} sahne")
 
-    # 1) TEK İSTEK SES (kural: tek anlatıcı, tek ton)
-    tek_wav = calisma / "vo_tek.wav"
-    tts.uret(anlatim, tek_wav, ayar)
-    if not tek_wav.exists():
-        raise SystemExit("Ses üretilemedi; video oluşturulmadı.")
-    print(f"Tek istek ses hazır: {round(re_.wav_duration(str(tek_wav)), 2)} sn")
+    if getattr(a, "plan_only", False):
+        plan_dir = MOTOR / "cikti" / "plan_only"
+        plan_dir.mkdir(parents=True, exist_ok=True)
+        plan_path = plan_dir / "shorts_v2_plan.json"
+        plan_path.write_text(json.dumps({
+            "topic": a.konu,
+            "shorts_version": SHORTS_VERSION,
+            "template_version": TEMPLATE_VERSION,
+            "scene_count": 7,
+            "voice_speed_factor": 1.0,
+            "script_lines": script_lines,
+            "narration": anlatim,
+            "plan_only": True,
+        }, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"PLAN-ONLY: metin planı yazıldı; ses sentezi ve render çalıştırılmadı: {plan_path}")
+        return 0
+
+    if calisma.exists():
+        shutil.rmtree(calisma, ignore_errors=True)
+    calisma.mkdir(parents=True, exist_ok=True)
+    vdir = calisma / "v2"
+    vdir.mkdir(parents=True, exist_ok=True)
+    (vdir / "script.txt").write_text("\n".join(script_lines) + "\n", encoding="utf-8")
+    raw_wav = _copy_arena_voice_audio(script_lines, vdir)
 
     if getattr(a, "sadece_ses", False):
         ses_onay = calisma / "ses_onay.wav"
-        shutil.copyfile(tek_wav, ses_onay)
-        tek_wav.unlink(missing_ok=True)
-        print(f"Sadece ses üretildi: {ses_onay}")
+        shutil.copyfile(raw_wav, ses_onay)
+        print(f"Yalnızca Arena sesi kopyalandı; sentez/render yapılmadı: {ses_onay}")
         return 0
 
-    # 2) GÖRSELLER (sahne başına bir görsel, sinematik + konuya %100 alakalı)
+    # 2) GÖRSELLER (v2 fail-closed: all seven scenes require live Pexels + Gemini Vision)
     gorsel_klasoru = calisma / "gorseller"
     gorsel_klasoru.mkdir(parents=True, exist_ok=True)
     import gorsel_uret
-    aramalar, yedekler = _gorsel_aramalari(
-        a.konu,
-        [s["ses"].replace("Daha fazla Bilgi Dozu için takip et!", "").strip() or a.konu for s in sahneler],
-        ayar,
-    )
-    parallelar = gorsel_uret.sahneler_icin_gorseller(
-        [{"gorsel": ar["ana"], "gorsel_anahtar": ar["ana"], "gorsel_alternatif": ar.get("alternatif", ""), "ses": s["ses"]}
-         for s, ar in zip(sahneler, aramalar)],
-        gorsel_klasoru, yedek_sorgular=yedekler)
-    if len(parallelar) != len(sahneler):
-        raise SystemExit(f"Görsel seçim sonucu sahne sayısıyla uyuşmuyor: {len(parallelar)} != {len(sahneler)}")
 
-    # 3) ONAYLI sablon_v2 MOTORU (shorts_pipeline + endcard_v2)
-    vdir = calisma / "v2"
-    vdir.mkdir(parents=True, exist_ok=True)
-    from PIL import Image
-    for i, p in enumerate(parallelar, start=1):
-        hedef_sahne = vdir / f"s{i}.jpg"
-        if p is None:
-            # Görsel seçilmediyse düz zemin; başlık ve altyazı render motorunda yine görünür.
-            Image.new("RGB", (1080, 1920), (10, 17, 23)).save(hedef_sahne, "JPEG", quality=94)
-        else:
-            with Image.open(p) as im_p:
-                im_p.convert("RGB").save(hedef_sahne, "JPEG", quality=94)
+    visual_sentences = [str(s["ses"]) for s in sahneler[:-1]] + [str(a.konu)]
+    aramalar, yedekler = _gorsel_aramalari(a.konu, visual_sentences, ayar)
+    visual_scene_inputs = [
+        {
+            "gorsel": ar["ana"],
+            "gorsel_anahtar": ar["ana"],
+            "gorsel_alternatif": ar.get("alternatif", ""),
+            "ses": visual_sentences[index],
+        }
+        for index, ar in enumerate(aramalar)
+    ]
+    parallelar = gorsel_uret.sahneler_icin_gorseller(
+        visual_scene_inputs, gorsel_klasoru, yedek_sorgular=yedekler
+    )
+    if len(parallelar) != 7 or any(path is None for path in parallelar):
+        raise SystemExit("Shorts v2 fail-closed: yedi sahnenin tamamı canlı görsel seçimini geçmedi.")
+
     secim_raporu_yolu = gorsel_klasoru / "gorsel_secim_raporu.json"
-    try:
-        secim_raporu = json.loads(secim_raporu_yolu.read_text(encoding="utf-8"))
-    except Exception:
-        secim_raporu = {"scenes": []}
-    shutil.copyfile(tek_wav, vdir / "vo_raw.wav")
-    (vdir / "script.txt").write_text(anlatim + "\n", encoding="utf-8")
+    if not secim_raporu_yolu.is_file():
+        raise SystemExit("Canlı görsel seçim raporu eksik; Shorts v2 durduruldu.")
+    secim_raporu = json.loads(secim_raporu_yolu.read_text(encoding="utf-8"))
+    rows = secim_raporu.get("scenes")
+    if not isinstance(rows, list) or len(rows) != 7:
+        raise SystemExit("Canlı görsel seçim raporu tam yedi sahne içermiyor.")
+    for index, row in enumerate(rows, start=1):
+        selected = row.get("selected") if isinstance(row, dict) else None
+        if not isinstance(selected, dict) or selected.get("provider") != "pexels" \
+                or selected.get("score_origin") != "live_gemini_vision":
+            raise SystemExit(f"Shorts v2 sahne {index}: canlı Pexels/Gemini Vision kanıtı yok.")
+
+    from shorts_acceptance import sha256_file
+    render_inputs = []
+    for index, path in enumerate(parallelar, start=1):
+        target = vdir / f"s{index}.jpg"
+        with Image.open(path) as image:
+            image.convert("RGB").save(target, "JPEG", quality=94)
+        render_inputs.append({"file": target.name, "sha256": sha256_file(target)})
+
+    visual_validation = {
+        "version": 2,
+        "mode": "production_v2",
+        "generation": "live",
+        "fallback_policy": "fail_closed",
+        "semantic_model": secim_raporu.get("semantic_model"),
+        "semantic_threshold": secim_raporu.get("threshold"),
+        "scenes": rows,
+        "render_inputs": render_inputs,
+    }
+    (vdir / "visual_validation.json").write_text(
+        json.dumps(visual_validation, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
 
     # Künye: kaynak bu videonun kendi senaryosundan; yoksa kaynak satırı gösterilmez.
     kaynak_url = str(sahneler[0].get("kaynak") or "")
@@ -1335,6 +1401,10 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     gorsel_notu = ""
 
     cfg = {
+        "shorts_version": SHORTS_VERSION,
+        "template_version": TEMPLATE_VERSION,
+        "production_mode": "production_v2",
+        "voice_speed_factor": 1.0,
         "title": [[sahneler[0]["baslik1"], "g"], [sahneler[0]["baslik2"]]],
         "scene_headlines": [{"icon": s.get("ikon", "!"), "line1": s["baslik1"], "line2": s["baslik2"]}
                             for s in sahneler],
@@ -1378,6 +1448,32 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     hedef_kapak = onay_dir / "kapak.jpg"
     shutil.copyfile(cikti, hedef_mp4)
 
+    # Keep the complete local proof bundle, then verify the delivered copy against it.
+    evidence_dir = onay_dir / "evidence_v2"
+    evidence_dir.mkdir(parents=True, exist_ok=True)
+    for name in (
+        "render_manifest_v2.json", "visual_validation.json", "voice_provenance_v2.json",
+        "script.txt", "timing.json", "audio_qc.json", "vo_raw.wav", "vo_final.wav", "mix.wav",
+    ):
+        source_path = vdir / name
+        if source_path.is_file():
+            shutil.copyfile(source_path, evidence_dir / name)
+    for name in cfg["scenes"]:
+        shutil.copyfile(vdir / name, evidence_dir / name)
+    (evidence_dir / "shorts_config.json").write_text(
+        json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    ffprobe = shutil.which("ffprobe")
+    if not ffprobe:
+        raise SystemExit("FFprobe yok; teslim MP4 SHA256/süre doğrulaması yapılamadı.")
+    probe = subprocess.run(
+        [ffprobe, "-v", "error", "-show_entries", "format=duration",
+         "-of", "default=noprint_wrappers=1:nokey=1", str(hedef_mp4)],
+        check=True, capture_output=True, text=True, timeout=60,
+    )
+    from shorts_acceptance import validate_render_manifest_v2
+    validate_render_manifest_v2(evidence_dir, cfg, probe.stdout.strip(), mp4_path=hedef_mp4)
+
     # Standart Bilgi Dozu dikey kapak şablonu (kapak_176..196 ile birebir uyumlu)
     import kapak as kapak_mod
     kapak_bilgi = kapak_mod.kapak_metni_hazirla(a.konu, sahneler, metadata)
@@ -1395,7 +1491,6 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     # Geçici klasörleri temizle ki Drive/Telegram glob araması tek MP4 ve tek kapak bulsun
     shutil.rmtree(vdir, ignore_errors=True)
     shutil.rmtree(gorsel_klasoru, ignore_errors=True)
-    tek_wav.unlink(missing_ok=True)
     cfg_yolu.unlink(missing_ok=True)
 
     print(f"Video hazır: {hedef_mp4}")
@@ -1541,12 +1636,17 @@ def main() -> int:
     ap.add_argument("--sure-min", type=float, default=0, help="0 = ayardan oku")
     ap.add_argument("--sure-max", type=float, default=0, help="0 = ayardan oku")
     ap.add_argument("--kuru", action="store_true", help="Sadece üret, hiçbir yere yükleme")
+    ap.add_argument("--shorts-v2", action="store_true", help="Fail-closed Shorts v2 hattını zorla; legacy TTS fallback yok")
+    ap.add_argument("--plan-only", action="store_true", help="Yalnız 7 sahne metin planı yaz; ses sentezi ve render yapma")
     ap.add_argument("--sadece-ses", action="store_true", help="Görsel/video üretmeden yalnızca onay sesi üret")
     ap.add_argument("--onay-verildi", action="store_true",
                     help="Kullanıcı videoyu izleyip onayladı: Drive + tablo + yayın kuyruğu")
     a = ap.parse_args()
 
     ayar = ayar_yukle()
+    if a.shorts_v2 or a.plan_only:
+        ayar["sahneler_sablon"] = True
+        ayar["sahne_sayisi"] = 7
     try:
         import arsiv
         arsiv.cikti_maskele_kur()   # konsola/GitHub loguna yazılan her satır maskeden geçer
@@ -1566,11 +1666,15 @@ def main() -> int:
         ayar.setdefault("sure", {})["min"] = a.sure_min
     if a.sure_max:
         ayar.setdefault("sure", {})["max"] = a.sure_max
-    re_ = motor_hazirla(ayar)
 
     if ayar.get("sahneler_sablon"):
-        return _sablon_v2_uret(a, ayar, sahne_sayisi, calisma=None)
+        if sahne_sayisi != 7:
+            raise SystemExit("Shorts v2 tam 7 sahne ister; legacy TTS fallback yapılmadı.")
+        return _sablon_v2_uret(a, ayar, 7, calisma=None)
 
+    if a.shorts_v2 or a.plan_only:
+        raise SystemExit("Shorts v2 planlama başarısız; legacy TTS fallback yapılmadı.")
+    re_ = motor_hazirla(ayar)
     sahneler = sahne_plani(a.konu, sahne_sayisi, ayar)
     anlatim_karakter = len(" ".join(str(x.get("ses", "")).strip() for x in sahneler))
     print(f"Gerçek anlatım karakteri: {anlatim_karakter}")

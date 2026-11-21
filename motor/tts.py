@@ -18,12 +18,18 @@ import base64
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import tempfile
 import urllib.request
 from pathlib import Path
 
 import soundfile as sf
+
+try:
+    from .workspace_paths import WORKSPACE_ROOT, workspace_temp_dir
+except ImportError:
+    from workspace_paths import WORKSPACE_ROOT, workspace_temp_dir
 
 import metin_hazirla
 
@@ -131,7 +137,8 @@ def _elevenlabs(metin: str, cikti: Path, ayar: dict) -> None:
             "stability": ses.get("stability", 0.35),
             "similarity_boost": ses.get("similarity_boost", 0.75),
             "style": ses.get("style", 0.35),
-            "speed": ses.get("speed", 1.0),
+            # Keep provider-side tempo neutral; the single post-TTS atempo point owns speed.
+            "speed": 1.0,
         },
     }
     istek = urllib.request.Request(
@@ -148,20 +155,23 @@ def _elevenlabs(metin: str, cikti: Path, ayar: dict) -> None:
 
 def _xtts_referansini_hazirla(ses: dict) -> Path:
     """Onaylı 0,95 referansı Drive'dan indirir; referansın kendisini işlemez."""
-    yol = Path(os.getenv("MOTOR_XTTS_REFERENCE", ses.get("referans_yolu", "ref_095.wav")))
+    yol = Path(os.getenv("MOTOR_XTTS_REFERENCE", ses.get("referans_yolu", "ref_095.wav"))).expanduser()
+    if not yol.is_absolute():
+        yol = WORKSPACE_ROOT / yol
     if yol.is_file() and yol.stat().st_size > 0:
         return yol
+    token_path = workspace_temp_dir() / "token.json"
     token = os.getenv("GOOGLE_TOKEN_JSON", "").strip()
     if token:
-        Path("token.json").write_text(token, encoding="utf-8")
-    if not Path("token.json").is_file():
+        token_path.write_text(token, encoding="utf-8")
+    if not token_path.is_file():
         raise SesHatasi("XTTS referansı yok ve GOOGLE_TOKEN_JSON bulunamadı.")
     try:
         from google.auth.transport.requests import Request
         from google.oauth2.credentials import Credentials
         from googleapiclient.discovery import build
         from googleapiclient.http import MediaIoBaseDownload
-        kimlik = Credentials.from_authorized_user_file("token.json")
+        kimlik = Credentials.from_authorized_user_file(str(token_path))
         if not kimlik.valid:
             kimlik.refresh(Request())
         drive = build("drive", "v3", credentials=kimlik, cache_discovery=False)
@@ -182,7 +192,7 @@ def _xtts(metin: str, cikti: Path, ayar: dict) -> None:
     """Onaylı referansla XTTS-v2 üretir; yeni çıktıya ses işlemini tam bir kez uygular."""
     ses = ayar.get("ses", {})
     referans = _xtts_referansini_hazirla(ses)
-    with tempfile.TemporaryDirectory(prefix="xtts_") as gecici:
+    with tempfile.TemporaryDirectory(prefix="xtts_", dir=workspace_temp_dir()) as gecici:
         ham = Path(gecici) / "ham.wav"
         komut = [
             "tts", "--text", metin,
@@ -194,7 +204,7 @@ def _xtts(metin: str, cikti: Path, ayar: dict) -> None:
             subprocess.run(komut, check=True, timeout=900)
             filtre = (
                 "highpass=f=70,equalizer=f=250:t=q:width=1.1:g=-1.0,"
-                "equalizer=f=3500:t=q:width=1.0:g=0.8,atempo=0.95,"
+                "equalizer=f=3500:t=q:width=1.0:g=0.8,"
                 "loudnorm=I=-18:TP=-1.5:LRA=11"
             )
             subprocess.run(["ffmpeg", "-y", "-i", str(ham), "-af", filtre,
@@ -218,6 +228,66 @@ def _ton_zinciri(ses: dict) -> list[str]:
         f"equalizer=f={float(b1.get('hz', 280)):g}:t=q:width={float(b1.get('genislik', 1.2)):g}:g={float(b1.get('kazanc_db', -1.2)):g}",
         f"equalizer=f={float(b2.get('hz', 3300)):g}:t=q:width={float(b2.get('genislik', 1.1)):g}:g={float(b2.get('kazanc_db', 1.8)):g}",
     ]
+
+
+def _voice_speed_factor(ayar: dict) -> float:
+    """Single explicit production speed: normal 1.00x or energetic 1.07x."""
+    try:
+        factor = float((ayar.get("ses") or {}).get("voice_speed_factor", 1.0))
+    except (TypeError, ValueError) as exc:
+        raise SesHatasi("voice_speed_factor must be 1.00 or 1.07") from exc
+    if not (factor == 1.0 or factor == 1.07):
+        raise SesHatasi("voice_speed_factor must be exactly 1.00 or 1.07")
+    return factor
+
+
+def _ffmpeg_executable() -> str:
+    binary = shutil.which("ffmpeg")
+    if binary:
+        return binary
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception as exc:  # noqa: BLE001
+        raise SesHatasi("FFmpeg is required for audio format/speed processing") from exc
+
+
+def _normalize_generated_audio(cikti: Path, factor: float) -> None:
+    """One common final audio stage; the only tempo filter is optional atempo=1.070."""
+    if not cikti.is_file() or cikti.stat().st_size == 0:
+        raise SesHatasi("TTS sağlayıcısı ses dosyası üretmedi.")
+    fd, tmp_name = tempfile.mkstemp(prefix="tts-final-", suffix=".wav", dir=workspace_temp_dir())
+    os.close(fd)
+    tmp_path = Path(tmp_name)
+    command = [_ffmpeg_executable(), "-nostdin", "-y", "-hide_banner", "-loglevel", "error", "-i", str(cikti)]
+    if factor == 1.07:
+        command.extend(["-af", "atempo=1.070"])
+    command.extend(["-ar", "48000", "-ac", "1", "-c:a", "pcm_s16le", str(tmp_path)])
+    try:
+        subprocess.run(command, check=True, timeout=180, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if not tmp_path.is_file() or tmp_path.stat().st_size == 0:
+            raise SesHatasi("TTS son ses dosyası boş oluştu")
+        os.replace(tmp_path, cikti)
+    except Exception as exc:  # noqa: BLE001
+        tmp_path.unlink(missing_ok=True)
+        if isinstance(exc, SesHatasi):
+            raise
+        raise SesHatasi(f"TTS format/tempo işlemi başarısız ({type(exc).__name__})") from exc
+
+
+def _update_speechify_alignment(alignment: dict, cikti: Path, factor: float) -> dict:
+    """Map Speechify source word times through the one global tempo transform."""
+    audio, sample_rate = sf.read(str(cikti), dtype="float32", always_2d=True)
+    duration = len(audio) / float(sample_rate)
+    for word in alignment.get("words") or []:
+        start = max(0.0, float(word["start"]) / factor)
+        end = max(start, float(word["end"]) / factor)
+        word["start"] = round(min(start, duration), 4)
+        word["end"] = round(min(end, duration), 4)
+    alignment["audio_duration_seconds"] = round(duration, 4)
+    alignment["audio_sha256"] = _sha256(cikti)
+    alignment["speed_factor"] = factor
+    return alignment
 
 
 def _arsivle(islev: str, *a, **k):
@@ -344,62 +414,27 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
         w.setframerate(24000)
         w.writeframes(pcm_i16.tobytes())
 
-    # Aktif konuşma hızını ölç ve iki üretimin tam ortasına (~0.94x / ~15.5-15.8 krk/sn aktif) dengele
+    # EQ/sample-format only here. A single explicit tempo point is applied later by uret().
     ham_sure = len(pcm) / 24000.0
-    pencere = 1200  # 50 ms @ 24 kHz
-    n_pen = len(pcm) // pencere
-    if n_pen > 4:
-        blok = pcm[: n_pen * pencere].reshape(n_pen, pencere)
-        rms = np.sqrt(np.mean(blok * blok, axis=1) + 1e-12)
-        aktif_sn = max(1.0, float(np.sum(rms > (10.0 ** (-41.0 / 20.0)))) * 0.050)
-    else:
-        aktif_sn = max(1.0, ham_sure)
-
-    temiz_metin = " ".join(metin.split())
-    aktif_hiz = len(temiz_metin) / aktif_sn
-    hedef_hiz = float(ses.get("hedef_aktif_krk_sn", 15.5))
-    min_atempo = float(ses.get("min_atempo", 0.93))
-    max_atempo = float(ses.get("max_atempo", 0.96))
-
-    if aktif_hiz > hedef_hiz:
-        atempo = max(min_atempo, min(max_atempo, round(hedef_hiz / aktif_hiz, 3)))
-    elif aktif_hiz > 14.5:
-        atempo = 0.945
-    else:
-        atempo = 1.0
-
-    ffmpeg_bin = shutil.which("ffmpeg")
-    if not ffmpeg_bin:
-        try:
-            import imageio_ffmpeg
-            ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
-        except Exception:
-            ffmpeg_bin = None
-
-    if ffmpeg_bin:
-        zincir = _ton_zinciri(ses)
-        if atempo < 0.995:
-            zincir.append(f"atempo={atempo:.3f}")
-        try:
-            subprocess.run(
-                [
-                    ffmpeg_bin, "-y", "-hide_banner", "-loglevel", "error",
-                    "-i", str(ham_yol), "-af", ",".join(zincir),
-                    "-ar", "48000", "-ac", "1", "-c:a", "pcm_s16le", str(cikti),
-                ],
-                check=True,
-                timeout=120,
-            )
-            ham_yol.unlink(missing_ok=True)
-            yeni_x, yeni_sr = sf.read(str(cikti), dtype="float32")
-            yeni_sure = len(yeni_x) / float(yeni_sr)
-            print(
-                f"  [Diksiyon] ham={ham_sure:.2f}s (aktif {aktif_sn:.2f}s, {aktif_hiz:.1f} krk/sn) "
-                f"-> atempo={atempo:.3f}, yeni={yeni_sure:.2f}s"
-            )
-            return
-        except Exception as e:
-            print(f"  [Diksiyon] FFmpeg işleme atlandı ({e}); ham WAV korunuyor.")
+    ffmpeg_bin = _ffmpeg_executable()
+    zincir = _ton_zinciri(ses)
+    try:
+        subprocess.run(
+            [
+                ffmpeg_bin, "-y", "-hide_banner", "-loglevel", "error",
+                "-i", str(ham_yol), "-af", ",".join(zincir),
+                "-ar", "48000", "-ac", "1", "-c:a", "pcm_s16le", str(cikti),
+            ],
+            check=True,
+            timeout=120,
+        )
+        ham_yol.unlink(missing_ok=True)
+        yeni_x, yeni_sr = sf.read(str(cikti), dtype="float32")
+        yeni_sure = len(yeni_x) / float(yeni_sr)
+        print(f"  [Diksiyon] format/EQ only: {ham_sure:.2f}s -> {yeni_sure:.2f}s; tempo=1.00x before final stage")
+        return
+    except Exception as e:
+        print(f"  [Diksiyon] FFmpeg format/EQ stage failed ({e}); raw WAV kept for final stage.")
 
     ham_yol.replace(cikti)
 
@@ -410,10 +445,10 @@ def _edge_tts(metin: str, cikti: Path, ayar: dict) -> None:
     # Yalnız tr-TR-* biçimindeki adlar kullanılır, aksi halde varsayılana düşülür.
     _v = str(ses.get("voice_id") or "").strip()
     voice = _v if _v.lower().startswith("tr-tr-") else "tr-TR-AhmetNeural"
-    with tempfile.TemporaryDirectory(prefix="edge_tts_") as gecici:
+    with tempfile.TemporaryDirectory(prefix="edge_tts_", dir=workspace_temp_dir()) as gecici:
         ham = Path(gecici) / "ham.mp3"
         try:
-            subprocess.run(["edge-tts", "--voice", voice, "--rate=+2%", "--pitch=-5Hz",
+            subprocess.run(["edge-tts", "--voice", voice, "--rate=+0%", "--pitch=-5Hz",
                             "--text", metin, "--write-media", str(ham)],
                            check=True, timeout=240)
             filtre = (
@@ -488,22 +523,29 @@ def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
     metin = metin_hazirla.hazirla(metin, ayar)
     _arsivle("yaz", "tts_metni_2_on_isleme_SONRASI", metin)
 
+    alignment = None
+    gemini_provider = False
     if saglayici == "speechify":
-        return _speechify(metin, cikti, ayar)
-    if saglayici == "elevenlabs":
+        alignment = _speechify(metin, cikti, ayar)
+    elif saglayici == "elevenlabs":
         _elevenlabs(metin, cikti, ayar)
-        return None
-    if saglayici in {"xtts", "xtts_v2", "coqui_xtts"}:
+    elif saglayici in {"xtts", "xtts_v2", "coqui_xtts"}:
         _xtts(metin, cikti, ayar)
-        return None
-    if saglayici in {"edge", "edge_tts", "ahmet_neural"}:
+    elif saglayici in {"edge", "edge_tts", "ahmet_neural"}:
         _edge_tts(metin, cikti, ayar)
-        return None
-    if saglayici in {"gemini", "gemini_tts", "gemini_natural"}:
+    elif saglayici in {"gemini", "gemini_tts", "gemini_natural"}:
         # KURAL (sahip): ses her zaman Gemini + Charon. Başka sese GEÇİLMEZ.
         # Gemini kotası dolarsa üretim DURUR; video yanlış sesle çıkmaz.
         _gemini_tts(metin, cikti, ayar)
         _ses_kontrol(ayar)
+        gemini_provider = True
+    else:
+        raise SesHatasi(f"Desteklenmeyen ses sağlayıcısı: {saglayici!r}")
+
+    factor = _voice_speed_factor(ayar)
+    _normalize_generated_audio(cikti, factor)
+    if alignment is not None:
+        alignment = _update_speechify_alignment(alignment, cikti, factor)
+    if gemini_provider:
         _arsiv_ses_olcumu(cikti)
-        return None
-    raise SesHatasi(f"Desteklenmeyen ses sağlayıcısı: {saglayici!r}")
+    return alignment
