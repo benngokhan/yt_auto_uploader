@@ -24,6 +24,11 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+try:
+    from .workspace_paths import workspace_temp_dir
+except ImportError:
+    from workspace_paths import workspace_temp_dir
+
 VOICE_TARGET_LUFS = -18.0
 MUSIC_BELOW_VOICE_LU = 12.0   # ÖLÇÜM (12.11): 2.0'da müzik konuşmayla iç içe geçiyordu; video sesinin %82'si bastı, konuşma 800-3000 Hz'de eziliyordu
 MASTER_TARGET_LUFS = -16.0   # CEO ses kuralı: çıkış -16 LUFS / -1 dBTP (eski kod -14 idi — 167'nin sapması)
@@ -223,7 +228,7 @@ def mix_speech_and_music(
     Path(out_wav).parent.mkdir(parents=True, exist_ok=True)
     # Measure the combined mix, then apply one shared linear gain.  This
     # improves overall consistency without changing the chosen stem balance.
-    with tempfile.TemporaryDirectory(prefix="bd_audio_") as tmpdir:
+    with tempfile.TemporaryDirectory(prefix="bd_audio_", dir=workspace_temp_dir()) as tmpdir:
         premix = str(Path(tmpdir) / "premix.wav")
         command = [ffmpeg_executable(), "-nostdin", "-y", "-hide_banner", "-loglevel", "error"]
         command += inputs + ["-filter_complex", ";".join(filters), "-map", "[aout]", "-t", f"{total_dur:.6f}",

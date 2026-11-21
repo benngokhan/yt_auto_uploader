@@ -3,6 +3,16 @@ import numpy as np
 import cv2
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
+try:
+    from .subtitle_utils import SubtitleFitError, clean_subtitle_block
+except ImportError:
+    from subtitle_utils import SubtitleFitError, clean_subtitle_block
+
+try:
+    from .workspace_paths import workspace_output_dir, workspace_temp_dir
+except ImportError:
+    from workspace_paths import workspace_output_dir, workspace_temp_dir
+
 # ── ŞABLON v2 (dikey_video_sablon_v2.md) ────────────────────────────────────
 # Fontlar varlik_hazirla.py ile motor/assets içine indirilir (Poppins = şablon).
 _ASSETS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
@@ -276,8 +286,16 @@ def make_subtitle_band(W, text_multiline, highlight_words=None, is_wide=False, *
     max_sub_w = (W - 260) if is_wide else 750
     max_satir = 4 if is_wide else 2
     base_sz = 36 if is_wide else 40
-    line_h = 48 if is_wide else 54
+    line_h = 42 if is_wide else 54
 
+    try:
+        text_multiline = clean_subtitle_block(
+            text_multiline,
+            max_lines=max_satir,
+            max_chars_per_line=(70 if is_wide else 42),
+        )
+    except SubtitleFitError as exc:
+        raise SubtitleFitError(f"Shorts altyazısı gösterim alanına sığmıyor: {exc}") from exc
     ham = [p.strip() for p in text_multiline.split("\n") if p.strip()]
     metin = " ".join(ham) if not is_wide else text_multiline
 
@@ -293,15 +311,22 @@ def make_subtitle_band(W, text_multiline, highlight_words=None, is_wide=False, *
             satirlar.append(mevcut)
         return satirlar
 
-    boyut = base_sz
-    while boyut > 26:
-        font = ImageFont.truetype(FONT_BOLD_PATH, boyut)
-        lines = _sar(metin, font)
-        if len(lines) <= max_satir and len(lines) * line_h <= band_h:
+    fitted = None
+    for boyut in range(base_sz, 24, -2):
+        candidate_font = ImageFont.truetype(FONT_BOLD_PATH, boyut)
+        candidate_lines = _sar(metin, candidate_font)
+        if (
+            1 <= len(candidate_lines) <= max_satir
+            and len(candidate_lines) * line_h <= band_h
+            and all(candidate_font.getlength(line) <= max_sub_w for line in candidate_lines)
+        ):
+            fitted = (candidate_font, candidate_lines)
             break
-        boyut -= 2
-    font = ImageFont.truetype(FONT_BOLD_PATH, boyut)
-    lines = _sar(metin, font)[:max_satir]
+    if fitted is None:
+        raise SubtitleFitError(
+            f"subtitle does not fit in {max_satir} lines at the minimum readable font size"
+        )
+    font, lines = fitted
 
     word_index = 0
     start_y = (band_h - len(lines) * line_h) // 2
@@ -440,6 +465,47 @@ def mix_master_audio_lufs(scenes_meta, total_dur, out_wav):
         from audio_balance import mix_speech_and_music
     return mix_speech_and_music(scenes_meta, BGM_PATH, total_dur, out_wav)
 
+
+def clean_scenes_subtitles(scenes_cfg, *, is_wide=False):
+    """Strip scene-number scaffolding and validate every caption before alignment.
+
+    Cleaning before word alignment keeps the spoken word index and displayed
+    caption text in lockstep. If cleanup changes the transcript away from the
+    actual voice track, the existing audio/ASR alignment gate will stop render.
+    """
+    max_lines = 4 if is_wide else 2
+    max_chars = 70 if is_wide else 42
+    cleaned_scenes = []
+    for scene_index, scene in enumerate(scenes_cfg, start=1):
+        if not isinstance(scene, dict):
+            raise SubtitleFitError(f"scene {scene_index}: configuration must be an object")
+        subs = scene.get("subs")
+        if not isinstance(subs, (list, tuple)) or not subs:
+            raise SubtitleFitError(f"scene {scene_index}: subtitle groups are missing")
+        cleaned_scene = dict(scene)
+        cleaned_groups = []
+        for group_index, group in enumerate(subs, start=1):
+            if isinstance(group, str):
+                original = group
+                cleaned = clean_subtitle_block(
+                    original, max_lines=max_lines, max_chars_per_line=max_chars
+                )
+                cleaned_groups.append(cleaned)
+            elif isinstance(group, (tuple, list)) and group and isinstance(group[0], str):
+                cleaned = clean_subtitle_block(
+                    group[0], max_lines=max_lines, max_chars_per_line=max_chars
+                )
+                rest = list(group[1:])
+                cleaned_groups.append((cleaned, *rest) if isinstance(group, tuple) else [cleaned, *rest])
+            else:
+                raise SubtitleFitError(
+                    f"scene {scene_index}, subtitle {group_index}: unsupported caption structure"
+                )
+        cleaned_scene["subs"] = cleaned_groups
+        cleaned_scenes.append(cleaned_scene)
+    return cleaned_scenes
+
+
 def render_video_master(
     out_mp4, scenes_cfg, vo_files, plates_bgr, source_line,
     is_wide=False, target_min_dur=None, target_max_dur=None,
@@ -450,6 +516,7 @@ def render_video_master(
     UPS_W, UPS_H = (2400, 1350) if is_wide else (1350, 2400)
     FPS = globals().get("FPS_HEDEF", 30)   # kural: 60 fps (uret.py ayarlar.json'dan set eder)
     CROSS_DISSOLVE = 0.50
+    scenes_cfg = clean_scenes_subtitles(scenes_cfg, is_wide=is_wide)
     N = len(scenes_cfg)
     if not N or len(vo_files) != N or len(plates_bgr) != N:
         raise ValueError("Her sahne için tek ses kaydı ve tek görsel gereklidir")
@@ -565,11 +632,12 @@ def render_video_master(
             ]
             sub_timeline.append(group)
 
+    run_tag = f"{os.getpid()}_{time.time_ns()}_{os.path.basename(out_mp4)}"
     master_wav = None
     if master_audio_source:
         audio_input = str(master_audio_source)
     else:
-        master_wav = f"/var/tmp/master_mix_{os.path.basename(out_mp4)}.wav"
+        master_wav = str(workspace_temp_dir() / f"master_mix_{run_tag}.wav")
         mix_master_audio_lufs(scenes_meta, TOTAL_DUR, master_wav)
         audio_input = master_wav
 
@@ -588,7 +656,7 @@ def render_video_master(
         return cv2.warpAffine(plates_bgr[s_idx], M, (W, H), flags=cv2.INTER_LINEAR | cv2.WARP_INVERSE_MAP, borderMode=cv2.BORDER_REFLECT_101)
 
     os.makedirs(os.path.dirname(out_mp4), exist_ok=True)
-    log_path = f"/tmp/ff_{os.path.basename(out_mp4)}.log"
+    log_path = str(workspace_temp_dir() / f"ff_{run_tag}.log")
     if __package__:
         from .audio_balance import ffmpeg_executable
     else:
@@ -726,7 +794,7 @@ if __name__ == "__main__":
             s = shorts_map[n]
             plates = build_6_vertical_plates(f"/home/user/pilot_engine/prod/ai/hero_{n}.png", seed_base=n)
             vos = [f"/home/user/pilot_engine/prod/scenes_vo/v{n}/scene_{i:02d}.wav" for i in range(1, 7)]
-            out_mp4 = f"/var/tmp/renders/video_{n}.mp4"
+            out_mp4 = str(workspace_output_dir("renders") / f"video_{n}.mp4")
             dur, meta = render_video_master(
                 out_mp4, s["scenes"], vos, plates, s["source_line"],
                 is_wide=False, target_min_dur=50.5, target_max_dur=57.5
@@ -745,7 +813,7 @@ if __name__ == "__main__":
             )
             extra_wide = "/home/user/pilot_engine/prod/ai/hero_u14_wide.png" if un == 14 else None
             plates_9 = build_9_horizontal_plates(f"/home/user/pilot_engine/prod/ai/hero_{u['parent_short']}.png", extra_wide, seed_base=un)[:len(scenes_9)]
-            out_mp4 = f"/var/tmp/renders/uzun_video_{un}.mp4"
+            out_mp4 = str(workspace_output_dir("renders") / f"uzun_video_{un}.mp4")
             dur, meta = render_video_master(
                 out_mp4, scenes_9, vos_9, plates_9, u["source_line"],
                 is_wide=True, target_min_dur=None, target_max_dur=None

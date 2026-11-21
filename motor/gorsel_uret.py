@@ -27,8 +27,14 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
+try:
+    from .workspace_paths import workspace_temp_dir
+except ImportError:
+    from workspace_paths import workspace_temp_dir
+
+from shorts_acceptance import MIN_AVG_BRIGHTNESS, SEMANTIC_THRESHOLD
+
 HEDEF = (1350, 2400)  # Tam 9:16 dikey, Ken Burns zoom için yüksek keskinlik
-SEMANTIC_THRESHOLD = 0.62
 SEMANTIC_MODEL = "gemini-3.8-flash"
 MAX_CANDIDATES_PER_QUERY = 8
 VISUAL_QA_ENV = "MOTOR_VISUAL_QA_PASSED"
@@ -104,6 +110,12 @@ def _avg_parlaklik(hex_renk: str) -> float | None:
         return None
 
 
+def average_image_brightness(image: Image.Image) -> float:
+    """Approximate mean Rec. 601 luma in 0..255 from the actual image pixels."""
+    small = np.asarray(image.convert("RGB").resize((64, 64), Image.Resampling.BILINEAR), dtype=np.float32)
+    return float((0.299 * small[..., 0] + 0.587 * small[..., 1] + 0.114 * small[..., 2]).mean())
+
+
 # Alaka ölçümünde sayılmayan süs/sanat kelimeleri.
 _SUS_KELIMELER = {
     "macro", "close", "closeup", "photography", "photo", "documentary",
@@ -151,6 +163,14 @@ _INSAN_ANATOMI = {
 def _kelimeler(metin: str, sus_at: bool = True) -> set[str]:
     k = {x for x in re.split(r"[^\wçğıöşü]+", str(metin or "").lower()) if len(x) >= 3}
     return {x for x in k if x not in _SUS_KELIMELER} if sus_at else k
+
+
+def _record_score_passes(record: dict) -> bool:
+    """Only a live Gemini Vision score is sufficient to select a production image."""
+    return (
+        record.get("score_origin") == "live_gemini_vision"
+        and semantic_score_passes(record.get("semantic_similarity"))
+    )
 
 
 def _yasak_etiket_seti(sorgu: str, ana_konu: str) -> set[str]:
@@ -368,6 +388,9 @@ def _ham_kusurlu_mu(im: Image.Image) -> tuple[bool, str]:
         return True, f"duz_yapay_arkaplan(std={kenar_std:.1f})"
 
     luma = (0.299 * kucuk[..., 0] + 0.587 * kucuk[..., 1] + 0.114 * kucuk[..., 2]) / 255.0
+    avg_luma = float(luma.mean() * 255.0)
+    if avg_luma < MIN_AVG_BRIGHTNESS:
+        return True, f"karanlik_gorsel({avg_luma:.1f}/255)"
     patlak_oran = float(np.mean(luma > 0.95))
     if patlak_oran > 0.34:
         return True, f"patlamis_isik({patlak_oran:.2f})"
@@ -530,7 +553,7 @@ def _visual_text_scores(scene_text: str, candidates: list[dict]) -> list[float |
         "Sadece geçerli JSON döndür: {\"scores\":[0.0, ...]} ; sıra görsellerin numarasıyla aynı ve her puan 0 ile 1 arasında olsun."
     )}]
     valid_indices: list[int] = []
-    with tempfile.TemporaryDirectory(prefix="visual-fit-") as td:
+    with tempfile.TemporaryDirectory(prefix="visual-fit-", dir=workspace_temp_dir()) as td:
         for i, hit in enumerate(candidates):
             url = str(hit.get("preview_url") or hit.get("indir_url") or "")
             if not url:
@@ -587,9 +610,15 @@ def _visual_text_scores(scene_text: str, candidates: list[dict]) -> list[float |
                 return [None] * len(candidates)
             scores: list[float | None] = [None] * len(candidates)
             for i, val in zip(valid_indices, raw):
-                score = float(val)
-                if 0.0 <= score <= 1.0:
+                try:
+                    score = float(val)
+                except (TypeError, ValueError):
+                    candidates[i]["_vision_error"] = "invalid_live_vision_score"
+                    continue
+                if np.isfinite(score) and 0.0 <= score <= 1.0:
                     scores[i] = score
+                else:
+                    candidates[i]["_vision_error"] = "invalid_live_vision_score"
             return scores
         except Exception as exc:  # noqa: BLE001 — fail closed
             # Keep only safe quota metadata; never log the request URL or API key.
@@ -717,15 +746,17 @@ def sahneler_icin_gorseller(
                 if len(scores) != len(hits):
                     scores = [None] * len(hits)
                 scored = []
-                for hit, score in zip(hits, scores):
+                for hit, vision_score in zip(hits, scores):
                     heuristic = float(_puanla(hit, query))
+                    score_origin = "live_gemini_vision" if vision_score is not None else None
                     record = {
                         "uid": str(hit.get("uid") or f"{provider}:{hit.get('id','') }"),
                         "provider": provider,
                         "search_query": query,
                         "candidate_tags": str(hit.get("tags") or ""),
                         "heuristic_tag_score": round(heuristic, 3),
-                        "semantic_similarity": None if score is None else round(float(score), 4),
+                        "semantic_similarity": None if vision_score is None else round(float(vision_score), 4),
+                        "score_origin": score_origin,
                         "image_url": str(hit.get("indir_url") or hit.get("fullHDURL") or hit.get("largeImageURL") or ""),
                         "source_page_url": str(hit.get("source_page_url") or ""),
                         "selected": False,
@@ -736,16 +767,16 @@ def sahneler_icin_gorseller(
                         record["rejection_reason"] = "duplicate_visual_already_used"
                     elif not _yeterince_uygun(hit, query, scene_text, gevsek=True):
                         record["rejection_reason"] = "provider_metadata_or_photo_quality_filter"
-                    elif score is None:
+                    elif score_origin is None:
                         record["rejection_reason"] = str(hit.get("_vision_error") or "semantic_score_unavailable_fail_closed")
-                    elif not semantic_score_passes(score):
+                    elif not _record_score_passes(record):
                         record["rejection_reason"] = "semantic_similarity_below_threshold"
                     elif not record["image_url"] or not _provider_page_url_ok(provider, record["source_page_url"]):
                         record["rejection_reason"] = "missing_or_invalid_provider_source_url"
-                    scored.append((hit, score, record))
+                    scored.append((hit, vision_score, record))
                     provider_log["candidates"].append(record)
 
-                eligible = [x for x in scored if semantic_score_passes(x[1])
+                eligible = [x for x in scored if _record_score_passes(x[2])
                             and x[2]["rejection_reason"] is None]
                 eligible.sort(key=lambda x: (float(x[1]), x[2]["heuristic_tag_score"]), reverse=True)
                 for hit, score, record in eligible:
@@ -760,9 +791,16 @@ def sahneler_icin_gorseller(
                                 record["rejection_reason"] = f"pixel_filter:{reason}"
                                 raw.unlink(missing_ok=True)
                                 continue
-                        selected_path = klasor / f"sahne_{scene_index:02d}.png"
                         with Image.open(raw) as im:
-                            sinematik_isle(dikey_kirp(im.convert("RGB")), tohum=20261100 + scene_index).save(selected_path, format="PNG")
+                            processed = sinematik_isle(dikey_kirp(im.convert("RGB")), tohum=20261100 + scene_index)
+                        processed_brightness = average_image_brightness(processed)
+                        if processed_brightness < MIN_AVG_BRIGHTNESS:
+                            record["rejection_reason"] = f"processed_dark_image:{processed_brightness:.1f}/255"
+                            raw.unlink(missing_ok=True)
+                            continue
+                        selected_path = klasor / f"sahne_{scene_index:02d}.png"
+                        processed.save(selected_path, format="PNG")
+                        record["average_brightness"] = round(processed_brightness, 2)
                         raw.unlink(missing_ok=True)
                         record["selected"] = True
                         record["rejection_reason"] = None
@@ -786,11 +824,19 @@ def sahneler_icin_gorseller(
                 "semantic_similarity": next(
                     (c["semantic_similarity"] for q in scene_log["queries"]
                      for p in q["provider_results"] for c in p["candidates"] if c.get("selected")), None),
+                "score_origin": next(
+                    (c["score_origin"] for q in scene_log["queries"]
+                     for p in q["provider_results"] for c in p["candidates"] if c.get("selected")), None),
+                "average_brightness": next(
+                    (c["average_brightness"] for q in scene_log["queries"]
+                     for p in q["provider_results"] for c in p["candidates"]
+                     if c.get("selected") and c.get("average_brightness") is not None), None),
                 "image_url": str(selected_hit.get("indir_url") or selected_hit.get("fullHDURL") or selected_hit.get("largeImageURL") or ""),
                 "source_page_url": str(selected_hit.get("source_page_url") or ""),
             }
             scene_log["fallback"] = None
-            print(f"  görsel {scene_index}: {selected_provider} / sorgu={selected_query!r} / puan={scene_log['selected']['semantic_similarity']} / {scene_log['selected']['source_page_url']}")
+            display_score = scene_log["selected"]["semantic_similarity"]
+            print(f"  görsel {scene_index}: {selected_provider} / sorgu={selected_query!r} / Gemini Vision={display_score} / {scene_log['selected']['source_page_url']}")
         else:
             reason = "no_scene_specific_query" if not queries else "no_candidate_passed_semantic_threshold_or_pixel_checks"
             scene_log["fallback_reason"] = reason

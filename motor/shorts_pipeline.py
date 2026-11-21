@@ -34,7 +34,6 @@ import re
 import shutil
 import subprocess
 import sys
-import tempfile
 import unicodedata
 import urllib.parse
 import wave
@@ -43,25 +42,33 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 
+try:
+    from .subtitle_utils import SubtitleFitError, clean_subtitle_block
+except ImportError:
+    from subtitle_utils import SubtitleFitError, clean_subtitle_block
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
 
 import endcard_v2  # noqa: E402
+from shorts_acceptance import (  # noqa: E402
+    EXPECTED_SCENES,
+    MIN_SCENE_SECONDS,
+    MAX_SCENE_SECONDS,
+    ShortsAcceptanceError,
+    sha256_file,
+    validate_duration,
+    validate_render_manifest_v2,
+    validate_scene_intervals,
+    validate_v2_production_context,
+)
 
 
 def _resolve_ffmpeg() -> str:
     envn = os.environ.get("MIRA_MOTOR_FFMPEG")
     if envn and os.path.exists(envn):
         return envn
-    tf = os.path.join(tempfile.gettempdir(), "mira_motor_ffmpeg_path.txt")
-    if os.path.exists(tf):
-        try:
-            cand = open(tf, encoding="utf-8").read().strip()
-            if cand and os.path.exists(cand):
-                return cand
-        except Exception:
-            pass
     p = os.path.join(HERE, "ffmpeg_path.txt")
     if os.path.exists(p):
         try:
@@ -734,7 +741,30 @@ def render_headline_card(icon_type: str, line1: str, line2: str) -> Image.Image:
 
 def render_subtitle_state(chunk: dict, active_tok_idx: int) -> Image.Image:
     """sablon_v2/build_v2_shorts.py birebir 2 satır tek-kelime karaoke altyazı (y=1131 & y=1205, Poppins-Bold 50 px)."""
+    original_toks = list(chunk["tokens"])
+    raw_text = " ".join(N_(token["text"]) for token in original_toks)
     f_sub = load_font("Poppins-Bold.ttf", S_(50))
+    cleaned_text = clean_subtitle_block(
+        raw_text,
+        max_lines=2,
+        max_chars_per_line=None,
+        max_width_px=S_(785),
+        measure_text=lambda line: f_sub.getlength(N_(line)),
+    )
+    cleaned_words = cleaned_text.split()
+    removed_prefix = len(original_toks) - len(cleaned_words)
+    if removed_prefix < 0 or [norm_word(t["text"]) for t in original_toks[removed_prefix:]] != [
+        norm_word(word) for word in cleaned_words
+    ]:
+        raise SubtitleFitError("Subtitle cleanup changed spoken-word order; render stopped")
+    toks = original_toks[removed_prefix:]
+    if not toks:
+        raise SubtitleFitError("subtitle is empty after scene-label cleanup")
+    if active_tok_idx < removed_prefix:
+        active_tok_idx = -1
+    else:
+        active_tok_idx -= removed_prefix
+
     box_h = S_(185)
     im_txt = Image.new("RGBA", (W, box_h), (0, 0, 0, 0))
     im_shd = Image.new("RGBA", (W, box_h), (0, 0, 0, 0))
@@ -742,11 +772,13 @@ def render_subtitle_state(chunk: dict, active_tok_idx: int) -> Image.Image:
     dt = ImageDraw.Draw(im_txt)
     ds = ImageDraw.Draw(im_shd)
 
-    toks = chunk["tokens"]
-    l1_cnt = int(chunk.get("l1_count") or len(toks))
+    cleaned_lines = cleaned_text.splitlines()
+    l1_cnt = len(cleaned_lines[0].split()) if len(cleaned_lines) > 1 else len(toks)
     lines = [toks[:l1_cnt]]
     if toks[l1_cnt:]:
         lines.append(toks[l1_cnt:])
+    if len(lines) > 2 or any(not line for line in lines):
+        raise SubtitleFitError("subtitle cannot be rendered in two non-empty lines")
 
     space_w = dt.textlength(" ", font=f_sub)
     ref_top = dt.textbbox((0, 0), "Ay", font=f_sub)[1]
@@ -757,6 +789,8 @@ def render_subtitle_state(chunk: dict, active_tok_idx: int) -> Image.Image:
         full_str = " ".join(t["text"] for t in ltoks)
         bb_full = dt.textbbox((0, 0), full_str, font=f_sub)
         line_w = bb_full[2] - bb_full[0]
+        if line_w > S_(785):
+            raise SubtitleFitError(f"subtitle line is wider than the visible limit ({line_w}>{S_(785)} px)")
         x_cur = (W / 2.0) - line_w / 2.0
         y_draw = (S_(1131) + li * S_(74) - Y_OFF) - ref_top
 
@@ -897,6 +931,53 @@ def ensure_vo_raw(work_dir: str) -> str:
                             "-i", p, "-ar", str(SR), "-ac", "1", "-c:a", "pcm_s16le", raw_wav], check=True)
             return raw_wav
     raise FileNotFoundError(f"{work_dir} içinde vo_raw.wav bulunamadı.")
+
+
+def prepare_voice_wav(
+    raw_wav: str,
+    output_wav: str,
+    speed_factor: float,
+    provider: str = "arena.generate_speech",
+) -> None:
+    """Prepare the declared Arena voice at 1.00x; format conversion never changes tempo."""
+    try:
+        factor = float(speed_factor)
+    except (TypeError, ValueError) as exc:
+        raise ShortsAcceptanceError("voice_speed_factor sayı olmalı") from exc
+    if not math.isfinite(factor):
+        raise ShortsAcceptanceError("voice_speed_factor sonlu olmalı")
+    if provider != "arena.generate_speech":
+        raise ShortsAcceptanceError(f"Shorts v2 yalnız Arena sesini kabul eder; sağlayıcı: {provider}")
+    if abs(factor - 1.0) >= 1e-9:
+        raise ShortsAcceptanceError("Arena sesi 1.00x kalmalı; yalnız biçim dönüştürmeye izin var")
+
+    source_ok = False
+    try:
+        with wave.open(raw_wav, "rb") as wav:
+            source_ok = (
+                wav.getnchannels() == 1 and wav.getframerate() == SR
+                and wav.getsampwidth() == 2 and wav.getnframes() > 0
+            )
+    except (OSError, wave.Error):
+        pass
+    if abs(factor - 1.0) < 1e-9 and source_ok:
+        if os.path.abspath(raw_wav) != os.path.abspath(output_wav):
+            shutil.copyfile(raw_wav, output_wav)
+        return
+
+    command = [FF, "-y", "-hide_banner", "-loglevel", "error", "-i", raw_wav]
+    command.extend(["-ar", str(SR), "-ac", "1", "-c:a", "pcm_s16le", output_wav])
+    try:
+        subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        with wave.open(output_wav, "rb") as wav:
+            if wav.getnchannels() != 1 or wav.getframerate() != SR or wav.getsampwidth() != 2 or wav.getnframes() <= 0:
+                raise ShortsAcceptanceError("Hazırlanan ses WAV biçim denetiminden geçmedi")
+    except ShortsAcceptanceError:
+        Path(output_wav).unlink(missing_ok=True)
+        raise
+    except Exception as exc:  # noqa: BLE001
+        Path(output_wav).unlink(missing_ok=True)
+        raise ShortsAcceptanceError(f"Arena WAV biçim/tempo işlemi başarısız ({type(exc).__name__})") from exc
 
 
 def ff_silences(path: str, noise_db: float = -35.0, min_dur: float = 0.14):
@@ -1125,19 +1206,26 @@ def build_auto_subtitle_chunks(tokens: list[dict]) -> list[dict]:
 
 def stage_timing(vdir_arg: str, explicit_cfg_path: str | None = None):
     work_dir, cfg, _ = _resolve_context(vdir_arg, explicit_cfg_path)
+    v2_context = validate_v2_production_context(work_dir, cfg)
     script_path = os.path.join(work_dir, "script.txt")
     script = open(script_path, encoding="utf-8").read().strip()
     raw_wav = ensure_vo_raw(work_dir)
 
     vo_final = os.path.join(work_dir, "vo_final.wav")
-    if os.path.abspath(raw_wav) != os.path.abspath(vo_final):
-        shutil.copyfile(raw_wav, vo_final)
-
-    x_raw, fr = read_wav_mono(raw_wav)
-    if fr != SR:
-        subprocess.run([FF, "-y", "-hide_banner", "-loglevel", "error",
-                        "-i", raw_wav, "-ar", str(SR), "-ac", "1", "-c:a", "pcm_s16le", vo_final], check=True)
+    if v2_context is not None:
+        prepare_voice_wav(
+            raw_wav, vo_final, v2_context["voice_speed_factor"],
+            provider=v2_context["voice_provider"],
+        )
         x_raw, fr = read_wav_mono(vo_final)
+    else:
+        if os.path.abspath(raw_wav) != os.path.abspath(vo_final):
+            shutil.copyfile(raw_wav, vo_final)
+        x_raw, fr = read_wav_mono(raw_wav)
+        if fr != SR:
+            subprocess.run([FF, "-y", "-hide_banner", "-loglevel", "error",
+                            "-i", raw_wav, "-ar", str(SR), "-ac", "1", "-c:a", "pcm_s16le", vo_final], check=True)
+            x_raw, fr = read_wav_mono(vo_final)
 
     dur_raw = len(x_raw) / float(fr)
     sents = [s.strip() for s in re.split(r"(?<=[.!?])\s+", script) if s.strip()]
@@ -1309,6 +1397,27 @@ def stage_timing(vdir_arg: str, explicit_cfg_path: str | None = None):
         })
     for si in range(len(scene_timeline) - 1):
         scene_timeline[si + 1]["start"] = scene_timeline[si]["end"]
+
+    if v2_context is not None:
+        if n_sc != EXPECTED_SCENES or len(sents) != EXPECTED_SCENES:
+            raise ShortsAcceptanceError("Shorts v2 zamanlaması tam 7 görsel ve 7 cümle ister")
+        interval_seconds = total_dur / EXPECTED_SCENES
+        scene_timeline = []
+        for si in range(EXPECTED_SCENES):
+            start = round(si * interval_seconds, 3)
+            end = round((si + 1) * interval_seconds, 3) if si < EXPECTED_SCENES - 1 else total_dur
+            scene_timeline.append({
+                "scene_idx": si,
+                "file": scene_files[si],
+                "is_closing": si == EXPECTED_SCENES - 1,
+                "mode": si % 3,
+                "start": start,
+                "end": end,
+                "icon": headlines[si]["icon"],
+                "line1": headlines[si]["line1"],
+                "line2": headlines[si]["line2"],
+            })
+        validate_scene_intervals(scene_timeline)
 
     cta_start, click_delay = endcard_v2.find_endcard_and_click_times(tokens_flat, last_word_end)
     for ch in chunks:
@@ -1692,9 +1801,15 @@ def build_mix(work_dir: str, tl: dict, cfg: dict | None = None) -> str:
 # ---------------------------------------------------------------- AŞAMA 4: RENDER (render_batch_187_196.py Birebir Kompozit)
 def render_video(vdir_arg: str, explicit_cfg_path: str | None = None):
     work_dir, cfg, _ = _resolve_context(vdir_arg, explicit_cfg_path)
+    v2_context = validate_v2_production_context(work_dir, cfg)
     with open(os.path.join(work_dir, "timing.json"), encoding="utf-8") as fh:
         tl = json.load(fh)
     total_dur = float(tl["total"])
+    if v2_context is not None:
+        validate_duration(total_dur)
+        validated_intervals = validate_scene_intervals(tl.get("scenes") or [])
+        if abs(validated_intervals[-1]["end"] - total_dur) > 1e-3:
+            raise ShortsAcceptanceError("V2 son sahne bitişi MP4 toplam süresiyle uyuşmuyor")
     n_frames = max(1, int(round(total_dur * FPS)))
 
     scenes_tl = tl.get("scenes") or []
@@ -1864,6 +1979,43 @@ def render_video(vdir_arg: str, explicit_cfg_path: str | None = None):
         raise RuntimeError(f"ffmpeg render hata kodu: {rc}")
     print(f"done: {out_mp4} ({os.path.getsize(out_mp4) / 1e6:.2f} MB)")
 
+    if v2_context is not None:
+        ffprobe = shutil.which("ffprobe")
+        if not ffprobe:
+            raise ShortsAcceptanceError("FFprobe yok; v2 MP4 süresi doğrulanamadı")
+        probe = subprocess.run(
+            [ffprobe, "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", out_mp4],
+            check=True, capture_output=True, text=True, timeout=60,
+        )
+        mp4_duration = validate_duration(probe.stdout.strip())
+        if abs(mp4_duration - total_dur) > 0.75:
+            raise ShortsAcceptanceError(
+                f"Gerçek MP4 süresi zaman çizelgesinden sapıyor: {mp4_duration:.3f}s / {total_dur:.3f}s"
+            )
+        image_hashes = [
+            {"file": name, "sha256": sha256_file(os.path.join(work_dir, name))}
+            for name in cfg["scenes"]
+        ]
+        render_manifest = {
+            "version": 2,
+            "production_mode": "production_v2",
+            "shorts_version": cfg["shorts_version"],
+            "template_version": cfg["template_version"],
+            "voice_provider": v2_context["voice_provider"],
+            "voice_provenance_status": v2_context["voice_provenance_status"],
+            "voice_speed_factor": v2_context["voice_speed_factor"],
+            "voice_raw_sha256": v2_context["voice_raw_sha256"],
+            "voice_render_sha256": sha256_file(os.path.join(work_dir, "vo_final.wav")),
+            "mix_sha256": sha256_file(mix_path),
+            "images": image_hashes,
+            "mp4_sha256": sha256_file(out_mp4),
+            "mp4_duration_seconds": mp4_duration,
+        }
+        with open(os.path.join(work_dir, "render_manifest_v2.json"), "w", encoding="utf-8") as fh:
+            json.dump(render_manifest, fh, ensure_ascii=False, indent=2)
+        validate_render_manifest_v2(work_dir, cfg, mp4_duration)
+
 
 # ---------------------------------------------------------------- AŞAMA 5: COVER (kapak.py Birebir 1080x1920 Dikey Kapak)
 def stage_cover(vdir_arg: str, explicit_cfg_path: str | None = None):
@@ -1891,6 +2043,10 @@ def main():
     stage = sys.argv[1]
     vdir_arg = sys.argv[2]
     explicit_cfg = sys.argv[3] if len(sys.argv) > 3 else None
+
+    if stage in {"all", "timing", "render"}:
+        gate_work_dir, gate_cfg, _ = _resolve_context(vdir_arg, explicit_cfg)
+        validate_v2_production_context(gate_work_dir, gate_cfg)
 
     if stage == "plates":
         stage_plates(vdir_arg, explicit_cfg)
