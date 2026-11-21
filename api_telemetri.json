@@ -1,12 +1,12 @@
 {
-  "zaman": "2026-11-20T15:33:07+00:00",
+  "zaman": "2026-11-21T00:00:42+00:00",
   "servisler": [
     {
       "ad": "Pexels",
       "durum": "ok",
-      "kalan": 24649,
+      "kalan": 24646,
       "limit": 25000,
-      "kullanilan": 351,
+      "kullanilan": 354,
       "birim": "istek/ay",
       "reset_iso": "2026-12-12T13:51:48+00:00",
       "yenilenme": "aylık kota · saatlik 200 istek penceresi",
@@ -16,8 +16,8 @@
       "ad": "Gemini · Charon",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1494,
-      "kullanilan": 6,
+      "kalan": 1498,
+      "kullanilan": 2,
       "birim": "istek/gün",
       "model_sayisi": 50,
       "yenilenme": "günlük · her gün TR 10:00 (00:00 Pasifik) sıfırlanır",
@@ -31,7 +31,7 @@
       "kullanilan": 1,
       "birim": "istek/gün",
       "yenilenme": "günlük kota · her gece 00:00 UTC sıfırlanır",
-      "not_": "Hızlı senaryo ve başlık motoru (Model: openai/gpt-oss-120b"
+      "not_": "Hızlı senaryo ve başlık motoru (Model: openai/gpt-oss-20b"
     },
     {
       "ad": "Pixabay (Yedek)",
@@ -88,14 +88,14 @@
     {
       "ad": "GitHub Actions",
       "durum": "ok",
-      "kalan": 1742.2,
+      "kalan": 1740.1,
       "limit": 2000,
-      "kullanilan": 257.8,
+      "kullanilan": 259.9,
       "birim": "dk/ay",
-      "actions_dakika": 257.8,
+      "actions_dakika": 259.9,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1742.2,
+      "actions_kalan": 1740.1,
       "api_kalan": 4999,
       "api_limit": 5000,
       "yenilenme": "aylık 2.000 dk ücretsiz · her ayın 1'inde sıfırlanır",
