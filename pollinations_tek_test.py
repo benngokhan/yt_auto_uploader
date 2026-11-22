@@ -65,7 +65,7 @@ try:
         print('POLLINATIONS_DURUM MODEL_FIYATI_DOGRULANAMADI',flush=True);raise SystemExit(2)
     if available<price or remaining<price or (budget is not None and budget<price):
         print('POLLINATIONS_DURUM YETERSIZ_GOREV_BAKIYESI_VEYA_BUTCE',flush=True);raise SystemExit(2)
-    prompt="Vertical photorealistic documentary photograph capturing the EXACT instant a birthday candle is being blown out, not before blowing and not while lighting. An adult person on the left side, shown in side profile, LEANS forward and visibly blows a strong puff through tightly rounded lips toward a single candle standing upright on a table at the right. The visible orange flame is almost horizontal, flattened and bent strongly TO THE RIGHT, away from the person's mouth, by their breath. A thin wisp of smoke streams to the right from the candle wick, making the extinguishing action unmistakable. Focus on the interaction between the pursed mouth and the bent flame. One person, one candle, realistic face and hands, natural warm daylight, clean simple background, vertical 9:16 composition. No upright vertical flame. No person posing still. No lighter, no match, no other flame. No text, logos, writing or watermark."
+    prompt='Solda bir kişi, sağda masanın üzerinde tek mum; kişi dudaklarını büzerek muma üflüyor, alev nefes yönünde sağa eğiliyor ve fitilden ince duman çıkıyor. Dikey, gerçekçi, yazısız ve logosuz bir görüntü istedim; ayrıca çakmak ve kibrit olmamasını belirttim.'
     print('POLLINATIONS_GORSEL_ISTEGI 1_BASLADI',flush=True)
     result=request_json('/v1/images/generations',{'model':MODEL,'prompt':prompt,'n':1,'size':'576x1024',
                         'response_format':'b64_json','seed':secrets.randbelow(2_000_000_000)})
