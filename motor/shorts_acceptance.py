@@ -269,9 +269,12 @@ def validate_script(
 
     all_text = " ".join(narration)
     all_words = _words(all_text)
-    if not MIN_NARRATION_WORDS <= len(all_words) <= MAX_NARRATION_WORDS:
+    preview_short = (os.getenv("MOTOR_PREVIEW_WORDS_30") == "1" and
+                     os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1")
+    word_minimum = 30 if preview_short else MIN_NARRATION_WORDS
+    if not word_minimum <= len(all_words) <= MAX_NARRATION_WORDS:
         raise ShortsAcceptanceError(
-            f"Anlatım {MIN_NARRATION_WORDS}–{MAX_NARRATION_WORDS} kelime olmalı; bulundu: {len(all_words)}"
+            f"Anlatım {word_minimum}–{MAX_NARRATION_WORDS} kelime olmalı; bulundu: {len(all_words)}"
         )
     if _RESCUE_TEXT_PATTERN.search(all_text):
         raise ShortsAcceptanceError("'Görsel temsildir' kurtarma metni anlatımda kullanılamaz")

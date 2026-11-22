@@ -1409,10 +1409,12 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     """Shorts v2.4 local production path; it never uploads or publishes."""
     if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" and not getattr(a, "kuru", False):
         raise SystemExit("Deneysel görsel doğrulayıcı yalnız yayınsız kuru testte kullanılabilir.")
-    if os.getenv("MOTOR_PREVIEW_TEXT_OPENROUTER") == "1" and (
+    if (os.getenv("MOTOR_PREVIEW_TEXT_OPENROUTER") == "1" or os.getenv("MOTOR_PREVIEW_WORDS_30") == "1") and (
         os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") != "1" or not getattr(a, "kuru", False)
     ):
-        raise SystemExit("Deneysel metin sağlayıcısı yalnız yayınsız kuru testte kullanılabilir.")
+        raise SystemExit("Deneysel metin ayarları yalnız yayınsız kuru testte kullanılabilir.")
+    if os.getenv("MOTOR_PREVIEW_WORDS_30") == "1":
+        print("DİKKAT: YAYINLANMAZ İNCELEME; kelime alt sınırı deneysel olarak 30, gerçek süre ayrıca kontrol edilir.")
     import shutil
     from PIL import Image
     from shorts_acceptance import (
