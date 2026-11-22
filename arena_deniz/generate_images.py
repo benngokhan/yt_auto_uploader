@@ -1,11 +1,17 @@
-"""Four explicitly approved image calls. No retries, TTS, render or publication."""
+"""Two explicitly approved replacement image calls. No retries, TTS, render or publication."""
 import os,json,hashlib,sys,time,base64,urllib.request,urllib.error,uuid,re
 from pathlib import Path
 REPO=os.environ['GITHUB_REPOSITORY'];SHA=os.environ['GITHUB_SHA']
-LOCK='refs/tags/arena-deniz-images-v2-consumed-20261122'
+LOCK='refs/tags/arena-deniz-images-068-consumed-20261122'
 OUT=Path('image_results');OUT.mkdir(exist_ok=False)
 plan_bytes=Path('arena_deniz/plan.json').read_bytes();plan=json.loads(plan_bytes)
-assert len(plan['scenes'])==4 and plan['assistant_chosen_request_ceiling']==4
+assert len(plan['scenes'])==2 and plan['assistant_chosen_request_ceiling']==2
+assert [s['scene'] for s in plan['scenes']]==[3,4]
+assert plan['paid_upgrade_authorized'] is False
+assert plan['model']=='@cf/black-forest-labs/flux-2-klein-4b'
+assert plan['width']==720 and plan['height']==1280
+assert os.environ.get('GITHUB_REF')=='refs/heads/arena/deniz-images-068-20261122'
+assert os.environ.get('GITHUB_RUN_ATTEMPT')=='1'
 assert plan['automatic_retry'] is False and plan['automatic_fallback'] is False
 assert re.fullmatch(r'[a-fA-F0-9]{32}',os.environ.get('CF_ACCOUNT',''))
 assert os.environ.get('CF_TOKEN','').strip()
@@ -16,9 +22,9 @@ def req(url,data,headers):
  r=urllib.request.Request(url,data=data,headers=headers,method='POST')
  return opener.open(r,timeout=150)
 # Durable consumed-ref reservation before any inference. Failure is fail-closed.
-with req('https://api.github.com/repos/'+REPO+'/git/refs',json.dumps({'ref':LOCK,'sha':SHA}).encode(),{'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','User-Agent':'deniz-four-bounded-images','Content-Type':'application/json'}) as r:
+with req('https://api.github.com/repos/'+REPO+'/git/refs',json.dumps({'ref':LOCK,'sha':SHA}).encode(),{'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','User-Agent':'deniz-two-bounded-images-068','Content-Type':'application/json'}) as r:
  assert r.status==201
-record={'kind':'four_image_attempts','plan_sha256':hashlib.sha256(plan_bytes).hexdigest(),'model':plan['model'],'attempts':[],'retry_count':0,'publication':False,'billing':'User-declared free account, not independently measured','run_id':os.environ.get('GITHUB_RUN_ID')}
+record={'kind':'two_replacement_image_attempts','plan_sha256':hashlib.sha256(plan_bytes).hexdigest(),'model':plan['model'],'attempts':[],'retry_count':0,'publication':False,'billing':'User-declared free account, not independently measured','run_id':os.environ.get('GITHUB_RUN_ID')}
 def save():
  (OUT/'manifest.json').write_text(json.dumps(record,ensure_ascii=False,indent=2))
 save()
