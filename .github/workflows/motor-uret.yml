@@ -1,304 +1,71 @@
-name: Motor - video üret (elle onaylı)
-
-# Kanalın KENDİ motoru (motor/render_engine.py) ile tek video üretir.
-# Onay modu "elle": video üretilir, Drive'a YÜKLENMEZ; izlemen için artifact olarak iner.
-# Ses (voice-02 / ELEVENLABS_VOICE_ID + ELEVENLABS_API_KEY) yoksa üretim DURUR — başka sese geçmez.
-
+name: Deniz Charon one isolated narration
 on:
   workflow_dispatch:
     inputs:
       konu:
-        description: "Video konusu"
-        required: true
+        required: false
         type: string
       kuru:
-        description: "Sadece üret, hiçbir yere yükleme"
-        type: boolean
-        default: false
-      sahne:
-        description: "Benzersiz görsel sayısı (4)"
         required: false
-        default: "4"
         type: string
-      sure_min:
-        description: "En kısa süre (sn)"
-        required: false
-        default: "15"
-        type: string
-      sure_max:
-        description: "En uzun süre (sn)"
-        required: false
-        default: "25"
-        type: string
-      sadece_ses:
-        description: "Yalnızca onay sesi üret; görsel/video üretme"
-        type: boolean
-        default: false
-
-concurrency:
-  group: arena-tek-video-deneme
-  cancel-in-progress: false
-
+permissions:
+  contents: write
 jobs:
-  uret:
-    if: ${{ inputs.kuru == true }}
+  single_test:
+    if: ${{ inputs.konu == '__DENIZ_CHARON_SINGLE__' && inputs.kuru == 'true' && github.run_attempt == 1 }}
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-    permissions:
-      contents: read   # izole yayınsız deneme
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: pip
-
-      - name: FFmpeg
-        run: |
-          if command -v ffmpeg >/dev/null 2>&1 && command -v ffprobe >/dev/null 2>&1; then
-            ffmpeg -version | head -1
-            exit 0
-          fi
-          for deneme in 1 2 3 4; do
-            echo "FFmpeg kurulum denemesi $deneme/4"
-            if sudo apt-get -o Acquire::Retries=4 update -qq && \
-               sudo apt-get -o Acquire::Retries=4 install -y -qq --fix-missing ffmpeg; then
-              command -v ffmpeg && command -v ffprobe && exit 0
-            fi
-            sudo rm -rf /var/lib/apt/lists/partial/* || true
-            sleep $((deneme * 12))
-          done
-          echo "FFmpeg kurulamadı"
-          exit 1
-
-      - name: Bağımlılıklar (MİRA v2.2 + Charon)
-        run: |
-          SAGLAYICI=$(python -c "import json; print(json.load(open('motor/ayarlar.json')).get('ses',{}).get('saglayici',''))" 2>/dev/null || echo "")
-          if [ "$SAGLAYICI" = "xtts" ] || [ "$SAGLAYICI" = "xtts_v2" ] || [ "$SAGLAYICI" = "coqui_xtts" ]; then
-            pip install -q torch torchaudio torchcodec --index-url https://download.pytorch.org/whl/cpu
-            pip install -q six coqui-tts edge-tts -r requirements.txt -r requirements-motor.txt
-          else
-            echo "Hızlı mod aktif (ses=$SAGLAYICI): ağır XTTS/PyTorch paketleri atlanıyor..."
-            pip install -q -r requirements-motor.txt openpyxl google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib edge-tts
-          fi
-
-      - name: Varlıklar (fontlar + fon müziği)
-        run: python motor/varlik_hazirla.py
-
-      - name: Görsel seçim regresyon kapısı (A-D)
-        run: |
-          python -m unittest discover -s tests -p 'test_pexels_gorsel_pipeline.py' -v
-          python -m unittest discover -s tests -p 'test_openrouter_preview_vision.py' -v
-          python -m unittest discover -s tests -p 'test_groq_preview_vision.py' -v
-          python -m unittest discover -s tests -p 'test_v2_orchestrator.py' -v
-          echo "MOTOR_VISUAL_QA_PASSED=1" >> "$GITHUB_ENV"
-
-      - name: Üret
+      - name: Reserve and request once
         env:
-          # Kullanıcı 7 Kasım 2026'da para kazanmanın kapalı olduğunu belirterek
-          # ticari olmayan CPML şartlarıyla üretime onay verdi.
-          COQUI_TOS_AGREED: "1"
-          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY || secrets.PEXELS_KEY || secrets.PEXELS_API }}
-          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
-          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
-          MOTOR_VOICE_ID: Charon
-          MOTOR_XTTS_REFERENCE: ref_095.wav
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          MOTOR_EXPERIMENTAL_OPENROUTER: "1"
-          MOTOR_PREVIEW_VISION_PROVIDER: "groq"
-          MOTOR_PREVIEW_FIXED_SCRIPT: "1"
-          MOTOR_PREVIEW_TEXT_OPENROUTER: "1"
-          MOTOR_KONU: ${{ inputs.konu }}
-          MOTOR_KURU: ${{ inputs.kuru }}
-          MOTOR_SAHNE: ${{ inputs.sahne }}
-          MOTOR_SURE_MIN: ${{ inputs.sure_min }}
-          MOTOR_SURE_MAX: ${{ inputs.sure_max }}
-          MOTOR_SADECE_SES: ${{ inputs.sadece_ses }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
         run: |
-          ARGS="--konu \"$MOTOR_KONU\" --sahne ${MOTOR_SAHNE:-4} --sure-min ${MOTOR_SURE_MIN:-15} --sure-max ${MOTOR_SURE_MAX:-25}"
-          [ "$MOTOR_KURU" = "true" ] && ARGS="$ARGS --kuru"
-          [ "$MOTOR_SADECE_SES" = "true" ] && ARGS="$ARGS --sadece-ses"
-          echo "Komut: python motor/uret.py $ARGS"
-          # Arşiv: tüm konsol çıktısı uretim_XX klasörüne de yazılır (çıkış kodu korunur).
-          set -o pipefail
-          ARSIV="motor/cikti_arsiv/uretim_${GITHUB_RUN_NUMBER}"
-          mkdir -p "$ARSIV"
-          export PYTHONUNBUFFERED=1
-          eval python motor/uret.py $ARGS 2>&1 | tee "$ARSIV/00_konsol_logu_$(date -u +%Y%m%dT%H%M%SZ).txt"
-
-      - name: Videoyu Drive'a koy (Onay Bekleyen Videolar)
-        if: success() && inputs.kuru != true
-        env:
-          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
-          ONAY_KLASOR: ${{ vars.MOTOR_ONAY_KLASOR || '1xyO_jNjbpghfR7CJ1P9DUvkzdb6eC0qf' }}
-          RUN_NO: ${{ github.run_number }}
-        run: |
-          shopt -s globstar nullglob
-          videolar=(motor/cikti/**/*.mp4 motor/cikti/**/kapak.jpg motor/cikti/**/ses_onay.wav motor/cikti/**/yayin_bilgisi.json)
-          if [ ${#videolar[@]} -eq 0 ]; then
-            echo "Video yok (üretim durdu) — Drive'a bir şey konmadı."; exit 0
-          fi
-          pip install -q google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
           python - <<'PY'
-          import os, glob, mimetypes
+          import base64, hashlib, json, os, urllib.request, urllib.error, wave
           from pathlib import Path
-          from google.oauth2.credentials import Credentials
-          from google.auth.transport.requests import Request
-          from googleapiclient.discovery import build
-          from googleapiclient.http import MediaFileUpload
-
-          Path("token.json").write_text(os.environ["GOOGLE_TOKEN_JSON"], encoding="utf-8")
-          creds = Credentials.from_authorized_user_file("token.json")
-          if not creds.valid:
-              creds.refresh(Request())
-          drive = build("drive", "v3", credentials=creds)
-
-          # Eski hatalı/ara deneme ONAY_55, ONAY_57 ve hızlı okunan ONAY_58 kalıntılarını temizle
+          key=os.getenv('GEMINI_API_KEY','').strip()
+          if not key:
+              print('STOP: secret missing',flush=True);raise SystemExit(1)
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self,*args,**kwargs): return None
+          op=urllib.request.build_opener(NoRedirect())
+          reserve=urllib.request.Request('https://api.github.com/repos/'+os.environ['REPO']+'/git/refs',
+              data=json.dumps({'ref':'refs/heads/arena/deniz-charon-one-consumed-20261122','sha':os.environ['SHA']}).encode(),
+              headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json','User-Agent':'single-test-guard'},method='POST')
           try:
-              eski_q = (
-                  f"'{os.environ['ONAY_KLASOR']}' in parents and trashed = false and "
-                  "(name contains '_55' or name contains '_57' or name contains '_58' or name contains '_59' or name contains '_60')"
-              )
-              for ef in drive.files().list(q=eski_q, fields="files(id,name)").execute().get("files", []):
-                  try:
-                      drive.files().update(fileId=ef["id"], body={"trashed": True}).execute()
-                      print("ESKİ KALINTI SİLİNDİ:", ef["name"], ef["id"])
-                  except Exception as se:
-                      print("Eski dosya silme uyarısı:", ef["name"], se)
-          except Exception as le:
-              print("Eski kalıntı tarama uyarısı:", le)
-
-          dosyalar = sorted(set(glob.glob("motor/cikti/**/*.mp4", recursive=True))
-                            | set(glob.glob("motor/cikti/**/kapak.jpg", recursive=True))
-                            | set(glob.glob("motor/cikti/**/ses_onay.wav", recursive=True))
-                            | set(glob.glob("motor/cikti/**/yayin_bilgisi.json", recursive=True)))
-          for d in dosyalar:
-              if d.endswith(".jpg"):
-                  ad, mime = f"kapak_{os.environ.get('RUN_NO','0')}.jpg", "image/jpeg"
-              elif d.endswith(".wav"):
-                  ad, mime = f"SES_ONAY_{os.environ.get('RUN_NO','0')}.wav", "audio/wav"
-              elif d.endswith(".json"):
-                  ad, mime = f"YAYIN_BILGISI_{os.environ.get('RUN_NO','0')}.json", "application/json"
-              else:
-                  ad, mime = f"ONAY_{os.environ.get('RUN_NO','0')}_{Path(d).name}", "video/mp4"
-              medya = MediaFileUpload(d, mimetype=mime, resumable=True)
-              try:
-                  sonuc = drive.files().create(
-                      body={"name": ad, "parents": [os.environ["ONAY_KLASOR"]]},
-                      media_body=medya, fields="id,name,webViewLink").execute()
-                  print("DRIVE:", sonuc.get("webViewLink"))
-              except Exception as ye:
-                  print(f"UYARI: {ad} Drive'a konamadi: {type(ye).__name__}: {str(ye)[:160]}")
-                  print("Klasor erisimi yok. GOOGLE_TOKEN_JSON hesabi bu klasoru goremiyor olabilir.")
-                  print(f"Klasor kimligi: {os.environ['ONAY_KLASOR']}")
+              with op.open(reserve,timeout=20) as r:
+                  if r.status != 201: raise ValueError('reservation failed')
+          except Exception as e:
+              print('STOP: reservation failed or exists; TYPE='+type(e).__name__,flush=True);raise SystemExit(1)
+          print('RESERVATION=created; ONE_TTS_REQUEST=starting',flush=True)
+          prompt=('Türkçe konuş. Doğal, dengeli, akıcı ve çok net diksiyonlu bir erkek bilim anlatıcısı gibi konuş. Ne acele et ne de fazla ağırlaş; orta-canlı bir belgesel temposunda her kelimeyi, ekleri ve sessiz harfleri tane tane, pürüzsüz telaffuz et. Cümle aralarında doğal ve kıvamında yarım saniyelik nefes ver.\n\nMetin:\nDeniz neden tuzludur?\nCevap, yağmur damlalarının karadaki yolculuğunda saklı.\nMerakını besle, Bilgi Dozu’nu takip et!\nYağmur suyu kayalardaki mineralleri çözer.\nAkarsular bunları denizlere taşır.\nSu buharlaştığında, çözünmüş tuzlar geride kalır.\nPeki, deniz neden tuzludur?')
+          body={'contents':[{'parts':[{'text':prompt}]}], 'generationConfig':{'responseModalities':['AUDIO'],'speechConfig':{'voiceConfig':{'prebuiltVoiceConfig':{'voiceName':'Charon'}}}}}
+          req=urllib.request.Request('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent',data=json.dumps(body,ensure_ascii=False).encode(),headers={'x-goog-api-key':key,'Content-Type':'application/json','User-Agent':'single-opening-test'},method='POST')
+          try:
+              with op.open(req,timeout=150) as r:
+                  data=r.read(12000001)
+              if len(data)>12000000: raise ValueError('response too large')
+              result=json.loads(data); part=result['candidates'][0]['content']['parts'][0]['inlineData']; mime=part.get('mimeType','')
+              if not mime.lower().startswith('audio/l16') or ('rate=24000' not in mime.lower()): raise ValueError('unexpected audio format')
+              raw=base64.b64decode(part['data'],validate=True)
+              if not raw or len(raw)%2 or len(raw)>10000000: raise ValueError('invalid pcm')
+              Path('one_audio').mkdir(exist_ok=True)
+              with wave.open('one_audio/deniz_charon_ham.wav','wb') as w:
+                  w.setnchannels(1);w.setsampwidth(2);w.setframerate(24000);w.writeframes(raw)
+              audio=Path('one_audio/deniz_charon_ham.wav').read_bytes()
+              print('RESULT=AUDIO; SHA256='+hashlib.sha256(audio).hexdigest()+'; PCM_BYTES='+str(len(raw))+'; MIME='+mime,flush=True)
+          except urllib.error.HTTPError as e:
+              print('RESULT=HTTP_ERROR; STATUS='+str(e.code)+'; NO_RETRY',flush=True);raise SystemExit(1)
+          except Exception as e:
+              print('RESULT=ERROR; TYPE='+type(e).__name__+'; NO_RETRY',flush=True);raise SystemExit(1)
           PY
-
-      - name: Telegram'a bilgi kartını gönder
-        if: success() && inputs.kuru != true
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_GROUP_CHAT_ID || secrets.TELEGRAM_CHAT_ID }}
-          KONU: ${{ inputs.konu }}
-          RUN_NO: ${{ github.run_number }}
-        run: |
-          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
-            echo "Telegram anahtarı/sohbet kimliği yok; gönderim atlandı."; exit 0
-          fi
-          shopt -s globstar nullglob
-          kapaklar=(motor/cikti/**/kapak.jpg)
-          videolar=(motor/cikti/**/*.mp4)
-          if [ ${#videolar[@]} -eq 0 ]; then exit 0; fi
-          BOYUT=$(du -h "${videolar[0]}" | cut -f1)
-          SURE=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "${videolar[0]}" | awk '{printf "%.2f",$1}')
-          META=$(find motor/cikti -name yayin_bilgisi.json | head -1)
-          if [ -z "$META" ] || [ ! -f "$META" ]; then echo "Metadata yok; Telegram gönderimi güvenli biçimde atlandı."; exit 0; fi
-          BASLIK=$(jq -r '.baslik // "—"' "$META")
-          CAPTION=$(printf '🎬 YENİ VİDEO · ONAY BEKLİYOR\n\nBaşlık: %s\nKonu: %s\nSes: Gemini doğal erkek\nSüre: %s sn · Boyut: %s\n\nYayın bilgileri aşağıdaki mesajdadır. Onay elle verilir.' "$BASLIK" "$KONU" "$SURE" "$BOYUT")
-          if [ ${#kapaklar[@]} -gt 0 ]; then
-            curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto" \
-              -F "chat_id=${TELEGRAM_CHAT_ID}" -F "photo=@${kapaklar[0]}" \
-              -F "caption=🖼 Video kapağı · ${KONU}"
-          fi
-          # Telegram bot API videoyu 50 MB'a kadar kabul eder; üstü 413 verir.
-          # Kural: 45 MB üstüyse Telegram için hafif kopya üretilir.
-          TG_MAX_MB=45
-          BOYUT_MB=$(du -m "${videolar[0]}" | cut -f1)
-          GONDER="${videolar[0]}"
-          if [ "$BOYUT_MB" -gt "$TG_MAX_MB" ]; then
-            echo "Video ${BOYUT_MB} MB > ${TG_MAX_MB} MB, Telegram için sıkıştırılıyor."
-            GONDER="motor/cikti/son/onay_bekleyen/final_tg.mp4"
-            ffmpeg -y -i "${videolar[0]}" \
-              -c:v libx264 -preset veryfast -crf 27 -maxrate 5M -bufsize 10M \
-              -vf "scale=1080:1920:force_original_aspect_ratio=decrease,format=yuv420p" \
-              -c:a aac -b:a 128k -movflags +faststart "$GONDER" 2>/dev/null \
-              || cp "${videolar[0]}" "$GONDER"
-            echo "Telegram kopyası: $(du -m "$GONDER" | cut -f1) MB"
-          fi
-          if ! curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo" \
-            -F "chat_id=${TELEGRAM_CHAT_ID}" -F "video=@${GONDER}" \
-            -F "supports_streaming=true" -F "caption=${CAPTION}"; then
-            echo "UYARI: Telegram video gönderilemedi (boyut/sınır). Video Drive'da ve artifact'ta hazır."
-          fi
-          # Telegram'a gidemezse koşu patlamasın: Drive + artifact yolu zaten çalıştı.
-          rm -f "motor/cikti/son/onay_bekleyen/final_tg.mp4" 2>/dev/null || true
-          python - "$META" "$KONU" > /tmp/yayin_karti.txt <<'PY3'
-          import json,sys,html
-          d=json.load(open(sys.argv[1])); konu=sys.argv[2]
-          def e(k): return html.escape(str(d.get(k,'—')))
-          text=("📋 <b>YAYIN BİLGİLERİ · ONAY BEKLİYOR</b>\n\n"
-                f"<b>Başlık:</b> {e('baslik')}\n"
-                f"<b>Konu:</b> {html.escape(konu)}\n"
-                f"<b>Özet:</b> {e('konu_ozeti')}\n\n"
-                f"<b>Açıklama:</b>\n{e('aciklama')}\n\n"
-                f"<b>Hashtag:</b> {e('hashtag')}\n"
-                f"<b>Arama etiketleri:</b> {e('etiketler')}\n"
-                f"<b>Kategori:</b> {e('kategori')}\n\n"
-                f"<b>Sabit yorum:</b>\n{e('sabit_yorum')}\n\n"
-                "⚠️ Siz onaylamadan yayın kuyruğuna alınmaz.")
-          if len(text)>4096: raise SystemExit(f'Yayın kartı Telegram sınırını aşıyor: {len(text)}')
-          print(text)
-          PY3
-          curl --fail-with-body -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" --data-urlencode "parse_mode=HTML" \
-            --data-urlencode "text@/tmp/yayin_karti.txt"
-
-
-      - name: Kayıt dosyalarını depoya yaz (ses perde kaydı + sözlük notları)
-        if: ${{ always() && inputs.kuru != true && github.ref == 'refs/heads/main' }}
-        continue-on-error: true
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add motor/ses_perde_kaydi.csv motor/sozluk_ek_kelimeler.txt 2>/dev/null || true
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(motor): ses perde kaydı / sözlük notu (üretim ${GITHUB_RUN_NUMBER}) [skip ci]"
-            git pull --rebase --autostash origin main || true
-            git push origin HEAD:main || echo "UYARI: kayıt dosyaları depoya yazılamadı"
-          else
-            echo "Kayıt dosyalarında değişiklik yok"
-          fi
-
-      - name: Üretim arşivini sakla (uretim_XX)
-        if: always()
+      - name: Save audio for human review
         uses: actions/upload-artifact@v4
         with:
-          name: uretim_${{ github.run_number }}_arsiv
-          path: motor/cikti_arsiv/
-          if-no-files-found: warn
-          retention-days: 90
-
-      - name: Videoyu indirilebilir yap
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: motor-video
-          path: |
-            motor/cikti/**/*.mp4
-            motor/cikti/**/kapak.jpg
-            motor/cikti/**/ses_onay.wav
-            motor/cikti/**/yayin_bilgisi.json
-          if-no-files-found: warn
+          name: deniz-charon-one
+          path: one_audio/
+          if-no-files-found: error
           retention-days: 7
