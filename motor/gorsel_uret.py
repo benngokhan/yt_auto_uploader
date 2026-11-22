@@ -404,6 +404,30 @@ def _ham_kusurlu_mu(im: Image.Image) -> tuple[bool, str]:
     return False, "ok"
 
 
+def _preview_raw_pixel_check(hit: dict) -> tuple[bool, str]:
+    """Apply the same raw-pixel gate before spending an experimental vision call.
+
+    No model scores are inferred from this check. Images are checked again after
+    selection; only known Pexels image hosts are downloaded during pre-screening.
+    """
+    url = str(hit.get("indir_url") or "")
+    parsed = urllib.parse.urlsplit(url)
+    if parsed.scheme != "https" or parsed.hostname != "images.pexels.com":
+        return False, "invalid_pexels_image_url"
+    if not _provider_page_url_ok("pexels", str(hit.get("source_page_url") or "")):
+        return False, "invalid_pexels_source_page"
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".jpg", dir=workspace_temp_dir()) as temporary:
+            path = Path(temporary.name)
+            _indir(url, path)
+            with Image.open(path) as image:
+                image.load()
+                rejected, reason = _ham_kusurlu_mu(image)
+        return not rejected, f"pixel_filter:{reason}" if rejected else "ok"
+    except (Exception, SystemExit) as exc:  # noqa: BLE001 — fail closed
+        return False, f"pixel_precheck_error:{type(exc).__name__}"
+
+
 def dikey_kirp(img: Image.Image) -> Image.Image:
     """9:16 dikey kadraj (1350x2400).
     Dikey/kareye yakın fotoğrafları akıllı merkez kırpar;
@@ -706,6 +730,7 @@ def sahneler_icin_gorseller(
 
     klasor.mkdir(parents=True, exist_ok=True)
     used: set[str] = set()
+    preview_pixel_cache: dict[tuple[str, str], tuple[bool, str]] = {}
     paths: list[Path | None] = []
     report = {
         "version": 1,
@@ -741,10 +766,10 @@ def sahneler_icin_gorseller(
                 provider_log = {"provider": provider, "returned_candidate_count": 0, "candidates": []}
                 query_log["provider_results"].append(provider_log)
                 try:
-                    # The experimental model frequently truncated/invalidated eight-image
-                    # responses; use at most four candidates without increasing request count.
+                    # Fetch a bounded candidate pool, but send at most four
+                    # pixel-qualified photos to the experimental model.
                     limit = 4 if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" else MAX_CANDIDATES_PER_QUERY
-                    hits = search_fn(query, api_key, adet=limit)
+                    hits = search_fn(query, api_key, adet=MAX_CANDIDATES_PER_QUERY)
                 except TypeError:
                     hits = search_fn(query, api_key)
                 except Exception as exc:  # noqa: BLE001
@@ -761,8 +786,29 @@ def sahneler_icin_gorseller(
                     fresh_hits = [hit for hit in uygun_hits if str(hit.get("uid") or f"{provider}:{hit.get('id','')}") not in used]
                     provider_log["duplicate_precheck_rejected_count"] = len(uygun_hits) - len(fresh_hits)
                     provider_log["vision_batch_limit"] = limit
-                    provider_log["deferred_after_limit_count"] = max(0, len(fresh_hits) - limit)
-                    hits = fresh_hits[:limit]
+                    provider_log["pixel_precheck_rejections"] = []
+                    checked_hits = []
+                    examined = 0
+                    # Bound the raw-image work as well as model calls. Bad or
+                    # unavailable images fail closed, exactly as after selection.
+                    for hit in fresh_hits[:12]:
+                        if len(checked_hits) >= limit:
+                            break
+                        examined += 1
+                        uid = str(hit.get("uid") or f"{provider}:{hit.get('id','')}")
+                        key = (uid, str(hit.get("indir_url") or ""))
+                        if key in preview_pixel_cache:
+                            pixel_ok, reason = preview_pixel_cache[key]
+                        else:
+                            pixel_ok, reason = _preview_raw_pixel_check(hit)
+                            if not reason.startswith("pixel_precheck_error:"):
+                                preview_pixel_cache[key] = (pixel_ok, reason)
+                        if pixel_ok:
+                            checked_hits.append(hit)
+                        else:
+                            provider_log["pixel_precheck_rejections"].append({"uid": uid, "reason": reason})
+                    provider_log["deferred_after_limit_count"] = max(0, len(fresh_hits) - examined)
+                    hits = checked_hits
                 try:
                     if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1":
                         pending = [hit for hit in hits if str(hit.get("uid") or f"{provider}:{hit.get('id','')}") not in preview_score_cache]

@@ -36,12 +36,39 @@ on:
         default: false
 
 concurrency:
-  group: arena-tek-video-deneme
+  group: arena-visual-only-check
   cancel-in-progress: false
 
 jobs:
+  visual_only:
+    if: ${{ inputs.kuru == true && inputs.konu == '__VISUAL_ONLY__' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q numpy Pillow
+      - name: Local visual tests
+        run: python -m unittest discover -s tests -p 'test_openrouter_preview_vision.py' -v
+      - name: Select candidates without any TTS or video
+        env:
+          MOTOR_EXPERIMENTAL_OPENROUTER: "1"
+          MOTOR_VISUAL_QA_PASSED: "1"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY || secrets.PEXELS_KEY || secrets.PEXELS_API }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: python yalniz_gorsel_teshis.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: isolated-visual-diagnostic
+          path: teshis_viz/
+          if-no-files-found: warn
   uret:
-    if: ${{ inputs.kuru == true }}
+    if: ${{ inputs.kuru == true && inputs.konu != '__VISUAL_ONLY__' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
