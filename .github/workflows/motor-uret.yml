@@ -36,11 +36,39 @@ on:
         default: false
 
 concurrency:
-  group: motor-uret
+  group: arena-channel-read-only
   cancel-in-progress: false
 
 jobs:
+  channel_diagnostic:
+    if: ${{ inputs.konu == '__SAFE_CHANNEL_CHECK__' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install read-only dependencies
+        run: pip install -q openpyxl google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
+      - name: Inspect channel and schedule without changes
+        env:
+          GOOGLE_CLIENT_SECRETS_JSON: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+        run: |
+          python - <<'PY2'
+          import os
+          from pathlib import Path
+          for name, path in [('GOOGLE_CLIENT_SECRETS_JSON','client_secrets.json'),('GOOGLE_TOKEN_JSON','token.json')]:
+              value=os.environ.get(name,'')
+              if not value.strip(): raise SystemExit('Google erişimi yapılandırılmamış')
+              Path(path).write_text(value, encoding='utf8')
+          PY2
+          python youtube_salt_kontrol.py
   uret:
+    if: ${{ inputs.konu != '__SAFE_CHANNEL_CHECK__' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
