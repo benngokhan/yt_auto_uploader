@@ -169,7 +169,10 @@ def _record_score_passes(record: dict) -> bool:
     """Only a live Gemini Vision score is sufficient to select a production image."""
     origin = record.get("score_origin")
     permitted = origin == "live_gemini_vision" or (
-        origin == "live_openrouter_experimental" and os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1"
+        os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" and (
+            (origin == "live_openrouter_experimental" and os.getenv("MOTOR_PREVIEW_VISION_PROVIDER", "openrouter") == "openrouter") or
+            (origin == "live_groq_experimental" and os.getenv("MOTOR_PREVIEW_VISION_PROVIDER") == "groq")
+        )
     )
     return permitted and semantic_score_passes(record.get("semantic_similarity"))
 
@@ -565,7 +568,14 @@ def _visual_text_scores(scene_text: str, candidates: list[dict]) -> list[float |
     None döner ve fail-closed davranılır (aday görsel seçilmez).
     """
     if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1":
-        from openrouter_preview_vision import score_images
+        provider = os.getenv("MOTOR_PREVIEW_VISION_PROVIDER", "openrouter")
+        if provider == "groq":
+            from groq_preview_vision import score_images
+        elif provider == "openrouter":
+            from openrouter_preview_vision import score_images
+        else:
+            for hit in candidates: hit["_vision_error"] = "unknown_experimental_vision_provider"
+            return [None] * len(candidates)
         return score_images(scene_text, candidates, _indir)
     key = (os.getenv("GEMINI_API_KEY") or "").strip()
     if not key:
@@ -733,9 +743,12 @@ def sahneler_icin_gorseller(
     preview_pixel_cache: dict[tuple[str, str], tuple[bool, str]] = {}
     preview_rate_limited = False
     paths: list[Path | None] = []
+    experimental_provider = os.getenv("MOTOR_PREVIEW_VISION_PROVIDER", "openrouter")
+    experimental_origin = "live_groq_experimental" if experimental_provider == "groq" else "live_openrouter_experimental"
+    experimental_model = "qwen/qwen3.8-27b" if experimental_provider == "groq" else "particle-ai/particle-1:free"
     report = {
         "version": 1,
-        "semantic_model": ("particle-ai/particle-1:free" if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" else SEMANTIC_MODEL),
+        "semantic_model": (experimental_model if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" else SEMANTIC_MODEL),
         "threshold": SEMANTIC_THRESHOLD,
         "provider_order": [p[0] for p in providers],
         "scenes": [],
@@ -818,14 +831,15 @@ def sahneler_icin_gorseller(
                         fresh_scores = _visual_text_scores(judge_text, pending) if pending else []
                         if len(fresh_scores) != len(pending):
                             fresh_scores = [None] * len(pending)
-                        if pending and all(score is None for score in fresh_scores) and any(
-                            hit.get("_vision_error") in {"openrouter_http_429", "openrouter_daily_quota_exhausted"} for hit in pending
+                        if pending and any(
+                            hit.get("_vision_error") in {"openrouter_http_429", "openrouter_daily_quota_exhausted",
+                                                         "groq_http_429", "groq_rate_limit_wait_too_long"} for hit in pending
                         ):
                             preview_rate_limited = True
                             provider_log["vision_circuit"] = "rate_limited_fail_closed"
                         for hit, score in zip(pending, fresh_scores):
-                            # Cache only scores explicitly attributed to the experimental live judge.
-                            if score is not None and hit.get("_vision_origin") == "live_openrouter_experimental":
+                            # Cache only scores explicitly attributed to the selected experimental live judge.
+                            if score is not None and hit.get("_vision_origin") == experimental_origin:
                                 key = str(hit.get("uid") or f"{provider}:{hit.get('id','')}")
                                 preview_score_cache[key] = (score, hit["_vision_origin"])
                         scores = []

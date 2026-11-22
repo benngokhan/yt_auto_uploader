@@ -1570,9 +1570,14 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         raise SystemExit("Canlı görsel seçim raporu tam dört görsel içermiyor.")
     for index, row in enumerate(rows, start=1):
         selected = row.get("selected") if isinstance(row, dict) else None
+        preview_models = {
+            "openrouter": ("particle-ai/particle-1:free", "live_openrouter_experimental"),
+            "groq": ("qwen/qwen3.8-27b", "live_groq_experimental"),
+        }
+        expected_preview = preview_models.get(os.getenv("MOTOR_PREVIEW_VISION_PROVIDER", "openrouter"))
         experimental_origin = (os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" and a.kuru and
-                               secim_raporu.get("semantic_model") == "particle-ai/particle-1:free" and
-                               isinstance(selected, dict) and selected.get("score_origin") == "live_openrouter_experimental")
+                               expected_preview is not None and secim_raporu.get("semantic_model") == expected_preview[0] and
+                               isinstance(selected, dict) and selected.get("score_origin") == expected_preview[1])
         if not isinstance(selected, dict) or selected.get("provider") != "pexels" \
                 or not (selected.get("score_origin") == "live_gemini_vision" or experimental_origin):
             raise SystemExit(f"Shorts v2 sahne {index}: canlı görsel doğrulama kanıtı yok.")

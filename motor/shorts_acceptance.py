@@ -431,9 +431,13 @@ def _validate_visual_report(report: dict) -> list[dict]:
         if urlparse(url).hostname not in {"pexels.com", "www.pexels.com"}:
             raise ShortsAcceptanceError(f"Görsel sahne {index} Pexels kaynak URL'si doğrulanamadı")
         score_origin = selected.get("score_origin")
-        experimental = (os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" and
-                        report.get("semantic_model") == "particle-ai/particle-1:free" and
-                        score_origin == "live_openrouter_experimental")
+        preview_models = {
+            "openrouter": ("particle-ai/particle-1:free", "live_openrouter_experimental"),
+            "groq": ("qwen/qwen3.8-27b", "live_groq_experimental"),
+        }
+        expected_preview = preview_models.get(os.getenv("MOTOR_PREVIEW_VISION_PROVIDER", "openrouter"))
+        experimental = (os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" and expected_preview is not None and
+                        report.get("semantic_model") == expected_preview[0] and score_origin == expected_preview[1])
         if score_origin == "live_gemini_vision" or experimental:
             score = _finite_float(selected.get("semantic_similarity"), f"Sahne {index} semantik skor")
             if score < SEMANTIC_THRESHOLD or score > 1.0:

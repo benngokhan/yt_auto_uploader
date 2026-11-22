@@ -70,6 +70,7 @@ def score_images(scene_text, candidates, download):
                     if 0 <= val <= 1:
                         scores[i]=val
                         candidates[i]['_vision_origin']=ORIGIN
+                        candidates[i].pop('_vision_error',None)
                 return scores
             except urllib.error.HTTPError as exc:
                 if exc.code not in (429,500,502,503,504):

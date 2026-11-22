@@ -90,6 +90,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p 'test_pexels_gorsel_pipeline.py' -v
           python -m unittest discover -s tests -p 'test_openrouter_preview_vision.py' -v
+          python -m unittest discover -s tests -p 'test_groq_preview_vision.py' -v
           python -m unittest discover -s tests -p 'test_v2_orchestrator.py' -v
           echo "MOTOR_VISUAL_QA_PASSED=1" >> "$GITHUB_ENV"
 
@@ -107,6 +108,7 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           MOTOR_EXPERIMENTAL_OPENROUTER: "1"
+          MOTOR_PREVIEW_VISION_PROVIDER: "groq"
           MOTOR_PREVIEW_FIXED_SCRIPT: "1"
           MOTOR_PREVIEW_TEXT_OPENROUTER: "1"
           MOTOR_KONU: ${{ inputs.konu }}
