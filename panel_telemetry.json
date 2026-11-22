@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-22 11:11:26",
-  "generated_at_iso": "2026-11-22T11:11:26.662016+03:00",
+  "generated_at": "2026-11-22 18:38:55",
+  "generated_at_iso": "2026-11-22T18:38:55.762285+03:00",
   "folders": {
     "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
     "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
@@ -32,12 +32,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 19,
+    "ready_shorts": 18,
     "ready_longs": 0,
-    "total_ready": 19,
-    "days_of_stock": 19,
-    "next_short": "video_183.mp4",
-    "next_short_title": "Kutup Ayılarının Kürkü Aslında Beyaz Değil, Derisi Simsiyah! 🐻‍❄️🔬 #bilgidozu #shorts",
+    "total_ready": 18,
+    "days_of_stock": 18,
+    "next_short": "video_184.mp4",
+    "next_short_title": "Yolcu Uçakları Neden Neredeyse Her Zaman Beyaza Boyanır? ✈️☀️ #bilgidozu #shorts",
     "next_long": null,
     "next_long_title": "",
     "missing_covers": []
@@ -418,8 +418,8 @@
         "id": "1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo",
         "name": "baslik.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 106360,
-        "modifiedTime": "2026-11-18T17:09:22.923Z"
+        "size": 106433,
+        "modifiedTime": "2026-11-22T15:02:19.344Z"
       },
       {
         "id": "1YjYzlPGzBlkFCH6baStgv1DOOdttaFzU",
@@ -1384,9 +1384,9 @@
       "file_name": "video_183.mp4",
       "number": 183,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Kutup Ayılarının Kürkü Aslında Beyaz Değil, Derisi Simsiyah! 🐻‍❄️🔬 #bilgidozu #shorts",
       "description": "💬 Kutup ayısının kürkünün şeffaf, derisinin ise simsiyah olduğunu ilk öğrendiğinde kaç yaşındaydın? 🐻‍❄️🖤 Yoruma yaz! 👇\n\nKutup ayılarının bembeyaz göründüğüne bakma; kürklerinde tek bir damla bile beyaz renk pigmenti yoktur! Mikroskop altında incelendiğinde her bir tüy, içi hava boşluklarıyla dolu tamamen şeffaf ve renksiz birer tüptür. Tıpkı şeffaf buz kristallerinin üst üste binince kar gibi beyaz görünmesiyle aynı optik ışık saçılması yaşanır. Daha da şaşırtıcı olanı, bu tüylerin altındaki kutup ayısı derisi kutup güneşinin ısısını emebilmek için kömür gibi simsiyahtır.\n\n💬 Kutup ayılarının şeffaf tüylü ve siyah derili olduğunu ilk duyduğunda sen de şaşırdın mı? Yoruma yaz! 👇\n\n📚 Kaynak: Smithsonian Institution • Polar Bears International\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #doğa #kutupayısı #hayvanlar #bilim",
       "tags": [
@@ -1403,7 +1403,7 @@
       ],
       "category_name": "Doğa ve Optik",
       "pinned_comment": "Kutup ayısının kürkünün şeffaf, derisinin ise simsiyah olduğunu ilk öğrendiğinde kaç yaşındaydın? 🐻‍❄️🖤 Yoruma yaz! 👇",
-      "youtube_url": "",
+      "youtube_url": "https://youtu.be/V-R79ZGpcOk",
       "has_drive_video": true,
       "drive_video_id": "1TvxdBa8TGcUtod9Ftd1Xx2f2PcekEo2Q",
       "drive_video_size_mb": 9.42,
