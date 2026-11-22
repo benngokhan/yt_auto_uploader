@@ -40,7 +40,71 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  diagnostics:
+    if: ${{ inputs.konu == '__READ_FAILURES__' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Inspect previous failures without revealing credentials
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY2'
+          import json, os, re, urllib.request, urllib.error
+          class SafeRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  result = super().redirect_request(req, fp, code, msg, headers, newurl)
+                  if result and not newurl.startswith('https://api.github.com/'):
+                      result.remove_header('Authorization')
+                  return result
+          opener=urllib.request.build_opener(SafeRedirect())
+          root='https://api.github.com/repos/benngokhan/yt_auto_uploader'
+          headers={'Authorization': 'Bearer '+os.environ['GH_TOKEN'], 'Accept':'application/vnd.github+json', 'User-Agent':'safe-workflow-diagnostic'}
+          runs=[45032792155]
+          patterns={
+             'format parametre hatası':r"KeyError: [\"']content_scenes",
+             'slot çok eski':r'Rescue slot is in the future or too old',
+             'Pexels ve Pixabay anahtarı ortamda yok':r'PEXELS_API_KEY and PIXABAY_API_KEY are both missing',
+             'Pexels anahtarı ortamda yok':r'PEXELS_API_KEY (?:missing|yok)',
+             'Gemini anahtarı ortamda yok':r'GEMINI_API_KEY (?:missing|yok)',
+             'API kota veya hız sınırı':r'(?i)(quota.?exceeded|resource_exhausted|rate.?limit|http error 429|too many requests)',
+             'HTTP 400':r'(?i)(http error 400|400 bad request)',
+             'HTTP 403':r'(?i)(http error 403|403 forbidden)',
+             'HTTP 404':r'(?i)(http error 404|404 not found)',
+             'Görsel seçimi başarısız':r'(?i)(no_candidate_passed|görsel seçilmedi|görsel bulunamadı)',
+             'Üretim süresi kuralı':r'(?i)(MP4 süresi.*hedef|duration.*out.of.range)',
+          }
+          for rid in runs:
+              try:
+                  req=urllib.request.Request(root+f'/actions/runs/{rid}/jobs',headers=headers)
+                  jobs=json.load(opener.open(req,timeout=30))['jobs']
+                  for j in jobs:
+                      try:
+                          req=urllib.request.Request(root+f'/actions/jobs/{j["id"]}/logs',headers=headers)
+                          text=opener.open(req,timeout=30).read(12000000).decode('utf-8','replace')
+                          matches=[name for name,pat in patterns.items() if re.search(pat,text)]
+                          classes=sorted(set(re.findall(r'(?m)(?:^|\s)([A-Za-z_][A-Za-z_0-9]*(?:Error|Exception))(?=:)',text)))
+                          print(f'::notice title=Kontrol {rid}::' + ('; '.join(matches + classes) if (matches or classes) else 'Bilinen hata sınıfı tespit edilmedi'))
+                          if rid in (44906016201, 45032792155):
+                              wanted=[]
+                              for line in text.splitlines()[-400:]:
+                                  clean=re.sub(r'^\d{4}-\d{2}-\d{2}T[^ ]+ ', '', line)
+                                  if re.search(r'(?i)(key|token|secret|authorization|password|AIza|gsk_)',clean): continue
+                                  if not re.search(r'(?i)(429|kota|quota|hata|error|başarısız|durduruldu|fallback|seçilemedi|secilemedi|bulunamadı|bulunamadi|bitti|retry|retrying|deneniyor|deneme|görsel|gorsel|vision|exception)',clean): continue
+                                  if re.search(r'(?i)(^test_| ok$|SKIP|upload.artifact|post run|yml)',clean): continue
+                                  clean=re.sub(r'https?://[^ ]+', '[adres]',clean)
+                                  clean=re.sub(r'[^\w\s.,:;()\[\]\-/%]', '',clean)[:180]
+                                  if clean.strip(): wanted.append(clean.strip())
+                              print(f'::notice title=Motor ayrıntı {rid}::'+' | '.join(wanted[-24:]).replace('%','%25'))
+                      except Exception as e:
+                          print(f'::notice title=Kontrol {rid}::Kayıt okunamadı ({type(e).__name__})')
+              except Exception as e:
+                  print(f'::notice title=Kontrol {rid}::Çalışma okunamadı ({type(e).__name__})')
+          PY2
   uret:
+    if: ${{ inputs.konu != '__READ_FAILURES__' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
