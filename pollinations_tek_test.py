@@ -13,7 +13,7 @@ from pathlib import Path
 from PIL import Image
 
 BASE='https://gen.pollinations.ai'
-MODEL='black-forest-labs/flux.1-schnell'
+MODEL='tongyi-mai/z-image-turbo'
 KEY=(os.getenv('POLLINATIONS_API_KEY') or '').strip()
 if not KEY:
     print('POLLINATIONS_DURUM SECRET_YOK',flush=True);raise SystemExit(2)
@@ -61,7 +61,7 @@ try:
     if len(entries)!=1:raise ValueError('missing_model')
     model=entries[0]; price=num((model.get('pricing') or {}).get('completionImageTokens'))
     print('POLLINATIONS_MODEL',MODEL,'BIRIM_KREDI',price if price is not None else 'BILINMIYOR',flush=True)
-    if model.get('paid_only') is not False or model.get('flat_rate') is not True or price is None or price<=0 or price>0.002:
+    if model.get('paid_only') is not False or model.get('flat_rate') is not True or price is None or price<=0 or price>0.004:
         print('POLLINATIONS_DURUM MODEL_FIYATI_DOGRULANAMADI',flush=True);raise SystemExit(2)
     if available<price or remaining<price or (budget is not None and budget<price):
         print('POLLINATIONS_DURUM YETERSIZ_GOREV_BAKIYESI_VEYA_BUTCE',flush=True);raise SystemExit(2)
