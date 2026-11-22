@@ -42,6 +42,7 @@ class UploadReportingIntegration(unittest.TestCase):
                 'sync_kartal_status_report': lambda *a, **kw: None,
                 'load_table_from_drive_or_local': lambda *a, **kw: {},
             }
+            stack.enter_context(patch('youtube_guvenlik.yayin_guvenlik_kontrolu', return_value=None))
             for name, value in replacements.items():
                 stack.enter_context(patch.object(uploader, name, value))
             stack.enter_context(patch.dict(os.environ, {'GITHUB_EVENT_NAME': 'workflow_dispatch'}, clear=True))
