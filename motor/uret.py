@@ -908,7 +908,7 @@ PROMPT_V2 = (
     "Konu: {konu}\n\n"
     "Bilgi Dozu için 15–25 saniyelik (varsayılan hedef yaklaşık 20 saniye), Türkçe bilim Shorts planı yaz. "
     "Tam dört benzersiz fotoğraf kullanılır; finalde ilk fotoğraf yeniden gösterilir.\n"
-    "- 'cumleler' dizisine TAM {n} kısa cümle yaz: toplam 35–45 kelime, her satır 3–10 kelime.\n"
+    "- 'cumleler' dizisine TAM {n} kısa cümle yaz. Her bir cümle 7–9 kelime olsun; toplam 35–45 kelime zorunludur. Göndermeden önce kelimeleri say, 35'ten azsa cümleleri somut ayrıntılarla uzat.\n"
     "- 1. cümle doğrudan merak uyandıran soru-hook olsun; ilk kelime video başında duyulur.\n"
     "- 2. cümle cevabın ilk kısmıdır ve ikinci görselle gösterilir. Ekrana ayrıca 'Takip et' yazı katmanı konur; "
     "bu ifade SADECE görsel katmanıdır, seslendirme cümlelerine ekleme.\n"
