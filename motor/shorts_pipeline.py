@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""BİLGİ DOZU — ONAYLI MASTER v2.2 SHORTS RENDER MOTORU (sablon_v2 / video_196 Birebir Kilitli)
+"""BİLGİ DOZU — Shorts v2.3 render motoru (7 bilgi sahnesi, loop-friendly).
 
-Onaylı koordinat ve ses mimarisi (1080x1920 @ 30fps):
+Kabul kuralları: 35–45 kelime, ilk hook 0. saniyede, 7 ardışık sahne 2–3 saniye,
+15–20 saniye hedefi (25 saniye sert üst sınır), loop'a dönen final; CTA/end-card yok.
+
+Görsel koordinat ve ses mimarisi (1080x1920 @ 30fps):
   - Üst İlerleme Çubuğu: x=78..1038 (960x8 px), y=48..56, zemin #3A3A3A, dolgu #E3F424
   - Sol Üst 3D Rozet: x=77, y=80 (214x58 px, 3x supersampled ArchivoBlack "BİLGİ DOZU")
   - Ortalanmış 2 Satır Sahne Başlığı: cx=540, y1=287, y2=363, Poppins-Bold 64 px, <=20 harf/satır,
@@ -12,11 +15,10 @@ Onaylı koordinat ve ses mimarisi (1080x1920 @ 30fps):
     girişte %100 beyaz, YALNIZCA o an okunan tek kelime #E3F424 sarı
   - Alt Kaynak & Marka İmzası: y=1751 görsel notu, y=1790 konuya özel bilimsel kaynak (Poppins-Regular 27 px),
     y=1840 ArchivoBlack 46 px "BİLGİ DOZU" ("BİLGİ " #FFFFFF + "DOZU" #E3F424)
-  - Saf 3D Kapanış Ekranı (endcard_v2.py): "Daha fazla Bilgi Dozu..." başladığı an arayüz söner,
-    arka plan bulanıklaşıp kararır ve tam "takip et!" dendiğinde fare tıklar
-  - Broadcast Jenerik Ses Mimarisi: 116 BPM Dm9 belgesel merak jeneriği, 1.45s tam ses intro,
-    ~0.62s cümle arası nefes esleri, konuşmada 50ms look-ahead -15.6 dB auto-ducking + 850 Hz FIR LPF,
-    sabit lineer -14.2 LUFS kalibrasyon
+  - Shorts v2.3: tam ses intro/outro yok; ilk kelime en geç 150ms'de, cümle arası hedef es 0.12s.
+    Gemini Natural TTS/Charon kimliği yerel manifest'te tutulur; hız 1.00x kalır, yalnız biçim dönüşümü yapılır.
+  - Broadcast Jenerik Ses Mimarisi: 116 BPM Dm9 belgesel merak jeneriği, 50ms look-ahead
+    auto-ducking + 720 Hz FIR LPF, sabit lineer -14.2 LUFS kalibrasyon. CTA/click SFX only for legacy jobs.
 
 Kullanım:
   python3 shorts_pipeline.py <plates|timing|music|render|cover|all> <video_id> [config_path]
@@ -54,13 +56,23 @@ if HERE not in sys.path:
 import endcard_v2  # noqa: E402
 from shorts_acceptance import (  # noqa: E402
     EXPECTED_SCENES,
-    MIN_SCENE_SECONDS,
+    EXPECTED_NARRATION_BEATS,
+    V2_CTA_OVERLAY_TEXT,
+    V2_CTA_OVERLAY_BEAT_INDEX,
+    V2_VISUAL_SEQUENCE,
+    FORMAT_VERSION,
     MAX_SCENE_SECONDS,
+    MIN_SCENE_SECONDS,
+    SHORTS_VERSION,
+    TEMPLATE_VERSION,
     ShortsAcceptanceError,
+    duration_in_target_band,
     sha256_file,
     validate_duration,
+    validate_hook_timing,
     validate_render_manifest_v2,
     validate_scene_intervals,
+    validate_v2_timeline,
     validate_v2_production_context,
 )
 
@@ -123,8 +135,9 @@ def _miks_ayarlari() -> dict:
 
 _MIKS = _miks_ayarlari()
 
+# These remain defaults for legacy jobs only; v2.3's locked mix timing is validated separately.
 DEFAULT_INTRO_LEAD = 1.45
-DEFAULT_SENT_PAUSE = float(_MIKS.get("cumle_arasi_es_sn", 0.54))          # cümle arası es süresi
+DEFAULT_SENT_PAUSE = float(_MIKS.get("cumle_arasi_es_sn", 0.54))
 DEFAULT_OUTRO_HOLD = endcard_v2.OUTRO_HOLD_SEC
 DUCK_FLOOR = float(_MIKS.get("muzik_kisma_tabani", 0.135))                # konuşma sırasında müzik seviyesi (1.0 = tam)
 TARGET_LUFS = float(_MIKS.get("hedef_ses_yuksekligi_lufs", -14.2))        # son miks ses yüksekliği hedefi
@@ -890,14 +903,17 @@ def _discover_scenes(work_dir: str, cfg: dict) -> list[str]:
 
 def stage_plates(vdir_arg: str, explicit_cfg_path: str | None = None):
     work_dir, cfg, _ = _resolve_context(vdir_arg, explicit_cfg_path)
+    v2_context = validate_v2_production_context(work_dir, cfg)
     names = _discover_scenes(work_dir, cfg)
     for i, n in enumerate(names):
         src = os.path.join(work_dir, n)
         out = os.path.join(work_dir, "plate_" + n)
-        build_plate(src, out, dark_bottom_cta=(i == len(names) - 1 and len(names) >= 4))
+        legacy_closing = v2_context is None and i == len(names) - 1 and len(names) >= 4
+        build_plate(src, out, dark_bottom_cta=legacy_closing)
         print("plate:", out)
-    cta_plate = os.path.join(work_dir, "plate_closing_cta.jpg")
-    build_plate(os.path.join(work_dir, names[-1]), cta_plate, dark_bottom_cta=True)
+    if v2_context is None:
+        cta_plate = os.path.join(work_dir, "plate_closing_cta.jpg")
+        build_plate(os.path.join(work_dir, names[-1]), cta_plate, dark_bottom_cta=True)
 
 
 # ---------------------------------------------------------------- AŞAMA 2: TIMING (Nefes Esli VO + faster-whisper + v2 Karaoke Chunks)
@@ -920,6 +936,34 @@ def write_wav_mono(path: str, sig: np.ndarray, fr: int = SR):
         w.writeframes(pcm.tobytes())
 
 
+def trim_leading_silence(sig: np.ndarray, fr: int, *, max_trim_seconds: float = 0.75) -> tuple[np.ndarray, float]:
+    """Remove only leading near-silence; never time-stretch the Gemini/Charon voice."""
+    if fr <= 0 or sig.size == 0:
+        raise ShortsAcceptanceError("Gemini/Charon sesi boş veya örnekleme hızı geçersiz")
+    frame = max(1, int(round(fr * 0.01)))
+    usable = (len(sig) // frame) * frame
+    if usable < frame:
+        return sig.copy(), 0.0
+    blocks = np.asarray(sig[:usable], dtype=np.float64).reshape(-1, frame)
+    rms = np.sqrt(np.mean(blocks * blocks, axis=1))
+    reference = float(np.percentile(rms, 95))
+    threshold = max(0.0015, reference * 0.025)
+    active = np.flatnonzero(rms > threshold)
+    if len(active) < 2:
+        return sig.copy(), 0.0
+    first = int(active[0])
+    # Require two adjacent energetic 10ms frames; a click/noise alone is not speech onset.
+    if first + 1 >= len(rms) or rms[first + 1] <= threshold:
+        return sig.copy(), 0.0
+    trim_samples = max(0, first * frame - int(round(0.03 * fr)))
+    trim_seconds = trim_samples / float(fr)
+    if trim_seconds > max_trim_seconds:
+        raise ShortsAcceptanceError(
+            f"Gemini/Charon sesindeki başlangıç sessizliği {trim_seconds:.3f}s; hook anında başlayamıyor"
+        )
+    return sig[trim_samples:].copy(), trim_seconds
+
+
 def ensure_vo_raw(work_dir: str) -> str:
     raw_wav = os.path.join(work_dir, "vo_raw.wav")
     if os.path.exists(raw_wav) and os.path.getsize(raw_wav) > 1000:
@@ -937,19 +981,19 @@ def prepare_voice_wav(
     raw_wav: str,
     output_wav: str,
     speed_factor: float,
-    provider: str = "arena.generate_speech",
+    provider: str = "gemini_tts",
 ) -> None:
-    """Prepare the declared Arena voice at 1.00x; format conversion never changes tempo."""
+    """Prepare Gemini Natural TTS/Charon at 1.00x; format conversion never changes tempo."""
     try:
         factor = float(speed_factor)
     except (TypeError, ValueError) as exc:
         raise ShortsAcceptanceError("voice_speed_factor sayı olmalı") from exc
     if not math.isfinite(factor):
         raise ShortsAcceptanceError("voice_speed_factor sonlu olmalı")
-    if provider != "arena.generate_speech":
-        raise ShortsAcceptanceError(f"Shorts v2 yalnız Arena sesini kabul eder; sağlayıcı: {provider}")
+    if provider != "gemini_tts":
+        raise ShortsAcceptanceError(f"Shorts v2 yalnız Gemini Natural TTS/Charon kabul eder; sağlayıcı: {provider}")
     if abs(factor - 1.0) >= 1e-9:
-        raise ShortsAcceptanceError("Arena sesi 1.00x kalmalı; yalnız biçim dönüştürmeye izin var")
+        raise ShortsAcceptanceError("Gemini/Charon sesi 1.00x kalmalı; yalnız biçim dönüştürmeye izin var")
 
     source_ok = False
     try:
@@ -977,7 +1021,7 @@ def prepare_voice_wav(
         raise
     except Exception as exc:  # noqa: BLE001
         Path(output_wav).unlink(missing_ok=True)
-        raise ShortsAcceptanceError(f"Arena WAV biçim/tempo işlemi başarısız ({type(exc).__name__})") from exc
+        raise ShortsAcceptanceError(f"Gemini/Charon WAV biçim/tempo işlemi başarısız ({type(exc).__name__})") from exc
 
 
 def ff_silences(path: str, noise_db: float = -35.0, min_dur: float = 0.14):
@@ -1227,17 +1271,29 @@ def stage_timing(vdir_arg: str, explicit_cfg_path: str | None = None):
                             "-i", raw_wav, "-ar", str(SR), "-ac", "1", "-c:a", "pcm_s16le", vo_final], check=True)
             x_raw, fr = read_wav_mono(vo_final)
 
+    timing_voice = vo_final
+    trim_offset = 0.0
+    if v2_context is not None:
+        x_raw, trim_offset = trim_leading_silence(x_raw, fr)
+        if trim_offset > 0:
+            timing_voice = os.path.join(work_dir, "vo_timing_input.wav")
+            write_wav_mono(timing_voice, x_raw, fr)
+            print(f"[v2 hook] baştaki sessizlik {trim_offset:.3f}s kesildi; Gemini/Charon ses hızı değiştirilmedi")
+        sents = [line.strip() for line in script.splitlines() if line.strip()]
+        if len(sents) != EXPECTED_NARRATION_BEATS:
+            raise ShortsAcceptanceError("V2 script.txt beş anlatım vuruşu içermeli")
+    else:
+        sents = [s.strip() for s in re.split(r"(?<=[.!?])\s+", script) if s.strip()]
+        if not sents:
+            sents = [script]
     dur_raw = len(x_raw) / float(fr)
-    sents = [s.strip() for s in re.split(r"(?<=[.!?])\s+", script) if s.strip()]
-    if not sents:
-        sents = [script]
 
     intro_lead = float(cfg.get("intro_lead", DEFAULT_INTRO_LEAD))
     pause_target = float(cfg.get("sentence_pause", DEFAULT_SENT_PAUSE))
     outro_hold = float(cfg.get("outro_hold", DEFAULT_OUTRO_HOLD))
 
     all_script_words = [w for s in sents for w in s.split()]
-    raw_whisper = _try_whisper_words(vo_final, all_script_words)
+    raw_whisper = _try_whisper_words(timing_voice, all_script_words)
 
     tokens_flat: list[dict] = []
     spaced_sent_spans: list[tuple[float, float]] = []
@@ -1313,7 +1369,7 @@ def stage_timing(vdir_arg: str, explicit_cfg_path: str | None = None):
             spaced_sent_spans.append((tokens_flat[w_a]["start"], tokens_flat[w_b]["end"]))
     else:
         # Yedek yol (Whisper yoksa): -43 dB eşiğiyle sessiz harfleri koruyarak hizala
-        sils, _ = ff_silences(vo_final, noise_db=-43.0, min_dur=0.18)
+        sils, _ = ff_silences(timing_voice, noise_db=-43.0, min_dur=0.18)
         spans, prev = [], 0.0
         for s, e in sils:
             if s - prev > 0.18:
@@ -1370,6 +1426,10 @@ def stage_timing(vdir_arg: str, explicit_cfg_path: str | None = None):
                 tokens_flat.append({"text": N_(w_txt), "start": round(cur_t, 3), "end": round(cur_t + wd, 3)})
                 cur_t += wd
 
+    if v2_context is not None:
+        if not tokens_flat:
+            raise ShortsAcceptanceError("V2 kelime zamanlaması üretilemedi; hook doğrulanamadı")
+        validate_hook_timing(0.0, tokens_flat[0]["start"])
     chunks = build_auto_subtitle_chunks(tokens_flat)
     last_word_end = tokens_flat[-1]["end"] if tokens_flat else round(total_dur - outro_hold, 3)
 
@@ -1399,48 +1459,62 @@ def stage_timing(vdir_arg: str, explicit_cfg_path: str | None = None):
         scene_timeline[si + 1]["start"] = scene_timeline[si]["end"]
 
     if v2_context is not None:
-        if n_sc != EXPECTED_SCENES or len(sents) != EXPECTED_SCENES:
-            raise ShortsAcceptanceError("Shorts v2 zamanlaması tam 7 görsel ve 7 cümle ister")
-        interval_seconds = total_dur / EXPECTED_SCENES
+        if n_sc != EXPECTED_SCENES or len(sents) != EXPECTED_NARRATION_BEATS:
+            raise ShortsAcceptanceError("Shorts v2 dört görsel ve beş anlatım vuruşu ister")
+        # Follow actual speech boundaries instead of dividing five sentences equally.
+        # Each transition is placed in the natural gap between consecutive sentences.
+        boundaries = [0.0]
+        for si in range(EXPECTED_NARRATION_BEATS - 1):
+            boundaries.append(round((spaced_sent_spans[si][1] + spaced_sent_spans[si + 1][0]) / 2, 3))
+        boundaries.append(total_dur)
         scene_timeline = []
-        for si in range(EXPECTED_SCENES):
-            start = round(si * interval_seconds, 3)
-            end = round((si + 1) * interval_seconds, 3) if si < EXPECTED_SCENES - 1 else total_dur
+        for si, visual_index in enumerate(V2_VISUAL_SEQUENCE):
+            headline = headlines[visual_index]
             scene_timeline.append({
                 "scene_idx": si,
-                "file": scene_files[si],
-                "is_closing": si == EXPECTED_SCENES - 1,
-                "mode": si % 3,
-                "start": start,
-                "end": end,
-                "icon": headlines[si]["icon"],
-                "line1": headlines[si]["line1"],
-                "line2": headlines[si]["line2"],
+                "visual_index": visual_index,
+                "file": scene_files[visual_index],
+                "is_closing": si == EXPECTED_NARRATION_BEATS - 1,
+                "mode": visual_index % 3,
+                "start": boundaries[si],
+                "end": boundaries[si + 1],
+                "icon": headline["icon"],
+                "line1": headline["line1"],
+                "line2": headline["line2"],
+                "cta_overlay": V2_CTA_OVERLAY_TEXT if si == V2_CTA_OVERLAY_BEAT_INDEX else None,
             })
-        validate_scene_intervals(scene_timeline)
+        validate_v2_timeline(scene_timeline, scene_files)
 
-    cta_start, click_delay = endcard_v2.find_endcard_and_click_times(tokens_flat, last_word_end)
-    for ch in chunks:
-        if ch.get("is_cta") or ch["start"] >= cta_start - 0.05:
-            ch["is_cta"] = True
-            ch["hide"] = ch["show"]
-        elif ch["end"] > cta_start:
-            ch["end"] = round(cta_start, 3)
-            ch["hide"] = round(cta_start, 3)
+    if v2_context is not None:
+        cta_start, click_delay = total_dur, 0.0
+    else:
+        cta_start, click_delay = endcard_v2.find_endcard_and_click_times(tokens_flat, last_word_end)
+        for ch in chunks:
+            if ch.get("is_cta") or ch["start"] >= cta_start - 0.05:
+                ch["is_cta"] = True
+                ch["hide"] = ch["show"]
+            elif ch["end"] > cta_start:
+                ch["end"] = round(cta_start, 3)
+                ch["hide"] = round(cta_start, 3)
 
     out = {
-        "template_version": "2.2-sablon_v2",
+        "format_version": FORMAT_VERSION if v2_context is not None else "legacy",
+        "shorts_version": SHORTS_VERSION if v2_context is not None else "legacy",
+        "template_version": TEMPLATE_VERSION if v2_context is not None else "2.2-sablon_v2",
         "fps": FPS,
         "total": total_dur,
         "vo_dur": round(dur_raw, 3),
         "vo_file": "vo_spaced.wav",
         "vo_raw_preserved": "vo_final.wav",
+        "trimmed_leading_silence_seconds": round(trim_offset, 3),
         "intro_lead": intro_lead,
         "sentence_pause": pause_target,
         "outro_hold": outro_hold,
         "last_end": round(last_word_end, 3),
-        "cta_start": round(cta_start, 3),
-        "cta_click_delay": round(click_delay, 3),
+        "hook_first_word_start": round(tokens_flat[0]["start"], 3) if tokens_flat else None,
+        "target_duration_met": duration_in_target_band(total_dur) if v2_context is not None else None,
+        "cta_start": None if v2_context is not None else round(cta_start, 3),
+        "cta_click_delay": None if v2_context is not None else round(click_delay, 3),
         "tokens": tokens_flat,
         "scenes": scene_timeline,
         "sentence_spans": [[round(a, 3), round(b, 3)] for a, b in spaced_sent_spans],
@@ -1448,7 +1522,10 @@ def stage_timing(vdir_arg: str, explicit_cfg_path: str | None = None):
     }
     with open(os.path.join(work_dir, "timing.json"), "w", encoding="utf-8") as fh:
         json.dump(out, fh, ensure_ascii=False, indent=2)
-    print(f"{vdir_arg}: sablon_v2 timing hazır -> {len(chunks)} altyazı bloğu, {n_sc} sahne, toplam {total_dur:.2f}s, CTA @ {cta_start:.2f}s")
+    duration_note = "hedef bandı" if v2_context is not None and duration_in_target_band(total_dur) else (
+        "izinli süre içinde, 20s hedefine uzak" if v2_context is not None else f"CTA @ {cta_start:.2f}s"
+    )
+    print(f"{vdir_arg}: timing hazır -> {len(chunks)} altyazı bloğu, {n_sc} sahne, toplam {total_dur:.2f}s, {duration_note}")
 
 
 # ---------------------------------------------------------------- AŞAMA 3: MUSIC (sablon_v2/build_v2_shorts.py Birebir Jenerik)
@@ -1658,7 +1735,8 @@ def _measure_lufs(wav_path: str) -> float:
 
 
 def build_mix(work_dir: str, tl: dict, cfg: dict | None = None) -> str:
-    """sablon_v2/build_v2_shorts.py + render_batch_187_196.py birebir auto-ducking broadcast miksajı."""
+    """Broadcast auto-duck mix; v2 has no CTA/click SFX and preserves 1.00x voice."""
+    v2_context = validate_v2_production_context(work_dir, cfg or {})
     total_dur = float(tl["total"])
     target_n = int(round(total_dur * SR))
     vo_file = os.path.join(work_dir, tl.get("vo_file", "vo_spaced.wav"))
@@ -1741,14 +1819,15 @@ def build_mix(work_dir: str, tl: dict, cfg: dict | None = None) -> str:
     mixL = vL + mL_ducked
     mixR = vR + mR_ducked
 
-    cta_t = float(tl.get("cta_start", max(1.0, total_dur - 2.6)))
-    click_delay = float(tl.get("cta_click_delay", 1.25))
-    sfx_st = endcard_v2.synthesize_endcard_sfx(click_delay=click_delay, sr=SR)
-    s0 = max(0, int(round(cta_t * SR)))
-    if s0 < target_n:
-        s1 = min(target_n, s0 + len(sfx_st))
-        mixL[s0:s1] += sfx_st[:s1 - s0, 0]
-        mixR[s0:s1] += sfx_st[:s1 - s0, 1]
+    if v2_context is None:
+        cta_t = float(tl.get("cta_start", max(1.0, total_dur - 2.6)))
+        click_delay = float(tl.get("cta_click_delay", 1.25))
+        sfx_st = endcard_v2.synthesize_endcard_sfx(click_delay=click_delay, sr=SR)
+        s0 = max(0, int(round(cta_t * SR)))
+        if s0 < target_n:
+            s1 = min(target_n, s0 + len(sfx_st))
+            mixL[s0:s1] += sfx_st[:s1 - s0, 0]
+            mixR[s0:s1] += sfx_st[:s1 - s0, 1]
 
     pre_wav = os.path.join(work_dir, "mix_pre.wav")
     peak0 = max(float(np.max(np.abs(mixL))), float(np.max(np.abs(mixR))), 1e-9)
@@ -1807,7 +1886,10 @@ def render_video(vdir_arg: str, explicit_cfg_path: str | None = None):
     total_dur = float(tl["total"])
     if v2_context is not None:
         validate_duration(total_dur)
-        validated_intervals = validate_scene_intervals(tl.get("scenes") or [])
+        validated_intervals = validate_v2_timeline(tl.get("scenes") or [], cfg.get("scenes"))
+        validate_hook_timing(
+            validated_intervals[0]["start"], tl.get("hook_first_word_start")
+        )
         if abs(validated_intervals[-1]["end"] - total_dur) > 1e-3:
             raise ShortsAcceptanceError("V2 son sahne bitişi MP4 toplam süresiyle uyuşmuyor")
     n_frames = max(1, int(round(total_dur * FPS)))
@@ -1820,7 +1902,7 @@ def render_video(vdir_arg: str, explicit_cfg_path: str | None = None):
     headlines = []
     for idx, sc in enumerate(scenes_tl):
         src_file = os.path.join(work_dir, sc["file"])
-        is_cl = bool(sc.get("is_closing"))
+        is_cl = False if v2_context is not None else bool(sc.get("is_closing"))
         pp = os.path.join(work_dir, "plate_closing_cta.jpg" if is_cl else ("plate_" + sc["file"]))
         if os.path.exists(pp):
             pl = Image.open(pp).convert("RGB")
@@ -1851,7 +1933,8 @@ def render_video(vdir_arg: str, explicit_cfg_path: str | None = None):
     visual_credits = cfg.get("visual_credits") or []
     static_overlays = []
     for scene_index in range(len(scenes)):
-        credit = visual_credits[scene_index] if scene_index < len(visual_credits) else None
+        visual_index = V2_VISUAL_SEQUENCE[scene_index] if v2_context is not None else scene_index
+        credit = visual_credits[visual_index] if visual_index < len(visual_credits) else None
         if isinstance(credit, dict):
             provider = str(credit.get("provider") or "").lower()
             url = str(credit.get("url") or "").strip()
@@ -1865,8 +1948,22 @@ def render_video(vdir_arg: str, explicit_cfg_path: str | None = None):
     if not static_overlays:
         static_overlays = [build_static_overlay()]
 
-    t_endcard = float(tl.get("cta_start", max(1.0, total_dur - 2.6)))
-    click_delay = float(tl.get("cta_click_delay", 1.25))
+    cta_overlay = None
+    if v2_context is not None:
+        cta_overlay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(cta_overlay)
+        font = load_font("bold", S_(48))
+        text = V2_CTA_OVERLAY_TEXT
+        bbox = draw.textbbox((0, 0), text, font=font)
+        tw = bbox[2] - bbox[0]
+        x = (W - tw) // 2
+        y = S_(1440)
+        draw.rounded_rectangle((x - S_(28), y - S_(16), x + tw + S_(28), y + S_(70)),
+                               radius=S_(20), fill=(15, 15, 15, 225))
+        draw.text((x, y), text, font=font, fill=(255, 255, 255, 255))
+
+    t_endcard = float(tl.get("cta_start", max(1.0, total_dur - 2.6))) if v2_context is None else total_dur
+    click_delay = float(tl.get("cta_click_delay", 1.25)) if v2_context is None else 0.0
 
     mix_path = build_mix(work_dir, tl, cfg=cfg)
     out_mp4 = os.path.join(work_dir, "video.mp4")
@@ -1902,8 +1999,11 @@ def render_video(vdir_arg: str, explicit_cfg_path: str | None = None):
             prev_bg = sample_fullscreen_kb(prev_sc["plate"], 1.0, prev_sc["mode"])
             bg = Image.blend(prev_bg, bg, alpha_xf)
 
-        bg = endcard_v2.blur_bg_for_endcard(bg, t, t_endcard, W=W)
-        ui_mul = endcard_v2.ui_fade_multiplier(t, t_endcard)
+        if v2_context is None:
+            bg = endcard_v2.blur_bg_for_endcard(bg, t, t_endcard, W=W)
+            ui_mul = endcard_v2.ui_fade_multiplier(t, t_endcard)
+        else:
+            ui_mul = 1.0
 
         frame = bg.convert("RGBA")
 
@@ -1959,7 +2059,10 @@ def render_video(vdir_arg: str, explicit_cfg_path: str | None = None):
                     sub_im = Image.merge("RGBA", (r_c, g_c, b_c, a_c.point(lambda p: int(p * op_s))))
                 frame.alpha_composite(sub_im, (0, S_(1115)))
 
-        endcard_v2.composite_endcard(frame, t, t_endcard, click_delay=click_delay, W=W, H=H)
+        if v2_context is not None and cur_si == V2_CTA_OVERLAY_BEAT_INDEX:
+            frame = Image.alpha_composite(frame, cta_overlay)
+        if v2_context is None:
+            endcard_v2.composite_endcard(frame, t, t_endcard, click_delay=click_delay, W=W, H=H)
 
         try:
             proc.stdin.write(frame.convert("RGB").tobytes())  # type: ignore[union-attr]
@@ -1999,18 +2102,33 @@ def render_video(vdir_arg: str, explicit_cfg_path: str | None = None):
         ]
         render_manifest = {
             "version": 2,
+            "format_version": FORMAT_VERSION,
             "production_mode": "production_v2",
             "shorts_version": cfg["shorts_version"],
             "template_version": cfg["template_version"],
             "voice_provider": v2_context["voice_provider"],
+            "voice_generation": v2_context["voice_generation"],
             "voice_provenance_status": v2_context["voice_provenance_status"],
+            "voice_id": v2_context["voice_id"],
+            "voice_model": v2_context["voice_model"],
+            "voice_language": v2_context["voice_language"],
             "voice_speed_factor": v2_context["voice_speed_factor"],
             "voice_raw_sha256": v2_context["voice_raw_sha256"],
             "voice_render_sha256": sha256_file(os.path.join(work_dir, "vo_final.wav")),
             "mix_sha256": sha256_file(mix_path),
             "images": image_hashes,
+            "visual_sequence": list(V2_VISUAL_SEQUENCE),
+            "cta_overlay_text": V2_CTA_OVERLAY_TEXT,
+            "cta_overlay_beat_index": V2_CTA_OVERLAY_BEAT_INDEX,
             "mp4_sha256": sha256_file(out_mp4),
             "mp4_duration_seconds": mp4_duration,
+            "target_duration_met": duration_in_target_band(mp4_duration),
+            "hook_first_word_start": tl.get("hook_first_word_start"),
+            "scene_intervals": [
+                {"start": scene["start"], "end": scene["end"],
+                 "file": scene["file"], "cta_overlay": scene.get("cta_overlay")}
+                for scene in (tl.get("scenes") or [])
+            ],
         }
         with open(os.path.join(work_dir, "render_manifest_v2.json"), "w", encoding="utf-8") as fh:
             json.dump(render_manifest, fh, ensure_ascii=False, indent=2)
@@ -2020,6 +2138,7 @@ def render_video(vdir_arg: str, explicit_cfg_path: str | None = None):
 # ---------------------------------------------------------------- AŞAMA 5: COVER (kapak.py Birebir 1080x1920 Dikey Kapak)
 def stage_cover(vdir_arg: str, explicit_cfg_path: str | None = None):
     work_dir, cfg, _ = _resolve_context(vdir_arg, explicit_cfg_path)
+    v2_context = validate_v2_production_context(work_dir, cfg)
     scenes = _discover_scenes(work_dir, cfg)
     src_p = os.path.join(work_dir, scenes[0])
     out_cov = os.path.join(work_dir, "kapak.jpg")
@@ -2028,8 +2147,16 @@ def stage_cover(vdir_arg: str, explicit_cfg_path: str | None = None):
         raw_lines = ["BİLİMSEL", "GERÇEK!"]
     try:
         import kapak as kapak_mod
+        if v2_context is not None:
+            from shorts_acceptance import validate_title_cover
+            validate_title_cover(cfg.get("question_title", ""), raw_lines, topic=cfg.get("topic", ""))
         kapak_mod.kapak_uret(src_p, out_cov, satirlar=raw_lines[:3], kategori="BİLİM & KEŞİF", alt_aciklama="")
-    except Exception:
+        with Image.open(out_cov) as cover_image:
+            if cover_image.size != (1080, 1920):
+                raise ShortsAcceptanceError(f"Kapak 9:16/1080x1920 boyutunda değil: {cover_image.size}")
+    except Exception as exc:
+        if v2_context is not None:
+            raise ShortsAcceptanceError(f"Shorts v2 kapak doğrulaması başarısız ({type(exc).__name__})") from exc
         im = prepare_fullscreen_plate(src_p, is_closing=False).resize((1080, 1920), Image.Resampling.LANCZOS)
         im.save(out_cov, quality=93)
     print(f"cover: {out_cov}")

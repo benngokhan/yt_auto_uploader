@@ -273,11 +273,28 @@ class RegresyonKapisiTestleri(_ArsivOrtami):
             self.assertFalse(regresyon.hepsi_yesil(regresyon.calistir({}, uret)))
 
     def test_senaryo_asamalari_arsivlenir(self):
-        cevap = {"cumleler": regresyon.URETIM_65[:6] + ["Yani duman yakıtın kendisidir."], "kapak_baslik": ["A", "B"]}
+        lines = [
+            "Mum alevi kapalı bir yerde neden söner?",
+            "Fitil eriyen balmumunu yukarı doğru sürekli taşır.",
+            "Isınan balmumu buharı çevredeki oksijenle birlikte yanar.",
+            "Oksijen azalınca yanma yavaşlar ve alev söner.",
+            "Peki mum alevi oksijen olmadan yanabilir mi?",
+        ]
+        cevap = {
+            "cumleler": lines,
+            "title_question": "Mum alevi neden söner?",
+            "kapak_baslik": ["MUM ALEVİ NEDEN", "SÖNER?"],
+            "loop_anchor": "mum",
+            "kaynak_url": "",
+            "sahne_basliklari": [
+                {"ikon": "!", "satir1": f"SAHNE {i}", "satir2": "MUM ALEVİ"}
+                for i in range(1, 5)
+            ],
+        }
         with mock.patch.object(uret, "_llm_json", return_value=cevap), mock.patch("builtins.print"):
-            uret.sahne_plani_v2("Mum dumanı neden yanar?", 7, {})
+            uret.sahne_plani_v2("Mum alevi", 4, {})
         ham = self.dosyalar("senaryo_ham_deneme1")[0].read_text(encoding="utf-8")
-        self.assertIn("5. Bu duman, alevle temas ettiğinde ortalama beş yüz derece", ham)
+        self.assertIn("5. Peki mum alevi oksijen olmadan yanabilir mi?", ham)
         self.assertIn("tekrar yok", ham)
 
 

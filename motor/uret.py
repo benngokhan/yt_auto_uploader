@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib.error
@@ -646,7 +647,7 @@ def _kaynak_temizle(ham, *, kaynaksiz_etiket: str = "") -> str:
 def sahne_plani(konu: str, sahne_sayisi: int, ayar: dict) -> list[dict]:
     """LLM'den sahne sahne plan alır: ses metni + üst başlık + altyazı vurguları."""
     if ayar.get("sahneler_sablon"):
-        return sahne_plani_v2(konu, ayar.get("sahne_sayisi", 7), ayar)
+        return sahne_plani_v2(konu, ayar.get("sahne_sayisi", 4), ayar)
     import urllib.request
 
     istem = (
@@ -902,27 +903,34 @@ def _anlatimi_uzat(konu: str, sahneler: list, hedef_toplam: int = 620) -> int:
 
 
 
-# ── ŞABLON v2.2 (sablon_v2 / video_196 Birebir Master Şablon) ───────────────
+# ── SHORTS V2.4: dört görsel, beş anlatım vuruşu ve ilk görsele dönen loop ──
 PROMPT_V2 = (
     "Konu: {konu}\n\n"
-    "Bilgi Dozu için 6 bilgi sahnesi + motorun ekleyeceği 1 CTA sahnesinden oluşan kısa Türkçe bilim Shorts metni yaz.\n"
-    "- 'cumleler' dizisine TAM {content_scenes} kısa bilgi cümlesi yaz; CTA cümlesini yazma. Motor 7. sahneye 'Daha fazla Bilgi Dozu için takip et!' ekler.\n"
-    "- Her bilgi cümlesi tek cümle, yaklaşık 3-5 kelime ve 18-30 karakter olsun. Toplam bilgi metni yaklaşık 120-175 karakter olsun; motor CTA'sı ile toplam ses metni 160-220 karakteri aşmasın.\n"
-    "- Her sahne 2-3 saniyeye sığmalı. Gereksiz giriş, bağlaç, tekrar ve dolgu sözü kullanma; bir cümlede tek net bilgi ver.\n"
-    "- KELİME SEÇİMİ: Tekerleme gibi zor akademik/yabancı kelimeler ('fotoreseptörlerdeki', 'rodopsinin', 'rejenerasyonu', 'biyolüminesans') YASAK; kulağın hemen anlayacağı sade Türkçe kullan.\n"
-    "- 1. cümle merak uyandıran kısa soru. 2-{son} cümleler yeni ve somut bilimsel ayrıntılar olsun; uydurma sayı verme.\n"
-    "- 'sahne_basliklari' TAM {content_scenes} elemanlı olsun; motor CTA başlığını ayrıca ekler. Başlıklar vurucu, TAM BÜYÜK HARF ve satır başına en fazla 18 karakter olsun.\n"
-    "- Kısaltma, parantez ve üç nokta kullanma. Selamlama veya CTA ekleme.\n"
+    "Bilgi Dozu için 15–25 saniyelik (varsayılan hedef yaklaşık 20 saniye), Türkçe bilim Shorts planı yaz. "
+    "Tam dört benzersiz fotoğraf kullanılır; finalde ilk fotoğraf yeniden gösterilir.\n"
+    "- 'cumleler' dizisine TAM {n} kısa cümle yaz: toplam 35–45 kelime, her satır 3–10 kelime.\n"
+    "- 1. cümle doğrudan merak uyandıran soru-hook olsun; ilk kelime video başında duyulur.\n"
+    "- 2. cümle cevabın ilk kısmıdır ve ikinci görselle gösterilir. Ekrana ayrıca 'Takip et' yazı katmanı konur; "
+    "bu ifade SADECE görsel katmanıdır, seslendirme cümlelerine ekleme.\n"
+    "- 3. ve 4. cümleler cevabı tamamlayan, birbirini tekrar etmeyen iki kısa ve somut bilgidir; 3. ve 4. görsellerle gösterilir.\n"
+    "- 5. cümle kısa bir soru ile kapanmalı; açılıştaki konuya ve aynı 3+ harfli anahtar sözcüğe dönerek ilk görsele kesintisiz loop kurmalı.\n"
+    "- 'sahne_basliklari' yalnız dört benzersiz görsel içindir ve tam {visual_count} elemanlı olmalı; son loop vuruşu ilk görsel ve ilk başlığı yeniden kullanır.\n"
+    "- EXTREME TOPIC FİLTRESİ: doğrulanmamış 'asla/her zaman/en büyük/tek gerçek', sansasyonel sağlık/ölüm iddiası, ölçü veya kesin sayı kullanma. Kaynağı doğrulanmayan kurum/araştırma adı da ekleme.\n"
+    "- Kaynak yoksa sayısal/ölçülü iddia, kurum atfı veya kaynak varmış izlenimi oluşturma. Emin değilsen iddiayı çıkar; uydurma bilgi ve sayı YASAK.\n"
+    "- KELİME SEÇİMİ: kulağın hemen anlayacağı sade Türkçe kullan; tekerleme gibi zor akademik/yabancı kelimeler ('fotoreseptörlerdeki', 'rodopsinin', 'rejenerasyonu', 'biyolüminesans') YASAK.\n"
+    "- Başlık soru biçiminde ve verilen konuyla doğrudan ilgili olsun; 'title_question' en fazla 70 karakter ve '?' ile bitsin.\n"
+    "- 'kapak_baslik' tek bir sorunun 2 veya 3 satıra bölünmüş hâlidir: tümü TAM BÜYÜK HARF, her satır 3–18 karakter, kelime bölünmez; soru işareti yalnız son satırın sonunda olur.\n"
+    "- 'loop_anchor' ilk ve son cümlede geçen, konuya özgü tek bir 3+ harfli kelime olsun.\n"
+    "- Her başlık anlamlı, vurucu iki TAM BÜYÜK HARF satırdan oluşsun (satır başı en fazla 18 karakter, kelime bölünmez) ve ikon ('?', '▼', '⚡', '▲', '!', '✔') içersin.\n"
+    "- Kısaltma, parantez, üç nokta, selamlama veya sesli CTA kullanma.\n"
     + TERIM_KURALLARI + SAYI_KURALLARI +
-    "- 'sahne_basliklari': TAM {n} elemanlı dizi. Her cümle için dilbilgisi düzgün, vurucu 2 satır TAM BÜYÜK HARF başlık (her satır EN FAZLA 18 karakter, kelime ortasından bölünmez) ve anlamına uygun ikon ('?', '▼', '⚡', '▲', '!', '✔'). Örnek: "
-    "{{\"ikon\":\"?\",\"satir1\":\"ATEŞİN VARKEN\",\"satir2\":\"NEDEN ÜŞÜRSÜN?\"}}, "
-    "{{\"ikon\":\"⚡\",\"satir1\":\"BEYNİN TERMOSTAT\",\"satir2\":\"OYUNU OYNUYOR!\"}}.\n"
-    "- 'kapak_baslik': TAM 2 elemanlı dizi; her satır TAM BÜYÜK HARF, 10-18 karakter arası.\n"
-    "- 'kaynak_url': yalnızca bu senaryodaki bilgiyi gerçekten destekleyen birincil/akademik sayfanın tam HTTPS URL'si; kurum/dergi adı tek başına kaynak değildir; gerçek bir kaynak yoksa boş bırak; genel geçer ifade YASAK. Emin değilsen boş bırak. URL ayrıca erişilebilirlik ve alan adı denetiminden geçecek.\n"
-    "- 'kaynak': eski kaynak adı alanı; kaynak_url yoksa yalnızca denetim uyarısında kalır ve ekrana yazılmaz.\n"
-    "Yalnız JSON döndür: {{\"kapak_baslik\": [\"SATIR 1\", \"SATIR 2\"], \"kaynak_url\": \"https://... (yoksa boş)\", \"kaynak\": \"isteğe bağlı kurum adı\", \"cumleler\": [\"cümle 1\", ...], \"sahne_basliklari\": [{{\"ikon\": \"?\", \"satir1\": \"...\", \"satir2\": \"...\"}}, ...]}}"
+    "- 'kaynak_url': yalnızca bu senaryodaki iddiayı gerçekten destekleyen ve erişilebilir birincil/akademik sayfanın tam HTTPS URL'si. Kurum adı tek başına kaynak değildir; gerçek bir kaynak yoksa boş bırak; genel geçer ifade YASAK; emin değilsen boş bırak.\n"
+    "- 'kaynak': eski kaynak adı alanı; kaynak_url yoksa ekrana yazılmaz.\n"
+    "Yalnız JSON döndür: {{\"title_question\": \"Soru başlığı?\", \"kapak_baslik\": [\"İLK SATIR\", \"SON SATIR?\"], "
+    "\"loop_anchor\": \"konu kelimesi\", \"kaynak_url\": \"https://... (yoksa boş)\", \"kaynak\": \"isteğe bağlı kurum adı\", "
+    "\"cumleler\": [\"1. hook sorusu?\", \"2. cevap başlangıcı.\", \"3. kısa bilgi.\", \"4. kısa bilgi.\", \"5. loop sorusu?\"], "
+    "\"sahne_basliklari\": [{{\"ikon\": \"?\", \"satir1\": \"...\", \"satir2\": \"...\"}}, ... dört başlık]}}"
 )
-
 
 def _llm_json(istem: str, ayar: dict, sistem: str | None = None) -> dict:
     """Sahne planındaki sağlayıcı zincirini (groq -> gemini -> openrouter) tek istem için kullanır."""
@@ -1090,84 +1098,133 @@ def _konu_iki_satir(konu: str, llm_kapak: list | None = None) -> tuple[str, str]
 
 
 def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
-    """Şablon v2.2: LLM yalnız cümleleri yazar, sonuna Saf 3D Kapanış CTA cümlesi eklenir.
-
-    Sahne sayısı, 2 satırlık TAM BÜYÜK HARF başlıklar ve sarı semantik ikon
-    (?, ▼, ⚡, ▲, !, ✔) motorun kendi çözümleyicisinden gelir:
-    shorts_pipeline.resolve_scene_headlines() — video_187..196 standardıyla birebir aynı.
-    """
+    """Plan five narration beats over four unique visuals; the closing beat reuses visual 1."""
     import sys as _sys
+    from shorts_acceptance import (
+        EXPECTED_NARRATION_BEATS, EXPECTED_SCENES, ShortsAcceptanceError,
+        topic_score, validate_script,
+    )
 
+    if int(n) != EXPECTED_SCENES:
+        raise SystemExit(f"Shorts v2.4 tam {EXPECTED_SCENES} benzersiz görsel ister")
     _sys.path.insert(0, str(MOTOR))
     try:
         import shorts_pipeline as _sp
     except Exception as h:
-        raise SystemExit(f"Şablon v2.2 motoru yüklenemedi (motor/shorts_pipeline.py): {h}")
+        raise SystemExit(f"Shorts v2.4 renderer yüklenemedi (motor/shorts_pipeline.py): {type(h).__name__}") from h
 
-    n = 7
-    content_scenes = n - 1
-    istem = PROMPT_V2.format(konu=konu, n=n, son=n - 1, content_scenes=content_scenes)
+    istem = PROMPT_V2.format(konu=konu, n=EXPECTED_NARRATION_BEATS, visual_count=EXPECTED_SCENES)
+    last_error = "LLM geçerli plan döndürmedi"
+    accepted = None
     for deneme in range(3):
         veri = _llm_json(istem, ayar, _LLM_SISTEM)
-        cumleler = veri.get("cumleler") or veri.get("sahneler") or []
-        if isinstance(cumleler, str):
-            cumleler = [cumleler]
-        duzgun = []
-        for c in cumleler:
+        if not isinstance(veri, dict):
+            veri = {}
+        ham_cumleler = veri.get("cumleler") or veri.get("sahneler") or []
+        if isinstance(ham_cumleler, str):
+            ham_cumleler = [ham_cumleler]
+        cumleler = []
+        for c in ham_cumleler if isinstance(ham_cumleler, list) else []:
             if isinstance(c, dict):
                 c = c.get("cumle") or c.get("ses") or c.get("metin") or ""
-            c = str(c).strip()
+            c = " ".join(str(c or "").split())
             if c:
-                duzgun.append(c)
-        cumleler = duzgun
-        tekrarlar = _tekrar_eden_cumleler(cumleler[:content_scenes])
-        _arsivle(f"senaryo_ham_deneme{deneme + 1}",
-                 "\n".join(f"{i}. {c}" for i, c in enumerate(cumleler, start=1))
-                 + f"\n\ntekrar denetimi (cümle, cümle, benzerlik): {tekrarlar or 'tekrar yok'}"
-                 + ("\nKARAR: yeniden yazdırılacak" if tekrarlar and deneme < 2 else ""))
-        if not tekrarlar:
-            break
-        print(f"Senaryoda tekrar eden cümle var {tekrarlar}; "
-              + ("yeniden isteniyor" if deneme < 2 else "UYARI: 3 denemede de düzelmedi"))
-        istem = (PROMPT_V2.format(konu=konu, n=n, son=n - 1, content_scenes=content_scenes)
-                 + "\nÖNCEKİ DENEMEDE aynı bilgiyi iki cümlede tekrar ettin. Her cümle farklı ve yeni bir bilgi versin.")
-    if len(cumleler) < content_scenes:
-        raise SystemExit(
-            f"v2 planı tam 6 kısa bilgi cümlesi ister; LLM {len(cumleler)} verdi, video üretilmedi."
+                cumleler.append(c)
+
+        title = " ".join(str(veri.get("title_question") or "").split())
+        raw_cover = veri.get("kapak_baslik")
+        cover_lines = [tr_upper(" ".join(str(line or "").split()))
+                       for line in raw_cover] if isinstance(raw_cover, list) else []
+        loop_anchor = " ".join(str(veri.get("loop_anchor") or "").split())
+        raw_headlines = veri.get("sahne_basliklari")
+        ham_kaynak = _kaynak_temizle(
+            veri.get("kaynak_url"), kaynaksiz_etiket=str(veri.get("kaynak") or "")
         )
-    cumleler = cumleler[:content_scenes]
-    if any("takip et" in line.lower() for line in cumleler):
-        raise SystemExit("v2 planı CTA'yı yazmamalı; son sahneye motor ekler.")
-    kapanis_cta = "Daha fazla Bilgi Dozu için takip et!"
-    cumleler.append(kapanis_cta)
+        tekrarlar = _tekrar_eden_cumleler(cumleler)
+        _arsivle(
+            f"senaryo_ham_deneme{deneme + 1}",
+            "\n".join(f"{i}. {line}" for i, line in enumerate(cumleler, 1))
+            + f"\n\ntekrar denetimi (cümle, cümle, benzerlik): {tekrarlar or 'tekrar yok'}",
+        )
+        try:
+            if len(cumleler) != EXPECTED_NARRATION_BEATS:
+                raise ShortsAcceptanceError(
+                    f"tam {EXPECTED_NARRATION_BEATS} anlatım vuruşu yerine {len(cumleler)} geldi"
+                )
+            if tekrarlar:
+                raise ShortsAcceptanceError(f"tekrar eden cümleler: {tekrarlar}")
+            checked = validate_script(
+                [{"ses": line} for line in cumleler], topic=konu,
+                verified_source_url=ham_kaynak, title=title,
+                cover_lines=cover_lines, loop_anchor=loop_anchor,
+            )
+            if not isinstance(raw_headlines, list) or len(raw_headlines) != EXPECTED_SCENES:
+                raise ShortsAcceptanceError(f"sahne_basliklari tam {EXPECTED_SCENES} benzersiz görsel başlığı içermeli")
+            if not isinstance(cover_lines, list) or len(cover_lines) not in (2, 3):
+                raise ShortsAcceptanceError("kapak_baslik 2 veya 3 satır değil")
+            accepted = {
+                "data": veri,
+                "lines": cumleler,
+                "title": title,
+                "cover_lines": cover_lines,
+                "loop_anchor": loop_anchor,
+                "source_url": ham_kaynak,
+                "headlines": raw_headlines,
+                "validation": checked,
+            }
+            break
+        except ShortsAcceptanceError as exc:
+            last_error = str(exc)
+            _arsivle(
+                f"senaryo_v24_dogrulama_deneme{deneme + 1}",
+                f"karar: REDDEDİLDİ\nneden: {last_error}\n\n"
+                + "\n".join(f"{i}. {line}" for i, line in enumerate(cumleler, 1)),
+            )
+            if deneme < 2:
+                istem = (
+                    PROMPT_V2.format(konu=konu, n=EXPECTED_NARRATION_BEATS, visual_count=EXPECTED_SCENES)
+                    + f"\nÖNCEKİ DENEME REDDEDİLDİ: {last_error}. Beş anlatım vuruşu ve dört görsel başlığını baştan doğru üret."
+                )
 
-    k_l1, k_l2 = _konu_iki_satir(konu, veri.get("kapak_baslik"))
-    llm_basliklar = veri.get("sahne_basliklari")
-    cfg = {"title": [[k_l1, "g"], [k_l2]]}
-    if isinstance(llm_basliklar, list) and len(llm_basliklar) >= content_scenes:
-        cfg["scene_headlines"] = llm_basliklar[:content_scenes] + [
-            {"icon": "?", "line1": "DAHA FAZLA", "line2": "BİLGİ DOZU"}
-        ]
+    if accepted is None:
+        raise SystemExit(f"Shorts v2.4 senaryo kapısı geçilemedi: {last_error}. Üretim yapılmadı.")
+
+    cumleler = accepted["lines"]
+    title = accepted["title"]
+    cover_lines = accepted["cover_lines"]
+    loop_anchor = accepted["loop_anchor"]
+    ham_kaynak = accepted["source_url"]
+    title_l1, title_l2 = _sp._wrap_two_lines_20(tr_upper(title), 20)
+    cfg = {"title": [[title_l1, "w"], [title_l2]], "scene_headlines": accepted["headlines"]}
     try:
-        basliklar = _sp.resolve_scene_headlines(cfg, cumleler, len(cumleler))
+        headlines = _sp.resolve_scene_headlines(cfg, cumleler[:EXPECTED_SCENES], EXPECTED_SCENES)
     except Exception as h:
-        print(f"Başlık çözümleyici uyarısı: {type(h).__name__}; yedek başlık kullanılıyor")
-        basliklar = [{"icon": "?", "line1": k_l1, "line2": k_l2}] + [
-            {"icon": "!", "line1": tr_upper(c.split()[0] if c.split() else ""), "line2": "BİLİM"}
-            for c in cumleler[1:-1]
-        ] + [{"icon": "?", "line1": "DAHA FAZLA", "line2": "BİLGİ DOZU"}]
+        raise SystemExit(f"Shorts v2.4 sahne başlıkları doğrulanamadı ({type(h).__name__}).") from h
+    headlines[0] = {"icon": "?", "line1": title_l1, "line2": title_l2}
+    # Loop closing shows image 1 and repeats its question headline; it is not a fifth asset.
+    timeline_headlines = headlines + [dict(headlines[0])]
 
-    # Yalnız allowlist'te, erişilebilir HTTPS URL'si doğrulanmışsa kaynak gösterilir.
-    ham_kaynak = _kaynak_temizle(veri.get("kaynak_url"), kaynaksiz_etiket=str(veri.get("kaynak") or ""))
-
-    print(f"Şablon v2.2 planı: {len(cumleler)} sahne (6 kısa bilgi + tek sahne CTA), kapak=[{k_l1} / {k_l2}], {ham_kaynak or 'kaynak yok (gösterilmeyecek)'}")
-    return [{"ses": c,
-             "baslik1": b.get("line1", ""),
-             "baslik2": b.get("line2", ""),
-             "ikon": b.get("icon", "!"),
-             "kaynak": ham_kaynak}
-            for c, b in zip(cumleler, basliklar)]
-
+    topic_filter = topic_score(konu, ham_kaynak)
+    print(
+        f"Shorts v2.4 planı: {EXPECTED_SCENES} benzersiz görsel, {EXPECTED_NARRATION_BEATS} anlatım vuruşu, "
+        f"{accepted['validation']['word_count']} kelime, hook/loop={loop_anchor!r}, başlık={title!r}, "
+        f"konu filtresi={topic_filter['score']}/100, {ham_kaynak or 'kaynak yok (gösterilmeyecek)'}"
+    )
+    scenes = [{
+        "ses": c,
+        "baslik1": b.get("line1", ""),
+        "baslik2": b.get("line2", ""),
+        "ikon": b.get("icon", "!"),
+        "kaynak": ham_kaynak,
+    } for c, b in zip(cumleler, timeline_headlines)]
+    scenes[0]["_v2_metadata"] = {
+        "title_question": title,
+        "cover_lines": cover_lines,
+        "loop_anchor": loop_anchor,
+        "source_url": ham_kaynak,
+        "topic_filter": topic_filter,
+    }
+    return scenes
 
 def tr_upper(metin: str) -> str:
     """Türkçe doğru büyük harf (i -> İ, ı -> I)."""
@@ -1216,44 +1273,73 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict]
     return sahneler_q, yedekler
 
 
-def _copy_arena_voice_audio(scene_lines: list[str], work_dir: Path) -> Path:
-    """Copy caller-supplied Arena audio and bind its declared source to the narration.
+def _v2_gemini_voice_settings(ayar: dict) -> dict:
+    """Validate the configured natural TTS voice without making a provider call."""
+    import math
+    from shorts_acceptance import ShortsAcceptanceError, V2_VOICE_ID, V2_VOICE_PROVIDER
 
-    The handoff records a caller attestation, not cryptographic proof of provider
-    origin; the downstream manifest preserves that distinction.
-    """
+    voice_settings = ayar.get("ses") if isinstance(ayar.get("ses"), dict) else {}
+    configured_provider = str(voice_settings.get("saglayici") or "").strip().lower()
+    voice_id = str(voice_settings.get("voice_id") or V2_VOICE_ID).strip()
+    model = str(voice_settings.get("model") or "gemini-2.5-flash-preview-tts").strip()
+    language = str(voice_settings.get("dil") or "tr").strip()
+    try:
+        speed = float(voice_settings.get("voice_speed_factor", 1.0))
+    except (TypeError, ValueError) as exc:
+        raise ShortsAcceptanceError("Gemini/Charon voice_speed_factor sayı olmalı") from exc
+
+    if configured_provider not in {"gemini", "gemini_tts", "gemini_natural"}:
+        raise ShortsAcceptanceError("Shorts v2 yalnız mevcut Gemini Natural TTS sağlayıcısını kullanabilir")
+    if voice_id != V2_VOICE_ID:
+        raise ShortsAcceptanceError("Shorts v2 ses kimliği Charon olmalı")
+    if not model.startswith("gemini-") or language not in {"tr", "tr-TR"}:
+        raise ShortsAcceptanceError("Gemini TTS modeli veya Türkçe dil ayarı geçersiz")
+    if not math.isfinite(speed) or abs(speed - 1.0) > 1e-9:
+        raise ShortsAcceptanceError("Shorts v2 Charon sesi 1.00x kalmalı")
+    return {
+        "provider": V2_VOICE_PROVIDER,
+        "voice_id": voice_id,
+        "model": model,
+        "language": language,
+        "speed_factor": speed,
+    }
+
+
+def _generate_gemini_v2_voice_audio(scene_lines: list[str], work_dir: Path, ayar: dict) -> Path:
+    """Generate the v2 narration through the existing Gemini Natural TTS/Charon path."""
     import hashlib
-    import shutil
-    from shorts_acceptance import sha256_file
+    from shorts_acceptance import (
+        ShortsAcceptanceError, V2_VOICE_GENERATION,
+        V2_VOICE_PROVENANCE_STATUS, sha256_file,
+    )
 
-    source_value = os.getenv("MIRA_ARENA_AUDIO_FILE", "").strip()
-    voice_id = os.getenv("MIRA_ARENA_VOICE_ID", "").strip()
-    language = os.getenv("MIRA_ARENA_VOICE_LANGUAGE", "tr").strip()
-    if not source_value or not voice_id:
-        raise SystemExit(
-            "Shorts v2 has no legacy-TTS fallback. Supply MIRA_ARENA_AUDIO_FILE and "
-            "MIRA_ARENA_VOICE_ID from a live Arena narration."
-        )
-    if not voice_id.startswith("voice-") or language not in {"tr", "tr-TR"}:
-        raise SystemExit("Arena voice ID/language provenance is invalid; v2 audio import stopped.")
-    source = Path(source_value).expanduser().resolve()
-    if not source.is_file() or source.stat().st_size == 0:
-        raise SystemExit("MIRA_ARENA_AUDIO_FILE is missing or empty; legacy TTS is disabled for v2.")
+    voice = _v2_gemini_voice_settings(ayar)
+    from shorts_acceptance import EXPECTED_NARRATION_BEATS
+    if len(scene_lines) != EXPECTED_NARRATION_BEATS:
+        raise ShortsAcceptanceError(f"Gemini/Charon sesi için tam {EXPECTED_NARRATION_BEATS} anlatım vuruşu gerekli")
 
     work_dir.mkdir(parents=True, exist_ok=True)
     raw_wav = work_dir / "vo_raw.wav"
-    if source != raw_wav.resolve():
-        shutil.copyfile(source, raw_wav)
+    raw_wav.unlink(missing_ok=True)
     narration = " ".join(" ".join(str(line).split()) for line in scene_lines)
+    try:
+        import tts
+        tts.uret("\n".join(str(line).strip() for line in scene_lines), raw_wav, ayar)
+    except Exception:
+        raw_wav.unlink(missing_ok=True)
+        raise
+    if not raw_wav.is_file() or raw_wav.stat().st_size == 0:
+        raise SystemExit("Gemini Natural TTS Charon ses dosyası üretmedi; v2 üretimi durduruldu.")
+
     manifest = {
-        "provider": "arena.generate_speech",
-        "generation": "caller_supplied",
-        "provenance_status": "caller_attested_unverified",
-        "voice_id": voice_id,
-        "language": language,
+        "provider": voice["provider"],
+        "generation": V2_VOICE_GENERATION,
+        "provenance_status": V2_VOICE_PROVENANCE_STATUS,
+        "voice_id": voice["voice_id"],
+        "model": voice["model"],
+        "language": voice["language"],
         "narration_sha256": hashlib.sha256(narration.encode("utf-8")).hexdigest(),
         "audio_sha256": sha256_file(raw_wav),
-        "source_filename": source.name,
     }
     (work_dir / "voice_provenance_v2.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -1262,17 +1348,20 @@ def _copy_arena_voice_audio(scene_lines: list[str], work_dir: Path) -> Path:
 
 
 def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
-    """ŞABLON v2.2 üretim hattı: sahne planı -> tek istek ses -> görseller ->
-    shorts_pipeline.py all (MİRA v2.2 + Saf 3D Kapanış) -> kapak -> onay."""
+    """Shorts v2.4 local production path; it never uploads or publishes."""
     import shutil
     from PIL import Image
-    from shorts_acceptance import SHORTS_VERSION, TEMPLATE_VERSION, validate_script
+    from shorts_acceptance import (
+        EXPECTED_NARRATION_BEATS, EXPECTED_SCENES, V2_CTA_OVERLAY_BEAT_INDEX,
+        V2_CTA_OVERLAY_TEXT, V2_VISUAL_SEQUENCE,
+        FORMAT_VERSION, LOCKED_MIX_TIMING, SHORTS_VERSION, TEMPLATE_VERSION, validate_script,
+    )
 
-    if int(sahne_sayisi) != 7:
-        raise SystemExit("Shorts v2 tam 7 sahne ister; legacy/TTS yoluna geçiş yapılmadı.")
+    if int(sahne_sayisi) != EXPECTED_SCENES:
+        raise SystemExit(f"Shorts v2 tam {EXPECTED_SCENES} benzersiz görsel ister; legacy yoluna geçilmedi.")
     calisma = MOTOR / "cikti" / "son"
 
-    sahneler = sahne_plani_v2(a.konu, 7, ayar)
+    sahneler = sahne_plani_v2(a.konu, EXPECTED_SCENES, ayar)
     _arsivle_senaryo("senaryo_1_plan_sonrasi", sahneler)
     _terim_birligi_sagla(sahneler, ayar, "kısa v2 planı")
     _sayi_denetimi(sahneler, ayar)
@@ -1292,19 +1381,22 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     except Exception as _dh:  # noqa: BLE001
         print(f"Senaryo uyarı denetimi çalışmadı ({type(_dh).__name__})")
 
+    v2_meta = sahneler[0].get("_v2_metadata") if sahneler else None
+    if not isinstance(v2_meta, dict):
+        raise SystemExit("Shorts v2.4 başlık/loop/kaynak metaverisi eksik; üretim durduruldu.")
     script_lines = [" ".join(str(x.get("ses") or "").split()) for x in sahneler]
-    if script_lines[-1] != _CTA or any(_CTA in line for line in script_lines[:-1]):
-        raise SystemExit("Shorts v2 tam altı içerik cümlesi ve sabit 7. sahne CTA'sı ister.")
-    script_check = validate_script(sahneler, topic=a.konu)
+    script_check = validate_script(
+        sahneler, topic=a.konu,
+        verified_source_url=str(v2_meta.get("source_url") or ""),
+        title=str(v2_meta.get("title_question") or ""),
+        cover_lines=v2_meta.get("cover_lines"),
+        loop_anchor=str(v2_meta.get("loop_anchor") or ""),
+    )
     anlatim = script_check["narration"]
-    if not 80 <= len(anlatim) <= 240:
-        raise SystemExit(
-            f"V2 anlatım uzunluğu 80–240 karakter olmalı ({len(anlatim)}); "
-            "7 sahne için uzatma veya legacy TTS uygulanmadı."
-        )
+    voice_plan = _v2_gemini_voice_settings(ayar)
     for sira, x in enumerate(sahneler, start=1):
         print(f"  senaryo {sira}: [{x.get('baslik1', '')} / {x.get('baslik2', '')}] {x['ses']}")
-    print(f"Anlatım: {len(anlatim)} karakter / {len(sahneler)} sahne")
+    print(f"Anlatım: {script_check['word_count']} kelime / {len(sahneler)} sahne")
 
     if getattr(a, "plan_only", False):
         plan_dir = MOTOR / "cikti" / "plan_only"
@@ -1312,12 +1404,25 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         plan_path = plan_dir / "shorts_v2_plan.json"
         plan_path.write_text(json.dumps({
             "topic": a.konu,
+            "format_version": FORMAT_VERSION,
             "shorts_version": SHORTS_VERSION,
             "template_version": TEMPLATE_VERSION,
-            "scene_count": 7,
-            "voice_speed_factor": 1.0,
+            "production_mode": "production_v2",
+            "scene_count": EXPECTED_SCENES,
+            "narration_beat_count": EXPECTED_NARRATION_BEATS,
+            "word_count": script_check["word_count"],
+            "voice_speed_factor": voice_plan["speed_factor"],
+            "voice_provider": voice_plan["provider"],
+            "voice_id": voice_plan["voice_id"],
+            "voice_model": voice_plan["model"],
+            "voice_language": voice_plan["language"],
+            "voice_generation": "not_run_plan_only",
             "script_lines": script_lines,
             "narration": anlatim,
+            "question_title": v2_meta["title_question"],
+            "cover_lines": v2_meta["cover_lines"],
+            "loop_anchor": v2_meta["loop_anchor"],
+            "topic_filter": v2_meta.get("topic_filter"),
             "plan_only": True,
         }, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"PLAN-ONLY: metin planı yazıldı; ses sentezi ve render çalıştırılmadı: {plan_path}")
@@ -1329,12 +1434,12 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     vdir = calisma / "v2"
     vdir.mkdir(parents=True, exist_ok=True)
     (vdir / "script.txt").write_text("\n".join(script_lines) + "\n", encoding="utf-8")
-    raw_wav = _copy_arena_voice_audio(script_lines, vdir)
+    raw_wav = _generate_gemini_v2_voice_audio(script_lines, vdir, ayar)
 
     if getattr(a, "sadece_ses", False):
         ses_onay = calisma / "ses_onay.wav"
         shutil.copyfile(raw_wav, ses_onay)
-        print(f"Yalnızca Arena sesi kopyalandı; sentez/render yapılmadı: {ses_onay}")
+        print(f"Yalnızca Gemini Natural TTS/Charon sesi üretildi; render yapılmadı: {ses_onay}")
         return 0
 
     # 2) GÖRSELLER (v2 fail-closed: all seven scenes require live Pexels + Gemini Vision)
@@ -1342,7 +1447,7 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     gorsel_klasoru.mkdir(parents=True, exist_ok=True)
     import gorsel_uret
 
-    visual_sentences = [str(s["ses"]) for s in sahneler[:-1]] + [str(a.konu)]
+    visual_sentences = [str(s["ses"]) for s in sahneler[:EXPECTED_SCENES]]
     aramalar, yedekler = _gorsel_aramalari(a.konu, visual_sentences, ayar)
     visual_scene_inputs = [
         {
@@ -1356,16 +1461,16 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     parallelar = gorsel_uret.sahneler_icin_gorseller(
         visual_scene_inputs, gorsel_klasoru, yedek_sorgular=yedekler
     )
-    if len(parallelar) != 7 or any(path is None for path in parallelar):
-        raise SystemExit("Shorts v2 fail-closed: yedi sahnenin tamamı canlı görsel seçimini geçmedi.")
+    if len(parallelar) != EXPECTED_SCENES or any(path is None for path in parallelar):
+        raise SystemExit("Shorts v2 fail-closed: dört görselin tamamı canlı görsel seçimini geçmedi.")
 
     secim_raporu_yolu = gorsel_klasoru / "gorsel_secim_raporu.json"
     if not secim_raporu_yolu.is_file():
         raise SystemExit("Canlı görsel seçim raporu eksik; Shorts v2 durduruldu.")
     secim_raporu = json.loads(secim_raporu_yolu.read_text(encoding="utf-8"))
     rows = secim_raporu.get("scenes")
-    if not isinstance(rows, list) or len(rows) != 7:
-        raise SystemExit("Canlı görsel seçim raporu tam yedi sahne içermiyor.")
+    if not isinstance(rows, list) or len(rows) != EXPECTED_SCENES:
+        raise SystemExit("Canlı görsel seçim raporu tam dört görsel içermiyor.")
     for index, row in enumerate(rows, start=1):
         selected = row.get("selected") if isinstance(row, dict) else None
         if not isinstance(selected, dict) or selected.get("provider") != "pexels" \
@@ -1401,18 +1506,27 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     gorsel_notu = ""
 
     cfg = {
+        "format_version": FORMAT_VERSION,
         "shorts_version": SHORTS_VERSION,
         "template_version": TEMPLATE_VERSION,
         "production_mode": "production_v2",
-        "voice_speed_factor": 1.0,
+        "topic": a.konu,
+        "question_title": v2_meta["title_question"],
+        "loop_anchor": v2_meta["loop_anchor"],
+        "topic_filter": v2_meta.get("topic_filter"),
+        "voice_speed_factor": voice_plan["speed_factor"],
+        "voice_provider": voice_plan["provider"],
+        "voice_id": voice_plan["voice_id"],
+        "voice_model": voice_plan["model"],
+        "voice_language": voice_plan["language"],
         "title": [[sahneler[0]["baslik1"], "g"], [sahneler[0]["baslik2"]]],
         "scene_headlines": [{"icon": s.get("ikon", "!"), "line1": s["baslik1"], "line2": s["baslik2"]}
-                            for s in sahneler],
-        "cover_lines": [sahneler[0]["baslik1"], sahneler[0]["baslik2"]],
+                            for s in sahneler[:EXPECTED_SCENES]],
+        "cover_lines": v2_meta["cover_lines"],
         "music_theme": ayar.get("music_theme", "gunluk_bilim"),
-        "intro_lead": 1.45,
-        "sentence_pause": float((ayar.get("miks") or {}).get("cumle_arasi_es_sn", 0.54)),
-        "outro_hold": 1.45,
+        "intro_lead": LOCKED_MIX_TIMING["intro_lead"],
+        "sentence_pause": LOCKED_MIX_TIMING["sentence_pause"],
+        "outro_hold": LOCKED_MIX_TIMING["outro_hold"],
         "note1": konu_kaynak,
         "note2": gorsel_notu,
         "source_url": kaynak_url,
@@ -1421,7 +1535,10 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
               "representative": True} if row.get("selected") else None)
             for row in (secim_raporu.get("scenes") or [])
         ],
-        "scenes": [f"s{i}.jpg" for i in range(1, len(sahneler) + 1)],
+        "scenes": [f"s{i}.jpg" for i in range(1, EXPECTED_SCENES + 1)],
+        "visual_sequence": list(V2_VISUAL_SEQUENCE),
+        "cta_overlay_text": V2_CTA_OVERLAY_TEXT,
+        "cta_overlay_beat_index": V2_CTA_OVERLAY_BEAT_INDEX,
     }
     cfg_yolu = calisma / "shorts_config.json"
     cfg_yolu.write_text(json.dumps({vdir.name: cfg}, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -1429,15 +1546,31 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     motor_py = str(MOTOR / "shorts_pipeline.py")
     env = os.environ.copy()
     env.setdefault("MIRA_MOTOR_FFMPEG", shutil.which("ffmpeg") or "")
-    print("MİRA v2.2 motoru çalışıyor (plates -> timing -> music -> render -> cover)…")
+    print("Shorts v2.4 renderer çalışıyor (plates -> timing -> music -> render -> cover; CTA yalnız görsel katman)…")
     subprocess.run([sys.executable, motor_py, "all", str(vdir), str(cfg_yolu)],
                    check=True, env=env)
 
     cikti = vdir / "video.mp4"
     if not cikti.exists():
-        raise SystemExit("v2.2 motoru video üretmedi.")
+        raise SystemExit("Shorts v2.4 renderer video üretmedi.")
 
-    metadata = yayin_bilgisi_uret(a.konu, sahneler)
+    # Deterministic local metadata: it may restate the checked script, but does not invent claims.
+    metadata = {
+        "baslik": v2_meta["title_question"],
+        "aciklama": anlatim + (f"\n\nKaynak: {kaynak_url}" if kaynak_url else ""),
+        "hashtag": "#bilgidozu #shorts #bilim",
+        "etiketler": ", ".join(dict.fromkeys(
+            [w.lower() for w in re.findall(r"[A-Za-zÇĞİÖŞÜçğıöşü]{4,}", a.konu)[:8]]
+            + ["bilgi dozu", "bilim", "shorts"]
+        )),
+        "sabit_yorum": v2_meta["title_question"],
+        "kategori": "Bilim ve Eğitim",
+        "konu_ozeti": anlatim,
+        "kapak_satirlari": v2_meta["cover_lines"],
+        "kapak_vurgu": len(v2_meta["cover_lines"]),
+        "kapak_kategori": "BİLİM & KEŞİF",
+        "kapak_alt": script_lines[1],
+    }
     (calisma / "yayin_bilgisi.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
     print("Yayın bilgileri hazır")
     _arsivle("yayin_bilgileri", json.dumps(metadata, ensure_ascii=False, indent=2), "json")
@@ -1487,8 +1620,15 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         kategori=kapak_bilgi["kategori"],
         alt_aciklama=kapak_bilgi["alt_aciklama"],
     )
+    from shorts_acceptance import validate_title_cover
+    validate_title_cover(
+        v2_meta["title_question"], kapak_bilgi["satirlar"], topic=a.konu
+    )
+    with Image.open(hedef_kapak) as final_cover:
+        if final_cover.size != (1080, 1920):
+            raise SystemExit(f"Kapak 9:16 ölçüsünde değil: {final_cover.size}")
 
-    # Geçici klasörleri temizle ki Drive/Telegram glob araması tek MP4 ve tek kapak bulsun
+    # Geçici klasörleri temizle ki yalnız yerel onay dosyaları kalsın; hiçbir yerde yayımlanmaz.
     shutil.rmtree(vdir, ignore_errors=True)
     shutil.rmtree(gorsel_klasoru, ignore_errors=True)
     cfg_yolu.unlink(missing_ok=True)
@@ -1637,7 +1777,7 @@ def main() -> int:
     ap.add_argument("--sure-max", type=float, default=0, help="0 = ayardan oku")
     ap.add_argument("--kuru", action="store_true", help="Sadece üret, hiçbir yere yükleme")
     ap.add_argument("--shorts-v2", action="store_true", help="Fail-closed Shorts v2 hattını zorla; legacy TTS fallback yok")
-    ap.add_argument("--plan-only", action="store_true", help="Yalnız 7 sahne metin planı yaz; ses sentezi ve render yapma")
+    ap.add_argument("--plan-only", action="store_true", help="Yalnız 4 görsel ve 5 anlatım vuruşu planı yaz; ses sentezi ve render yapma")
     ap.add_argument("--sadece-ses", action="store_true", help="Görsel/video üretmeden yalnızca onay sesi üret")
     ap.add_argument("--onay-verildi", action="store_true",
                     help="Kullanıcı videoyu izleyip onayladı: Drive + tablo + yayın kuyruğu")
@@ -1646,7 +1786,7 @@ def main() -> int:
     ayar = ayar_yukle()
     if a.shorts_v2 or a.plan_only:
         ayar["sahneler_sablon"] = True
-        ayar["sahne_sayisi"] = 7
+        ayar["sahne_sayisi"] = 4
     try:
         import arsiv
         arsiv.cikti_maskele_kur()   # konsola/GitHub loguna yazılan her satır maskeden geçer
@@ -1655,9 +1795,9 @@ def main() -> int:
         pass
     _regresyon_kapisi(ayar)
     if ayar.get("sahneler_sablon"):
-        # ŞABLON v2.0: 7 sahne, 38-45 sn (onaylı video_187..196 standardı)
-        sahne_sayisi = int(ayar.get("sahne_sayisi") or 7)
-        print(f"Şablon v2 aktif: {sahne_sayisi} sahne")
+        # V2.4: 4 unique visuals, 5 narration beats, 15–25 seconds.
+        sahne_sayisi = int(a.sahne or ayar.get("sahne_sayisi") or 4)
+        print(f"Şablon v2.4 aktif: {sahne_sayisi} benzersiz görsel")
     else:
         # KURAL (sahip, 12.11.2026): her video 4 sahne, 38-42 saniye.
         sahne_sayisi = 4
@@ -1668,9 +1808,9 @@ def main() -> int:
         ayar.setdefault("sure", {})["max"] = a.sure_max
 
     if ayar.get("sahneler_sablon"):
-        if sahne_sayisi != 7:
-            raise SystemExit("Shorts v2 tam 7 sahne ister; legacy TTS fallback yapılmadı.")
-        return _sablon_v2_uret(a, ayar, 7, calisma=None)
+        if sahne_sayisi != 4:
+            raise SystemExit("Shorts v2.4 tam 4 görsel ister; legacy TTS fallback yapılmadı.")
+        return _sablon_v2_uret(a, ayar, 4, calisma=None)
 
     if a.shorts_v2 or a.plan_only:
         raise SystemExit("Shorts v2 planlama başarısız; legacy TTS fallback yapılmadı.")

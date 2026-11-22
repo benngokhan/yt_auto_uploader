@@ -1,8 +1,8 @@
 {
-  "sahne_sayisi": 7,
+  "sahne_sayisi": 4,
   "sure": {
-    "min": 38,
-    "max": 45
+    "min": 15,
+    "max": 25
   },
   "fps": 30,
   "ses": {
@@ -133,13 +133,13 @@
     "drive_klasoru_adi": "Onay_Bekleyen (active.sav81@gmail.com)"
   },
   "kararlar": {
-    "sure": "38-42 sn (kullanıcı: 3 Kasım 2026)",
+    "sure": "15–25 sn, yaklaşık 20 sn hedef",
     "ses": "Onaylı Gemini Charon doğal erkek anlatıcı; Ahmet Neural yedekte korunur; otomatik fallback yok",
     "gorsel": "Pexels dikey (portrait) küratörlü editoryal/makro fotoğraf (birincil) + Pixabay yedek + anti-ham piksel filtresi + doğal sablon_v2 işleme",
     "akis": "Her video elle onaylı; otomatik yayın yok",
-    "sablon": "sablon_v2 (video_187..196 birebir): 7 sahne, ortalı 64px 2 satır başlık + satır içi sarı semantik rozet, ortalı 50px tek kelime karaoke, saf 3D kapanış ekranı, 116 BPM Dm9 jenerik + auto-ducking",
+    "sablon": "sablon_v2.4: 4 benzersiz görsel, 5 anlatım vuruşu, kapanış ilk görsel, ikinci görselde Takip et",
     "ses_tek_istek": "Tüm cümleler TEK Gemini isteğinde okunur (4 ayrı istek 4 farklı ton üretiyordu)"
   },
   "sahneler_sablon": true,
-  "sablon_surumu": "2.2-sablon_v2 (video_187..196 master — shorts_pipeline.py + endcard_v2.py)"
+  "sablon_surumu": "2.4-four-image-loop"
 }

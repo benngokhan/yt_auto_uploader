@@ -38,19 +38,41 @@ class TekrarTestleri(unittest.TestCase):
         self.assertEqual(uret._tekrar_eden_cumleler(URETIM_64[1:]), [])
 
     def test_plan_tekrar_varsa_yeniden_istenir(self):
-        iyi = [URETIM_64[0]] + URETIM_64[2:6] + ["Peki bu duman olmasa alev mumu bulabilir miydi?", "Yanma için yakıt şarttır."]
-        cevaplar = [{"cumleler": URETIM_64, "kapak_baslik": ["A", "B"]}, {"cumleler": iyi, "kapak_baslik": ["A", "B"]}]
-        istemler = []
+        good = [
+            "Mum alevi kapalı bir yerde neden söner?",
+            "Fitil eriyen balmumunu yukarı doğru sürekli taşır.",
+            "Isınan balmumu buharı çevredeki oksijenle birlikte yanar.",
+            "Oksijen azalınca yanma yavaşlar ve alev söner.",
+            "Peki mum alevi oksijen olmadan yanabilir mi?",
+        ]
+        duplicate = good.copy()
+        duplicate[3] = duplicate[1]
 
-        def sahte(istem, ayar, sistem=None):
-            istemler.append(istem)
-            return cevaplar[min(len(istemler) - 1, 1)]
+        def response(lines):
+            return {
+                "cumleler": lines,
+                "title_question": "Mum alevi neden söner?",
+                "kapak_baslik": ["MUM ALEVİ NEDEN", "SÖNER?"],
+                "loop_anchor": "mum",
+                "kaynak_url": "",
+                "sahne_basliklari": [
+                    {"ikon": "!", "satir1": f"SAHNE {i}", "satir2": "MUM ALEVİ"}
+                    for i in range(1, 5)
+                ],
+            }
 
-        with mock.patch.object(uret, "_llm_json", sahte), mock.patch("builtins.print"):
-            plan = uret.sahne_plani_v2("Mum dumanı neden yanar?", 7, {})
-        self.assertEqual(len(istemler), 2)
-        self.assertIn("ÖNCEKİ DENEMEDE", istemler[1])
-        self.assertEqual(uret._tekrar_eden_cumleler([p["ses"] for p in plan]), [])
+        answers = [response(duplicate), response(good)]
+        prompts = []
+
+        def fake(prompt, settings, system=None):
+            prompts.append(prompt)
+            return answers[min(len(prompts) - 1, 1)]
+
+        with mock.patch.object(uret, "_llm_json", fake), mock.patch("builtins.print"):
+            plan = uret.sahne_plani_v2("mum alevi", 4, {})
+        self.assertEqual(len(prompts), 2)
+        self.assertIn("ÖNCEKİ DENEME", prompts[1])
+        self.assertEqual(uret._tekrar_eden_cumleler([scene["ses"] for scene in plan]), [])
 
     def test_uzatma_baska_cumleyi_tekrar_ederse_reddedilir(self):
         sahneler = _sahneler(["Sönen mumun dumanı kül değil, kolayca tutuşabilen yakıt zerrecikleridir.", "Duman yanar."])

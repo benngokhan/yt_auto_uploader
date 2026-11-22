@@ -16,19 +16,19 @@ on:
         type: boolean
         default: false
       sahne:
-        description: "Sahne sayısı (boş = 7)"
+        description: "Benzersiz görsel sayısı (4)"
         required: false
-        default: "7"
+        default: "4"
         type: string
       sure_min:
         description: "En kısa süre (sn)"
         required: false
-        default: "38"
+        default: "15"
         type: string
       sure_max:
         description: "En uzun süre (sn)"
         required: false
-        default: "45"
+        default: "25"
         type: string
       sadece_ses:
         description: "Yalnızca onay sesi üret; görsel/video üretme"
@@ -110,7 +110,7 @@ jobs:
           MOTOR_SURE_MAX: ${{ inputs.sure_max }}
           MOTOR_SADECE_SES: ${{ inputs.sadece_ses }}
         run: |
-          ARGS="--konu \"$MOTOR_KONU\" --sahne ${MOTOR_SAHNE:-7} --sure-min ${MOTOR_SURE_MIN:-38} --sure-max ${MOTOR_SURE_MAX:-45}"
+          ARGS="--konu \"$MOTOR_KONU\" --sahne ${MOTOR_SAHNE:-4} --sure-min ${MOTOR_SURE_MIN:-15} --sure-max ${MOTOR_SURE_MAX:-25}"
           [ "$MOTOR_KURU" = "true" ] && ARGS="$ARGS --kuru"
           [ "$MOTOR_SADECE_SES" = "true" ] && ARGS="$ARGS --sadece-ses"
           echo "Komut: python motor/uret.py $ARGS"
@@ -259,7 +259,7 @@ jobs:
 
 
       - name: Kayıt dosyalarını depoya yaz (ses perde kaydı + sözlük notları)
-        if: always()
+        if: ${{ always() && inputs.kuru != true && github.ref == 'refs/heads/main' }}
         continue-on-error: true
         run: |
           git config user.name "github-actions[bot]"
