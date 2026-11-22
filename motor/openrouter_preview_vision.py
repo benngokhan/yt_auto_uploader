@@ -46,7 +46,7 @@ def score_images(scene_text, candidates, download):
             except Exception as exc:
                 hit['_vision_error'] = 'image_fetch:' + type(exc).__name__
         if not ids: return scores
-        body = {'model':MODEL, 'messages':[{'role':'user','content':parts}], 'max_tokens':1200, 'temperature':0}
+        body = {'model':MODEL, 'messages':[{'role':'user','content':parts}], 'max_tokens':1200, 'temperature':0, 'reasoning':{'enabled':False}}
         for attempt in range(3):
             req=urllib.request.Request('https://openrouter.ai/api/v1/chat/completions',
                 data=json.dumps(body).encode(), headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'})

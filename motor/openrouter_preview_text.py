@@ -14,7 +14,7 @@ def get_json(prompt, system):
     if not key:
         print('Deneysel metin modeli: anahtar yok')
         return {}
-    body={'model': MODEL, 'temperature': 0.35, 'max_tokens': 2200,
+    body={'model': MODEL, 'temperature': 0.35, 'max_tokens': 2200, 'reasoning': {'enabled': False},
           'messages':[{'role':'system','content':system},{'role':'user','content':prompt}]}
     for attempt in range(3):
         request=urllib.request.Request('https://openrouter.ai/api/v1/chat/completions',
