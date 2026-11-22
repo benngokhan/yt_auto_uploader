@@ -1,14 +1,14 @@
 {
- "total": 41155,
- "day_gain": 73,
- "updated": 58,
+ "total": 41163,
+ "day_gain": 80,
+ "updated": 61,
  "baseline_count": 25,
  "compared_count": 48,
  "unavailable_count": 4,
  "dry_run": false,
  "top": [
   {
-   "delta": 10,
+   "delta": 11,
    "title": "Baldır Kasların Aslında İkinci Kalbin! Kanı Kalbe Nasıl Taşı",
    "file": "video_132.mp4"
   },
@@ -19,6 +19,11 @@
   },
   {
    "delta": 5,
+   "title": "Sabah Uyandığında Boyun Geceye Göre Neden 2 Santim Daha Uzun",
+   "file": "video_150.mp4"
+  },
+  {
+   "delta": 5,
    "title": "Beynin Senden Sakladığı 3 Yanılsama! Özgür İraden Bile Senin",
    "file": "uzun_video_3.mp4"
   },
@@ -26,11 +31,6 @@
    "delta": 4,
    "title": "Utandığında Neden Sadece Yüzün ve Kulakların Kızarır? 😳 #bil",
    "file": "video_100.mp4"
-  },
-  {
-   "delta": 3,
-   "title": "Vücudundaki Hücrelerin Yarısından Fazlası Aslında Bakteri! 🦠",
-   "file": "video_86.mp4"
   }
  ]
 }
