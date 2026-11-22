@@ -30,14 +30,19 @@ except urllib.error.HTTPError as exc:
  print('GROQ_HTTP',exc.code,flush=True)
  try:
   import re
-  obj=json.loads(exc.read(16000)).get('error') or {}
-  for field in ('type','code'):
-   val=obj.get(field)
-   if isinstance(val,str) and re.fullmatch(r'[a-zA-Z0-9_.-]{1,80}',val):print('GROQ_HATA_ALANI',field,val,flush=True)
-  message=str(obj.get('message') or '').lower()
-  words=['permission','model','organization','project','terms','billing','country','region','decommission','disabled','tier','preview','policy']
-  print('GROQ_HATA_IPUCLARI',','.join(x for x in words if x in message) or 'yok',flush=True)
- except Exception:print('GROQ_HATA_DETAYI','yok',flush=True)
+  raw=exc.read(16000)
+  print('GROQ_HATA_BOYUT',len(raw),'CONTENT_TYPE',str(exc.headers.get('Content-Type') or '')[:80],flush=True)
+  print('GROQ_HATA_SERVER',str(exc.headers.get('Server') or '')[:60],flush=True)
+  text=raw.decode('utf8','replace'); lower=text.lower()
+  words=['permission','model','organization','project','terms','billing','country','region','decommission','disabled','tier','preview','policy','cloudflare','access denied','forbidden','request blocked','rate limit','api key','unsupported']
+  print('GROQ_HATA_IPUCLARI',','.join(x for x in words if x in lower) or 'yok',flush=True)
+  try:
+   obj=json.loads(text).get('error') or {}
+   for field in ('type','code'):
+    val=obj.get(field)
+    if isinstance(val,str) and re.fullmatch(r'[a-zA-Z0-9_.-]{1,80}',val):print('GROQ_HATA_ALANI',field,val,flush=True)
+  except (ValueError,AttributeError,TypeError):print('GROQ_HATA_BICIMI','json_degil',flush=True)
+ except Exception as problem:print('GROQ_HATA_DETAYI',type(problem).__name__,flush=True)
  for h in ('retry-after','x-ratelimit-remaining-requests','x-ratelimit-reset-requests','x-ratelimit-remaining-tokens'):
   if exc.headers and exc.headers.get(h):print('GROQ_LIMIT',h,exc.headers.get(h),flush=True)
 except Exception as exc: print('GROQ_HATA',type(exc).__name__,flush=True)
