@@ -52,7 +52,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref_name }}
           persist-credentials: true
 
       - name: Set up Python
@@ -258,7 +258,7 @@ jobs:
           fi
 
       - name: Telegram VIP Bildirimi
-        if: ${{ always() }}
+        if: ${{ always() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_GROUP_CHAT_ID || secrets.TELEGRAM_CHAT_ID }}
