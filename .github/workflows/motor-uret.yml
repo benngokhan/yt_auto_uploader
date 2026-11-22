@@ -1,38 +1,42 @@
-name: Three bounded candle scene tests
+name: Deniz · four bounded image candidates only
 on:
   workflow_dispatch:
     inputs:
       konu:
-        required: false
+        required: true
         type: string
       kuru:
-        required: false
+        required: true
         type: string
 permissions:
   contents: write
+concurrency:
+  group: arena-deniz-four-image-candidates-v2
+  cancel-in-progress: false
 jobs:
-  three_scenes:
-    if: ${{ inputs.konu == '__CF_THREE_117__' && inputs.kuru == 'true' && github.run_attempt == 1 }}
+  images_only:
+    if: ${{ inputs.konu == '__DENIZ_FOUR_IMAGES_057__' && inputs.kuru == 'true' && github.run_attempt == 1 && github.ref == 'refs/heads/arena/deniz-images-v2-20261122' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - name: Read isolated test inputs
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Reserve and generate each scene at most once
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Image inspection dependency
+        run: python -m pip install 'Pillow==11.3.0'
+      - name: Four bounded requests, no retries or fallback
         env:
           CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          SHA: ${{ github.sha }}
-        run: python arena_reference/cf_remaining_scenes.py
-      - name: Save results for inspection
+        run: python arena_deniz/generate_images.py
+      - uses: actions/upload-artifact@v4
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
         with:
-          name: cloudflare-remaining-candle-scenes-117
-          path: scene_results/
-          if-no-files-found: ignore
+          name: deniz-four-ai-images-057
+          path: image_results/
+          if-no-files-found: warn
           retention-days: 7
