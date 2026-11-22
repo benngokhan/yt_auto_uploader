@@ -36,12 +36,34 @@ on:
         default: false
 
 concurrency:
-  group: arena-tek-video-deneme
+  group: arena-isik-teshis
   cancel-in-progress: false
 
 jobs:
+  light_check:
+    if: ${{ inputs.kuru == true && inputs.konu == '__LIGHT_DIAGNOSTIC__' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q numpy Pillow
+      - name: Inspect existing stock search and pixel checks only
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY || secrets.PEXELS_KEY || secrets.PEXELS_API }}
+        run: python aday_isik_teshis.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: light-search-diagnostic
+          path: aday_isik_sonuclari.json
+          if-no-files-found: warn
   uret:
-    if: ${{ inputs.kuru == true }}
+    if: ${{ inputs.kuru == true && inputs.konu != '__LIGHT_DIAGNOSTIC__' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
