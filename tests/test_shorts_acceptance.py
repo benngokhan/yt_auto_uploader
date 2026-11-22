@@ -1,8 +1,10 @@
 import hashlib
 import json
+import os
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 import numpy as np
@@ -112,6 +114,14 @@ class ShortsV2GateTests(unittest.TestCase):
         self.assertEqual(result["loop_anchor"], LOOP_ANCHOR)
         self.assertEqual(result["hook"], SCRIPT_LINES[0])
         self.assertEqual(result["title_cover"]["cover_lines"], COVER_LINES)
+
+    def test_34_words_rejected_even_when_old_preview_flags_are_set(self):
+        lines = SCRIPT_LINES.copy()
+        lines[1] = "Fitil eriyen balmumunu yukarı sürekli taşır."
+        with mock.patch.dict(os.environ, {"MOTOR_EXPERIMENTAL_OPENROUTER": "1", "MOTOR_PREVIEW_WORDS_30": "1"}):
+            with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "35–45 kelime"):
+                acceptance.validate_script(_scenes(lines), topic=TOPIC, title=TITLE, cover_lines=COVER_LINES,
+                                           loop_anchor=LOOP_ANCHOR)
 
     def test_script_rejects_wrong_scene_count_empty_scene_filler_and_cta(self):
         with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "5 anlatım vuruşu"):

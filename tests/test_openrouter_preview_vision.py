@@ -73,12 +73,16 @@ class PreviewSearchTests(unittest.TestCase):
         import tempfile
         settings={'MOTOR_EXPERIMENTAL_OPENROUTER':'1','MOTOR_VISUAL_QA_PASSED':'1',
                   'PEXELS_API_KEY':'pex','PIXABAY_API_KEY':'pix'}
+        # Search can return more than requested when its two API queries merge.
+        hits=[{'uid':f'pexels:{n}','id':n,'kaynak':'pexels','tags':'candle flame'} for n in range(7)]
         with tempfile.TemporaryDirectory() as td, mock.patch.dict(os.environ,settings), \
-             mock.patch.object(gorsel_uret,'pexels_ara',return_value=[]) as pex, \
-             mock.patch.object(gorsel_uret,'pixabay_ara') as pix:
+             mock.patch.object(gorsel_uret,'pexels_ara',return_value=hits) as pex, \
+             mock.patch.object(gorsel_uret,'pixabay_ara') as pix, \
+             mock.patch.object(gorsel_uret,'_visual_text_scores',return_value=[None]*4) as judge:
             result=gorsel_uret.sahneler_icin_gorseller([{'gorsel':'candle flame','ses':'mum'}],Path(td))
         self.assertEqual(result,[None])
         self.assertEqual(pex.call_args.kwargs['adet'],4)
+        self.assertEqual(len(judge.call_args.args[1]), 4)
         pix.assert_not_called()
 
 if __name__ == '__main__': unittest.main()

@@ -748,6 +748,11 @@ def sahneler_icin_gorseller(
                     provider_log["error"] = f"{type(exc).__name__}: {exc}"
                     continue
                 provider_log["returned_candidate_count"] = len(hits)
+                # Pexels performs two searches and can return more hits than its
+                # per-request `adet`; enforce the experimental vision limit on
+                # the combined result too. Never change the production path.
+                if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1":
+                    hits = hits[:limit]
                 try:
                     scores = _visual_text_scores(judge_text, hits)
                 except Exception as exc:  # noqa: BLE001 — semantic failure must fail closed
