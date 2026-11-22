@@ -10,6 +10,7 @@ import urllib.request
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from PIL import Image
+from openrouter_preview_limits import classify_retry
 
 MODEL = 'particle-ai/particle-1:free'
 ORIGIN = 'live_openrouter_experimental'
@@ -71,9 +72,14 @@ def score_images(scene_text, candidates, download):
                         candidates[i]['_vision_origin']=ORIGIN
                 return scores
             except urllib.error.HTTPError as exc:
-                for i in ids: candidates[i]['_vision_error'] = 'openrouter_http_'+str(exc.code)
-                if exc.code not in (429,500,502,503,504) or attempt == 2: break
-                time.sleep((6,12)[attempt])
+                if exc.code not in (429,500,502,503,504):
+                    for i in ids: candidates[i]['_vision_error'] = 'openrouter_http_'+str(exc.code)
+                    break
+                reason, wait = classify_retry(exc, attempt)
+                error = 'openrouter_daily_quota_exhausted' if reason == 'daily_quota_exhausted' else 'openrouter_http_'+str(exc.code)
+                for i in ids: candidates[i]['_vision_error'] = error
+                if attempt == 2 or wait is None: break
+                time.sleep(wait)
             except Exception as exc:
                 for i in ids: candidates[i]['_vision_error'] = 'openrouter_'+type(exc).__name__
                 break

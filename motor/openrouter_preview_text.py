@@ -5,11 +5,17 @@ import os
 import time
 import urllib.error
 import urllib.request
+from openrouter_preview_limits import classify_retry
 
 MODEL = 'particle-ai/particle-1:free'
+_DAILY_EXHAUSTED = False  # scoped to this process, never persistent account state
 
 
 def get_json(prompt, system):
+    global _DAILY_EXHAUSTED
+    if _DAILY_EXHAUSTED:
+        print('Deneysel metin modeli: günlük limit dolu; yeni istek gönderilmedi',flush=True)
+        return {}
     key=(os.environ.get('OPENROUTER_API_KEY') or '').strip()
     if not key:
         print('Deneysel metin modeli: anahtar yok')
@@ -33,8 +39,13 @@ def get_json(prompt, system):
             return {}
         except urllib.error.HTTPError as exc:
             print('Deneysel metin modeli: HTTP',exc.code,flush=True)
-            if exc.code not in (429,500,502,503,504) or attempt == 2:break
-            time.sleep((6,12)[attempt])
+            if exc.code not in (429,500,502,503,504):break
+            reason, wait = classify_retry(exc, attempt)
+            if reason == 'daily_quota_exhausted':
+                _DAILY_EXHAUSTED = True
+                print('Deneysel metin modeli: ücretsiz günlük istek limiti dolu',flush=True)
+            if attempt == 2 or wait is None:break
+            time.sleep(wait)
         except Exception as exc:
             print('Deneysel metin modeli:',type(exc).__name__,flush=True)
             break
