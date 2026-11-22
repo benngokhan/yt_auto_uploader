@@ -699,7 +699,9 @@ def sahneler_icin_gorseller(
     providers: list[tuple[str, str, object]] = []
     if pexels_key:
         providers.append(("pexels", pexels_key, pexels_ara))
-    if pixabay_key:
+    # V2 acceptance requires Pexels. Do not spend rate-limited vision calls on
+    # Pixabay during the isolated V2 experiment; it can never pass that gate.
+    if pixabay_key and os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") != "1":
         providers.append(("pixabay", pixabay_key, pixabay_ara))
 
     klasor.mkdir(parents=True, exist_ok=True)
@@ -715,6 +717,8 @@ def sahneler_icin_gorseller(
 
     for scene_index, scene in enumerate(sahneler, start=1):
         scene_text = str(scene.get("ses") or "").strip()
+        topic = str(scene.get("konu") or "").strip()
+        judge_text = f"Ana konu: {topic}\nSahne: {scene_text}" if topic else scene_text
         queries = _sorgu_adaylari(scene)
         scene_log = {
             "scene_index": scene_index,
@@ -734,7 +738,10 @@ def sahneler_icin_gorseller(
                 provider_log = {"provider": provider, "returned_candidate_count": 0, "candidates": []}
                 query_log["provider_results"].append(provider_log)
                 try:
-                    hits = search_fn(query, api_key, adet=MAX_CANDIDATES_PER_QUERY)
+                    # The experimental model frequently truncated/invalidated eight-image
+                    # responses; use at most four candidates without increasing request count.
+                    limit = 4 if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" else MAX_CANDIDATES_PER_QUERY
+                    hits = search_fn(query, api_key, adet=limit)
                 except TypeError:
                     hits = search_fn(query, api_key)
                 except Exception as exc:  # noqa: BLE001
@@ -742,7 +749,7 @@ def sahneler_icin_gorseller(
                     continue
                 provider_log["returned_candidate_count"] = len(hits)
                 try:
-                    scores = _visual_text_scores(scene_text, hits)
+                    scores = _visual_text_scores(judge_text, hits)
                 except Exception as exc:  # noqa: BLE001 — semantic failure must fail closed
                     scores = [None] * len(hits)
                     for hit in hits:

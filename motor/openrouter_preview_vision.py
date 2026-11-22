@@ -22,9 +22,12 @@ def score_images(scene_text, candidates, download):
         return scores
     parts = [{'type':'text', 'text': (
         'Sahne metni: ' + scene_text + '\n'
-        'Her numaralı fotoğrafı sahne metninde anlatılan somut nesne, eylem veya mekanizmayı '
-        'gösterip göstermediğine göre puanla. Sadece genel bilim havası alaka değildir. '
-        '0 = ilgisiz; 0.5 = kısmi/dolaylı; 1 = doğrudan açıkça gösteriyor. '
+        'Her fotoğraftaki ana nesne ve sahne bağlantısını puanla. Fotoğrafın kendisi '
+        'konuya özgü ana nesneyi açıkça gösteriyorsa, soyut mekanizmayı göstermese de '
+        'konuyla doğrudan ilgili temsilî bir görüntü sayılabilir. Tek başına genel bilim '
+        'havası yeterli değil; farklı nesneleri veya eylemleri yanlışlıkla eşitleme. '
+        '0 = alakasız veya yanıltıcı; 0.5 = belirsiz veya yalnız genel bağlantı; '
+        '0.8 = konu nesnesi doğrudan görünüyor; 1 = sahnedeki nesne ve eylem açıkça görünüyor. '
         'Sadece JSON döndür: {"scores":[0.0,...]}. Sayı ve sıra görsellerle aynı olmalı.') }]
     ids = []
     with TemporaryDirectory(prefix='or-vision-') as tmp:

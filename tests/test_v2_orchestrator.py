@@ -60,6 +60,19 @@ class V2OrchestratorTests(unittest.TestCase):
         self.assertEqual(scenes[0]["_v2_metadata"]["loop_anchor"], "mum")
         self.assertNotIn("takip et", scenes[-1]["ses"].lower())
 
+    def test_short_script_repair_preserves_metadata_and_revalidates(self):
+        lines = [scene["ses"] for scene in self._scenes()]
+        first = {"title_question": "Mum alevi neden söner?", "kapak_baslik": ["MUM ALEVİ NEDEN", "SÖNER?"],
+                 "loop_anchor": "mum", "kaynak_url": "", "cumleler": ["Mum alevi neden söner?", "Mum çok ısınır.", "Sonra hava gelir.", "Sonra alev söner.", "Mum yeniden yanar mı?"],
+                 "sahne_basliklari": [{"ikon": "?", "satir1": f"BİLGİ {i}", "satir2": "MUM ALEVİ"} for i in range(1,5)]}
+        with mock.patch.object(uret, "_llm_json", side_effect=[first,{"cumleler":lines}]) as llm, \
+             mock.patch.object(uret, "_arsivle"):
+            result = uret.sahne_plani_v2("mum alevi",4,{})
+        self.assertEqual([row["ses"] for row in result],lines)
+        self.assertEqual(result[0]["_v2_metadata"]["title_question"], first["title_question"])
+        self.assertIn("Hata:",llm.call_args_list[1].args[0])
+        self.assertIn("Önceki cümleler:",llm.call_args_list[1].args[0])
+
     def test_plan_only_writes_five_beats_without_audio_or_render(self):
         with tempfile.TemporaryDirectory(dir=ROOT / ".agent_tmp") as temp:
             motor_root = Path(temp) / "motor"

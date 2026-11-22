@@ -50,4 +50,35 @@ class PreviewVisionTests(unittest.TestCase):
             self.assertTrue(gorsel_uret._record_score_passes(row))
             self.assertFalse(gorsel_uret._record_score_passes(dict(row,semantic_similarity=0.5)))
 
+class PreviewSearchTests(unittest.TestCase):
+    def test_experimental_search_rejects_queries_without_main_subject(self):
+        import uret
+        result={'ana_nesne':'candle','sahneler_gorsel':[
+            {'ana':'human breath fog','alternatif':'candle smoke'},
+            {'ana':'candle flame','alternatif':'hot air balloon'}]}
+        with mock.patch.dict(os.environ, {'MOTOR_EXPERIMENTAL_OPENROUTER':'1'}), \
+             mock.patch.object(uret,'_llm_json',return_value=result):
+            queries,_=uret._gorsel_aramalari('mum',['one','two'],{})
+        self.assertEqual(queries,[{'ana':'candle smoke','alternatif':''},
+                                  {'ana':'candle flame','alternatif':''}])
+
+    def test_missing_subject_fails_closed(self):
+        import uret
+        with mock.patch.dict(os.environ, {'MOTOR_EXPERIMENTAL_OPENROUTER':'1'}), \
+             mock.patch.object(uret,'_llm_json',return_value={'sahneler_gorsel':[{'ana':'candle flame'}]}):
+            queries,_=uret._gorsel_aramalari('mum',['one'],{})
+        self.assertEqual(queries,[{'ana':'','alternatif':''}])
+
+    def test_preview_only_uses_pexels_and_limits_candidates(self):
+        import tempfile
+        settings={'MOTOR_EXPERIMENTAL_OPENROUTER':'1','MOTOR_VISUAL_QA_PASSED':'1',
+                  'PEXELS_API_KEY':'pex','PIXABAY_API_KEY':'pix'}
+        with tempfile.TemporaryDirectory() as td, mock.patch.dict(os.environ,settings), \
+             mock.patch.object(gorsel_uret,'pexels_ara',return_value=[]) as pex, \
+             mock.patch.object(gorsel_uret,'pixabay_ara') as pix:
+            result=gorsel_uret.sahneler_icin_gorseller([{'gorsel':'candle flame','ses':'mum'}],Path(td))
+        self.assertEqual(result,[None])
+        self.assertEqual(pex.call_args.kwargs['adet'],4)
+        pix.assert_not_called()
+
 if __name__ == '__main__': unittest.main()

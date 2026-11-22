@@ -1123,8 +1123,29 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
     istem = temel_istem
     last_error = "LLM geçerli plan döndürmedi"
     accepted = None
+    onceki_veri = None
     for deneme in range(3):
-        veri = _llm_json(istem, ayar, _LLM_SISTEM)
+        # Targeted repairs avoid asking the model to regenerate every metadata
+        # field when only word count or loop anchoring failed. The entire plan
+        # is validated again; this does not assert factual accuracy.
+        onarim = bool(onceki_veri and ("kelime olmalı" in last_error or
+                                      "ana kavramı yeniden anmalı" in last_error))
+        if onarim:
+            eski_satirlar = onceki_veri.get("cumleler") or []
+            istem = ("Aşağıdaki Türkçe beş cümleyi bilimsel anlamı koruyarak düzelt. "
+                     "TAM beş cümle yaz; her cümle 7–9 kelime, toplam 35–45 kelime olsun. "
+                     "İlk ve son cümle soru; ikisinde de aynı konu kelimesi açıkça geçsin. "
+                     "Yeni veya emin olmadığın bilgi ekleme. Hata: " + last_error + "\n"
+                     "Konu: " + konu + "\nÖnceki cümleler: " + json.dumps(eski_satirlar,ensure_ascii=False) +
+                     "\nSadece JSON ver: {\"cumleler\":[\"...\",\"...\",\"...\",\"...\",\"...\"]}")
+            if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" and konu == "Mum üflendiğinde neden söner?":
+                istem += "\nKaynak bilgisi: üfleme sıcak gazı soğutur ve balmumu buharını dağıtır; oksijeni kesmez."
+            duzeltme = _llm_json(istem, ayar, _LLM_SISTEM)
+            veri = dict(onceki_veri)
+            if isinstance(duzeltme,dict) and isinstance(duzeltme.get("cumleler"),list):
+                veri["cumleler"] = duzeltme["cumleler"]
+        else:
+            veri = _llm_json(istem, ayar, _LLM_SISTEM)
         if not isinstance(veri, dict):
             veri = {}
         ham_cumleler = veri.get("cumleler") or veri.get("sahneler") or []
@@ -1182,6 +1203,7 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
             break
         except ShortsAcceptanceError as exc:
             last_error = str(exc)
+            onceki_veri = veri if isinstance(veri, dict) else None
             _arsivle(
                 f"senaryo_v24_dogrulama_deneme{deneme + 1}",
                 f"karar: REDDEDİLDİ\nneden: {last_error}\n\n"
@@ -1249,7 +1271,7 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict]
         f"Konu: {konu}\n\n"
         f"Cümleler:\n{numarali}\n\n"
         f"Yukarıdaki {n} Türkçe bilim cümlesinin her biri için Pexels gerçek kamera fotoğrafı arşivinde "
-        f"net 4K dikey bilimsel/tıbbi/optik sonuç verecek BİRBİRİNDEN TAMAMEN FARKLI İngilizce somut nesne aramaları yaz.\n"
+        f"net dikey fotoğraf sonucu verecek İngilizce somut nesne aramaları yaz; her sahnede ana konu nesnesi açıkça geçsin.\n"
         "KESİN KURALLAR (Pexels gerçek kamera fotoğrafı arşividir, 3D çizim arşivi değildir):\n"
         "1) Her sahne ana konuyla doğrudan ilgili olmalı; aynı ana nesne farklı fotoğraflarda tekrarlanabilir.\n"
         "2) SADECE gerçek bir fotoğrafçının kamerayla çekebileceği somut bilimsel/optik/anatomik/laboratuvar nesneleri yaz "
@@ -1262,8 +1284,21 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict]
         f"Yalnız JSON döndür: {{\"sahneler_gorsel\": [{{\"ana\": \"bu sahnenin metnindeki somut nesne/eylem\", \"alternatif\": \"aynı sahneyle doğrudan ilgili başka somut nesne\"}}, ...]}}. "
         f"\"sahneler_gorsel\" dizisi TAM {n} elemanlı olacak."
     )
+    if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1":
+        istem += ("\nEK DENEME ŞARTI: JSON içinde ana_nesne adlı alanla konunun İngilizce somut nesnesini "
+                  "(bir veya iki kelime) belirt. Dört sahnenin her ana ve alternatif aramasında bu "
+                  "nesne aynen yer alsın; farklı fotoğraflar kullanılacak, farklı nesneler şart değil. "
+                  "Örneğin mum konusunda ana_nesne: candle; human breath fog veya smoke ring tek başına "
+                  "ilgili değildir; candle flame ve candle smoke daha doğrudur. "
+                  "Belirsizse boş dön, alakasız nesne uydurma.")
     veri = _llm_json(istem, ayar, _LLM_SISTEM)
     ham_liste = veri.get("sahneler_gorsel") or veri.get("aramalar") or []
+    experimental_anchor = ""
+    if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1":
+        experimental_anchor = " ".join(str(veri.get("ana_nesne") or "").lower().split())
+        if not re.fullmatch(r"[a-z]+(?: [a-z]+)?", experimental_anchor):
+            print("Deneysel görsel arama: ana nesne eksik/geçersiz; sorgular reddedildi")
+            experimental_anchor = ""
     # Genel bilim/atmosfer yedeği bilinçli olarak yok: sahneye uygun terim yoksa görsel seçilmez.
     yedekler: list[str] = []
     sahneler_q: list[dict] = []
@@ -1274,6 +1309,14 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict]
         else:
             ana = str(item).strip()
             alt = ""
+        if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1":
+            def _bagli(query):
+                return bool(experimental_anchor and re.search(
+                    r"(?<![a-z])" + re.escape(experimental_anchor) + r"(?![a-z])", query.lower()))
+            ana = ana if _bagli(ana) else ""
+            alt = alt if _bagli(alt) else ""
+            if not ana and alt:
+                ana, alt = alt, ""
         sahneler_q.append({"ana": ana, "alternatif": alt})
 
     while len(sahneler_q) < n:
@@ -1474,6 +1517,7 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
             "gorsel_anahtar": ar["ana"],
             "gorsel_alternatif": ar.get("alternatif", ""),
             "ses": visual_sentences[index],
+            "konu": a.konu,
         }
         for index, ar in enumerate(aramalar)
     ]
