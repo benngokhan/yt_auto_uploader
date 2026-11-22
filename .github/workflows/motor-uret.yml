@@ -36,11 +36,59 @@ on:
         default: false
 
 concurrency:
-  group: motor-uret
+  group: arena-daily-validation
   cancel-in-progress: false
 
 jobs:
+  daily_test:
+    if: ${{ inputs.konu == '__DAILY_DRY__' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -q -r requirements.txt PyYAML
+      - name: Validate all safeguards and workflow syntax
+        run: |
+          python -m unittest discover -s tests -p 'test_*.py' -v
+          python - <<'PY2'
+          import yaml
+          from pathlib import Path
+          data=yaml.safe_load(Path('.github/workflows/gunluk-on-planlama.yml').read_text())
+          assert data['concurrency']['group']=='yt-drive-uploader'
+          assert data['jobs']['plan']['timeout-minutes']==30
+          print('Yeni akış biçimi ve ortak kilit doğrulandı')
+          PY2
+      - name: Verify a planned previous video blocks next-day advancement
+        env:
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          GOOGLE_CLIENT_SECRETS_JSON: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}
+        run: |
+          python - <<'PY2'
+          import os
+          from pathlib import Path
+          from datetime import datetime,timezone
+          Path('token.json').write_text(os.environ['GOOGLE_TOKEN_JSON'],encoding='utf8')
+          Path('client_secrets.json').write_text(os.environ['GOOGLE_CLIENT_SECRETS_JSON'],encoding='utf8')
+          import bugun_planla as b
+          from uploader import get_google_clients
+          b.STATE=Path('.')
+          yt,_=get_google_clients()
+          try:
+              b.previous_publication_verified(yt,datetime(2026,11,23,16,30,tzinfo=timezone.utc))
+          except RuntimeError as exc:
+              if 'yayında doğrulanamadı' not in str(exc):raise
+              print('Planlı ancak henüz yayınlanmamış video sonraki sırayı durduruyor: OK')
+          else:
+              raise SystemExit('Planlı önceki video yanlışlıkla yayında sayıldı')
+          PY2
   uret:
+    if: ${{ inputs.konu != '__DAILY_DRY__' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
