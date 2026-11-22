@@ -52,9 +52,9 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -q Pillow
-      - name: One free-model visual calibration
+      - name: One Groq free-plan visual calibration
         env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: python aday_hakem_kontrol.py
   uret:
     if: ${{ inputs.kuru == true && inputs.konu != '__VISION_CALIBRATION__' }}
