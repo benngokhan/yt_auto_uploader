@@ -65,7 +65,7 @@ try:
         print('POLLINATIONS_DURUM MODEL_FIYATI_DOGRULANAMADI',flush=True);raise SystemExit(2)
     if available<price or remaining<price or (budget is not None and budget<price):
         print('POLLINATIONS_DURUM YETERSIZ_GOREV_BAKIYESI_VEYA_BUTCE',flush=True);raise SystemExit(2)
-    prompt='Solda bir kişi, sağda masanın üzerinde tek mum; kişi dudaklarını büzerek muma üflüyor, alev nefes yönünde sağa eğiliyor ve fitilden ince duman çıkıyor. Dikey, gerçekçi, yazısız ve logosuz bir görüntü istedim; ayrıca çakmak ve kibrit olmamasını belirttim.'
+    prompt='Bir kişinin bir mumu üflediği anı görsele dönüştür görsel yakın çekim olsun'
     print('POLLINATIONS_GORSEL_ISTEGI 1_BASLADI',flush=True)
     result=request_json('/v1/images/generations',{'model':MODEL,'prompt':prompt,'n':1,'size':'576x1024',
                         'response_format':'b64_json','seed':secrets.randbelow(2_000_000_000)})
