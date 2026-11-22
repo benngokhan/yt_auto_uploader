@@ -13,7 +13,7 @@ for index,url in enumerate(urls,1):parts.extend([{'type':'text','text':f'Görsel
 body={'model':'qwen/qwen3.8-27b','messages':[{'role':'user','content':parts}], 'response_format':{'type':'json_object'},
       'reasoning_effort':'none','temperature':0,'max_completion_tokens':400}
 req=urllib.request.Request('https://api.groq.com/openai/v1/chat/completions',data=json.dumps(body).encode(),
-                           headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'})
+                           headers={'Authorization':'Bearer '+key,'Content-Type':'application/json','Accept':'application/json','User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'})
 try:
  with urllib.request.urlopen(req,timeout=80) as response:
   data=json.load(response)
@@ -34,6 +34,7 @@ except urllib.error.HTTPError as exc:
   print('GROQ_HATA_BOYUT',len(raw),'CONTENT_TYPE',str(exc.headers.get('Content-Type') or '')[:80],flush=True)
   print('GROQ_HATA_SERVER',str(exc.headers.get('Server') or '')[:60],flush=True)
   text=raw.decode('utf8','replace'); lower=text.lower()
+  if re.fullmatch(r'error code: [0-9]{4}',lower.strip()):print('GROQ_CLOUDFLARE',lower.strip(),flush=True)
   words=['permission','model','organization','project','terms','billing','country','region','decommission','disabled','tier','preview','policy','cloudflare','access denied','forbidden','request blocked','rate limit','api key','unsupported']
   print('GROQ_HATA_IPUCLARI',','.join(x for x in words if x in lower) or 'yok',flush=True)
   try:
