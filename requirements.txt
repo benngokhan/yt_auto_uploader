@@ -15,5 +15,7 @@ python-dotenv>=1.0.0
 tiktok-uploader>=1.1.0
 uvicorn>=0.29.0
 Pillow>=10.0.0
+# Altyazı testleri render_engine.py üzerinden OpenCV kullanır.
+opencv-python-headless>=4.9
 # Testler motor/tts.py'yi yukluyor; o da soundfile import ediyor (CI'da eksikti).
 soundfile>=0.12

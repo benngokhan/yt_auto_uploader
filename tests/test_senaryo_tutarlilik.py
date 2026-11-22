@@ -27,7 +27,7 @@ class SenaryoKurallariTestleri(unittest.TestCase):
             self.assertIn(parca, k)
 
     def test_v2_isteminde_kurallar_ve_bos_kaynak_talimati_var(self):
-        istem = self.uret.PROMPT_V2.format(konu="Mum neden söner?", n=7, son=6)
+        istem = self.uret.PROMPT_V2.format(konu="Mum neden söner?", n=7, son=6, content_scenes=6)
         self.assertIn(self.uret.TERIM_KURALLARI, istem)
         self.assertIn("gerçek bir kaynak yoksa boş bırak", istem)
         self.assertIn("genel geçer ifade YASAK", istem)
