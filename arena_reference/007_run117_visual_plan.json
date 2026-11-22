@@ -1,0 +1,110 @@
+{
+  "kind": "manually_authored_calibration_plan_not_production_manifest",
+  "target_commit": "26af954719242454746117e9291a3e3cbe0e4127",
+  "policy": "ai_only",
+  "provider_requests_authorized": false,
+  "render_authorized": false,
+  "production_ready": false,
+  "scene_count": 4,
+  "narration_beat_count": 5,
+  "visual_sequence": [
+    0,
+    1,
+    2,
+    3,
+    0
+  ],
+  "narration_lines": [
+    "Mum alevi üflendiğinde neden birden sönüyor, hiç düşündün mü?",
+    "Üflemek mum alevinin çevresindeki sıcak gazları hızla soğutur.",
+    "Aynı hava akımı yanan balmumu buharını da dağıtır.",
+    "Yeterli ısı ve yakıt kalmayınca yanma süreci durur.",
+    "Peki mum alevi hangi koşullarda yeniden yanabilir?"
+  ],
+  "tasks": [
+    {
+      "image_index": 0,
+      "beat_index": 0,
+      "meaning": "İnsan üflüyor; alev nefes yönünde yana yatmış.",
+      "prompt": "Photorealistic vertical 9:16 educational photograph. One ivory taper candle on a plain table, warm natural light, sufficiently visible detail, uncluttered background. No text, labels, arrows, logos, extra candles, lighter or matches. Side view: an adult person on the left, candle on the right, tightly pursed lips at wick height. A small clearly visible flame stretches almost horizontally to the RIGHT, away from the mouth. The flame tip is right of the wick and only slightly higher. Clear air without decorative smoke.",
+      "critical_visible_requirements": [
+        "One adult visibly blowing toward one candle.",
+        "A visible flame extends sideways away from the person, not upright."
+      ],
+      "reject_if": [
+        "Upright flame.",
+        "Lighting the candle instead of blowing.",
+        "Fully extinguished candle with no flame."
+      ],
+      "status": "planned_not_generated",
+      "image_sha256": null,
+      "review": {
+        "result": "not_reviewed",
+        "reviewed_image_sha256": null
+      }
+    },
+    {
+      "image_index": 1,
+      "beat_index": 1,
+      "meaning": "Hava akımında alev/fitil makrosu; soğuma fotoğraftan ölçülemez.",
+      "prompt": "Photorealistic vertical 9:16 educational photograph. One ivory taper candle on a plain table, warm natural light, sufficiently visible detail, uncluttered background. No text, labels, arrows, logos, extra candles, lighter or matches. Macro side view of the wick and a small burning flame visibly stretched sideways to the right by airflow. The wick remains visible and the flame is attached to it. Clear air. Do not depict visible blue cooling gas, ice, a thermometer, or invented temperature gradients.",
+      "critical_visible_requirements": [
+        "One visible wick with an attached burning flame.",
+        "Flame visibly deformed sideways by airflow."
+      ],
+      "not_visually_provable": [
+        "Gas temperature or temperature drop."
+      ],
+      "status": "planned_not_generated",
+      "image_sha256": null,
+      "review": {
+        "result": "not_reviewed",
+        "reviewed_image_sha256": null
+      }
+    },
+    {
+      "image_index": 2,
+      "beat_index": 2,
+      "meaning": "Eriyen mum/fitil yakın planı; balmumu buharı görünür duman gibi sunulmaz.",
+      "prompt": "Photorealistic vertical 9:16 educational photograph. One ivory taper candle on a plain table, warm natural light, sufficiently visible detail, uncluttered background. No text, labels, arrows, logos, extra candles, lighter or matches. Very close side view of the melted wax pool and wick of a single candle, a tiny visible yellow flame flattened rightward under airflow, near extinction. Wax texture in focus. Clean surrounding air. Do not invent a visible wax-vapor cloud, molecular particles, or decorative smoke.",
+      "critical_visible_requirements": [
+        "Melted wax and one wick are visible.",
+        "A small flame is still present and bent sideways."
+      ],
+      "not_visually_provable": [
+        "Distribution or concentration of invisible wax vapor."
+      ],
+      "status": "planned_not_generated",
+      "image_sha256": null,
+      "review": {
+        "result": "not_reviewed",
+        "reviewed_image_sha256": null
+      }
+    },
+    {
+      "image_index": 3,
+      "beat_index": 3,
+      "meaning": "Yanma durmuş: sönmüş fitil; artık görünür alev yok.",
+      "prompt": "Photorealistic vertical 9:16 educational photograph. One ivory taper candle on a plain table, warm natural light, sufficiently visible detail, uncluttered background. No text, labels, arrows, logos, extra candles, lighter or matches. Close-up of a freshly extinguished candle. The wick has a tiny dull glowing ember and a very thin wisp of smoke. No burning flame anywhere. Wax pool and wick in focus.",
+      "critical_visible_requirements": [
+        "One candle with an extinguished wick.",
+        "No visible burning flame."
+      ],
+      "reject_if": [
+        "A still-burning visible flame."
+      ],
+      "status": "planned_not_generated",
+      "image_sha256": null,
+      "review": {
+        "result": "not_reviewed",
+        "reviewed_image_sha256": null
+      }
+    }
+  ],
+  "limitations": [
+    "Photographs illustrate the narration; they cannot measure gas temperature or prove invisible vapor dispersion.",
+    "These prompts were authored offline, not generated by a model; no image provider was called.",
+    "Image 1 is deliberately reused for the final loop beat; four other images must be unique.",
+    "Any changes to factual claims require separate source checking; a vision score is not scientific validation."
+  ]
+}
