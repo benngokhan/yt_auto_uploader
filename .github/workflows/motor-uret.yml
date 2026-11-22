@@ -36,11 +36,30 @@ on:
         default: false
 
 concurrency:
-  group: motor-uret
+  group: safe-provider-diagnostic
   cancel-in-progress: false
 
 jobs:
+  alternative_vision:
+    if: ${{ inputs.konu == '__VISION_DIAGNOSTIC__' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q numpy Pillow
+      - name: Test real vision alternatives without revealing credentials
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python openrouter_skor_kalite_deneme.py
   uret:
+    if: ${{ inputs.konu != '__VISION_DIAGNOSTIC__' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
