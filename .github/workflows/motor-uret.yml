@@ -36,11 +36,38 @@ on:
         default: false
 
 concurrency:
-  group: motor-uret
+  group: yt-drive-uploader
   cancel-in-progress: false
 
 jobs:
+  planned_row:
+    if: ${{ inputs.konu == '__SCHEDULED_ROW__' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -q openpyxl google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
+      - name: Test workbook preservation
+        run: python -m unittest discover -s tests -p 'test_plan_tablo.py' -v
+      - name: Verify YouTube plan and mark one row
+        env:
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          GOOGLE_CLIENT_SECRETS_JSON: ${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}
+        run: |
+          python - <<'PY2'
+          import os
+          from pathlib import Path
+          Path('token.json').write_text(os.environ['GOOGLE_TOKEN_JSON'],encoding='utf8')
+          Path('client_secrets.json').write_text(os.environ['GOOGLE_CLIENT_SECRETS_JSON'],encoding='utf8')
+          PY2
+          python plan_tablo_dogrula.py
   uret:
+    if: ${{ inputs.konu != '__SCHEDULED_ROW__' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
