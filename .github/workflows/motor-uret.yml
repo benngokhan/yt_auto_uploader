@@ -36,12 +36,28 @@ on:
         default: false
 
 concurrency:
-  group: arena-tek-video-deneme
+  group: arena-vision-calibration
   cancel-in-progress: false
 
 jobs:
+  vision_calibration:
+    if: ${{ inputs.kuru == true && inputs.konu == '__VISION_CALIBRATION__' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q Pillow
+      - name: One free-model visual calibration
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: python aday_hakem_kontrol.py
   uret:
-    if: ${{ inputs.kuru == true }}
+    if: ${{ inputs.kuru == true && inputs.konu != '__VISION_CALIBRATION__' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
