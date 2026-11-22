@@ -206,6 +206,19 @@ def _yazim_denetimi(sahneler: list, ayar: dict) -> int:
     Yapay zekâ cümleyi yeniden yazmaya kalkarsa ya da hata olursa özgün metin korunur; üretim durmaz.
     """
     import difflib
+    # Confirmed recurring typo; exact whole-word replacement, independent of LLM
+    # availability. Other unknown words are not guessed or silently changed.
+    duzeltilen = 0
+    def _bilinen_yazim(match):
+        value = "tüten"
+        original = match.group(0)
+        return value.upper() if original.isupper() else value.capitalize() if original[:1].isupper() else value
+    for scene in sahneler:
+        eski_metin = str(scene.get("ses", ""))
+        duz_metin, adet = re.subn(r"(?<!\w)(?:tütcen|tütücen)(?!\w)", _bilinen_yazim, eski_metin, flags=re.IGNORECASE)
+        if adet:
+            scene["ses"] = duz_metin
+            duzeltilen += adet
     cta = "Daha fazla Bilgi Dozu için takip et!"
     cumleler = [str(x.get("ses", "")).replace(cta, "").strip() for x in sahneler]
     basliklar = [[str(x.get("baslik1", "")), str(x.get("baslik2", ""))] for x in sahneler]
@@ -222,7 +235,7 @@ def _yazim_denetimi(sahneler: list, ayar: dict) -> int:
         veri = _llm_json(istem, ayar, "Sen titiz bir Türkçe yazım denetçisisin. Yalnız geçerli JSON döndürürsün.")
     except (Exception, SystemExit) as h:  # noqa: BLE001 — denetim üretimi asla durdurmaz
         print(f"Yazım denetimi yapılamadı ({type(h).__name__}); metin olduğu gibi kullanılıyor")
-        return 0
+        return duzeltilen
 
     def _kucuk_fark(eski: str, yeni: str, esik: float = 0.9) -> bool:
         if not yeni or yeni == eski or abs(len(yeni) - len(eski)) > 4:
@@ -231,7 +244,6 @@ def _yazim_denetimi(sahneler: list, ayar: dict) -> int:
             return False
         return difflib.SequenceMatcher(None, eski.lower(), yeni.lower()).ratio() >= esik
 
-    duzeltilen = 0
     yeni_c = veri.get("cumleler") if isinstance(veri, dict) else None
     if isinstance(yeni_c, list) and len(yeni_c) == len(sahneler):
         for x, eski, yeni in zip(sahneler, cumleler, yeni_c):
@@ -1409,12 +1421,10 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     """Shorts v2.4 local production path; it never uploads or publishes."""
     if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" and not getattr(a, "kuru", False):
         raise SystemExit("Deneysel görsel doğrulayıcı yalnız yayınsız kuru testte kullanılabilir.")
-    if (os.getenv("MOTOR_PREVIEW_TEXT_OPENROUTER") == "1" or os.getenv("MOTOR_PREVIEW_WORDS_30") == "1") and (
+    if os.getenv("MOTOR_PREVIEW_TEXT_OPENROUTER") == "1" and (
         os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") != "1" or not getattr(a, "kuru", False)
     ):
-        raise SystemExit("Deneysel metin ayarları yalnız yayınsız kuru testte kullanılabilir.")
-    if os.getenv("MOTOR_PREVIEW_WORDS_30") == "1":
-        print("DİKKAT: YAYINLANMAZ İNCELEME; kelime alt sınırı deneysel olarak 30, gerçek süre ayrıca kontrol edilir.")
+        raise SystemExit("Deneysel metin sağlayıcısı yalnız yayınsız kuru testte kullanılabilir.")
     import shutil
     from PIL import Image
     from shorts_acceptance import (

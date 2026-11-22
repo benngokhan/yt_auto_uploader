@@ -103,17 +103,20 @@ class YazimDenetimiTestleri(unittest.TestCase):
     def test_yeniden_yazma_kabul_edilmez(self):
         s = _sahneler(URETIM_64)
         yeni = ["Bambaşka ve yepyeni bir cümle yazdım, hiç ilgisi yok."] * 7
-        self.assertEqual(self._calistir(s, {"cumleler": yeni, "basliklar": [["YENİ BAŞLIK", "BAMBAŞKA SÖZ"]] * 7}), 0)
-        self.assertEqual([x["ses"] for x in s], URETIM_64)
+        self.assertEqual(self._calistir(s, {"cumleler": yeni, "basliklar": [["YENİ BAŞLIK", "BAMBAŞKA SÖZ"]] * 7}), 2)
+        self.assertEqual([x["ses"] for x in s], [x.replace("tütücen", "tüten") for x in URETIM_64])
+        self.assertTrue(all(x["baslik1"] != "YENİ BAŞLIK" for x in s))
 
     def test_bozuk_cevap_ya_da_hata_uretimi_durdurmaz(self):
+        expected = [x.replace("tütücen", "tüten") for x in URETIM_64]
         for cevap in ({}, {"cumleler": ["tek"]}, {"cumleler": None, "basliklar": "x"}, []):
             s = _sahneler(URETIM_64)
-            self.assertEqual(self._calistir(s, cevap), 0)
-            self.assertEqual([x["ses"] for x in s], URETIM_64)
+            self.assertEqual(self._calistir(s, cevap), 2)
+            self.assertEqual([x["ses"] for x in s], expected)
         s = _sahneler(URETIM_64)
         with mock.patch.object(uret, "_llm_json", side_effect=SystemExit("LLM yok")), mock.patch("builtins.print"):
-            self.assertEqual(uret._yazim_denetimi(s, {}), 0)
+            self.assertEqual(uret._yazim_denetimi(s, {}), 2)
+        self.assertEqual([x["ses"] for x in s], expected)
 
 
 if __name__ == "__main__":

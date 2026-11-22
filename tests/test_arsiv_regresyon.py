@@ -252,13 +252,21 @@ class RegresyonKapisiTestleri(_ArsivOrtami):
         self.assertEqual((d1["gecti"], d1["durum"]), (False, "FARKLI DÜZELTME"))
 
     def test_tutcen_duzelmezse_kirmizi_ve_motor_durur(self):
-        with mock.patch.object(uret, "_llm_json", return_value={}), mock.patch("builtins.print"):
+        # Even if the entire correction step breaks, the lock must remain red.
+        with mock.patch.object(uret, "_yazim_denetimi", return_value=0), mock.patch.object(uret, "_llm_json", return_value={}), mock.patch("builtins.print"):
             sonuc = regresyon.calistir({}, uret)
             self.assertIn("R1", [s["kod"] for s in sonuc if not s["gecti"]])
             with self.assertRaises(SystemExit) as h:
                 uret._regresyon_kapisi({})
         self.assertIn("KIRMIZI", str(h.exception))
         self.assertIn("MOTOR VİDEO ÜRETMEYECEK", self.dosyalar("regresyon_sonuclari")[0].read_text(encoding="utf-8"))
+
+    def test_bilinen_yazim_yapay_zeka_yokken_duzelir_kismi_kelimeler_korunur(self):
+        sahneler = [{"ses": "tütcen Tütcen TÜTCEN tütücen atütcen tütcenlik", "baslik1": "", "baslik2": ""}]
+        with mock.patch.object(uret, "_llm_json", side_effect=SystemExit("LLM yok")), mock.patch("builtins.print"):
+            adet = uret._yazim_denetimi(sahneler, {})
+        self.assertEqual(adet, 4)
+        self.assertEqual(sahneler[0]["ses"], "tüten Tüten TÜTEN tüten atütcen tütcenlik")
 
     def test_sozluk_yoksa_r2_kirmizi_motor_kilitli(self):
         import sozluk as _s
