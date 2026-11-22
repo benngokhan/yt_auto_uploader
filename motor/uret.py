@@ -1305,6 +1305,8 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict]
         istem += ("\nEK DENEME ŞARTI: JSON içinde ana_nesne adlı alanla konunun İngilizce somut nesnesini "
                   "(bir veya iki kelime) belirt. Dört sahnenin her ana ve alternatif aramasında bu "
                   "nesne aynen yer alsın; farklı fotoğraflar kullanılacak, farklı nesneler şart değil. "
+                  "Alternatif aramalarda doğal gün ışığında veya aydınlık ortamda çekilmiş "
+                  "doğrudan ilgili fotoğrafları hedefle; İngilizce aramaya daylight ekle. "
                   "Örneğin mum konusunda ana_nesne: candle; human breath fog veya smoke ring tek başına "
                   "ilgili değildir; candle flame ve candle smoke daha doğrudur. "
                   "Belirsizse boş dön, alakasız nesne uydurma.")
