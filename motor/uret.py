@@ -1373,7 +1373,14 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         raise SystemExit(f"Shorts v2 tam {EXPECTED_SCENES} benzersiz görsel ister; legacy yoluna geçilmedi.")
     calisma = MOTOR / "cikti" / "son"
 
-    sahneler = sahne_plani_v2(a.konu, EXPECTED_SCENES, ayar)
+    if os.getenv("MOTOR_PREVIEW_FIXED_SCRIPT") == "1":
+        if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") != "1" or not getattr(a, "kuru", False):
+            raise SystemExit("Sabit inceleme metni sadece yayınsız deneyde kullanılabilir.")
+        from preview_script_v2 import candidate
+        sahneler = candidate(a.konu)
+        print("DENEME: kaynağa bakılarak elle hazırlanan senaryo, otomatik üretim DEĞİL.")
+    else:
+        sahneler = sahne_plani_v2(a.konu, EXPECTED_SCENES, ayar)
     _arsivle_senaryo("senaryo_1_plan_sonrasi", sahneler)
     _terim_birligi_sagla(sahneler, ayar, "kısa v2 planı")
     _sayi_denetimi(sahneler, ayar)

@@ -105,6 +105,7 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           MOTOR_EXPERIMENTAL_OPENROUTER: "1"
+          MOTOR_PREVIEW_FIXED_SCRIPT: "1"
           MOTOR_KONU: ${{ inputs.konu }}
           MOTOR_KURU: ${{ inputs.kuru }}
           MOTOR_SAHNE: ${{ inputs.sahne }}
