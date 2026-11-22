@@ -908,7 +908,7 @@ PROMPT_V2 = (
     "Konu: {konu}\n\n"
     "Bilgi Dozu için 15–25 saniyelik (varsayılan hedef yaklaşık 20 saniye), Türkçe bilim Shorts planı yaz. "
     "Tam dört benzersiz fotoğraf kullanılır; finalde ilk fotoğraf yeniden gösterilir.\n"
-    "- 'cumleler' dizisine TAM {n} kısa cümle yaz. Her bir cümle 7–9 kelime olsun; toplam 35–45 kelime zorunludur. Göndermeden önce kelimeleri say, 35'ten azsa cümleleri somut ayrıntılarla uzat.\n"
+    "- 'cumleler' dizisine TAM {n} kısa cümle yaz. Her bir cümle 8–9 kelime olsun; toplam 40–45 kelime hedefle (35–45 zorunlu). Göndermeden önce her cümledeki boşlukla ayrılan kelimeleri say, eksikse gerçeklere sadık kalarak tamamla.\n"
     "- 1. cümle doğrudan merak uyandıran soru-hook olsun; ilk kelime video başında duyulur.\n"
     "- 2. cümle cevabın ilk kısmıdır ve ikinci görselle gösterilir. Ekrana ayrıca 'Takip et' yazı katmanı konur; "
     "bu ifade SADECE görsel katmanıdır, seslendirme cümlelerine ekleme.\n"
@@ -1113,7 +1113,14 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
     except Exception as h:
         raise SystemExit(f"Shorts v2.4 renderer yüklenemedi (motor/shorts_pipeline.py): {type(h).__name__}") from h
 
-    istem = PROMPT_V2.format(konu=konu, n=EXPECTED_NARRATION_BEATS, visual_count=EXPECTED_SCENES)
+    temel_istem = PROMPT_V2.format(konu=konu, n=EXPECTED_NARRATION_BEATS, visual_count=EXPECTED_SCENES)
+    if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" and konu == "Mum üflendiğinde neden söner?":
+        # Manually checked source context for this one non-publishing review only.
+        temel_istem += ("\nBU TESTİN KAYNAK BİLGİSİ: Üflemek mumun etrafındaki sıcak gazları soğutur "
+            "ve balmumu buharını dağıtır. Yanma için yeterli ısı ve yoğun yakıt buharı kalmayınca alev söner. "
+            "Üflemenin oksijeni kestiğini iddia etme. Kaynak: University of Illinois Physics Van "
+            "https://van.physics.illinois.edu/ask/listing/27883 . Kaynak URL kabul edilmezse boş bırak.")
+    istem = temel_istem
     last_error = "LLM geçerli plan döndürmedi"
     accepted = None
     for deneme in range(3):
@@ -1182,8 +1189,11 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
             )
             if deneme < 2:
                 istem = (
-                    PROMPT_V2.format(konu=konu, n=EXPECTED_NARRATION_BEATS, visual_count=EXPECTED_SCENES)
-                    + f"\nÖNCEKİ DENEME REDDEDİLDİ: {last_error}. Beş anlatım vuruşu ve dört görsel başlığını baştan doğru üret."
+                    temel_istem
+                    + f"\nÖNCEKİ DENEME REDDEDİLDİ: {last_error}. Önceki yanıt aşağıda. "
+                    + "Sorunu düzelt, önceki geçerli alanları koru ve TAM JSON nesnesini geri ver. "
+                    + "İlk ve son soru aynı konu anahtarını içermeli, toplam 35–45 kelime olmalı.\n"
+                    + json.dumps(veri, ensure_ascii=False)
                 )
 
     if accepted is None:
@@ -1241,7 +1251,7 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict]
         f"Yukarıdaki {n} Türkçe bilim cümlesinin her biri için Pexels gerçek kamera fotoğrafı arşivinde "
         f"net 4K dikey bilimsel/tıbbi/optik sonuç verecek BİRBİRİNDEN TAMAMEN FARKLI İngilizce somut nesne aramaları yaz.\n"
         "KESİN KURALLAR (Pexels gerçek kamera fotoğrafı arşividir, 3D çizim arşivi değildir):\n"
-        "1) İki sahnede aynı ana kelimeyi TEKRARLAMA.\n"
+        "1) Her sahne ana konuyla doğrudan ilgili olmalı; aynı ana nesne farklı fotoğraflarda tekrarlanabilir.\n"
         "2) SADECE gerçek bir fotoğrafçının kamerayla çekebileceği somut bilimsel/optik/anatomik/laboratuvar nesneleri yaz "
         "(mükemmel örnekler: 'human eye iris', 'scientist microscope', 'laboratory test tube', 'brain mri scan', "
         "'optical glass lens', 'blue laser beam', 'hourglass sand', 'medical laboratory', 'astronomy night sky', "

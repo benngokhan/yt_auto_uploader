@@ -31,8 +31,8 @@ class SenaryoKurallariTestleri(unittest.TestCase):
         self.assertIn(self.uret.TERIM_KURALLARI, istem)
         self.assertIn("gerçek bir kaynak yoksa boş bırak", istem)
         self.assertIn("genel geçer ifade YASAK", istem)
-        self.assertIn("Her bir cümle 7–9 kelime olsun", istem)
-        self.assertIn("toplam 35–45 kelime zorunludur", istem)
+        self.assertIn("Her bir cümle 8–9 kelime olsun", istem)
+        self.assertIn("toplam 40–45 kelime hedefle (35–45 zorunlu)", istem)
 
     def test_cumle_uzatma_istemi_kurallari_ve_baglami_tasir(self):
         gonderilen = {}
