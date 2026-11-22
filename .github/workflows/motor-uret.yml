@@ -52,10 +52,10 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -q Pillow
-      - name: One Groq free-plan visual calibration
+      - name: Single controlled Gemini calibration (no retries)
         env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        run: python aday_hakem_kontrol.py
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python gemini_tek_kontrollu_gorsel.py
   uret:
     if: ${{ inputs.kuru == true && inputs.konu != '__VISION_CALIBRATION__' }}
     runs-on: ubuntu-latest
