@@ -96,4 +96,26 @@ class PreviewSearchTests(unittest.TestCase):
         self.assertEqual([x['id'] for x in judge.call_args.args[1]], [1,2,3,4])
         pix.assert_not_called()
 
+    def test_preview_reuses_judgment_only_within_same_scene(self):
+        import tempfile
+        settings={'MOTOR_EXPERIMENTAL_OPENROUTER':'1','MOTOR_VISUAL_QA_PASSED':'1','PEXELS_API_KEY':'pex'}
+        def search(query, key, adet):
+            ids = [1,2] if query == 'candle flame' else [2,3]
+            return [{'uid':f'pexels:{n}','id':n,'kaynak':'pexels','tags':'candle flame'} for n in ids]
+        calls=[]
+        def judge(text, hits):
+            calls.append((text,[hit['id'] for hit in hits]))
+            for hit in hits:
+                hit['_vision_origin']='live_openrouter_experimental'
+            return [0.5]*len(hits)  # remain below the acceptance threshold
+        scenes=[{'gorsel':'candle flame','gorsel_alternatif':'candle daylight','ses':'mum one'},
+                {'gorsel':'candle flame','gorsel_alternatif':'candle daylight','ses':'mum two'}]
+        with tempfile.TemporaryDirectory() as td, mock.patch.dict(os.environ,settings,clear=False), \
+             mock.patch.object(gorsel_uret,'pexels_ara',side_effect=search), \
+             mock.patch.object(gorsel_uret,'_visual_text_scores',side_effect=judge):
+            self.assertEqual(gorsel_uret.sahneler_icin_gorseller(scenes,Path(td)),[None,None])
+        self.assertEqual([ids for _,ids in calls],[[1,2],[3],[1,2],[3]])
+        self.assertIn('one',calls[0][0])
+        self.assertIn('two',calls[2][0])
+
 if __name__ == '__main__': unittest.main()

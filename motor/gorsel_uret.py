@@ -731,6 +731,9 @@ def sahneler_icin_gorseller(
         selected_hit: dict | None = None
         selected_query = ""
         selected_provider = ""
+        # Only reuse a valid score within the same scene (same judge text).
+        # Across different scenes the same image must be judged again.
+        preview_score_cache: dict[str, tuple[float, str]] = {}
 
         for query in queries:
             query_log = {"query": query, "provider_results": []}
@@ -755,11 +758,34 @@ def sahneler_icin_gorseller(
                 if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1":
                     uygun_hits = [hit for hit in hits if _yeterince_uygun(hit, query, scene_text, gevsek=True)]
                     provider_log["metadata_precheck_rejected_count"] = len(hits) - len(uygun_hits)
+                    fresh_hits = [hit for hit in uygun_hits if str(hit.get("uid") or f"{provider}:{hit.get('id','')}") not in used]
+                    provider_log["duplicate_precheck_rejected_count"] = len(uygun_hits) - len(fresh_hits)
                     provider_log["vision_batch_limit"] = limit
-                    provider_log["deferred_after_limit_count"] = max(0, len(uygun_hits) - limit)
-                    hits = uygun_hits[:limit]
+                    provider_log["deferred_after_limit_count"] = max(0, len(fresh_hits) - limit)
+                    hits = fresh_hits[:limit]
                 try:
-                    scores = _visual_text_scores(judge_text, hits)
+                    if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1":
+                        pending = [hit for hit in hits if str(hit.get("uid") or f"{provider}:{hit.get('id','')}") not in preview_score_cache]
+                        fresh_scores = _visual_text_scores(judge_text, pending) if pending else []
+                        if len(fresh_scores) != len(pending):
+                            fresh_scores = [None] * len(pending)
+                        for hit, score in zip(pending, fresh_scores):
+                            # Cache only scores explicitly attributed to the experimental live judge.
+                            if score is not None and hit.get("_vision_origin") == "live_openrouter_experimental":
+                                key = str(hit.get("uid") or f"{provider}:{hit.get('id','')}")
+                                preview_score_cache[key] = (score, hit["_vision_origin"])
+                        scores = []
+                        for hit in hits:
+                            key = str(hit.get("uid") or f"{provider}:{hit.get('id','')}")
+                            cached = preview_score_cache.get(key)
+                            if cached is not None:
+                                hit["_vision_origin"] = cached[1]
+                                scores.append(cached[0])
+                            else:
+                                scores.append(None)
+                        provider_log["vision_new_candidates_count"] = len(pending)
+                    else:
+                        scores = _visual_text_scores(judge_text, hits)
                 except Exception as exc:  # noqa: BLE001 — semantic failure must fail closed
                     scores = [None] * len(hits)
                     for hit in hits:
