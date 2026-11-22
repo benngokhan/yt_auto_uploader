@@ -108,6 +108,7 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           MOTOR_EXPERIMENTAL_OPENROUTER: "1"
           MOTOR_PREVIEW_FIXED_SCRIPT: "0"
+          MOTOR_PREVIEW_TEXT_OPENROUTER: "1"
           MOTOR_KONU: ${{ inputs.konu }}
           MOTOR_KURU: ${{ inputs.kuru }}
           MOTOR_SAHNE: ${{ inputs.sahne }}

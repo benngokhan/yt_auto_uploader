@@ -1121,6 +1121,11 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
             "Üflemenin oksijeni kestiğini iddia etme. Kaynak: University of Illinois Physics Van "
             "https://van.physics.illinois.edu/ask/listing/27883 . Kaynak URL kabul edilmezse boş bırak.")
     istem = temel_istem
+    def plan_llm(prompt):
+        if os.getenv("MOTOR_PREVIEW_TEXT_OPENROUTER") == "1":
+            from openrouter_preview_text import get_json
+            return get_json(prompt, _LLM_SISTEM)
+        return _llm_json(prompt, ayar, _LLM_SISTEM)
     last_error = "LLM geçerli plan döndürmedi"
     accepted = None
     onceki_veri = None
@@ -1140,12 +1145,12 @@ def sahne_plani_v2(konu: str, n: int, ayar: dict) -> list[dict]:
                      "\nSadece JSON ver: {\"cumleler\":[\"...\",\"...\",\"...\",\"...\",\"...\"]}")
             if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" and konu == "Mum üflendiğinde neden söner?":
                 istem += "\nKaynak bilgisi: üfleme sıcak gazı soğutur ve balmumu buharını dağıtır; oksijeni kesmez."
-            duzeltme = _llm_json(istem, ayar, _LLM_SISTEM)
+            duzeltme = plan_llm(istem)
             veri = dict(onceki_veri)
             if isinstance(duzeltme,dict) and isinstance(duzeltme.get("cumleler"),list):
                 veri["cumleler"] = duzeltme["cumleler"]
         else:
-            veri = _llm_json(istem, ayar, _LLM_SISTEM)
+            veri = plan_llm(istem)
         if not isinstance(veri, dict):
             veri = {}
         ham_cumleler = veri.get("cumleler") or veri.get("sahneler") or []
@@ -1404,6 +1409,10 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     """Shorts v2.4 local production path; it never uploads or publishes."""
     if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" and not getattr(a, "kuru", False):
         raise SystemExit("Deneysel görsel doğrulayıcı yalnız yayınsız kuru testte kullanılabilir.")
+    if os.getenv("MOTOR_PREVIEW_TEXT_OPENROUTER") == "1" and (
+        os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") != "1" or not getattr(a, "kuru", False)
+    ):
+        raise SystemExit("Deneysel metin sağlayıcısı yalnız yayınsız kuru testte kullanılabilir.")
     import shutil
     from PIL import Image
     from shorts_acceptance import (
