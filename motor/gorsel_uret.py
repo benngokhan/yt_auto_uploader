@@ -748,11 +748,16 @@ def sahneler_icin_gorseller(
                     provider_log["error"] = f"{type(exc).__name__}: {exc}"
                     continue
                 provider_log["returned_candidate_count"] = len(hits)
-                # Pexels performs two searches and can return more hits than its
-                # per-request `adet`; enforce the experimental vision limit on
-                # the combined result too. Never change the production path.
+                # Pexels merges two searches and can return more hits than the
+                # requested per-page count. First remove hits the unchanged
+                # metadata gate would reject anyway, then enforce the four-image
+                # experimental vision cap on the combined result. Production is unchanged.
                 if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1":
-                    hits = hits[:limit]
+                    uygun_hits = [hit for hit in hits if _yeterince_uygun(hit, query, scene_text, gevsek=True)]
+                    provider_log["metadata_precheck_rejected_count"] = len(hits) - len(uygun_hits)
+                    provider_log["vision_batch_limit"] = limit
+                    provider_log["deferred_after_limit_count"] = max(0, len(uygun_hits) - limit)
+                    hits = uygun_hits[:limit]
                 try:
                     scores = _visual_text_scores(judge_text, hits)
                 except Exception as exc:  # noqa: BLE001 — semantic failure must fail closed

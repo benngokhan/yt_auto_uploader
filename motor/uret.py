@@ -1307,6 +1307,9 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict]
                   "nesne aynen yer alsın; farklı fotoğraflar kullanılacak, farklı nesneler şart değil. "
                   "Alternatif aramalarda doğal gün ışığında veya aydınlık ortamda çekilmiş "
                   "doğrudan ilgili fotoğrafları hedefle; İngilizce aramaya daylight ekle. "
+                  "Her sorgu somut nesneyi ve gerçek durumunu betimlesin; mecaz, deyim ve "
+                  "'end of life' gibi anlam kaydıran kalıplar kullanma. Örneğin mumun sönmesi "
+                  "için 'candle smoke daylight' somutken 'candle end of life' ilgisiz cenaze görselleri bulabilir. "
                   "Örneğin mum konusunda ana_nesne: candle; human breath fog veya smoke ring tek başına "
                   "ilgili değildir; candle flame ve candle smoke daha doğrudur. "
                   "Belirsizse boş dön, alakasız nesne uydurma.")
@@ -1330,6 +1333,10 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict]
             alt = ""
         if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1":
             def _bagli(query):
+                # Known misleading figurative phrase: searches for funeral
+                # imagery rather than the physical scene. Do not guess a replacement.
+                if re.search(r"\bend\s+of\s+life\b", query, re.IGNORECASE):
+                    return False
                 return bool(experimental_anchor and re.search(
                     r"(?<![a-z])" + re.escape(experimental_anchor) + r"(?![a-z])", query.lower()))
             ana = ana if _bagli(ana) else ""

@@ -26,6 +26,9 @@ def score_images(scene_text, candidates, download):
         'konuya özgü ana nesneyi açıkça gösteriyorsa, soyut mekanizmayı göstermese de '
         'konuyla doğrudan ilgili temsilî bir görüntü sayılabilir. Tek başına genel bilim '
         'havası yeterli değil; farklı nesneleri veya eylemleri yanlışlıkla eşitleme. '
+        'Eğer görünen eylem sahnedekinin tersiyse yanıltıcıdır ve 0 ver; örneğin mumun '
+        'çakmakla yakılması mumun üflenerek söndürülmesi değildir. Nesne var fakat '
+        'eylem açıkça gösterilmiyorsa 1 verme. Emin değilsen 0.5 veya daha düşük ver. '
         '0 = alakasız veya yanıltıcı; 0.5 = belirsiz veya yalnız genel bağlantı; '
         '0.8 = konu nesnesi doğrudan görünüyor; 1 = sahnedeki nesne ve eylem açıkça görünüyor. '
         'Sadece JSON döndür: {"scores":[0.0,...]}. Sayı ve sıra görsellerle aynı olmalı.') }]

@@ -62,6 +62,15 @@ class PreviewSearchTests(unittest.TestCase):
         self.assertEqual(queries,[{'ana':'candle smoke','alternatif':''},
                                   {'ana':'candle flame','alternatif':''}])
 
+    def test_figurative_end_of_life_query_is_rejected_not_generalized(self):
+        import uret
+        response={'ana_nesne':'candle','sahneler_gorsel':[
+            {'ana':'candle wick','alternatif':'candle end of life daylight'}]}
+        with mock.patch.dict(os.environ, {'MOTOR_EXPERIMENTAL_OPENROUTER':'1'}), \
+             mock.patch.object(uret,'_llm_json',return_value=response):
+            queries,_=uret._gorsel_aramalari('mum',['one'],{})
+        self.assertEqual(queries,[{'ana':'candle wick','alternatif':''}])
+
     def test_missing_subject_fails_closed(self):
         import uret
         with mock.patch.dict(os.environ, {'MOTOR_EXPERIMENTAL_OPENROUTER':'1'}), \
@@ -75,6 +84,7 @@ class PreviewSearchTests(unittest.TestCase):
                   'PEXELS_API_KEY':'pex','PIXABAY_API_KEY':'pix'}
         # Search can return more than requested when its two API queries merge.
         hits=[{'uid':f'pexels:{n}','id':n,'kaynak':'pexels','tags':'candle flame'} for n in range(7)]
+        hits[0]['tags']='candle coffee'  # Existing metadata filter rejects this before vision.
         with tempfile.TemporaryDirectory() as td, mock.patch.dict(os.environ,settings), \
              mock.patch.object(gorsel_uret,'pexels_ara',return_value=hits) as pex, \
              mock.patch.object(gorsel_uret,'pixabay_ara') as pix, \
@@ -83,6 +93,7 @@ class PreviewSearchTests(unittest.TestCase):
         self.assertEqual(result,[None])
         self.assertEqual(pex.call_args.kwargs['adet'],4)
         self.assertEqual(len(judge.call_args.args[1]), 4)
+        self.assertEqual([x['id'] for x in judge.call_args.args[1]], [1,2,3,4])
         pix.assert_not_called()
 
 if __name__ == '__main__': unittest.main()
