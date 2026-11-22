@@ -52,10 +52,18 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -q Pillow
-      - name: One Groq free-plan visual calibration
+      - name: One Quest-only Pollinations image with preflight
         env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        run: python aday_hakem_kontrol.py
+          POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
+        run: python pollinations_tek_test.py
+      - name: Save one review image
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pollinations-single-image
+          path: pollinations_ornek.png
+          retention-days: 2
+          if-no-files-found: error
   uret:
     if: ${{ inputs.kuru == true && inputs.konu != '__VISION_CALIBRATION__' }}
     runs-on: ubuntu-latest
