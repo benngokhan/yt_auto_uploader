@@ -36,11 +36,26 @@ on:
         default: false
 
 concurrency:
-  group: motor-uret
+  group: api-read-only-test
   cancel-in-progress: false
 
 jobs:
+  api_diagnostic:
+    if: ${{ inputs.konu == '__SAFE_API_TEST__' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: API availability without displaying credentials
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY || secrets.PEXELS_KEY || secrets.PEXELS_API }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python api_salt_kontrol.py
   uret:
+    if: ${{ inputs.konu != '__SAFE_API_TEST__' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
