@@ -1,8 +1,8 @@
 {
   "kind": "bounded_image_asset_request_not_video_render",
-  "authorization_source": "User in current conversation: iste kanka apiden yeni cizim sorun yok ucretsiz zaten 😂",
+  "authorization_source": "User approved exactly two replacement requests after 067 proposal: devam knk guzel",
   "new_image_generation_approved": true,
-  "assistant_chosen_request_ceiling": 4,
+  "assistant_chosen_request_ceiling": 2,
   "attempts_per_scene": 1,
   "automatic_retry": false,
   "automatic_fallback": false,
@@ -13,37 +13,35 @@
   "height": 1280,
   "input_references": [],
   "billing_status": "User declares free account; remaining quota and actual billing not independently verified. Use existing free account only, stop on quota/auth errors, do not upgrade.",
-  "executor": "Only the other agent with the existing credential-backed workflow may execute these four image requests. This conversation has no credentials and will not send parallel requests. All video/code work remains here.",
+  "executor": "This conversation dispatches once after independent branch verification. Other agent only installs these files on the isolated branch; no dispatch.",
   "shared_style": "One premium editorial science illustration with highly realistic materials and restrained explanatory cutaway elements. Vertical 9:16, natural navy blue and warm daylight palette, clean composition, readable focal subject, generous uncluttered top and lower areas for later video overlays. Not a generic landscape postcard, not a text infographic. No text, letters, numbers, logos, labels, inset panels, decorative borders, glowing energy beams, humans or giant salt crystals. Any particle representation is deliberately illustrative rather than a claim of visible ions in a real photograph.",
   "scenes": [
     {
-      "scene": 1,
-      "role": "Opening question and natural slogan; reused for closing question",
-      "seed": 42817,
-      "prompt": "One premium editorial science illustration with photorealistic water and rock materials, vertical 9:16. A dramatic close oblique view where deep navy ocean water meets a rugged sunlit coastal rock ledge. The principal subject is richly detailed clean seawater curling around one foreground rock, not a tiny distant horizon. Clear blue water depth and restrained warm daylight, no sunset, no boats, no people. Strong central subject with uncluttered darker upper quarter and lower quarter for later captions. Crisp natural texture, not an aerial wallpaper, no motion blur. No text, letters, numbers, logos, labels, charts, borders, panels, arrows or visible salt crystals.",
-      "critical_checks": ["Recognizable seawater and coastal rock, meaningful close viewpoint", "No generic full-frame foam texture or distracting text", "Space for existing template overlays"]
-    },
-    {
-      "scene": 2,
-      "role": "Rainwater weathers rock and dissolves minerals",
-      "seed": 42818,
-      "prompt": "One premium editorial science illustration with highly realistic materials, vertical 9:16. Tight macro of raindrops hitting a rough mineral-bearing rock surface; small clear rivulets wash over its texture. In a small physically integrated cutaway at the water-rock contact, a few tiny separated blue and warm-gold spheres represent dissolved ions moving from the rock into clear water. These few spheres are explicitly schematic scientific illustration, not glowing real objects; no visible giant salt chunks or intact salt crystals floating downstream. Most of the image is beautiful realistic wet rock and rain detail, not a landscape. Restrained navy blue, grey mineral and warm daylight palette, strong subject near middle, uncluttered top and lower quarters. No text, letters, numbers, chemical symbols, labels, inset panels, boxes, logos, arrows, neon or energy beams.",
-      "critical_checks": ["Rain and wet rock interaction visibly central", "Only restrained schematic dissolved-particle representation; not floating salt crystals", "No model-generated scientific text"]
-    },
-    {
       "scene": 3,
       "role": "Rivers transport dissolved minerals to the sea",
-      "seed": 42819,
-      "prompt": "One premium editorial science illustration with highly realistic natural materials, vertical 9:16. A compact and clearly understandable oblique cutaway of a small river mouth meeting a much broader deep-blue sea. The foreground transparent cross-section of river water contains a sparse trail of tiny separated blue and warm-gold spheres that continues into the seawater, representing dissolved ions being transported. The spheres are restrained schematic illustration, not sediment clouds, not solid crystals, not pollution. Natural shore and water above the small cutaway remain photorealistic. Make the connection river-to-sea obvious and prominent, not a distant generic forest stream or a busy map. Restrained navy, grey, warm daylight palette consistent with an editorial science series. Uncluttered upper and lower quarters. No text, labels, chemical symbols, numbers, logos, panels, borders, arrows, glowing paths, humans or boats.",
-      "critical_checks": ["Visible unambiguous river-to-sea connection", "Dissolved material represented schematically, not rocks or rubbish", "Distinct composition from scene 1"]
+      "seed": 52819,
+      "prompt": "One single premium editorial science illustration, vertical 9:16. High oblique aerial view of a clearly visible winding natural river entering a broad deep navy blue ocean. In the upper middle, a narrow river snakes between two irregular grassy banks; in the center its mouth opens and widens into the sea occupying the lower half. The entire continuous winding river channel and its opening into the much wider ocean must be obvious at a glance. Natural curved shorelines, rocks and coastal grass, realistic water and warm daylight matching a navy and gold science series. No cutaway, no cross section, no beads, no spheres, no crystals, no particle trails, no straight translucent strips. Dissolved minerals are invisible in this natural-scale view and will be explained by narration. No concrete, ramps, roads, piers, pipes, outfalls, buildings, boats, people, rubbish or pollution. No text, labels, symbols, arrows, boxes, panels or borders. Keep essential river mouth in the middle third, leave top and bottom areas relatively uncluttered for later subtitles.",
+      "critical_checks": [
+        "Continuous winding river with two natural banks visibly opens into a much wider sea",
+        "No concrete ramp, pipe, outfall, beads or rubbish",
+        "Natural river mouth readable within template safe area"
+      ]
     },
     {
       "scene": 4,
       "role": "Evaporation removes water while dissolved salts remain",
-      "seed": 42820,
-      "prompt": "One premium editorial science illustration with realistic water and daylight, vertical 9:16. Close oblique cutaway of a small sunlit patch of seawater. Below the water surface a sparse set of tiny separated blue and warm-gold spheres represents dissolved salt ions. Above the surface, a few subtle pale-blue transparent curved upward arrows indicate water evaporation as a schematic overlay. All blue and gold ion spheres remain below the surface; none rise with the evaporation arrows. Realistic calm sea materials with a restrained, deliberately illustrative cutaway, no boiling, no fire, no dense white steam, no crystallized salt crust, no claims that sea water is already fresh. Strong subject in the middle with clean dark-blue upper and lower space for later titles and captions. Same navy, grey and warm daylight science-editorial aesthetic. No text, chemical symbols, labels, numbers, panels, boxes, logos, human figures or decorative neon.",
-      "critical_checks": ["Water-only evaporation arrows, schematic rather than realistic steam", "Salt particles stay in liquid; no salt rising into air", "No boiling, fire or dry salt bed"]
+      "seed": 52820,
+      "prompt": "One single clean editorial science illustration, vertical 9:16, navy blue sea and restrained warm daylight. Oblique scientific cutaway of sunlit seawater with a clearly defined horizontal water surface across the middle. Under the surface, a few small separated blue and gold dots are a deliberately schematic representation of dissolved salt ions dispersed within liquid water. Above the surface, exactly three simple slender pale blue upward arrows represent evaporation of water. All blue and gold dots stay clearly below the surface, no dots in the air and no dots on arrows. Realistic water texture surrounding the restrained scientific cutaway. This is an educational illustration, not a literal photograph of visible ions. Minimal readable composition centered in middle half; quiet dark navy top and bottom quarters for video overlays. No boiling, no fire, no steam clouds, no salt crust, no dry land, no crystals, no humans. No text, letters, chemical symbols, numbers, labels, panels, montage, inset or decorative border.",
+      "critical_checks": [
+        "Water-only evaporation arrows, schematic rather than realistic steam",
+        "Salt particles stay in liquid; no salt rising into air",
+        "No boiling, fire or dry salt bed"
+      ]
     }
   ],
-  "return_artifacts": ["Four original output images, successful attempts only", "Prompt/model/seed/request and response dimensions for each", "SHA256 per original output; exact inference attempt count, no secret data", "Partial failures reported honestly; do not regenerate them without renewed scope"]
+  "return_artifacts": [
+    "Original successful scene 3 and 4 outputs only",
+    "Manifest with prompts, seed, model, hashes and exact attempt count",
+    "Partial failures retained, no retries"
+  ]
 }
