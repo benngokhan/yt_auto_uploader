@@ -1,4 +1,4 @@
-name: Deniz · four bounded image candidates only
+name: Deniz · two replacement image candidates only
 on:
   workflow_dispatch:
     inputs:
@@ -11,11 +11,11 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: arena-deniz-four-image-candidates-v2
+  group: arena-deniz-two-image-candidates-068
   cancel-in-progress: false
 jobs:
   images_only:
-    if: ${{ inputs.konu == '__DENIZ_FOUR_IMAGES_057__' && inputs.kuru == 'true' && github.run_attempt == 1 && github.ref == 'refs/heads/arena/deniz-images-v2-20261122' }}
+    if: ${{ inputs.konu == '__DENIZ_TWO_IMAGES_068__' && inputs.kuru == 'true' && github.run_attempt == 1 && github.ref == 'refs/heads/arena/deniz-images-068-20261122' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -27,7 +27,7 @@ jobs:
           python-version: '3.11'
       - name: Image inspection dependency
         run: python -m pip install 'Pillow==11.3.0'
-      - name: Four bounded requests, no retries or fallback
+      - name: Two bounded requests, no retries or fallback
         env:
           CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -36,7 +36,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
-          name: deniz-four-ai-images-057
+          name: deniz-two-ai-images-068
           path: image_results/
           if-no-files-found: warn
           retention-days: 7
