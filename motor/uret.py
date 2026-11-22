@@ -1349,6 +1349,8 @@ def _generate_gemini_v2_voice_audio(scene_lines: list[str], work_dir: Path, ayar
 
 def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     """Shorts v2.4 local production path; it never uploads or publishes."""
+    if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" and not getattr(a, "kuru", False):
+        raise SystemExit("Deneysel görsel doğrulayıcı yalnız yayınsız kuru testte kullanılabilir.")
     import shutil
     from PIL import Image
     from shorts_acceptance import (
@@ -1473,9 +1475,12 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         raise SystemExit("Canlı görsel seçim raporu tam dört görsel içermiyor.")
     for index, row in enumerate(rows, start=1):
         selected = row.get("selected") if isinstance(row, dict) else None
+        experimental_origin = (os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" and a.kuru and
+                               secim_raporu.get("semantic_model") == "particle-ai/particle-1:free" and
+                               isinstance(selected, dict) and selected.get("score_origin") == "live_openrouter_experimental")
         if not isinstance(selected, dict) or selected.get("provider") != "pexels" \
-                or selected.get("score_origin") != "live_gemini_vision":
-            raise SystemExit(f"Shorts v2 sahne {index}: canlı Pexels/Gemini Vision kanıtı yok.")
+                or not (selected.get("score_origin") == "live_gemini_vision" or experimental_origin):
+            raise SystemExit(f"Shorts v2 sahne {index}: canlı görsel doğrulama kanıtı yok.")
 
     from shorts_acceptance import sha256_file
     render_inputs = []

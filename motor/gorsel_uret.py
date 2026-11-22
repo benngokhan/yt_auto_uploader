@@ -167,10 +167,11 @@ def _kelimeler(metin: str, sus_at: bool = True) -> set[str]:
 
 def _record_score_passes(record: dict) -> bool:
     """Only a live Gemini Vision score is sufficient to select a production image."""
-    return (
-        record.get("score_origin") == "live_gemini_vision"
-        and semantic_score_passes(record.get("semantic_similarity"))
+    origin = record.get("score_origin")
+    permitted = origin == "live_gemini_vision" or (
+        origin == "live_openrouter_experimental" and os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1"
     )
+    return permitted and semantic_score_passes(record.get("semantic_similarity"))
 
 
 def _yasak_etiket_seti(sorgu: str, ana_konu: str) -> set[str]:
@@ -539,6 +540,9 @@ def _visual_text_scores(scene_text: str, candidates: list[dict]) -> list[float |
     Bu puan CLIP cosine benzeri otomatik bir görsel-metin uygunluk puanıdır; hata halinde
     None döner ve fail-closed davranılır (aday görsel seçilmez).
     """
+    if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1":
+        from openrouter_preview_vision import score_images
+        return score_images(scene_text, candidates, _indir)
     key = (os.getenv("GEMINI_API_KEY") or "").strip()
     if not key:
         return [None] * len(candidates)
@@ -703,7 +707,7 @@ def sahneler_icin_gorseller(
     paths: list[Path | None] = []
     report = {
         "version": 1,
-        "semantic_model": SEMANTIC_MODEL,
+        "semantic_model": ("particle-ai/particle-1:free" if os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" else SEMANTIC_MODEL),
         "threshold": SEMANTIC_THRESHOLD,
         "provider_order": [p[0] for p in providers],
         "scenes": [],
@@ -748,7 +752,7 @@ def sahneler_icin_gorseller(
                 scored = []
                 for hit, vision_score in zip(hits, scores):
                     heuristic = float(_puanla(hit, query))
-                    score_origin = "live_gemini_vision" if vision_score is not None else None
+                    score_origin = (hit.get("_vision_origin") or "live_gemini_vision") if vision_score is not None else None
                     record = {
                         "uid": str(hit.get("uid") or f"{provider}:{hit.get('id','') }"),
                         "provider": provider,
@@ -836,7 +840,7 @@ def sahneler_icin_gorseller(
             }
             scene_log["fallback"] = None
             display_score = scene_log["selected"]["semantic_similarity"]
-            print(f"  görsel {scene_index}: {selected_provider} / sorgu={selected_query!r} / Gemini Vision={display_score} / {scene_log['selected']['source_page_url']}")
+            print(f"  görsel {scene_index}: {selected_provider} / sorgu={selected_query!r} / Görsel puanı={display_score} / {scene_log['selected']['source_page_url']}")
         else:
             reason = "no_scene_specific_query" if not queries else "no_candidate_passed_semantic_threshold_or_pixel_checks"
             scene_log["fallback_reason"] = reason

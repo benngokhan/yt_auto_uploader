@@ -8,6 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 import re
 import unicodedata
 from pathlib import Path
@@ -430,7 +431,10 @@ def _validate_visual_report(report: dict) -> list[dict]:
         if urlparse(url).hostname not in {"pexels.com", "www.pexels.com"}:
             raise ShortsAcceptanceError(f"Görsel sahne {index} Pexels kaynak URL'si doğrulanamadı")
         score_origin = selected.get("score_origin")
-        if score_origin == "live_gemini_vision":
+        experimental = (os.getenv("MOTOR_EXPERIMENTAL_OPENROUTER") == "1" and
+                        report.get("semantic_model") == "particle-ai/particle-1:free" and
+                        score_origin == "live_openrouter_experimental")
+        if score_origin == "live_gemini_vision" or experimental:
             score = _finite_float(selected.get("semantic_similarity"), f"Sahne {index} semantik skor")
             if score < SEMANTIC_THRESHOLD or score > 1.0:
                 raise ShortsAcceptanceError(f"Görsel sahne {index} canlı Gemini Vision eşiğini geçmedi")
