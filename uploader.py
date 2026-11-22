@@ -1532,6 +1532,11 @@ def upload_job(
         log.info("DRY-RUN TAMAMLANDI: Video YouTube'a yüklenmedi, tablo eşleşmesi doğrulandı.")
         return {"dry_run": True, "file_name": file_name, "title": meta["title"], "metadata": meta}
 
+    # YouTube Studio'da elle planlanan videolar ve eski yükleme kayıtları da
+    # kontrol edilir; eksik veya şüpheli sonuçta hiçbir yeni video yüklenmez.
+    from youtube_guvenlik import yayin_guvenlik_kontrolu
+    yayin_guvenlik_kontrolu(youtube, meta['title'], slot_key=slot_key)
+
     # SERI KOPRUSU: açıklamaya oynatma listesi linkini göm (ilgili-video rozeti API'de yok -> aynı işi link yapar)
     try:
         if file_name.startswith("uzun_"):
