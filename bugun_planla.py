@@ -14,14 +14,28 @@ UTC = timezone.utc
 TR = timezone(timedelta(hours=3))
 
 
+def utcnow():
+    return datetime.now(UTC)
+
+
 def slot_for_today(now=None):
-    now = now or datetime.now(UTC)
+    """Next daily 19:30 TR slot, today or tomorrow; never backfill a past day."""
+    now = now or utcnow()
     if now.tzinfo is None:
         raise ValueError('Zaman dilimi zorunlu')
+    now = now.astimezone(UTC)
     slot = now.astimezone(TR).replace(hour=19, minute=30, second=0, microsecond=0).astimezone(UTC)
-    if not timedelta(minutes=20) <= slot - now.astimezone(UTC) <= timedelta(hours=8):
-        raise RuntimeError('Güvenli planlama zaman aralığı dışında')
+    if slot <= now:
+        slot += timedelta(days=1)
+    if slot - now < timedelta(minutes=20):
+        raise RuntimeError('Yayın saatine 20 dakikadan az kaldı; güvenli ön planlama bekletildi')
     return slot
+
+
+def ensure_future_target(slot, minimum_minutes=5):
+    lead = slot - utcnow()
+    if not timedelta(minutes=minimum_minutes) <= lead <= timedelta(hours=24):
+        raise RuntimeError('Hedef saat güvenli gelecek aralığında değil; yükleme yapılmadı')
 
 
 def key_for(slot):
@@ -49,16 +63,22 @@ def previous_publication_verified(youtube, current_slot):
 
 
 def inspect():
-    slot = slot_for_today(); key = key_for(slot)
-    if slot_claimed(STATE / 'slot_claims.txt', key) or slot_completed(STATE / 'uploaded.txt', key):
-        raise RuntimeError('Bu yayın saati daha önce ayrılmış veya kaydedilmiş')
+    try:
+        slot = slot_for_today()
+    except RuntimeError as exc:
+        return {'should_plan':'false', 'reason':str(exc)}
+    key = key_for(slot)
+    if slot_completed(STATE / 'uploaded.txt', key):
+        return {'should_plan':'false', 'slot':key, 'reason':'Bu saatin yükleme kaydı var; tekrar yüklenmez'}
+    if slot_claimed(STATE / 'slot_claims.txt', key):
+        raise RuntimeError('Saat ayrılmış ancak yükleme sonucu belirsiz; otomatik tekrar yasak')
     youtube, drive = get_google_clients(); config=load_config()
     previous_publication_verified(youtube, slot)
     candidate=get_next_scheduled_video(drive, config['drive_queue_folder_id'],
         skip_ids=load_uploaded_ids(STATE/'uploaded.txt'), video_type='short')
     if not candidate: raise RuntimeError('Sıradaki video hazır değil')
     yayin_guvenlik_kontrolu(youtube, candidate['title'], slot_key=key)
-    return {'slot':key,'name':candidate['name'],'id':candidate['id']}
+    return {'should_plan':'true','slot':key,'name':candidate['name'],'id':candidate['id']}
 
 
 def reserve(key):
@@ -69,11 +89,13 @@ def reserve(key):
 
 
 def upload(key, expected_name, expected_id):
-    if key != key_for(slot_for_today()): raise RuntimeError('Hedef saat doğrulanamadı')
+    slot = slot_for_today()
+    if key != key_for(slot): raise RuntimeError('Hedef saat doğrulanamadı')
+    ensure_future_target(slot, minimum_minutes=20)
     if not slot_claimed(STATE/'slot_claims.txt',key) or slot_completed(STATE/'uploaded.txt',key):
         raise RuntimeError('Saat ayrılmamış veya zaten kaydedilmiş')
     youtube, drive=get_google_clients(); config=load_config()
-    previous_publication_verified(youtube, slot_for_today())
+    previous_publication_verified(youtube, slot)
     candidate=get_next_scheduled_video(drive,config['drive_queue_folder_id'],
         skip_ids=load_uploaded_ids(STATE/'uploaded.txt'),video_type='short')
     if not candidate or candidate['name']!=expected_name or candidate['id']!=expected_id:
@@ -81,9 +103,10 @@ def upload(key, expected_name, expected_id):
     yayin_guvenlik_kontrolu(youtube,candidate['title'],slot_key=key)
     meta={'title':candidate['title'],'description':sanitize_public_description(candidate['description']),
           'tags':candidate['tags'],'categoryId':candidate['categoryId'],
-          'privacyStatus':'private','publishAt':slot_for_today().isoformat(timespec='seconds')}
+          'privacyStatus':'private','publishAt':slot.isoformat(timespec='seconds')}
     with tempfile.TemporaryDirectory(prefix='plan-video-') as temp:
         path=Path(temp)/candidate['name'];download_drive_file(drive,candidate['id'],path)
+        ensure_future_target(slot)
         response=upload_to_youtube(youtube,path,meta)
         video_id=response['id'];url='https://youtu.be/'+video_id
         # Save the irreversible upload before querying or attempting optional work.
@@ -97,13 +120,13 @@ def upload(key, expected_name, expected_id):
         published=status.get('publishAt','')
         try: actual=datetime.fromisoformat(published.replace('Z','+00:00')).astimezone(UTC)
         except (ValueError,TypeError): actual=None
-        if status.get('privacyStatus')!='private' or actual!=slot_for_today():
+        if status.get('privacyStatus')!='private' or actual!=slot:
             raise RuntimeError('Video yüklemesi kaydedildi, fakat YouTube planı doğrulanamadı')
         result['status']='PLANLANDI'
         Path('plan_result.json').write_text(json.dumps(result,ensure_ascii=False),encoding='utf8')
         try:
             from plan_tablo import mark_scheduled
-            mark_scheduled(drive, candidate['name'], url, slot_for_today())
+            mark_scheduled(drive, candidate['name'], url, slot)
             result['sheet_ok']=True
         except Exception as exc:
             print('Tablo güncellenemedi:', type(exc).__name__)
