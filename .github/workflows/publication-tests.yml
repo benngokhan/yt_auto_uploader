@@ -1,0 +1,38 @@
+name: Publication isolation regression (no network)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*.py'
+      - 'tests/**'
+      - 'scripts/publication_tests.py'
+      - 'requirements-publication.txt'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - '*.py'
+      - 'tests/**'
+      - 'scripts/publication_tests.py'
+      - 'requirements-publication.txt'
+      - '.github/workflows/**'
+  schedule:
+    - cron: '43 */4 * * *'
+  workflow_dispatch: {}
+permissions:
+  contents: read
+concurrency:
+  group: publication-regression-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install publication-only dependencies
+        run: pip install -q -r requirements-publication.txt
+      - name: Test without provider credentials or network
+        run: python scripts/publication_tests.py
