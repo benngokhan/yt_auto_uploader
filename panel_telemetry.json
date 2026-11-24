@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-24 19:36:47",
-  "generated_at_iso": "2026-11-24T19:36:47.088526+03:00",
+  "generated_at": "2026-11-25 02:32:16",
+  "generated_at_iso": "2026-11-25T02:32:16.019250+03:00",
   "folders": {
     "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
     "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
@@ -225,6 +225,20 @@
         "mimeType": "video/mp4",
         "size": 12639000,
         "modifiedTime": "2026-11-12T20:02:43.626Z"
+      },
+      {
+        "id": "196-Oo4wtsEzGb4psjPWlkZndZKgqrJjD",
+        "name": "video_202.mp4",
+        "mimeType": "video/mp4",
+        "size": 16616262,
+        "modifiedTime": "2026-11-24T23:04:17.430Z"
+      },
+      {
+        "id": "1nMxVYQ3ICYo8-fq8E_-DwfIi9--qgzj3",
+        "name": "video_203.mp4",
+        "mimeType": "video/mp4",
+        "size": 18946007,
+        "modifiedTime": "2026-11-24T23:19:32.694Z"
       }
     ],
     "shorts_covers": [
@@ -409,6 +423,20 @@
         "mimeType": "image/jpeg",
         "size": 562174,
         "modifiedTime": "2026-11-12T20:02:43.900Z"
+      },
+      {
+        "id": "1nkCJB-V6Ij-cRvMbKZfBYY2NAZ8TehEY",
+        "name": "kapak_202.jpg",
+        "mimeType": "image/jpeg",
+        "size": 562649,
+        "modifiedTime": "2026-11-24T23:04:14.846Z"
+      },
+      {
+        "id": "1aeuMwL3aVc7WB_k2haZs2GB9FI7dm2gn",
+        "name": "kapak_203.jpg",
+        "mimeType": "image/jpeg",
+        "size": 479946,
+        "modifiedTime": "2026-11-24T23:19:29.655Z"
       }
     ],
     "long_videos": [],
@@ -1991,12 +2019,12 @@
       "category_name": "Malzeme ve Üretim Mühendisliği",
       "pinned_comment": "Yıllarca fırına tepsi koyarken 'dur yanlış sardın, parlak tarafı içe gelecekti!' diye boşuna mı tartışmışız?! 😂✨ Mutfak ekibine gönder! 👇",
       "youtube_url": "",
-      "has_drive_video": false,
-      "drive_video_id": "",
-      "drive_video_size_mb": 0,
+      "has_drive_video": true,
+      "drive_video_id": "196-Oo4wtsEzGb4psjPWlkZndZKgqrJjD",
+      "drive_video_size_mb": 15.85,
       "expected_cover": "kapak_202.jpg",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1nkCJB-V6Ij-cRvMbKZfBYY2NAZ8TehEY"
     },
     {
       "row": 184,
@@ -2021,12 +2049,12 @@
       "category_name": "Mühendislik ve Davranış Psikolojisi",
       "pinned_comment": "Motoru hızlandırmak yerine ayna takıp insan beynini oyalamak tarihin en zekice mühendislik hamlelerinden biri değil mi? 😄🛗🪞👇",
       "youtube_url": "",
-      "has_drive_video": false,
-      "drive_video_id": "",
-      "drive_video_size_mb": 0,
+      "has_drive_video": true,
+      "drive_video_id": "1nMxVYQ3ICYo8-fq8E_-DwfIi9--qgzj3",
+      "drive_video_size_mb": 18.07,
       "expected_cover": "kapak_203.jpg",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1aeuMwL3aVc7WB_k2haZs2GB9FI7dm2gn"
     },
     {
       "row": 185,
