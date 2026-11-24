@@ -298,6 +298,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_GROUP_CHAT_ID || secrets.TELEGRAM_CHAT_ID }}
           JOB_STATUS: ${{ job.status }}
+          PUBLICATION_SLOT: ${{ steps.slot.outputs.key }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           python - <<'PY'
@@ -313,6 +314,10 @@ jobs:
           status = os.getenv("JOB_STATUS", "")
           run_url = os.getenv("RUN_URL", "")
           payload_file = Path("last_upload_payload.json")
+
+          if status == "success" and os.environ.get("PUBLICATION_SLOT", "").strip():
+              print("Yayın kartı canlı public doğrulamasından sonra tek kez gönderilecek.")
+              raise SystemExit(0)
 
           if status == "success" and payload_file.exists():
               payload = json.loads(payload_file.read_text(encoding="utf-8"))
@@ -348,3 +353,10 @@ jobs:
               print(f"::warning::Telegram gönderimi doğrulanamadı ({type(exc).__name__}).")
               raise SystemExit(1) from None
           PY
+
+      - name: Confirm public video and send the original green Telegram card
+        if: ${{ success() && steps.slot.outputs.key != '' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)) }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_GROUP_CHAT_ID || secrets.TELEGRAM_CHAT_ID }}
+        run: python scripts/publication_verify.py deliver
