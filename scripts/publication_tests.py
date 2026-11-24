@@ -10,6 +10,7 @@ import unittest
 
 PUBLICATION_TESTS = (
     'test_bugun_planla.py',
+    'test_publication_verify.py',
     'test_crosspost_user_disabled.py',
     'test_delivery_diagnostics.py',
     'test_drive_dosya_koruma.py',
