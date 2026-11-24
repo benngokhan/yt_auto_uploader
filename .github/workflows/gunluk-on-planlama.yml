@@ -2,8 +2,9 @@ name: Gunluk YouTube erken planlama
 
 on:
   schedule:
-    # 11:30 Türkiye: Pasifik kota sıfırlaması sonrası; cron gecikse de 19:30 öncesi pay bırakır.
-    - cron: '30 8 * * *'
+    # Her 4 saatte kontrol: bugün/yarın 19:30 için önceden YouTube planı.
+    # GitHub cron gecikse de geçmiş güne telafi yüklemesi yapılmaz.
+    - cron: '17 */4 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -25,6 +26,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - name: Check out live state
         uses: actions/checkout@v4
         with:
@@ -34,9 +37,9 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install -q -r requirements.txt
+        run: pip install -q -r requirements-publication.txt
       - name: Test queue and duplicate safeguards
-        run: python -m unittest discover -s tests -p 'test_*.py' -v
+        run: python scripts/publication_tests.py
       - name: Configure Google credentials
         if: ${{ github.event_name == 'schedule' || !inputs.dry_run }}
         env:
@@ -55,7 +58,7 @@ jobs:
         if: ${{ github.event_name == 'schedule' || !inputs.dry_run }}
         run: python bugun_planla.py inspect
       - name: Reserve and persist the exact slot before any upload
-        if: ${{ github.event_name == 'schedule' || !inputs.dry_run }}
+        if: ${{ (github.event_name == 'schedule' || !inputs.dry_run) && steps.inspect.outputs.should_plan == 'true' }}
         env:
           SLOT: ${{ steps.inspect.outputs.slot }}
         run: |
@@ -70,7 +73,7 @@ jobs:
           git push origin HEAD:main
       - name: Upload once and verify private timed schedule
         id: publish
-        if: ${{ github.event_name == 'schedule' || !inputs.dry_run }}
+        if: ${{ (github.event_name == 'schedule' || !inputs.dry_run) && steps.inspect.outputs.should_plan == 'true' }}
         env:
           SLOT: ${{ steps.inspect.outputs.slot }}
           FILE: ${{ steps.inspect.outputs.name }}
@@ -106,13 +109,13 @@ jobs:
           if path.exists():
               result=json.loads(path.read_text(encoding='utf8'))
               if result.get('status')=='PLANLANDI':
-                  text=f"📅 {result['filename']} bugün 19:30 için YouTube'da planlandı. Henüz yayınlanmadı.\n{result['url']}"
+                  text=f"📅 {result['filename']} {result['slot']} (UTC; TR +3) için YouTube'da planlandı. Henüz yayınlanmadı.\n{result['url']}"
                   if not result.get('cover_ok'):text+='\n⚠️ Kapak doğrulanamadı.'
                   if not result.get('sheet_ok'):text+='\n⚠️ Tablo güncellenemedi.'
                   if os.getenv('JOB_STATUS')!='success':text+='\n⚠️ Kayıt adımlarından biri başarısız; kontrol gerekiyor.'
               else:text='⚠️ Video yüklendi ancak yayın saati doğrulanamadı; mükerrer yükleme engellendi.'
           elif os.getenv('JOB_STATUS')!='success':
-              text='⚠️ Bugünkü video planlanamadı. Güvenlik gereği tekrar yüklenmedi; kontrol gerekiyor.'
+              text='⚠️ Günlük Shorts ön planlaması tamamlanamadı. Güvenlik gereği kör tekrar yükleme yapılmadı; kontrol gerekiyor.'
           else:raise SystemExit(0)
           request=urllib.request.Request('https://api.telegram.org/bot'+token+'/sendMessage', data=json.dumps({'chat_id':chat,'text':text}).encode(),headers={'Content-Type':'application/json'})
           try:
