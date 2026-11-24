@@ -3,6 +3,42 @@ name: YouTube Drive Uploader
 on:
   push:
     branches: [main]
+    paths:
+      - 'uploader.py'
+      - 'sheets_metadata.py'
+      - 'slot_guard.py'
+      - 'bugun_planla.py'
+      - 'youtube_guvenlik.py'
+      - 'plan_tablo.py'
+      - 'thumbnail_design.py'
+      - 'related_plan.py'
+      - 'crosspost_worker.py'
+      - 'delivery_diagnostics.py'
+      - 'kota_sayac.py'
+      - 'sync_panel_telemetry.py'
+      - 'config.json'
+      - 'approved_new_series_manifest.json'
+      - 'repair_video.json'
+      - 'force_next_video.txt'
+      - 'requirements-publication.txt'
+      - 'scripts/publication_tests.py'
+      - 'tests/test_*.py'
+      - '!tests/test_arsiv_regresyon.py'
+      - '!tests/test_kapak_consistency.py'
+      - '!tests/test_kapak_icerik.py'
+      - '!tests/test_metin_hazirla.py'
+      - '!tests/test_pexels_gorsel_pipeline.py'
+      - '!tests/test_senaryo_kurallari.py'
+      - '!tests/test_senaryo_tekrar_yazim.py'
+      - '!tests/test_senaryo_tutarlilik.py'
+      - '!tests/test_shorts_acceptance.py'
+      - '!tests/test_shorts_pipeline_v2.py'
+      - '!tests/test_subtitle_utils.py'
+      - '!tests/test_tts_speed_chain.py'
+      - '!tests/test_v2_orchestrator.py'
+      - '.github/workflows/youtube-drive-uploader.yml'
+      - '.github/workflows/gunluk-on-planlama.yml'
+      - '.github/workflows/slot-watchdog.yml'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -27,7 +63,7 @@ on:
         default: ""
   schedule:
     # Türkiye (UTC+03): Günde tek yayın, 19:30.
-    # Cuma 19:30 Uzun Video; diğer günler 19:30 Shorts.
+    # Her gün tek Shorts; ön planlama yapılmamışsa yedek yayın yolu.
     - cron: "12 16 * * *"  # 19:12 Türkiye erken ısınma
     - cron: "30 16 * * *"  # 19:30 Türkiye ana slot
 
@@ -44,8 +80,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
       # Kullanıcı isteği: Instagram/TikTok devre dışı; eski oturumlar kullanılmaz.
       CROSSPOST_ENABLED: 'false'
     steps:
@@ -60,12 +94,13 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
+          cache-dependency-path: requirements-publication.txt
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements-publication.txt
 
       - name: Test queue order and duplicate safeguards
-        run: python -m unittest discover -s tests -p 'test_*.py' -v
+        run: python scripts/publication_tests.py
 
       - name: Resolve publication slot
         id: slot
