@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-24 05:22:17",
-  "generated_at_iso": "2026-11-24T05:22:17.123456+03:00",
+  "generated_at": "2026-11-24 16:58:03",
+  "generated_at_iso": "2026-11-24T16:58:03.191309+03:00",
   "folders": {
     "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
     "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
@@ -32,12 +32,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 18,
+    "ready_shorts": 17,
     "ready_longs": 0,
-    "total_ready": 18,
-    "days_of_stock": 18,
-    "next_short": "video_184.mp4",
-    "next_short_title": "Yolcu Uçakları Neden Neredeyse Her Zaman Beyaza Boyanır? ✈️☀️ #bilgidozu #shorts",
+    "total_ready": 17,
+    "days_of_stock": 17,
+    "next_short": "video_185.mp4",
+    "next_short_title": "Uykusuz Kaldığında Göz Altların Neden Morarır? Derin Kararmıyor! 😴👁️ #bilgidozu #shorts",
     "next_long": null,
     "next_long_title": "",
     "missing_covers": []
@@ -418,8 +418,8 @@
         "id": "1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo",
         "name": "baslik.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 106433,
-        "modifiedTime": "2026-11-22T15:02:19.344Z"
+        "size": 106498,
+        "modifiedTime": "2026-11-24T13:37:40.943Z"
       },
       {
         "id": "1YjYzlPGzBlkFCH6baStgv1DOOdttaFzU",
@@ -1416,9 +1416,9 @@
       "file_name": "video_184.mp4",
       "number": 184,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Yolcu Uçakları Neden Neredeyse Her Zaman Beyaza Boyanır? ✈️☀️ #bilgidozu #shorts",
       "description": "💬 Havalimanında camdan dışarı bakarken 'neden uçakların hepsi beyaz?' diye hiç aklından geçmiş miydi? ✈️🤔 Gördüğün en ilginç uçak rengini yoruma yaz! 👇\n\nHavalimanına baktığında neredeyse bütün yolcu uçaklarının neden bembeyaz olduğunu hiç düşündün mü? Dev bir yolcu uçağını koyu renge boyamak, gövdeye yüzlerce kilogram fazladan boya ağırlığı ekleyip her uçuşta tonlarca ekstra yakıt yaktırır. Beyaz boya ise hem yakıcı güneş ışığını yansıtarak kabini serin tutar, hem de gövdedeki en ufak çatlak ve yağ sızıntısını bakımda hemen ele verir. Hatta Purdue Üniversitesi araştırmaları, beyaz gövdenin gökyüzünde kuş çarpmalarını bile azalttığını kanıtladı.\n\n💬 Sen daha önce tamamen siyah veya koyu renkli bir yolcu uçağı gördün mü? Yoruma yaz! 👇\n\n📚 Kaynak: Boeing Commercial Airplanes Engineering • Purdue University (PNAS)\n\n#bilgidozu #shorts #havacılık #uçak #mühendislik #bilim",
       "tags": [
@@ -1434,7 +1434,7 @@
       ],
       "category_name": "Havacılık ve Mühendislik",
       "pinned_comment": "Havalimanında camdan dışarı bakarken 'neden uçakların hepsi beyaz?' diye hiç aklından geçmiş miydi? ✈️🤔 Gördüğün en ilginç uçak rengini yoruma yaz! 👇",
-      "youtube_url": "",
+      "youtube_url": "https://youtu.be/h6TZN2_Zbmg",
       "has_drive_video": true,
       "drive_video_id": "1CwkWthE0k3weo3V0HlChVyod39YHDQBI",
       "drive_video_size_mb": 7.03,
