@@ -1,14 +1,14 @@
 {
- "total": 42371,
- "day_gain": 106,
- "updated": 63,
- "baseline_count": 27,
+ "total": 43222,
+ "day_gain": 108,
+ "updated": 64,
+ "baseline_count": 28,
  "compared_count": 48,
  "unavailable_count": 4,
  "dry_run": false,
  "top": [
   {
-   "delta": 14,
+   "delta": 15,
    "title": "Baldır Kasların Aslında İkinci Kalbin! Kanı Kalbe Nasıl Taşı",
    "file": "video_132.mp4"
   },
@@ -29,8 +29,8 @@
   },
   {
    "delta": 5,
-   "title": "Beynin Senden Sakladığı 3 Yanılsama! Özgür İraden Bile Senin",
-   "file": "uzun_video_3.mp4"
+   "title": "Kışın Kalbi Durup Buz Tutan, Baharda Çözülüp Canlanan Kurbağ",
+   "file": "video_40.mp4"
   }
  ]
 }
