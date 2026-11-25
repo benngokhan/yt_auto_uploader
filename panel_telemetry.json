@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-25 02:32:16",
-  "generated_at_iso": "2026-11-25T02:32:16.019250+03:00",
+  "generated_at": "2026-11-25 11:51:32",
+  "generated_at_iso": "2026-11-25T11:51:32.095415+03:00",
   "folders": {
     "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
     "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
@@ -32,12 +32,12 @@
     "crosspost_enabled": false
   },
   "queue_summary": {
-    "ready_shorts": 17,
+    "ready_shorts": 16,
     "ready_longs": 0,
-    "total_ready": 17,
-    "days_of_stock": 17,
-    "next_short": "video_185.mp4",
-    "next_short_title": "Uykusuz Kaldığında Göz Altların Neden Morarır? Derin Kararmıyor! 😴👁️ #bilgidozu #shorts",
+    "total_ready": 16,
+    "days_of_stock": 16,
+    "next_short": "video_186.mp4",
+    "next_short_title": "Yağmur Öncesi Toprak Kokusunu Köpekbalığından Keskin Alıyorsun! 🌧️🌱 #bilgidozu #shorts",
     "next_long": null,
     "next_long_title": "",
     "missing_covers": []
@@ -239,6 +239,13 @@
         "mimeType": "video/mp4",
         "size": 18946007,
         "modifiedTime": "2026-11-24T23:19:32.694Z"
+      },
+      {
+        "id": "1hZvuEj4kEswi-X1_0FLOCGP_uULIRKnN",
+        "name": "video_204.mp4",
+        "mimeType": "video/mp4",
+        "size": 12758224,
+        "modifiedTime": "2026-11-24T23:38:34.291Z"
       }
     ],
     "shorts_covers": [
@@ -437,6 +444,13 @@
         "mimeType": "image/jpeg",
         "size": 479946,
         "modifiedTime": "2026-11-24T23:19:29.655Z"
+      },
+      {
+        "id": "1Bhl1VCxLDF7YPLUmeENhCVcTcrmGAtG8",
+        "name": "kapak_204.jpg",
+        "mimeType": "image/jpeg",
+        "size": 339857,
+        "modifiedTime": "2026-11-24T23:38:33.946Z"
       }
     ],
     "long_videos": [],
@@ -446,8 +460,8 @@
         "id": "1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo",
         "name": "baslik.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 106498,
-        "modifiedTime": "2026-11-24T13:37:40.943Z"
+        "size": 106564,
+        "modifiedTime": "2026-11-25T00:45:14.596Z"
       },
       {
         "id": "1YjYzlPGzBlkFCH6baStgv1DOOdttaFzU",
@@ -1475,9 +1489,9 @@
       "file_name": "video_185.mp4",
       "number": 185,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Uykusuz Kaldığında Göz Altların Neden Morarır? Derin Kararmıyor! 😴👁️ #bilgidozu #shorts",
       "description": "💬 Bu videoyu gece geç saatte uykusuz izleyenler el kaldırsın! 🙋‍♂️😴 Sen bugün kaç saat uyudun? Yoruma yaz! 👇\n\nUykusuz kaldığın sabah aynaya baktığında gördüğün göz altı morluğu, derinin renk değiştirmesi değildir! Göz altındaki deri yalnızca yarım milimetre kalınlığıyla tüm insan vücudundaki en ince ve en yarı saydam tabakadır. Vücudun yorgun düştüğünde stres hormonu yükselir ve göz altındaki kılcal damarlar daha fazla kan taşımak için genişler. O incecik derinin hemen altından yansıyan koyu renkli toplardamar kanı dışarıdan mor bir gölge gibi görünür.\n\n💬 Peki sen bugün kaç saat uyudun? Yoruma yaz! 👇\n\n📚 Kaynak: Mayo Clinic • Cleveland Clinic Dermatology\n\n#bilgidozu #shorts #insanvücudu #uyku #sağlık #bilim",
       "tags": [
@@ -1494,7 +1508,7 @@
       ],
       "category_name": "İnsan Vücudu ve Tıp",
       "pinned_comment": "Bu videoyu gece geç saatte uykusuz izleyenler el kaldırsın! 🙋‍♂️😴 Sen bugün kaç saat uyudun? Yoruma yaz! 👇",
-      "youtube_url": "",
+      "youtube_url": "https://youtu.be/H_2u3XjrmVU",
       "has_drive_video": true,
       "drive_video_id": "1HzWJJKzy0pDmRHoAxUHb2HZf-K8EVgLg",
       "drive_video_size_mb": 8.99,
@@ -2080,12 +2094,12 @@
       "category_name": "Bilim Tarihi ve Mühendislik",
       "pinned_comment": "Adam hem yerçekimi yasasını ve kalkülüsü buluyor, hem de boş zamanında darphanenin başına geçip kalpazanlığı bitiriyor! 🤯🪙👇",
       "youtube_url": "",
-      "has_drive_video": false,
-      "drive_video_id": "",
-      "drive_video_size_mb": 0,
+      "has_drive_video": true,
+      "drive_video_id": "1hZvuEj4kEswi-X1_0FLOCGP_uULIRKnN",
+      "drive_video_size_mb": 12.17,
       "expected_cover": "kapak_204.jpg",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1Bhl1VCxLDF7YPLUmeENhCVcTcrmGAtG8"
     },
     {
       "row": 186,
