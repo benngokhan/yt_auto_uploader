@@ -1,0 +1,46 @@
+{
+  "method": "Four acoustically bounded clip transcriptions; last longclip split at sentence silence after original skipping/hallucination. Same localWhisperbase, intended-text prompts. No provider regeneration.",
+  "audio_sha256": "c24a2b380eb5bb16db767a01869664133831200f411574e64c2645fc05842392",
+  "clips": [
+    {
+      "clip": [
+        0,
+        8.15
+      ],
+      "expected": "Fatih Sultan Mehmet, Venedik’ten bir ressam istedi. Peki bu portrenin arkasında nasıl bir hikâye vardı?",
+      "recognized": "Fatih Sultan Mehmet, Venedik’ten bir ressam istedi. Peki bu portrenin arkasında nasıl bir hikâye vardı?",
+      "similarity": 1.0
+    },
+    {
+      "clip": [
+        8.15,
+        27.8
+      ],
+      "expected": "Yıl bin dört yüz yetmiş dokuz. Fatih’in isteği üzerine Venedik, ressam Gentile Bellini’yi İstanbul’a gönderdi. Bellini burada yaklaşık bir buçuk yıl kaldı. Bu ziyaret yalnızca sanatla ilgili değildi. İki taraf da siyasi ve ticari ilişkilerini geliştirmek istiyordu.",
+      "recognized": "Yıl bin dört yüz yetmiş dokuz. Fatih’in isteği üzerine Venedik, ressam Gentile Bellini’yi İstanbul’a gönderdi. Bellini burada yaklaşık bir buçuk yıl kaldı. Bu ziyaret yalnızca sanatla ilgili değildi. İki tarafta siyasi ve ticari ilişkilerini geliştirmek istiyordu.",
+      "similarity": 0.9954545454545455
+    },
+    {
+      "clip": [
+        27.8,
+        38.75
+      ],
+      "expected": "Bin dört yüz seksen tarihli portrede Fatih, taş bir kemerin içinde resmedildi. İşlemeli kumaşlar, inciler ve taçlar, hükümdarın ihtişamını vurguluyordu.",
+      "recognized": "Bin dört yüz seksen tarihli portrede Fatih, taş bir kemerin içinde resmedildi. İşlemeli kumaşlar, inciler ve taçlar, hükümdarın ihtişamını vurguluyordu.",
+      "similarity": 1.0
+    },
+    {
+      "clip": [
+        38.75,
+        51.77095833333333
+      ],
+      "expected": "Bu tablo, bir sanat eserinin aynı zamanda diplomatik bir buluşmanın izi olabileceğini gösteriyor. Fatih’in hikâyesinde fırçaya da yer vardı. Merakını besle, Bilgi Dozu’nu takip et!",
+      "recognized": "Bu tablo, bir sanat eserinin aynı zamanda diplomatik bir buluşmanın izi olabileceğini gösteriyor. Fatih’in hikâyesinde fırçaya da yer vardı. Merakını besle, Bilgi Dozu’nu takip et. Bırak.",
+      "similarity": 0.9834983498349835
+    }
+  ],
+  "combined_similarity": 0.9940119760479041,
+  "original_full_pass_similarity": 0.8989,
+  "human_voice_tone_approved": true,
+  "new_provider_calls": 0
+}

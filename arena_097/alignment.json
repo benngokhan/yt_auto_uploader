@@ -1,0 +1,1010 @@
+{
+  "method": "local Whisper known-text cross-attention on two audio-grounded clips; separately validated against four acoustic clips",
+  "approximate": true,
+  "audio_sha256": "c24a2b380eb5bb16db767a01869664133831200f411574e64c2645fc05842392",
+  "audio_duration_seconds": 51.77095833333333,
+  "asr_transcript": "Fatih Sultan Mehmet, Venedik’ten bir ressam istedi. Peki bu portrenin arkasında nasıl bir hikâye vardı? Yıl bin dört yüz yetmiş dokuz. Fatih’in isteği üzerine Venedik, ressam Gentile Bellini’yi İstanbul’a gönderdi. Bellini burada yaklaşık bir buçuk yıl kaldı. Bu ziyaret yalnızca sanatla ilgili değildi. İki tarafta siyasi ve ticari ilişkilerini geliştirmek istiyordu. Bin dört yüz seksen tarihli portrede Fatih, taş bir kemerin içinde resmedildi. İşlemeli kumaşlar, inciler ve taçlar, hükümdarın ihtişamını vurguluyordu. Bu tablo, bir sanat eserinin aynı zamanda diplomatik bir buluşmanın izi olabileceğini gösteriyor. Fatih’in hikâyesinde fırçaya da yer vardı. Merakını besle, Bilgi Dozu’nu takip et. Bırak.",
+  "asr_similarity": 0.994,
+  "split_seconds": 25.54,
+  "split_word_index": 49,
+  "words": [
+    {
+      "word": "Fatih",
+      "start": 0.0,
+      "end": 0.64
+    },
+    {
+      "word": "Sultan",
+      "start": 0.64,
+      "end": 0.98
+    },
+    {
+      "word": "Mehmet,",
+      "start": 0.98,
+      "end": 1.5
+    },
+    {
+      "word": "Venedik’ten",
+      "start": 2.1,
+      "end": 2.6
+    },
+    {
+      "word": "bir",
+      "start": 2.6,
+      "end": 2.78
+    },
+    {
+      "word": "ressam",
+      "start": 2.78,
+      "end": 3.1
+    },
+    {
+      "word": "istedi.",
+      "start": 3.1,
+      "end": 3.44
+    },
+    {
+      "word": "Peki",
+      "start": 4.2,
+      "end": 4.5
+    },
+    {
+      "word": "bu",
+      "start": 4.5,
+      "end": 4.92
+    },
+    {
+      "word": "portrenin",
+      "start": 4.92,
+      "end": 5.56
+    },
+    {
+      "word": "arkasında",
+      "start": 5.56,
+      "end": 6.16
+    },
+    {
+      "word": "nasıl",
+      "start": 6.16,
+      "end": 6.76
+    },
+    {
+      "word": "bir",
+      "start": 6.76,
+      "end": 7.0
+    },
+    {
+      "word": "hikâye",
+      "start": 7.0,
+      "end": 7.44
+    },
+    {
+      "word": "vardı?",
+      "start": 7.44,
+      "end": 7.74
+    },
+    {
+      "word": "Yıl",
+      "start": 8.48,
+      "end": 8.84
+    },
+    {
+      "word": "bin",
+      "start": 8.84,
+      "end": 9.1
+    },
+    {
+      "word": "dört",
+      "start": 9.1,
+      "end": 9.36
+    },
+    {
+      "word": "yüz",
+      "start": 9.36,
+      "end": 9.58
+    },
+    {
+      "word": "yetmiş",
+      "start": 9.58,
+      "end": 9.88
+    },
+    {
+      "word": "dokuz.",
+      "start": 9.88,
+      "end": 10.22
+    },
+    {
+      "word": "Fatih’in",
+      "start": 11.0,
+      "end": 11.58
+    },
+    {
+      "word": "isteği",
+      "start": 11.58,
+      "end": 12.02
+    },
+    {
+      "word": "üzerine",
+      "start": 12.02,
+      "end": 12.42
+    },
+    {
+      "word": "Venedik,",
+      "start": 12.42,
+      "end": 13.26
+    },
+    {
+      "word": "ressam",
+      "start": 13.48,
+      "end": 13.82
+    },
+    {
+      "word": "Gentile",
+      "start": 13.82,
+      "end": 14.36
+    },
+    {
+      "word": "Bellini’yi",
+      "start": 14.36,
+      "end": 15.2
+    },
+    {
+      "word": "İstanbul’a",
+      "start": 15.2,
+      "end": 15.92
+    },
+    {
+      "word": "gönderdi.",
+      "start": 15.92,
+      "end": 16.4
+    },
+    {
+      "word": "Bellini",
+      "start": 17.04,
+      "end": 17.58
+    },
+    {
+      "word": "burada",
+      "start": 17.58,
+      "end": 17.98
+    },
+    {
+      "word": "yaklaşık",
+      "start": 17.98,
+      "end": 18.72
+    },
+    {
+      "word": "bir",
+      "start": 18.72,
+      "end": 18.88
+    },
+    {
+      "word": "buçuk",
+      "start": 18.88,
+      "end": 19.2
+    },
+    {
+      "word": "yıl",
+      "start": 19.2,
+      "end": 19.38
+    },
+    {
+      "word": "kaldı.",
+      "start": 19.38,
+      "end": 19.8
+    },
+    {
+      "word": "Bu",
+      "start": 20.38,
+      "end": 20.58
+    },
+    {
+      "word": "ziyaret",
+      "start": 20.58,
+      "end": 21.0
+    },
+    {
+      "word": "yalnızca",
+      "start": 21.0,
+      "end": 21.76
+    },
+    {
+      "word": "sanatla",
+      "start": 21.76,
+      "end": 22.22
+    },
+    {
+      "word": "ilgili",
+      "start": 22.22,
+      "end": 22.46
+    },
+    {
+      "word": "değildi.",
+      "start": 22.46,
+      "end": 23.0
+    },
+    {
+      "word": "İki",
+      "start": 23.52,
+      "end": 23.76
+    },
+    {
+      "word": "taraf",
+      "start": 23.76,
+      "end": 24.14
+    },
+    {
+      "word": "da",
+      "start": 24.14,
+      "end": 24.28
+    },
+    {
+      "word": "siyasi",
+      "start": 24.28,
+      "end": 24.86
+    },
+    {
+      "word": "ve",
+      "start": 24.86,
+      "end": 25.14
+    },
+    {
+      "word": "ticari",
+      "start": 25.14,
+      "end": 25.52
+    },
+    {
+      "word": "ilişkilerini",
+      "start": 25.54,
+      "end": 26.3
+    },
+    {
+      "word": "geliştirmek",
+      "start": 26.3,
+      "end": 26.88
+    },
+    {
+      "word": "istiyordu.",
+      "start": 26.88,
+      "end": 27.44
+    },
+    {
+      "word": "Bin",
+      "start": 28.16,
+      "end": 28.44
+    },
+    {
+      "word": "dört",
+      "start": 28.44,
+      "end": 28.66
+    },
+    {
+      "word": "yüz",
+      "start": 28.66,
+      "end": 28.8
+    },
+    {
+      "word": "seksen",
+      "start": 28.8,
+      "end": 29.24
+    },
+    {
+      "word": "tarihli",
+      "start": 29.24,
+      "end": 29.74
+    },
+    {
+      "word": "portrede",
+      "start": 29.74,
+      "end": 30.36
+    },
+    {
+      "word": "Fatih,",
+      "start": 30.36,
+      "end": 30.88
+    },
+    {
+      "word": "taş",
+      "start": 31.16,
+      "end": 31.38
+    },
+    {
+      "word": "bir",
+      "start": 31.38,
+      "end": 31.5
+    },
+    {
+      "word": "kemerin",
+      "start": 31.5,
+      "end": 31.92
+    },
+    {
+      "word": "içinde",
+      "start": 31.92,
+      "end": 32.22
+    },
+    {
+      "word": "resmedildi.",
+      "start": 32.22,
+      "end": 32.98
+    },
+    {
+      "word": "İşlemeli",
+      "start": 33.58,
+      "end": 34.06
+    },
+    {
+      "word": "kumaşlar,",
+      "start": 34.06,
+      "end": 34.62
+    },
+    {
+      "word": "inciler",
+      "start": 34.9,
+      "end": 35.28
+    },
+    {
+      "word": "ve",
+      "start": 35.28,
+      "end": 35.58
+    },
+    {
+      "word": "taçlar,",
+      "start": 35.58,
+      "end": 36.06
+    },
+    {
+      "word": "hükümdarın",
+      "start": 36.38,
+      "end": 37.0
+    },
+    {
+      "word": "ihtişamını",
+      "start": 37.0,
+      "end": 37.7
+    },
+    {
+      "word": "vurguluyordu.",
+      "start": 37.7,
+      "end": 38.38
+    },
+    {
+      "word": "Bu",
+      "start": 39.16,
+      "end": 39.48
+    },
+    {
+      "word": "tablo,",
+      "start": 39.48,
+      "end": 39.86
+    },
+    {
+      "word": "bir",
+      "start": 40.14,
+      "end": 40.22
+    },
+    {
+      "word": "sanat",
+      "start": 40.22,
+      "end": 40.58
+    },
+    {
+      "word": "eserinin",
+      "start": 40.58,
+      "end": 41.02
+    },
+    {
+      "word": "aynı",
+      "start": 41.02,
+      "end": 41.52
+    },
+    {
+      "word": "zamanda",
+      "start": 41.52,
+      "end": 41.98
+    },
+    {
+      "word": "diplomatik",
+      "start": 41.98,
+      "end": 42.64
+    },
+    {
+      "word": "bir",
+      "start": 42.64,
+      "end": 42.76
+    },
+    {
+      "word": "buluşmanın",
+      "start": 42.76,
+      "end": 43.42
+    },
+    {
+      "word": "izi",
+      "start": 43.42,
+      "end": 43.64
+    },
+    {
+      "word": "olabileceğini",
+      "start": 43.64,
+      "end": 44.34
+    },
+    {
+      "word": "gösteriyor.",
+      "start": 44.34,
+      "end": 44.88
+    },
+    {
+      "word": "Fatih’in",
+      "start": 45.64,
+      "end": 46.22
+    },
+    {
+      "word": "hikâyesinde",
+      "start": 46.22,
+      "end": 47.0
+    },
+    {
+      "word": "fırçaya",
+      "start": 47.0,
+      "end": 47.58
+    },
+    {
+      "word": "da",
+      "start": 47.58,
+      "end": 47.74
+    },
+    {
+      "word": "yer",
+      "start": 47.74,
+      "end": 47.92
+    },
+    {
+      "word": "vardı.",
+      "start": 47.92,
+      "end": 48.3
+    },
+    {
+      "word": "Merakını",
+      "start": 49.04,
+      "end": 49.54
+    },
+    {
+      "word": "besle,",
+      "start": 49.54,
+      "end": 49.92
+    },
+    {
+      "word": "Bilgi",
+      "start": 50.24,
+      "end": 50.46
+    },
+    {
+      "word": "Dozu’nu",
+      "start": 50.46,
+      "end": 50.82
+    },
+    {
+      "word": "takip",
+      "start": 50.82,
+      "end": 51.24
+    },
+    {
+      "word": "et!",
+      "start": 51.24,
+      "end": 51.44
+    }
+  ],
+  "groups": [
+    [
+      {
+        "word": "Fatih",
+        "start": 0.0,
+        "end": 0.64
+      },
+      {
+        "word": "Sultan",
+        "start": 0.64,
+        "end": 0.98
+      },
+      {
+        "word": "Mehmet,",
+        "start": 0.98,
+        "end": 1.5
+      },
+      {
+        "word": "Venedik’ten",
+        "start": 2.1,
+        "end": 2.6
+      },
+      {
+        "word": "bir",
+        "start": 2.6,
+        "end": 2.78
+      },
+      {
+        "word": "ressam",
+        "start": 2.78,
+        "end": 3.1
+      },
+      {
+        "word": "istedi.",
+        "start": 3.1,
+        "end": 3.44
+      }
+    ],
+    [
+      {
+        "word": "Peki",
+        "start": 4.2,
+        "end": 4.5
+      },
+      {
+        "word": "bu",
+        "start": 4.5,
+        "end": 4.92
+      },
+      {
+        "word": "portrenin",
+        "start": 4.92,
+        "end": 5.56
+      },
+      {
+        "word": "arkasında",
+        "start": 5.56,
+        "end": 6.16
+      },
+      {
+        "word": "nasıl",
+        "start": 6.16,
+        "end": 6.76
+      },
+      {
+        "word": "bir",
+        "start": 6.76,
+        "end": 7.0
+      },
+      {
+        "word": "hikâye",
+        "start": 7.0,
+        "end": 7.44
+      },
+      {
+        "word": "vardı?",
+        "start": 7.44,
+        "end": 7.74
+      }
+    ],
+    [
+      {
+        "word": "Yıl",
+        "start": 8.48,
+        "end": 8.84
+      },
+      {
+        "word": "bin",
+        "start": 8.84,
+        "end": 9.1
+      },
+      {
+        "word": "dört",
+        "start": 9.1,
+        "end": 9.36
+      },
+      {
+        "word": "yüz",
+        "start": 9.36,
+        "end": 9.58
+      },
+      {
+        "word": "yetmiş",
+        "start": 9.58,
+        "end": 9.88
+      },
+      {
+        "word": "dokuz.",
+        "start": 9.88,
+        "end": 10.22
+      }
+    ],
+    [
+      {
+        "word": "Fatih’in",
+        "start": 11.0,
+        "end": 11.58
+      },
+      {
+        "word": "isteği",
+        "start": 11.58,
+        "end": 12.02
+      },
+      {
+        "word": "üzerine",
+        "start": 12.02,
+        "end": 12.42
+      },
+      {
+        "word": "Venedik,",
+        "start": 12.42,
+        "end": 13.26
+      },
+      {
+        "word": "ressam",
+        "start": 13.48,
+        "end": 13.82
+      },
+      {
+        "word": "Gentile",
+        "start": 13.82,
+        "end": 14.36
+      },
+      {
+        "word": "Bellini’yi",
+        "start": 14.36,
+        "end": 15.2
+      },
+      {
+        "word": "İstanbul’a",
+        "start": 15.2,
+        "end": 15.92
+      },
+      {
+        "word": "gönderdi.",
+        "start": 15.92,
+        "end": 16.4
+      }
+    ],
+    [
+      {
+        "word": "Bellini",
+        "start": 17.04,
+        "end": 17.58
+      },
+      {
+        "word": "burada",
+        "start": 17.58,
+        "end": 17.98
+      },
+      {
+        "word": "yaklaşık",
+        "start": 17.98,
+        "end": 18.72
+      },
+      {
+        "word": "bir",
+        "start": 18.72,
+        "end": 18.88
+      },
+      {
+        "word": "buçuk",
+        "start": 18.88,
+        "end": 19.2
+      },
+      {
+        "word": "yıl",
+        "start": 19.2,
+        "end": 19.38
+      },
+      {
+        "word": "kaldı.",
+        "start": 19.38,
+        "end": 19.8
+      }
+    ],
+    [
+      {
+        "word": "Bu",
+        "start": 20.38,
+        "end": 20.58
+      },
+      {
+        "word": "ziyaret",
+        "start": 20.58,
+        "end": 21.0
+      },
+      {
+        "word": "yalnızca",
+        "start": 21.0,
+        "end": 21.76
+      },
+      {
+        "word": "sanatla",
+        "start": 21.76,
+        "end": 22.22
+      },
+      {
+        "word": "ilgili",
+        "start": 22.22,
+        "end": 22.46
+      },
+      {
+        "word": "değildi.",
+        "start": 22.46,
+        "end": 23.0
+      }
+    ],
+    [
+      {
+        "word": "İki",
+        "start": 23.52,
+        "end": 23.76
+      },
+      {
+        "word": "taraf",
+        "start": 23.76,
+        "end": 24.14
+      },
+      {
+        "word": "da",
+        "start": 24.14,
+        "end": 24.28
+      },
+      {
+        "word": "siyasi",
+        "start": 24.28,
+        "end": 24.86
+      },
+      {
+        "word": "ve",
+        "start": 24.86,
+        "end": 25.14
+      },
+      {
+        "word": "ticari",
+        "start": 25.14,
+        "end": 25.52
+      },
+      {
+        "word": "ilişkilerini",
+        "start": 25.54,
+        "end": 26.3
+      },
+      {
+        "word": "geliştirmek",
+        "start": 26.3,
+        "end": 26.88
+      },
+      {
+        "word": "istiyordu.",
+        "start": 26.88,
+        "end": 27.44
+      }
+    ],
+    [
+      {
+        "word": "Bin",
+        "start": 28.16,
+        "end": 28.44
+      },
+      {
+        "word": "dört",
+        "start": 28.44,
+        "end": 28.66
+      },
+      {
+        "word": "yüz",
+        "start": 28.66,
+        "end": 28.8
+      },
+      {
+        "word": "seksen",
+        "start": 28.8,
+        "end": 29.24
+      },
+      {
+        "word": "tarihli",
+        "start": 29.24,
+        "end": 29.74
+      },
+      {
+        "word": "portrede",
+        "start": 29.74,
+        "end": 30.36
+      },
+      {
+        "word": "Fatih,",
+        "start": 30.36,
+        "end": 30.88
+      },
+      {
+        "word": "taş",
+        "start": 31.16,
+        "end": 31.38
+      },
+      {
+        "word": "bir",
+        "start": 31.38,
+        "end": 31.5
+      },
+      {
+        "word": "kemerin",
+        "start": 31.5,
+        "end": 31.92
+      },
+      {
+        "word": "içinde",
+        "start": 31.92,
+        "end": 32.22
+      },
+      {
+        "word": "resmedildi.",
+        "start": 32.22,
+        "end": 32.98
+      }
+    ],
+    [
+      {
+        "word": "İşlemeli",
+        "start": 33.58,
+        "end": 34.06
+      },
+      {
+        "word": "kumaşlar,",
+        "start": 34.06,
+        "end": 34.62
+      },
+      {
+        "word": "inciler",
+        "start": 34.9,
+        "end": 35.28
+      },
+      {
+        "word": "ve",
+        "start": 35.28,
+        "end": 35.58
+      },
+      {
+        "word": "taçlar,",
+        "start": 35.58,
+        "end": 36.06
+      },
+      {
+        "word": "hükümdarın",
+        "start": 36.38,
+        "end": 37.0
+      },
+      {
+        "word": "ihtişamını",
+        "start": 37.0,
+        "end": 37.7
+      },
+      {
+        "word": "vurguluyordu.",
+        "start": 37.7,
+        "end": 38.38
+      }
+    ],
+    [
+      {
+        "word": "Bu",
+        "start": 39.16,
+        "end": 39.48
+      },
+      {
+        "word": "tablo,",
+        "start": 39.48,
+        "end": 39.86
+      },
+      {
+        "word": "bir",
+        "start": 40.14,
+        "end": 40.22
+      },
+      {
+        "word": "sanat",
+        "start": 40.22,
+        "end": 40.58
+      },
+      {
+        "word": "eserinin",
+        "start": 40.58,
+        "end": 41.02
+      },
+      {
+        "word": "aynı",
+        "start": 41.02,
+        "end": 41.52
+      },
+      {
+        "word": "zamanda",
+        "start": 41.52,
+        "end": 41.98
+      },
+      {
+        "word": "diplomatik",
+        "start": 41.98,
+        "end": 42.64
+      },
+      {
+        "word": "bir",
+        "start": 42.64,
+        "end": 42.76
+      },
+      {
+        "word": "buluşmanın",
+        "start": 42.76,
+        "end": 43.42
+      },
+      {
+        "word": "izi",
+        "start": 43.42,
+        "end": 43.64
+      },
+      {
+        "word": "olabileceğini",
+        "start": 43.64,
+        "end": 44.34
+      },
+      {
+        "word": "gösteriyor.",
+        "start": 44.34,
+        "end": 44.88
+      }
+    ],
+    [
+      {
+        "word": "Fatih’in",
+        "start": 45.64,
+        "end": 46.22
+      },
+      {
+        "word": "hikâyesinde",
+        "start": 46.22,
+        "end": 47.0
+      },
+      {
+        "word": "fırçaya",
+        "start": 47.0,
+        "end": 47.58
+      },
+      {
+        "word": "da",
+        "start": 47.58,
+        "end": 47.74
+      },
+      {
+        "word": "yer",
+        "start": 47.74,
+        "end": 47.92
+      },
+      {
+        "word": "vardı.",
+        "start": 47.92,
+        "end": 48.3
+      }
+    ],
+    [
+      {
+        "word": "Merakını",
+        "start": 49.04,
+        "end": 49.54
+      },
+      {
+        "word": "besle,",
+        "start": 49.54,
+        "end": 49.92
+      },
+      {
+        "word": "Bilgi",
+        "start": 50.24,
+        "end": 50.46
+      },
+      {
+        "word": "Dozu’nu",
+        "start": 50.46,
+        "end": 50.82
+      },
+      {
+        "word": "takip",
+        "start": 50.82,
+        "end": 51.24
+      },
+      {
+        "word": "et!",
+        "start": 51.24,
+        "end": 51.44
+      }
+    ]
+  ],
+  "original_full_asr_similarity": 0.8989,
+  "validation_proof_file": "asr_validation.json"
+}
