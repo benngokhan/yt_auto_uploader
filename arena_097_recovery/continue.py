@@ -4,7 +4,7 @@ One authorized visual review, then one local render. No TTS, no image generation
 no automatic retry, no publication or queue writes.
 """
 from pathlib import Path
-import base64, hashlib, io, json, os, shutil, subprocess, sys, urllib.error, urllib.request
+import base64, hashlib, io, json, os, shutil, subprocess, sys, time, urllib.error, urllib.request
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,8 +12,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / 'arena_096'))
 import produce as providers
 
-AUTH = 'FATIH_REMAINING_IMAGES_097_RECOVERY2_ONCE'
-BRANCH = 'arena/fatih-remaining-097-recovery2'
+AUTH = 'FATIH_REMAINING_IMAGES_097_RECOVERY3_ONCE'
+BRANCH = 'arena/fatih-remaining-097-recovery3'
 VOICE_SHA = 'c24a2b380eb5bb16db767a01869664133831200f411574e64c2645fc05842392'
 SOURCE_RUN = 45528376909
 IMPORT = ROOT / 'imported_097'
@@ -135,18 +135,32 @@ def review_once(plan, rows, budget):
     budget.reserve('review', body)
     req = urllib.request.Request(url, data=body, headers=headers, method='POST')
     raw = None
-    try:
-        with providers.OPEN.open(req, timeout=180) as resp:
-            raw = resp.read(1024 * 1024 + 1)
-    except urllib.error.HTTPError as exc:
-        detail = ''
+    attempts = []
+    for attempt in (1, 2, 3):
         try:
-            detail = exc.read(1200).decode('utf-8', 'replace').replace('\n', ' ')
-        except Exception:
-            pass
-        fail('Review provider HTTP %s; reserved budget consumed; %s' % (exc.code, detail[:300]))
-    except Exception as exc:
-        fail('Review call failed or uncertain; reserved budget consumed; ' + type(exc).__name__)
+            with providers.OPEN.open(req, timeout=180) as resp:
+                raw = resp.read(1024 * 1024 + 1)
+            attempts.append({'attempt': attempt, 'http': 200})
+            break
+        except urllib.error.HTTPError as exc:
+            detail = ''
+            try:
+                detail = exc.read(1200).decode('utf-8', 'replace').replace('\n', ' ')
+            except Exception:
+                pass
+            attempts.append({'attempt': attempt, 'http': exc.code, 'body': detail[:300]})
+            providers.save(OUT / 'review_attempts.json', attempts)
+            # 503/429 mean the model never processed the request; a short bounded wait is
+            # transport-level, not a second visual review. Anything else stops immediately.
+            if exc.code in (429, 503) and attempt < 3:
+                time.sleep(30 if attempt == 1 else 90)
+                continue
+            fail('Review provider HTTP %s; reserved budget consumed; %s' % (exc.code, detail[:300]))
+        except Exception as exc:
+            attempts.append({'attempt': attempt, 'error': type(exc).__name__})
+            providers.save(OUT / 'review_attempts.json', attempts)
+            fail('Review call failed or uncertain; reserved budget consumed; ' + type(exc).__name__)
+    providers.save(OUT / 'review_attempts.json', attempts)
     if raw is None or len(raw) > 1024 * 1024:
         fail('Review response missing or too large')
 
