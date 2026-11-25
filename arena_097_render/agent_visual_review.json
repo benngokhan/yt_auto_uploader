@@ -1,0 +1,16 @@
+{
+  "review_method": "agent_vision_review",
+  "reason": "Gemini review unavailable: gemini-2.5-flash HTTP 404 (retired), flash vision models HTTP 503, pro/omni models HTTP 429 (quota).",
+  "reviewer": "OpenCode agent vision review",
+  "human_approved": false,
+  "scenes": [
+    {"scene": 1, "pass": true, "note": "Sultan and anonymous painter in palace chamber; costumes and architecture illustrative; background painting is invented studio decor; no readable text."},
+    {"scene": 2, "pass": true, "note": "Venice lagoon with late-medieval wooden boat and atmospheric Doge Palace approximation; no modern vessels or engines."},
+    {"scene": 3, "pass": true, "note": "Still life matches the request; parchment blank, no invented seal, signature or readable marks."},
+    {"scene": 4, "pass": true, "note": "Courtyard arrival under stone colonnade with cypress and fountain; hands not prominent; architecture approximate; no fez or modern buildings."},
+    {"scene": 5, "pass": true, "note": "Painter mixing earth pigment on a palette; hands plausible; no modern tubes; blue canvas mark reads as paint, not UI."},
+    {"scene": 6, "pass": true, "note": "Two envoys at a low table with blank parchment and cups; hands plausible; sailing vessels beyond the arch; no handshake or named ruler."},
+    {"scene": 7, "pass": true, "note": "Interpretive Bellini-style portrait on an easel with turban, fur caftan, side crowns, pearls and textile; no readable inscription."},
+    {"scene": 8, "pass": true, "note": "Closing still life with brushes, used palette and pigment pot; only a blurred turban suggestion at upper right; no people or text."}
+  ]
+}
