@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-25 19:35:14",
-  "generated_at_iso": "2026-11-25T19:35:14.255323+03:00",
+  "generated_at": "2026-11-25 22:26:30",
+  "generated_at_iso": "2026-11-25T22:26:30.833315+03:00",
   "folders": {
     "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
     "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
@@ -246,6 +246,55 @@
         "mimeType": "video/mp4",
         "size": 12758224,
         "modifiedTime": "2026-11-24T23:38:34.291Z"
+      },
+      {
+        "id": "1D5NnV25BQDLRQkoYZzbXGRHkueRoDMJ-",
+        "name": "video_205.mp4",
+        "mimeType": "video/mp4",
+        "size": 14180136,
+        "modifiedTime": "2026-11-25T16:54:06.970Z"
+      },
+      {
+        "id": "1Qv8GGKQd7I00YeFZqeXH--SEGq9uwDca",
+        "name": "video_206.mp4",
+        "mimeType": "video/mp4",
+        "size": 13649137,
+        "modifiedTime": "2026-11-25T16:52:27.458Z"
+      },
+      {
+        "id": "1Szuy7f0NTAfrgY-9cC56haD6JiKESvU1",
+        "name": "video_207.mp4",
+        "mimeType": "video/mp4",
+        "size": 19350548,
+        "modifiedTime": "2026-11-25T16:41:45.763Z"
+      },
+      {
+        "id": "1PAwePjbqDBxh-9qzYxtZluCHHjxT17wC",
+        "name": "video_208.mp4",
+        "mimeType": "video/mp4",
+        "size": 10119680,
+        "modifiedTime": "2026-11-25T16:41:45.802Z"
+      },
+      {
+        "id": "1Ral2duxqMsLBDDaNQDRZfVCSK_nVzY1G",
+        "name": "video_209.mp4",
+        "mimeType": "video/mp4",
+        "size": 17099071,
+        "modifiedTime": "2026-11-25T16:41:45.784Z"
+      },
+      {
+        "id": "1tIS6Z2Fms62qJNulFAkdxOkostBcjbHx",
+        "name": "video_210.mp4",
+        "mimeType": "video/mp4",
+        "size": 12225983,
+        "modifiedTime": "2026-11-25T16:41:45.757Z"
+      },
+      {
+        "id": "1elSFaad9poZWEBiMqtRsaunqiC52jpN0",
+        "name": "video_211.mp4",
+        "mimeType": "video/mp4",
+        "size": 14222071,
+        "modifiedTime": "2026-11-25T16:41:45.771Z"
       }
     ],
     "shorts_covers": [
@@ -451,6 +500,55 @@
         "mimeType": "image/jpeg",
         "size": 339857,
         "modifiedTime": "2026-11-24T23:38:33.946Z"
+      },
+      {
+        "id": "17SO6XcOIpCKdK4BWXXbzHvxxgxQUfURi",
+        "name": "kapak_205.jpg",
+        "mimeType": "image/jpeg",
+        "size": 461662,
+        "modifiedTime": "2026-11-25T16:54:04.547Z"
+      },
+      {
+        "id": "1g6AlTj2ELzCOwfZ-MP8ZAeyul5kzN7ob",
+        "name": "kapak_206.jpg",
+        "mimeType": "image/jpeg",
+        "size": 371225,
+        "modifiedTime": "2026-11-25T16:52:23.991Z"
+      },
+      {
+        "id": "1E1ck2he1LhJVC7yhY554ZttvqqWk4O8i",
+        "name": "kapak_207.jpg",
+        "mimeType": "image/jpeg",
+        "size": 611487,
+        "modifiedTime": "2026-11-25T16:42:12.922Z"
+      },
+      {
+        "id": "196IxK9JnzFaqfGZdMzt7Hf-00AOTBxA9",
+        "name": "kapak_208.jpg",
+        "mimeType": "image/jpeg",
+        "size": 498000,
+        "modifiedTime": "2026-11-25T16:42:13.090Z"
+      },
+      {
+        "id": "15ddZlwOxXvCHdBtcuqnupyE6OPJYJCLX",
+        "name": "kapak_209.jpg",
+        "mimeType": "image/jpeg",
+        "size": 334160,
+        "modifiedTime": "2026-11-25T16:42:12.805Z"
+      },
+      {
+        "id": "1wYwTuxfT7ynF1Al1E5xjU9766W16yDru",
+        "name": "kapak_210.jpg",
+        "mimeType": "image/jpeg",
+        "size": 390115,
+        "modifiedTime": "2026-11-25T16:42:12.952Z"
+      },
+      {
+        "id": "1z_nNbV9kgmoW0Z38M6TyZdU8gTQXAyY0",
+        "name": "kapak_211.jpg",
+        "mimeType": "image/jpeg",
+        "size": 313910,
+        "modifiedTime": "2026-11-25T16:42:13.062Z"
       }
     ],
     "long_videos": [],
@@ -2126,12 +2224,12 @@
       "category_name": "Biyoakustik ve Veterinerlik",
       "pinned_comment": "Kedilerin 7/24 yanında taşıdığı yerleşik fizik tedavi cihazıyla gezmesi şaka mı?! 😻🔊 Evinde kedi olanlar kedisinin adını yoruma yazsın! 👇",
       "youtube_url": "",
-      "has_drive_video": false,
-      "drive_video_id": "",
-      "drive_video_size_mb": 0,
+      "has_drive_video": true,
+      "drive_video_id": "1D5NnV25BQDLRQkoYZzbXGRHkueRoDMJ-",
+      "drive_video_size_mb": 13.52,
       "expected_cover": "kapak_205.jpg",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "17SO6XcOIpCKdK4BWXXbzHvxxgxQUfURi"
     },
     {
       "row": 187,
@@ -2158,12 +2256,12 @@
       "category_name": "Biyoloji ve Biyomekanik",
       "pinned_comment": "1.200 G kuvvetle günde 12.000 kez kafa atıp baş ağrısı bile çekmemek... Doğanın mühendisliği karşısında şapka çıkarılır! 🤯🐦👇",
       "youtube_url": "",
-      "has_drive_video": false,
-      "drive_video_id": "",
-      "drive_video_size_mb": 0,
+      "has_drive_video": true,
+      "drive_video_id": "1Qv8GGKQd7I00YeFZqeXH--SEGq9uwDca",
+      "drive_video_size_mb": 13.02,
       "expected_cover": "kapak_206.jpg",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1g6AlTj2ELzCOwfZ-MP8ZAeyul5kzN7ob"
     },
     {
       "row": 188,
@@ -2190,12 +2288,12 @@
       "category_name": "Optik ve Atmosfer Fiziği",
       "pinned_comment": "Çocukluğumun en büyük gizemi çözüldü: Meğer asfalttaki su birikintisi değil, yere bükülen gökyüzünü izliyormuşuz! 🛣️☀️👇",
       "youtube_url": "",
-      "has_drive_video": false,
-      "drive_video_id": "",
-      "drive_video_size_mb": 0,
+      "has_drive_video": true,
+      "drive_video_id": "1Szuy7f0NTAfrgY-9cC56haD6JiKESvU1",
+      "drive_video_size_mb": 18.45,
       "expected_cover": "kapak_207.jpg",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1E1ck2he1LhJVC7yhY554ZttvqqWk4O8i"
     },
     {
       "row": 189,
@@ -2221,12 +2319,12 @@
       "category_name": "Atmosfer Fiziği ve Optik",
       "pinned_comment": "Yıllarca gökkuşağının ucunda hazine var diye anlatıldı, meğer ucu bile yokmuş çünkü tam çembermiş! 🤯🌈👇",
       "youtube_url": "",
-      "has_drive_video": false,
-      "drive_video_id": "",
-      "drive_video_size_mb": 0,
+      "has_drive_video": true,
+      "drive_video_id": "1PAwePjbqDBxh-9qzYxtZluCHHjxT17wC",
+      "drive_video_size_mb": 9.65,
       "expected_cover": "kapak_208.jpg",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "196IxK9JnzFaqfGZdMzt7Hf-00AOTBxA9"
     },
     {
       "row": 190,
@@ -2252,12 +2350,12 @@
       "category_name": "Aerodinamik ve Akışkanlar Fiziği",
       "pinned_comment": "Eskimiş ve darbe almış topların yepyeni pürüzsüz toplardan 2 kat uzağa gitmesi fiziğin en güzel sürprizlerinden biri! ⛳💨👇",
       "youtube_url": "",
-      "has_drive_video": false,
-      "drive_video_id": "",
-      "drive_video_size_mb": 0,
+      "has_drive_video": true,
+      "drive_video_id": "1Ral2duxqMsLBDDaNQDRZfVCSK_nVzY1G",
+      "drive_video_size_mb": 16.31,
       "expected_cover": "kapak_209.jpg",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "15ddZlwOxXvCHdBtcuqnupyE6OPJYJCLX"
     },
     {
       "row": 191,
@@ -2283,12 +2381,12 @@
       "category_name": "Termodinamik ve Akustik",
       "pinned_comment": "Tenceredeki her bir mısır tanesinin 9 barlık minyatür düdüklü tencere gibi patlaması... 🍿💥 Tuzlu mu tatlı mı, senin favorin hangisi? 👇",
       "youtube_url": "",
-      "has_drive_video": false,
-      "drive_video_id": "",
-      "drive_video_size_mb": 0,
+      "has_drive_video": true,
+      "drive_video_id": "1tIS6Z2Fms62qJNulFAkdxOkostBcjbHx",
+      "drive_video_size_mb": 11.66,
       "expected_cover": "kapak_210.jpg",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1wYwTuxfT7ynF1Al1E5xjU9766W16yDru"
     },
     {
       "row": 192,
@@ -2315,12 +2413,12 @@
       "category_name": "Aerodinamik ve Spor Mühendisliği",
       "pinned_comment": "Meğer o tüyler süs için değil, saatte 200 km hızla gelen topu frenleyen aerodinamik paraşütmüş! 🤯🎾👇",
       "youtube_url": "",
-      "has_drive_video": false,
-      "drive_video_id": "",
-      "drive_video_size_mb": 0,
+      "has_drive_video": true,
+      "drive_video_id": "1elSFaad9poZWEBiMqtRsaunqiC52jpN0",
+      "drive_video_size_mb": 13.56,
       "expected_cover": "kapak_211.jpg",
-      "has_drive_cover": false,
-      "drive_cover_id": ""
+      "has_drive_cover": true,
+      "drive_cover_id": "1z_nNbV9kgmoW0Z38M6TyZdU8gTQXAyY0"
     },
     {
       "row": 199,
