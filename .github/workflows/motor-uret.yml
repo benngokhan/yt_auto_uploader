@@ -1,9 +1,9 @@
-name: Boston206 — remaining8images with approved096voice /097
+name: Boston206 — 097 recovery (reuse 8 images + approved voice, review & render once)
 on:
   workflow_dispatch:
     inputs:
       konu:
-        description: One-use authorization marker
+        description: One-use recovery authorization marker
         required: true
         type: string
       kuru:
@@ -13,11 +13,11 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: boston206-autonomous-097-once
+  group: boston206-recovery-097-once
   cancel-in-progress: false
 jobs:
   produce:
-    if: ${{ github.repository == 'benngokhan/yt_auto_uploader' && github.ref == 'refs/heads/arena/fatih-remaining-097' && inputs.konu == '__FATIH_AUTONOMOUS_097_ONCE__' && inputs.kuru == 'true' && github.run_attempt == 1 }}
+    if: ${{ github.repository == 'benngokhan/yt_auto_uploader' && github.ref == 'refs/heads/arena/fatih-remaining-097-recovery' && inputs.konu == '__FATIH_AUTONOMOUS_097_RECOVERY_ONCE__' && inputs.kuru == 'true' && github.run_attempt == 1 }}
     runs-on: ubuntu-latest
     timeout-minutes: 40
     permissions:
@@ -30,16 +30,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install pinned local render and alignment dependencies
-        run: python -m pip install 'Pillow==11.1.0' 'numpy==2.2.6' 'imageio-ffmpeg==0.6.0' 'faster-whisper==1.2.1' 'soundfile==0.13.1' 'scipy==1.15.3'
-      - name: Import approved voice from completed096artifact, no new TTS
+      - name: Install pinned render dependencies
+        run: python -m pip install 'Pillow==11.1.0' 'numpy==2.2.6' 'imageio-ffmpeg==0.6.0'
+      - name: Import the eight reviewed images and approved voice from run150
         uses: actions/download-artifact@v4
         with:
           github-token: ${{ github.token }}
-          run-id: 45526381049
-          name: boston206-charon-visual096-results
-          path: imported_096
-      - name: Permanently reserve this single run before any inference
+          run-id: 45528376909
+          name: boston206-remaining097-results
+          path: imported_097
+      - name: Permanently reserve this single recovery run before any inference
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -47,37 +47,32 @@ jobs:
           import base64,json,os,urllib.request
           from pathlib import Path
           repo=os.environ['GITHUB_REPOSITORY']
-          if repo!='benngokhan/yt_auto_uploader' or os.environ['GITHUB_REF']!='refs/heads/arena/fatih-remaining-097' or os.environ['GITHUB_RUN_ATTEMPT']!='1':raise SystemExit('Wrong context; no inference')
-          claim={'authorization':'FATIH_REMAINING_IMAGES_097_ONCE','run_id':os.environ['GITHUB_RUN_ID'],'state':'consumed_before_inference','max_tts':0,'max_images':8,'max_visual_reviews':1,'automatic_retry':False,'publication':False}
+          if repo!='benngokhan/yt_auto_uploader' or os.environ['GITHUB_REF']!='refs/heads/arena/fatih-remaining-097-recovery' or os.environ['GITHUB_RUN_ATTEMPT']!='1':raise SystemExit('Wrong context; no inference')
+          claim={'authorization':'FATIH_REMAINING_IMAGES_097_RECOVERY_ONCE','run_id':os.environ['GITHUB_RUN_ID'],'state':'consumed_before_inference','source_run':45528376909,'reused_images':8,'max_tts':0,'max_new_images':0,'max_visual_reviews':1,'automatic_retry':False,'publication':False}
           raw=json.dumps(claim).encode()
-          body={'branch':'arena/fatih-remaining-097','message':'Reserve single097authorization [skip ci]','content':base64.b64encode(raw).decode()}
-          req=urllib.request.Request('https://api.github.com/repos/'+repo+'/contents/arena_097/claimed.json',data=json.dumps(body).encode(),method='PUT',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'})
+          body={'branch':'arena/fatih-remaining-097-recovery','message':'Reserve single097 recovery authorization [skip ci]','content':base64.b64encode(raw).decode()}
+          req=urllib.request.Request('https://api.github.com/repos/'+repo+'/contents/arena_097_recovery/claimed.json',data=json.dumps(body).encode(),method='PUT',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'})
           class NoRedirect(urllib.request.HTTPRedirectHandler):
               def redirect_request(self,*a,**k):return None
           try:
               with urllib.request.build_opener(NoRedirect).open(req,timeout=40) as r:
                   if r.status!=201:raise ValueError()
-          except Exception:raise SystemExit('Reservation failed or uncertain; no retry or inference')
-          Path('arena_097/claimed.json').write_bytes(raw)
-          print('097authorization permanently consumed for this single run')
+          except Exception:raise SystemExit('Recovery reservation failed or uncertain; no retry or inference')
+          Path('arena_097_recovery/claimed.json').write_bytes(raw)
+          print('097 recovery authorization permanently consumed for this single run')
           PY
-      - name: Reuse approved voice, generate remaining images, review and render once
+      - name: Reuse voice and images, review once and render once
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: python arena_097/continue.py
-      - name: Save only generated outputs and nonsecret call journals
+        run: python arena_097_recovery/continue.py
+      - name: Save only generated outputs and nonsecret review journals
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: boston206-remaining097-results
+          name: boston206-recovery097-results
           path: |
-            result_097/
-            work_097/assets/
-            work_097/voice_provenance.json
-            work_097/alignment.json
-            work_097/asset_review.json
-            work_097/asr_validation.json
+            result_097_recovery/
+            work_097_recovery/asset_review.json
+            work_097_recovery/plan.json
           if-no-files-found: ignore
           retention-days: 7
