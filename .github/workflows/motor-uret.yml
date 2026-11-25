@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   produce:
-    if: ${{ github.repository == 'benngokhan/yt_auto_uploader' && github.ref == 'refs/heads/arena/fatih-remaining-097-recovery3' && inputs.konu == '__FATIH_AUTONOMOUS_097_RECOVERY3_ONCE__' && inputs.kuru == 'true' && github.run_attempt == 1 }}
+    if: ${{ github.repository == 'benngokhan/yt_auto_uploader' && github.ref == 'refs/heads/arena/fatih-remaining-097-recovery4' && inputs.konu == '__FATIH_AUTONOMOUS_097_RECOVERY4_ONCE__' && inputs.kuru == 'true' && github.run_attempt == 1 }}
     runs-on: ubuntu-latest
     timeout-minutes: 40
     permissions:
@@ -47,10 +47,10 @@ jobs:
           import base64,json,os,urllib.request
           from pathlib import Path
           repo=os.environ['GITHUB_REPOSITORY']
-          if repo!='benngokhan/yt_auto_uploader' or os.environ['GITHUB_REF']!='refs/heads/arena/fatih-remaining-097-recovery3' or os.environ['GITHUB_RUN_ATTEMPT']!='1':raise SystemExit('Wrong context; no inference')
-          claim={'authorization':'FATIH_REMAINING_IMAGES_097_RECOVERY3_ONCE','run_id':os.environ['GITHUB_RUN_ID'],'state':'consumed_before_inference','source_run':45528376909,'reused_images':8,'max_tts':0,'max_new_images':0,'max_visual_reviews':1,'automatic_retry':False,'publication':False}
+          if repo!='benngokhan/yt_auto_uploader' or os.environ['GITHUB_REF']!='refs/heads/arena/fatih-remaining-097-recovery4' or os.environ['GITHUB_RUN_ATTEMPT']!='1':raise SystemExit('Wrong context; no inference')
+          claim={'authorization':'FATIH_REMAINING_IMAGES_097_RECOVERY4_ONCE','run_id':os.environ['GITHUB_RUN_ID'],'state':'consumed_before_inference','source_run':45528376909,'reused_images':8,'max_tts':0,'max_new_images':0,'max_visual_reviews':1,'automatic_retry':False,'publication':False}
           raw=json.dumps(claim).encode()
-          body={'branch':'arena/fatih-remaining-097-recovery3','message':'Reserve single097 recovery authorization [skip ci]','content':base64.b64encode(raw).decode()}
+          body={'branch':'arena/fatih-remaining-097-recovery4','message':'Reserve single097 recovery authorization [skip ci]','content':base64.b64encode(raw).decode()}
           req=urllib.request.Request('https://api.github.com/repos/'+repo+'/contents/arena_097_recovery/claimed.json',data=json.dumps(body).encode(),method='PUT',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'})
           class NoRedirect(urllib.request.HTTPRedirectHandler):
               def redirect_request(self,*a,**k):return None

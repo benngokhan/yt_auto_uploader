@@ -12,8 +12,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / 'arena_096'))
 import produce as providers
 
-AUTH = 'FATIH_REMAINING_IMAGES_097_RECOVERY3_ONCE'
-BRANCH = 'arena/fatih-remaining-097-recovery3'
+AUTH = 'FATIH_REMAINING_IMAGES_097_RECOVERY4_ONCE'
+BRANCH = 'arena/fatih-remaining-097-recovery4'
 VOICE_SHA = 'c24a2b380eb5bb16db767a01869664133831200f411574e64c2645fc05842392'
 SOURCE_RUN = 45528376909
 IMPORT = ROOT / 'imported_097'
@@ -21,7 +21,7 @@ SRC_WORK = IMPORT / 'work_097'
 SRC_OUT = IMPORT / 'result_097'
 WORK = ROOT / 'work_097_recovery'
 OUT = ROOT / 'result_097_recovery'
-REVIEW_MODEL = 'gemini-3.8-flash'
+REVIEW_MODEL = 'gemini-3.6-flash'
 SCENE_FILES = ['scene%02d.png' % i for i in range(1, 9)]
 
 
