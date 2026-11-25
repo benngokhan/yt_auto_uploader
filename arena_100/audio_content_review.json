@@ -1,0 +1,81 @@
+{
+  "ending_matches": true,
+  "state": "audio_verified",
+  "method": "unprompted waveform-only acoustic segmentation; no expected-text prompt",
+  "similarity": 0.9953488372093023,
+  "threshold": 0.95,
+  "line_coverage": [
+    1.0,
+    1.0,
+    1.0,
+    0.9848484848484849,
+    1.0,
+    1.0,
+    0.9821428571428571,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "minimum_line_coverage": 0.85,
+  "numeric_entities_match": true,
+  "expected_numeric_entities": [
+    "1",
+    "1",
+    "1479",
+    "1.5",
+    "1480",
+    "1",
+    "1",
+    "1"
+  ],
+  "recognized_numeric_entities": [
+    "1",
+    "1",
+    "1479",
+    "1.5",
+    "1480",
+    "1",
+    "1",
+    "1"
+  ],
+  "recognized_text": "Fatih Sultan Mehmet, Venedikten bir ressam istedi. Peki bu portrenin arkasında nasıl bir hikaye vardı? Yıl 1479 Fatih'in isteği üzerine, Venedik, ressam Centi ile Bellini'yi İstanbul'a gönderdi. Bellini burada yaklaşık 1,5 yıl kaldı. Bu ziyaret, yalnızca sanatla ilgili değildi. İki tarafta siyasi ve ticari ilişkilerini geliştirmek istiyordu. 1480 tarihli portrede Fatih Taş bir kemerin içinde resmedildi. İşlemeli kumaşlar, inciler ve taçlar hükümdarın ihtişamını vurguluyordu. Bu tablo, bir sanat eserinin... Aynı zamanda diplomatik bir buluşmanın izi olabileceğini gösteriyor. Fatih'in hikayesinde fırçaya da yer vardı. Merakını besle, bilgi dozunu takip et.",
+  "clips": [
+    {
+      "start": 0.0,
+      "end": 10.68,
+      "text": "Fatih Sultan Mehmet, Venedikten bir ressam istedi. Peki bu portrenin arkasında nasıl bir hikaye vardı? Yıl 1479"
+    },
+    {
+      "start": 10.68,
+      "end": 20.12,
+      "text": "Fatih'in isteği üzerine, Venedik, ressam Centi ile Bellini'yi İstanbul'a gönderdi. Bellini burada yaklaşık 1,5 yıl kaldı."
+    },
+    {
+      "start": 20.12,
+      "end": 31.06,
+      "text": "Bu ziyaret, yalnızca sanatla ilgili değildi. İki tarafta siyasi ve ticari ilişkilerini geliştirmek istiyordu. 1480 tarihli portrede Fatih"
+    },
+    {
+      "start": 31.06,
+      "end": 41.26,
+      "text": "Taş bir kemerin içinde resmedildi. İşlemeli kumaşlar, inciler ve taçlar hükümdarın ihtişamını vurguluyordu. Bu tablo, bir sanat eserinin..."
+    },
+    {
+      "start": 41.26,
+      "end": 51.771,
+      "text": "Aynı zamanda diplomatik bir buluşmanın izi olabileceğini gösteriyor. Fatih'in hikayesinde fırçaya da yer vardı. Merakını besle, bilgi dozunu takip et."
+    }
+  ],
+  "original_full_asr": {
+    "text": "Fatih’s sultan Mehmet, Venedik'ten bir ressam istedi. Peki bu portrenin arkasında nasıl bir hikâye vardı? Yıl bin dört yüz yetmiş dokuz. Fatih'in isteği üzerine Venedik, ressam Gentile Bellini'yi İstanbul'a gönderdi. Bellini burada yaklaşık bir buçuk yıl kaldı. Bu ziyaret yalnızca sanatla ilgili değildi. İki tarafta siyasi ve ticari ilişkilerini geliştirmek istiyordu. 1480 tarihli portrede Fatih taş bir kemerin içinde resmedildi. İşlemeli kumaşlar, inciler ve taçlar hükümdarın ihtişamını vurguluyordu. Bu tablo, bir sanat eserinin aynı zamanda diplomatik bir buluşmanın izi olabileceğini gösteriyor. Fatih'in hikayesinde fırçaya da yer vardı. Merakını besle, bilgi dozunu takip et.",
+    "similarity": 0.9800520381613183
+  },
+  "automatic_tts_retry": false,
+  "timings_validated_by_this_check": false,
+  "caveat": "ASR agreement is not proof of pronunciation or historical truth.",
+  "audio_sha256": "c24a2b380eb5bb16db767a01869664133831200f411574e64c2645fc05842392",
+  "natural_seconds": 51.77095833333333,
+  "new_provider_calls": 0
+}

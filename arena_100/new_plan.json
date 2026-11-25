@@ -1,0 +1,84 @@
+{
+  "profile": "099 hardened candidate — NOT deployed or generation-authorized",
+  "target_seconds": 53,
+  "voice_speed_factor": 1,
+  "motor_integration": false,
+  "voice_id": "Charon",
+  "script_lines": [
+    "Fatih Sultan Mehmet, Venedik’ten bir ressam istedi.",
+    "Peki bu portrenin arkasında nasıl bir hikâye vardı?",
+    "Yıl bin dört yüz yetmiş dokuz.",
+    "Fatih’in isteği üzerine Venedik, ressam Gentile Bellini’yi İstanbul’a gönderdi.",
+    "Bellini burada yaklaşık bir buçuk yıl kaldı.",
+    "Bu ziyaret yalnızca sanatla ilgili değildi.",
+    "İki taraf da siyasi ve ticari ilişkilerini geliştirmek istiyordu.",
+    "Bin dört yüz seksen tarihli portrede Fatih, taş bir kemerin içinde resmedildi.",
+    "İşlemeli kumaşlar, inciler ve taçlar, hükümdarın ihtişamını vurguluyordu.",
+    "Bu tablo, bir sanat eserinin aynı zamanda diplomatik bir buluşmanın izi olabileceğini gösteriyor.",
+    "Fatih’in hikâyesinde fırçaya da yer vardı.",
+    "Merakını besle, Bilgi Dozu’nu takip et!"
+  ],
+  "source": {
+    "reviewed": true,
+    "url": "https://www.nationalgallery.org.uk/paintings/gentile-bellini-the-sultan-mehmet-ii",
+    "supporting_url": "https://www.open.edu/openlearn/history-the-arts/visual-art/art-renaissance-venice/content-section-1.4",
+    "label": "National Gallery • Open University"
+  },
+  "budget": {
+    "new_images_max": 0,
+    "full_narrations_max": 0,
+    "visual_review_max": 0,
+    "automatic_generation_retries": false,
+    "publication": false
+  },
+  "design": {
+    "template": "Boston v1",
+    "cover_style": 2,
+    "cover_title": [
+      "FATİH’İN",
+      "RESSAMI"
+    ],
+    "follow_button": "compact260x68 singlehairline,larger42pxtext,nobellinside,smallmouse",
+    "cover_category": "TARİH / İSTANBUL / 1480",
+    "cover_subtitle": "Venedik’ten İstanbul’a:\nBir portrenin hikâyesi."
+  },
+  "template_version": "boston-v1-206.2",
+  "voice_provider": "gemini",
+  "voice_model": "gemini-2.5-flash-preview-tts",
+  "highlight_words": [
+    "ressam",
+    "bellini’yi",
+    "portrede",
+    "diplomatik",
+    "fırçaya"
+  ],
+  "visual_disclosure": "Yapay zekâ ile temsili tarihsel canlandırma",
+  "authorization_id": "UNAUTHORIZED_099_OFFLINE_ONLY",
+  "scene_group_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    7,
+    9
+  ],
+  "voice_direction": "Türkçe, sakin ve kendinden emin anlat. İlginç bir bilgiyi bir arkadaşınla paylaşıyormuş gibi konuş. Merakı bağırarak değil, doğru kelimeleri hafifçe vurgulayarak kur. Reklam spikeri, fragman veya ders anlatımı tonuna girme. Cümle sonlarını gereksiz uzatma; noktalarda doğal, kısa nefesler bırak. Ne acele et ne de ağırlaştır. Yalnız aşağıdaki metni oku; hiçbir kelime ekleme veya çıkarma.",
+  "scene_prompts": [
+    "Vertical 9:16 cinematic historical illustration, set only in 1479–1480. Warm charcoal, burgundy, restrained old gold, soft natural window light and subtle film grain. This is an imagined reconstruction, not an authentic archive or exact likeness. Keep the upper left and lower quarter clear for overlays. Mehmed II, interpretive likeness: late forties, light olive skin, long aquiline nose, short dark beard, large wrapped white Ottoman turban and deep red fur-edged caftan. Gentile Bellini, interpretive likeness: about fifty, greying hair, plain dark soft cap and maroon robe. Use a rear or obscured side view to avoid inventing inconsistent faces. Painter at easel on the left with his back to us; sultan seated on the right. Medium-wide shot in a plain stone workshop. No other paintings or invented court insignia. Hard exclusions: NO spectacles, no modern eyeglass arms, no fez, no modern tailoring, no paint tubes, no electricity, no modern transport, no tea or coffee cups, no text or invented inscriptions, no watermark or interface. No invented monumental skyline, no four- or six-minaret imperial complex, no post1480 buildings. If architecture is uncertain, use a plain interior or shallow focus instead. Keep each named character consistent in age, facial structure, beard and clothing across scenes. ",
+    "Vertical 9:16 cinematic historical illustration, set only in 1479–1480. Warm charcoal, burgundy, restrained old gold, soft natural window light and subtle film grain. This is an imagined reconstruction, not an authentic archive or exact likeness. Keep the upper left and lower quarter clear for overlays. An anonymous Venetian envoy boards a simple late-medieval wooden sailing vessel at a lagoon quay in 1479. Wide exterior, weathered timber, ropes and mist. Only indistinct medieval buildings in the distance; no recognizable invented palace. Hard exclusions: NO spectacles, no modern eyeglass arms, no fez, no modern tailoring, no paint tubes, no electricity, no modern transport, no tea or coffee cups, no text or invented inscriptions, no watermark or interface. No invented monumental skyline, no four- or six-minaret imperial complex, no post1480 buildings. If architecture is uncertain, use a plain interior or shallow focus instead. Keep each named character consistent in age, facial structure, beard and clothing across scenes. ",
+    "Vertical 9:16 cinematic historical illustration, set only in 1479–1480. Warm charcoal, burgundy, restrained old gold, soft natural window light and subtle film grain. This is an imagined reconstruction, not an authentic archive or exact likeness. Keep the upper left and lower quarter clear for overlays. Macro still life: blank parchment tied with cord, a plain inkwell, ceramic pigment bowls and a wooden brush on a walnut desk. No signature, seal or writing; no people. Hard exclusions: NO spectacles, no modern eyeglass arms, no fez, no modern tailoring, no paint tubes, no electricity, no modern transport, no tea or coffee cups, no text or invented inscriptions, no watermark or interface. No invented monumental skyline, no four- or six-minaret imperial complex, no post1480 buildings. If architecture is uncertain, use a plain interior or shallow focus instead. Keep each named character consistent in age, facial structure, beard and clothing across scenes. ",
+    "Vertical 9:16 cinematic historical illustration, set only in 1479–1480. Warm charcoal, burgundy, restrained old gold, soft natural window light and subtle film grain. This is an imagined reconstruction, not an authentic archive or exact likeness. Keep the upper left and lower quarter clear for overlays. Gentile Bellini, interpretive likeness: about fifty, greying hair, plain dark soft cap and maroon robe. Use a rear or obscured side view to avoid inventing inconsistent faces. Rear view, carrying a small wooden paintbox into a modest stone courtyard. An anonymous Ottoman attendant, also seen from behind, wears a wrapped white turban and green caftan. Plain colonnade and cypress, no skyline or identifiable monument. Hard exclusions: NO spectacles, no modern eyeglass arms, no fez, no modern tailoring, no paint tubes, no electricity, no modern transport, no tea or coffee cups, no text or invented inscriptions, no watermark or interface. No invented monumental skyline, no four- or six-minaret imperial complex, no post1480 buildings. If architecture is uncertain, use a plain interior or shallow focus instead. Keep each named character consistent in age, facial structure, beard and clothing across scenes. ",
+    "Vertical 9:16 cinematic historical illustration, set only in 1479–1480. Warm charcoal, burgundy, restrained old gold, soft natural window light and subtle film grain. This is an imagined reconstruction, not an authentic archive or exact likeness. Keep the upper left and lower quarter clear for overlays. Gentile Bellini, interpretive likeness: about fifty, greying hair, plain dark soft cap and maroon robe. Use a rear or obscured side view to avoid inventing inconsistent faces. Close side view mixing earth-red pigments on a wooden palette. Canvas seen from behind on the right, modest workshop. No sultan visible; no face-forward view. Hard exclusions: NO spectacles, no modern eyeglass arms, no fez, no modern tailoring, no paint tubes, no electricity, no modern transport, no tea or coffee cups, no text or invented inscriptions, no watermark or interface. No invented monumental skyline, no four- or six-minaret imperial complex, no post1480 buildings. If architecture is uncertain, use a plain interior or shallow focus instead. Keep each named character consistent in age, facial structure, beard and clothing across scenes. ",
+    "Vertical 9:16 cinematic historical illustration, set only in 1479–1480. Warm charcoal, burgundy, restrained old gold, soft natural window light and subtle film grain. This is an imagined reconstruction, not an authentic archive or exact likeness. Keep the upper left and lower quarter clear for overlays. Two anonymous diplomatic envoys, NOT the sultan or Bellini: Ottoman envoy in white turban and green caftan on the left, Venetian envoy in dark cap and maroon robe on the right. Oblique view in a modest closed interior, plain table with blank parchment ONLY. No beverages, NOoutdoorview: no windows showing scenery, no mosques, no skyline, no spectacles. Symbolic diplomacy, not a documented exact meeting. Hard exclusions: NO spectacles, no modern eyeglass arms, no fez, no modern tailoring, no paint tubes, no electricity, no modern transport, no tea or coffee cups, no text or invented inscriptions, no watermark or interface. No invented monumental skyline, no four- or six-minaret imperial complex, no post1480 buildings. If architecture is uncertain, use a plain interior or shallow focus instead. Keep each named character consistent in age, facial structure, beard and clothing across scenes. ",
+    "Vertical 9:16 cinematic historical illustration, set only in 1479–1480. Warm charcoal, burgundy, restrained old gold, soft natural window light and subtle film grain. This is an imagined reconstruction, not an authentic archive or exact likeness. Keep the upper left and lower quarter clear for overlays. Mehmed II, interpretive likeness: late forties, light olive skin, long aquiline nose, short dark beard, large wrapped white Ottoman turban and deep red fur-edged caftan. An interpretive painted portrait on an easel in a dim workshop, using a stone-arch composition and embroidered cloth with pearls. NOT a photo or faithful reproduction of the original Bellini painting. No invented inscriptions or claims about crown meanings; no physical crowns perched on the easel. No actual sitter standing beside the painting. Hard exclusions: NO spectacles, no modern eyeglass arms, no fez, no modern tailoring, no paint tubes, no electricity, no modern transport, no tea or coffee cups, no text or invented inscriptions, no watermark or interface. No invented monumental skyline, no four- or six-minaret imperial complex, no post1480 buildings. If architecture is uncertain, use a plain interior or shallow focus instead. Keep each named character consistent in age, facial structure, beard and clothing across scenes. ",
+    "Vertical 9:16 cinematic historical illustration, set only in 1479–1480. Warm charcoal, burgundy, restrained old gold, soft natural window light and subtle film grain. This is an imagined reconstruction, not an authentic archive or exact likeness. Keep the upper left and lower quarter clear for overlays. Quiet closing still life: three wooden brushes, a used wooden palette, folded linen and a ceramic pigment pot on a walnut table. No people, faces, portraits, cups or buildings. Calm dark middle for the closing follow button. Hard exclusions: NO spectacles, no modern eyeglass arms, no fez, no modern tailoring, no paint tubes, no electricity, no modern transport, no tea or coffee cups, no text or invented inscriptions, no watermark or interface. No invented monumental skyline, no four- or six-minaret imperial complex, no post1480 buildings. If architecture is uncertain, use a plain interior or shallow focus instead. Keep each named character consistent in age, facial structure, beard and clothing across scenes. "
+  ],
+  "visual_acceptance_policy": {
+    "required_review": "strict_six_checks_each_scene",
+    "fail_on_period_uncertainty": true,
+    "provider_error_is_not_pass": true,
+    "publication_approved": false
+  }
+}
