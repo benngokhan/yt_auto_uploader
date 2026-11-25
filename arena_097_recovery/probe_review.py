@@ -8,14 +8,10 @@ WORK = ROOT / 'imported_097' / 'work_097'
 rows = json.loads((ROOT / 'imported_097' / 'result_097' / 'asset_review.json').read_text())
 plan = json.loads((ROOT / 'arena_096' / 'plan.json').read_text())
 
-prompt = ('You are a strict historical documentary image reviewer. These AI reconstructions '
-          'illustrate the Ottoman Sultan Mehmed II inviting Venetian painter Gentile Bellini to '
-          'Istanbul around 1479-1480. They are NOT photographs of original artwork or exact '
-          'historical likenesses. Evaluate the images in supplied order against their individual '
-          'requested scenes. Reject conspicuous modern objects, obvious malformed people/hands, '
-          'unreadable fabricated labels or UI, severe factual contradictions, or near-duplicate '
-          'scenes. Output ONLY JSON: {"scenes":[{"scene":1,"pass":true,"note":"..."}]}. '
-          'Passing is only automated review, not human approval. Requested scenes:\n'
+prompt = ('Strict documentary image review. These are AI reconstructions of Mehmed II and Gentile '
+          'Bellini in Istanbul ~1479-1480, not photographs. Reject modern objects, malformed '
+          'people/hands, unreadable fabricated text, or near-duplicates. Output ONLY JSON '
+          '{"scenes":[{"scene":1,"pass":true,"note":"..."}]}. Requested scenes:\n'
           + json.dumps(plan['scene_prompts'], ensure_ascii=False))
 
 
@@ -42,35 +38,32 @@ def post(model, parts):
         headers={'Content-Type': 'application/json', 'x-goog-api-key': KEY})
     started = time.time()
     try:
-        with urllib.request.urlopen(req, timeout=180) as r:
-            status, text = r.status, r.read(400).decode('utf-8', 'replace')
+        with urllib.request.urlopen(req, timeout=120) as r:
+            status, text = r.status, r.read(300).decode('utf-8', 'replace')
     except urllib.error.HTTPError as e:
-        status, text = e.code, e.read(300).decode('utf-8', 'replace')
+        status, text = e.code, e.read(200).decode('utf-8', 'replace')
     except Exception as e:
-        status, text = type(e).__name__, str(e)[:200]
+        status, text = type(e).__name__, str(e)[:150]
     print('REVIEW', model, 'bytes=' + str(len(body)), status, round(time.time() - started, 1),
-          text[:200].replace('\n', ' '), flush=True)
+          text[:160].replace('\n', ' '), flush=True)
+    return status
 
 
-model = 'gemini-3.6-flash'
+models = ['gemini-2.5-pro', 'gemini-3.1-pro-preview', 'gemini-pro-latest',
+          'gemini-3-flash-preview', 'gemini-omni-1.2-flash', 'gemini-3.1-flash-lite']
+single = [{'text': prompt},
+          {'inlineData': {'mimeType': 'image/jpeg', 'data': jpeg(load(rows[0], (270, 480)))}}]
 
-# A: one image
-parts = [{'text': prompt}, {'inlineData': {'mimeType': 'image/jpeg', 'data': jpeg(load(rows[0], (270, 480)))}}]
-post(model, parts)
-
-# B: single 4x2 contact sheet
 sheet = Image.new('RGB', (1080, 960), (0, 0, 0))
 for i, row in enumerate(rows):
-    tile = load(row, (270, 480))
-    sheet.paste(tile, ((i % 4) * 270, (i // 4) * 480))
-parts = [{'text': prompt + '\nThe eight scenes are in one contact sheet, row-major: top-left to '
-          'bottom-right = scenes 1-8.'},
-         {'inlineData': {'mimeType': 'image/jpeg', 'data': jpeg(sheet, 80)}}]
-post(model, parts)
+    sheet.paste(load(row, (270, 480)), ((i % 4) * 270, (i // 4) * 480))
+sheet_parts = [{'text': prompt + '\nOne contact sheet, row-major: top-left to bottom-right = scenes 1-8.'},
+               {'inlineData': {'mimeType': 'image/jpeg', 'data': jpeg(sheet, 80)}}]
 
-# C: eight tiny images
-parts = [{'text': prompt}]
-for row in rows:
-    parts.append({'text': 'Scene ' + str(row['scene'])})
-    parts.append({'inlineData': {'mimeType': 'image/jpeg', 'data': jpeg(load(row, (120, 213)), 70)}})
-post(model, parts)
+ok = []
+for model in models:
+    if post(model, single) == 200:
+        ok.append(model)
+for model in ok:
+    post(model, sheet_parts)
+print('WORKING_MODELS', ok, flush=True)
