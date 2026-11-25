@@ -1631,7 +1631,10 @@ def hizala(ses_yolu: Path, metin: str, ayar: dict) -> dict:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--konu", required=True)
+    ap.add_argument("--konu", required=False)
+    ap.add_argument("--boston-bundle", help="Onaylı Boston206 varlık paketi; yeni üretim sağlayıcısı çağrılmaz")
+    ap.add_argument("--boston-output", help="Yeni ve boş çıktı klasörü")
+    ap.add_argument("--boston-mode", choices=("check", "stills", "render"), default="check")
     ap.add_argument("--sahne", type=int, default=0, help="0 = ayardan oku")
     ap.add_argument("--sure-min", type=float, default=0, help="0 = ayardan oku")
     ap.add_argument("--sure-max", type=float, default=0, help="0 = ayardan oku")
@@ -1642,6 +1645,19 @@ def main() -> int:
     ap.add_argument("--onay-verildi", action="store_true",
                     help="Kullanıcı videoyu izleyip onayladı: Drive + tablo + yayın kuyruğu")
     a = ap.parse_args()
+    if a.boston_bundle:
+        if not a.boston_output:
+            ap.error("--boston-bundle için --boston-output zorunlu")
+        if a.onay_verildi or a.shorts_v2 or a.plan_only or a.sadece_ses:
+            ap.error("Boston206 varlık aktarımı eski üretim/yayın bayraklarıyla birleştirilemez")
+        from boston206_job import run_bundle
+        report = run_bundle(a.boston_bundle, a.boston_output, a.boston_mode)
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return 0
+    if a.boston_output or a.boston_mode != "check":
+        ap.error("Boston seçenekleri --boston-bundle gerektirir")
+    if not a.konu:
+        ap.error("--konu zorunlu")
 
     ayar = ayar_yukle()
     if a.shorts_v2 or a.plan_only:
