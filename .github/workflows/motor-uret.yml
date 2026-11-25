@@ -61,7 +61,7 @@ jobs:
           PY
 
       - name: Add to Drive queue and baslik.xlsx
-        run: python arena_queue_097/queue.py
+        run: python arena_queue_097/kuyruk_ekle.py
 
       - name: Save queue result
         if: ${{ always() }}

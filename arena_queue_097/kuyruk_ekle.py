@@ -26,6 +26,7 @@ from kapak_yukle import upsert_cover  # noqa: E402
 AUTH = "FATIH_097_QUEUE_APPROVED_ONCE"
 BRANCH = "arena/queue-097"
 SOURCE_RUN = 45661166999
+NUMBER = 205
 VIDEO_SHA = "6d0042481a5a76b1c1dc3bf7389c1431846f0d5de04997b75c3a35bf1042fac7"
 VIDEO_BYTES = 16974021
 
@@ -91,6 +92,15 @@ def load_table(drive) -> dict:
     )
 
 
+def drive_file_exists(drive, folder_id: str, name: str) -> bool:
+    res = drive.files().list(
+        q=f"'{folder_id}' in parents and name = '{name}' and trashed = false",
+        pageSize=5,
+        fields="files(id, name)",
+    ).execute()
+    return bool(res.get("files"))
+
+
 def delete_file(drive, file_id: str):
     try:
         drive.files().delete(fileId=file_id).execute()
@@ -115,11 +125,14 @@ def main() -> int:
         return 0
 
     existing = {v["name"] for v in sm.list_drive_videos(drive, sm.SHORTS_VIDEO_FOLDER_ID)}
-    number = teslim.sonraki_numara(drive)
+    current_max = teslim.sonraki_numara(drive) - 1
+    number = NUMBER
     video_name = f"video_{number}.mp4"
     cover_name = f"kapak_{number}.jpg"
     if video_name in existing:
         fail(f"{video_name} zaten var; mükerrer yazım engellendi")
+    if drive_file_exists(drive, sm.SHORTS_COVER_FOLDER_ID, cover_name):
+        fail(f"{cover_name} zaten var; başka videonun kapağını ezmemek için durdu")
 
     video_id = teslim.drive_yukle(drive, video, video_name)
     cover_id = None
@@ -146,6 +159,9 @@ def main() -> int:
         "file": video_name,
         "cover": cover_name,
         "number": number,
+        "current_max_number": current_max,
+        "queue_order_warning": None if number == current_max + 1 else
+        f"205 sabit istendi; mevcut en yüksek numara {current_max}",
         "title": TITLE,
         "category": CATEGORY,
         "source": SOURCE,
