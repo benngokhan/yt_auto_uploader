@@ -8,7 +8,7 @@ try:
  from .boston206_button import follow as premium_follow, animated_button
 except ImportError:
  from boston206_button import follow as premium_follow, animated_button
-TEMPLATE_VERSION='boston-v1-206.1'
+TEMPLATE_VERSION='boston-v1-206.2'
 FONT_DIR=Path(__file__).resolve().parent/'assets'
 W,H,FPS,DURATION,SR=1080,1920,30,53.0,24000
 
@@ -46,8 +46,12 @@ class Story:
   verify_template_lock()
   self.plan=read(self.root/'plan.json');self.edges=validate_edges(self.plan.get('timeline_edges'));self.a=read(self.root/'alignment.json');self.reviews=read(self.root/'asset_review.json')
   source=self.assets/'narration.wav'
+  if self.plan['voice_id']=='Charon':
+   proof=read(self.root/'voice_provenance.json')
+   narration=' '.join(self.plan['script_lines'])
+   if proof.get('voice')!='Charon' or proof.get('model')!='gemini-2.5-flash-preview-tts' or proof.get('provider')!='gemini' or proof.get('speed_factor')!=1 or proof.get('audio_sha256')!=sha(source) or proof.get('narration_sha256')!=hashlib.sha256(narration.encode()).hexdigest():raise ValueError('Explicit Charon provenance required; no voice fallback')
   if sha(source)!=self.a['audio_sha256'] or self.a['asr_similarity']<.95:raise ValueError('Audio not verified')
-  if self.plan['voice_id']!='voice-00' or self.plan['motor_integration'] is not False:raise ValueError('Independent selected voice required')
+  if self.plan['voice_id'] not in {'voice-00','Charon'} or self.plan['motor_integration'] is not False:raise ValueError('Independent selected voice required')
   if [w['word'] for w in self.a['words']]!=' '.join(self.plan['script_lines']).split():raise ValueError('Narration/caption mismatch')
   if [w for g in self.a['groups'] for w in g]!=self.a['words']:raise ValueError('Caption grouping differs from aligned words')
   previous=0.0

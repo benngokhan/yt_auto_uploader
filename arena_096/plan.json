@@ -1,0 +1,78 @@
+{
+  "profile": "Boston v1 / independent206 Fatih Bellini",
+  "target_seconds": 53,
+  "voice_speed_factor": 1,
+  "motor_integration": false,
+  "voice_id": "Charon",
+  "script_lines": [
+    "Fatih Sultan Mehmet, Venedik’ten bir ressam istedi.",
+    "Peki bu portrenin arkasında nasıl bir hikâye vardı?",
+    "Yıl bin dört yüz yetmiş dokuz.",
+    "Fatih’in isteği üzerine Venedik, ressam Gentile Bellini’yi İstanbul’a gönderdi.",
+    "Bellini burada yaklaşık bir buçuk yıl kaldı.",
+    "Bu ziyaret yalnızca sanatla ilgili değildi.",
+    "İki taraf da siyasi ve ticari ilişkilerini geliştirmek istiyordu.",
+    "Bin dört yüz seksen tarihli portrede Fatih, taş bir kemerin içinde resmedildi.",
+    "İşlemeli kumaşlar, inciler ve taçlar, hükümdarın ihtişamını vurguluyordu.",
+    "Bu tablo, bir sanat eserinin aynı zamanda diplomatik bir buluşmanın izi olabileceğini gösteriyor.",
+    "Fatih’in hikâyesinde fırçaya da yer vardı.",
+    "Merakını besle, Bilgi Dozu’nu takip et!"
+  ],
+  "source": {
+    "reviewed": true,
+    "url": "https://www.nationalgallery.org.uk/paintings/gentile-bellini-the-sultan-mehmet-ii",
+    "supporting_url": "https://www.open.edu/openlearn/history-the-arts/visual-art/art-renaissance-venice/content-section-1.4",
+    "label": "National Gallery • Open University"
+  },
+  "budget": {
+    "new_images_max": 8,
+    "full_narrations_max": 1,
+    "visual_review_max": 1,
+    "automatic_generation_retries": false,
+    "publication": false
+  },
+  "design": {
+    "template": "Boston v1",
+    "cover_style": 2,
+    "cover_title": [
+      "FATİH’İN",
+      "RESSAMI"
+    ],
+    "follow_button": "compact260x68 singlehairline,larger42pxtext,nobellinside,smallmouse",
+    "cover_category": "TARİH / İSTANBUL / 1480",
+    "cover_subtitle": "Venedik’ten İstanbul’a:\nBir portrenin hikâyesi."
+  },
+  "template_version": "boston-v1-206.2",
+  "voice_provider": "gemini",
+  "voice_model": "gemini-2.5-flash-preview-tts",
+  "highlight_words": [
+    "ressam",
+    "bellini’yi",
+    "portrede",
+    "diplomatik",
+    "fırçaya"
+  ],
+  "visual_disclosure": "Yapay zekâ ile temsili tarihsel canlandırma",
+  "authorization_id": "FATIH_CHARON_CLOUDFLARE_AUTONOMOUS_096_ONCE",
+  "scene_group_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    7,
+    9
+  ],
+  "voice_direction": "Türkçe, sakin ve kendinden emin anlat. İlginç bir bilgiyi bir arkadaşınla paylaşıyormuş gibi konuş. Merakı bağırarak değil, doğru kelimeleri hafifçe vurgulayarak kur. Reklam spikeri, fragman veya ders anlatımı tonuna girme. Cümle sonlarını gereksiz uzatma; noktalarda doğal, kısa nefesler bırak. Ne acele et ne de ağırlaştır. Yalnız aşağıdaki metni oku; hiçbir kelime ekleme veya çıkarma.",
+  "scene_prompts": [
+    "Vertical 9:16 cinematic realistic historical reconstruction, late fifteenth century Ottoman Istanbul or Venice circa 1479-1480. Warm charcoal, burgundy, restrained old gold, soft natural window light, subtle fine film grain. No text, captions, watermark, interface, empty buttons or modern objects. Historically illustrative, not an authentic archive. Leave upper left and lower quarter relatively uncluttered for overlays. Palace painter chamber. Sultan Mehmed II seated at right, age late forties, light olive complexion, long aquiline nose, short dark beard, large wrapped white Ottoman turban, deep red caftan with fur collar. Anonymous fifty-year-old Venetian painter in plain dark cap and maroon robe, greying hair, back to viewer at left, working at a simple wooden easel. Medium wide respectful composition. No armor or sword.",
+    "Vertical 9:16 cinematic realistic historical reconstruction, late fifteenth century Ottoman Istanbul or Venice circa 1479-1480. Warm charcoal, burgundy, restrained old gold, soft natural window light, subtle fine film grain. No text, captions, watermark, interface, empty buttons or modern objects. Historically illustrative, not an authentic archive. Leave upper left and lower quarter relatively uncluttered for overlays. Venice 1479 lagoon quay, late-medieval wooden sailing boat in foreground, distant Gothic Doge palace as atmospheric approximation, soft dawn mist. An anonymous Venetian envoy in dark robe and cap prepares to board. Distinct exterior wide shot, no modern boats or engines, no flags.",
+    "Vertical 9:16 cinematic realistic historical reconstruction, late fifteenth century Ottoman Istanbul or Venice circa 1479-1480. Warm charcoal, burgundy, restrained old gold, soft natural window light, subtle fine film grain. No text, captions, watermark, interface, empty buttons or modern objects. Historically illustrative, not an authentic archive. Leave upper left and lower quarter relatively uncluttered for overlays. Close still life: blank rolled parchment tied with silk cord, small plain inkwell, wooden brush and ceramic pigment bowls on walnut desk, dark red sleeve partly visible. Symbolic correspondence, no readable marks, no invented signature or historical seal.",
+    "Vertical 9:16 cinematic realistic historical reconstruction, late fifteenth century Ottoman Istanbul or Venice circa 1479-1480. Warm charcoal, burgundy, restrained old gold, soft natural window light, subtle fine film grain. No text, captions, watermark, interface, empty buttons or modern objects. Historically illustrative, not an authentic archive. Leave upper left and lower quarter relatively uncluttered for overlays. An anonymous Venetian painter arrives at a restrained Ottoman stone palace courtyard carrying small wooden paintbox. Rear three quarter view, simple dark cap and maroon robe. Ottoman attendant in white turban and long green caftan guides him under a stone colonnade. Cypress and small fountain. Architecture is approximate, no fez or modern buildings.",
+    "Vertical 9:16 cinematic realistic historical reconstruction, late fifteenth century Ottoman Istanbul or Venice circa 1479-1480. Warm charcoal, burgundy, restrained old gold, soft natural window light, subtle fine film grain. No text, captions, watermark, interface, empty buttons or modern objects. Historically illustrative, not an authentic archive. Leave upper left and lower quarter relatively uncluttered for overlays. Close side view of anonymous middle-aged Venetian painter wearing simple dark cap and maroon robe, mixing earth red pigments on wooden palette in modest workshop. Natural linen canvas seen from back at right, warm side window, no tubes or modern supplies. No Sultan visible.",
+    "Vertical 9:16 cinematic realistic historical reconstruction, late fifteenth century Ottoman Istanbul or Venice circa 1479-1480. Warm charcoal, burgundy, restrained old gold, soft natural window light, subtle fine film grain. No text, captions, watermark, interface, empty buttons or modern objects. Historically illustrative, not an authentic archive. Leave upper left and lower quarter relatively uncluttered for overlays. Two anonymous envoys converse calmly at a low walnut table, Ottoman man in white wrapped turban and green caftan on left, Venetian in plain dark cap and maroon robe on right. Rolled blank parchment, ceramic cups. Soft Bosphorus sailing vessels beyond stone arch. Imagined diplomatic scene, no handshake or named rulers.",
+    "Vertical 9:16 cinematic realistic historical reconstruction, late fifteenth century Ottoman Istanbul or Venice circa 1479-1480. Warm charcoal, burgundy, restrained old gold, soft natural window light, subtle fine film grain. No text, captions, watermark, interface, empty buttons or modern objects. Historically illustrative, not an authentic archive. Leave upper left and lower quarter relatively uncluttered for overlays. Respectful interpretive Renaissance painted portrait on wooden easel: Mehmed II with long aquiline nose, short beard, white wrapped turban, deep red fur edged caftan, face turned to left, dark background, stone arch around head and shoulders, three small gold crowns on each side, embroidered textile with pearls and gems draped over ledge. Inspired by Bellini composition but NOT a photo of the original. No readable inscriptions.",
+    "Vertical 9:16 cinematic realistic historical reconstruction, late fifteenth century Ottoman Istanbul or Venice circa 1479-1480. Warm charcoal, burgundy, restrained old gold, soft natural window light, subtle fine film grain. No text, captions, watermark, interface, empty buttons or modern objects. Historically illustrative, not an authentic archive. Leave upper left and lower quarter relatively uncluttered for overlays. Quiet closing still life: fine wooden brushes and used wooden palette with ivory, burgundy and ochre pigments on worn walnut table, folded linen and ceramic pigment pot. Only a very blurred suggestion of a white turban portrait at upper right. Calm dark middle for a follow button. No people, no text, no decorative pill shapes."
+  ]
+}

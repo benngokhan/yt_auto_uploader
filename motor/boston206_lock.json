@@ -1,10 +1,10 @@
 {
-  "version": "boston-v1-206.1",
+  "version": "boston-v1-206.2",
   "sha256": {
-    "boston206.py": "b03ad1a3538a764c32f5870f2e33f865c38112bae0f19ff582e3a9d3070c480b",
+    "boston206.py": "8c5f9a79eb2ce5739dc766eadd5593621fd301baa8bf4ebdc6fbc7b0fddeefc0",
     "boston206_button.py": "c25379ebc80c5ea3a23d60b9e6dd1de5d9d3c2e6299aa90b32e78a5346122850",
     "boston206_cover.py": "fc170ef0cd69d60e3fd42f81cc51723ee8a08aa9b1d5309927fc83864888b4d3",
-    "boston206_job.py": "c92267d846f10c03ea5623fed3f476f8fca9069cb79a55bee1cf1eedba104abf",
+    "boston206_job.py": "2fc1c7e514f28ae1364b80a5609508ac80ea4a1486922330acf08ec7d50592e4",
     "assets/Poppins-Regular.ttf": "7e65201e9b79159e2300267cc885e16c8dcef2424cdfa09a29bfb0980a94a7ba",
     "assets/Poppins-SemiBold.ttf": "d3bf1bdaf0550e83da9ac0b1d1d9fe6db086835a83aa28578e609a394b9a0286",
     "assets/Anton-Regular.ttf": "a4ba3a92350ebb031da0cb47630ac49eb265082ca1bc0450442f4a83ab947cab"
