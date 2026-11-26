@@ -1,37 +1,37 @@
 {
-  "generated_at": "2026-11-25T13:06:32.994271+00:00",
-  "used_count": 220,
+  "generated_at": "2026-11-26T12:46:46.689139+00:00",
+  "used_count": 221,
   "method": "Drive yükleme tablosu + onay bekleyen metadata + Gemini anlamsal tekrar kontrolü + yerel benzerlik kapısı",
   "suggestions": [
     {
-      "title": "Yıldırım Düşen Kumlar Ne Olur? Dünyanın En Sert Camı Fulgurit Nasıl Doğar? ⚡🏜️",
-      "score": 97,
-      "reason": "Yıldırımın anlık 30 bin derece sıcaklığıyla kumun nasıl bir anda doğal tüp cama dönüştüğünü gösteren güçlü görsel materyal.",
-      "duplicate_check": "Geçmişte yıldırımın aşağıdan yukarı çaktığı işlendi, yıldırımın kum üzerindeki kimyasal/fiziksel etkisi işlenmedi."
-    },
-    {
-      "title": "Neden Uçak Pencereleri Hep Ovaldir? Kare Olursa Ne Olur? ✈️🪟",
+      "title": "Neden En Kalabalık Ortamda Bile Kendi Adımızı Saniyede Duyarız?",
       "score": 96,
-      "reason": "Havacılık tarihini değiştiren de Havilland Comet faciasına dayanan, somut ve her yolcunun merak ettiği mühendislik sırrı.",
-      "duplicate_check": "Geçmişte uçak penceresindeki minik delik ve beyaz boya işlendi, köşe gerilimi ve pencere şekli işlenmedi."
+      "reason": "Beynin kokteyl partisi etkisi adı verilen dikkat filtreleme mekanizmasını soru formatıyla doğrudan izleyiciye soruyor.",
+      "duplicate_check": "Geçmişte beyin refleksleri işlendi ama kokteyl partisi etkisi ve işitsel filtreleme işlenmedi."
     },
     {
-      "title": "Bütün Kolanlar Neden Şişeden Taşar? Mentos Aslında Ne Yapıyor? 🥤💥",
+      "title": "Çay Kaşığı Neden Sürekli Fincanın İçinde Döner ve Dışarı Çıkmaz?",
       "score": 95,
-      "reason": "Mentos ve kola deneyinin sanılanın aksine kimyasal değil saf fiziksel bir yüzey gerilimi ve nükleasyon olayı olduğunu somut bir soruyla anlatır.",
-      "duplicate_check": "Geçmişte asit, gaz veya yüzey gerilimi ile ilgili bu spesifik deney ve nükleasyon süreci işlenmedi."
+      "reason": "Sıvı dinamigi ve Coanda etkisiyle ilgili günlük hayatta sıkça karşılaşılan ama sebebi bilinmeyen fiziksel bir olayı ilk saniyede merak uyandıran soruyla ele alıyor.",
+      "duplicate_check": "Geçmiş başlıklarda ev eşyaları, mutfak veya sıvı dinamikleri bu açıdan işlenmedi."
     },
     {
-      "title": "Çölün Ortasında Serap Nasıl Oluşur? Asfaltta Gördüğün O Su Birikintisi Gerçek mi? 🏜️👁️",
+      "title": "Kuşlar Yüksek Gerilim Hattına Konunca Neden Çarpılmaz?",
       "score": 95,
-      "reason": "Işığın sıcak hava katmanlarındaki kırılma fiziğini görselleştirerek izleyicide 'gerçekten var mı?' hissi uyandırır.",
-      "duplicate_check": "Geçmişte sadece 'görünmeyen su birikintisi' başlığıyla geçildi, bu içerik optik kırılma ve serap fiziğini işleyecek."
+      "reason": "Elektrik akımı potansiyel farkı kuralını herkesin bildüğü klasik bir doğa manzarası üzerinden açıklıyor.",
+      "duplicate_check": "Geçmiş başlıklarda elektrikli yılan balığı işlendi ama kuşların hat üzerindeki fiziksel durumu işlenmedi."
     },
     {
-      "title": "Neden Asla Karınca Yiyerek Hayatta Kalamazsın? Doğa Seni Neden Cezalandırır? 🐜⚠️",
+      "title": "Fermuarı Hızlı Çekince Sıkışan Kumaş Neden Tek Hamlede Açılmaz?",
       "score": 94,
-      "reason": "Karıncaların içindeki formik asit ve hayatta kalma paradoksuna odaklanan güçlü, şaşırtıcı ve somut bir hayatta kalma bilgisi sunar.",
-      "duplicate_check": "Geçmişte karıncaların ağırlığı ve gümüş karıncaların çöl yürüyüşü işlendi, formik asit ve besin paradoksu işlenmedi."
+      "reason": "Herkesin defalarca yaşadığı sinir bozucu bir anı mekanik ve fiziksel bir soruyla açarak anında merak uyandırıyor.",
+      "duplicate_check": "Geçmişte fermuar veya mekanik günlük eşya detayları hiç kullanılmadı."
+    },
+    {
+      "title": "Sabun Neden Suyu Keser? Yüzey Gerilimini Yok Eden O Gizli Güç!",
+      "score": 94,
+      "reason": "Sabun moleküllerinin hidrofobik yapısını somut bir fiziksel deney görüntüsü potansiyeliyle sunuyor.",
+      "duplicate_check": "Geçmiş başlıklarda sabun ve yüzey gerilimi moleküler düzeyde ele alınmadı."
     }
   ]
 }
