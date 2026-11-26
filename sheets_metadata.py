@@ -711,11 +711,16 @@ def get_next_scheduled_video(
     # previous publication (log or YouTube link) advances the expected number.
     completed_names = {str(x).strip().casefold() for x in skip_ids}
     completed_names.update(KNOWN_PUBLISHED_NAMES)
+    existing_names = {str(v.get("name", "")).strip().casefold() for v in videos}
     expected = MIN_SHORTS_NUMBER
     while True:
         name = f"video_{expected}.mp4"
         meta = table.get(name) or {}
         if name.casefold() in completed_names or meta.get("has_youtube_link") or meta.get("youtube_url"):
+            expected += 1
+            continue
+        # Ne tabloda ne Drive'da olan numara hic var olmamis demektir; sirayi kilitlemez.
+        if not meta and name.casefold() not in existing_names:
             expected += 1
             continue
         break
