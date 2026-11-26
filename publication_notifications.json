@@ -8,9 +8,11 @@
     "sent_at": "2026-11-25T01:02:42.199236+00:00"
   },
   "2026-11-25T16:30Z": {
-    "state": "pending",
+    "state": "sent",
     "video_id": "H_2u3XjrmVU",
     "run_id": "45730223979",
-    "payload_sha256": "f94d9fd67667b8421a16369ffceb8a32bb734f6d84dcf0854dc79440f1c57ec9"
+    "payload_sha256": "f94d9fd67667b8421a16369ffceb8a32bb734f6d84dcf0854dc79440f1c57ec9",
+    "message_id": 125,
+    "sent_at": "2026-11-26T00:39:15.403169+00:00"
   }
 }
