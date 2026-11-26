@@ -325,7 +325,7 @@ def make_subtitle_band(text_multiline, highlight_words):
     return arr[:, :, [2, 1, 0, 3]].copy()
 
 def make_static_brand_layers():
-    """Top BİLGİ DOZU pill (y=80..150) + Bottom source & BİLGİ DOZU logo (y=1735..1875)."""
+    """Top BİLGİ DOZU pill (y=210..250) + Bottom source & BİLGİ DOZU logo (y=1735..1875)."""
     top_band = Image.new("RGBA", (W, 80), (0, 0, 0, 0))
     dt = ImageDraw.Draw(top_band)
     # Neon lime rounded pill at x=72, y=14..58
@@ -512,8 +512,8 @@ for f_idx in range(TOTAL_FRAMES):
     if fill_x > bar_x0:
         frame[58:64, bar_x0:fill_x] = np.array([46, 255, 220], dtype=np.uint8)  # BGR for #DCFF2E
 
-    # Static Top Brand Pill (y=74..154) & Bottom Footer (y=1740..1890)
-    blend_band_inplace(frame, 74, top_brand_bgra, 1.0)
+    # Static Top Brand Pill (y=196..276, TikTok ust arayuzunun altinda) & Bottom Footer (y=1740..1890)
+    blend_band_inplace(frame, 196, top_brand_bgra, 1.0)
     blend_band_inplace(frame, 1740, bot_brand_bgra, 1.0)
 
     # Upper 1/3 Scene Title Overlay (y=155..455) with smooth 0.25s fade-in / fade-out

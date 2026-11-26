@@ -8,7 +8,7 @@ try:
  from .boston206_button import follow as premium_follow, animated_button
 except ImportError:
  from boston206_button import follow as premium_follow, animated_button
-TEMPLATE_VERSION='boston-v1-206.1'
+TEMPLATE_VERSION='boston-v1-206.2'
 FONT_DIR=Path(__file__).resolve().parent/'assets'
 W,H,FPS,DURATION,SR=1080,1920,30,53.0,24000
 
@@ -100,7 +100,7 @@ class Story:
  def static_overlay(self):
   out=Image.new('RGBA',(W,H),(0,0,0,0));d=ImageDraw.Draw(out);f=font(20,True);x=82
   for letter in 'BİLGİ DOZU':
-   d.text((x,103),letter,font=f,fill=(246,239,222,215));x+=round(f.getlength(letter))+4
+   d.text((x,210),letter,font=f,fill=(246,239,222,215));x+=round(f.getlength(letter))+4
   f=font(19)
   for y,t in [(1510,self.plan.get('visual_disclosure','Yapay zekâ ile temsili canlandırma')),(1541,'Kaynak: '+self.plan['source']['label'])]:
    if d.textbbox((0,0),t,font=f)[2]>906:raise ValueError('Source/disclosure label too long')

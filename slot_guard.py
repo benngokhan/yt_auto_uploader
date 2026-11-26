@@ -67,7 +67,10 @@ def parse_slot(key, now=None, recovery=False):
     kind = _slot_kind_for_stamp(stamp)
     if recovery:
         age = _utc(now) - stamp
-        if age < -timedelta(minutes=25) or age > timedelta(hours=6):
+        # GitHub Actions cron'lari yogun saatlerde 8-10 saat gecikebiliyor; 14 saat
+        # pencere ayni slotun gun icinde bir kez yayinlanmasini saglar (mukerrer
+        # yayin reserve_slot + uploaded.txt ile yine engellenir).
+        if age < -timedelta(minutes=25) or age > timedelta(hours=14):
             raise ValueError("Rescue slot is in the future or too old")
     return stamp, kind
 

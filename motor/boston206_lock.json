@@ -1,7 +1,7 @@
 {
-  "version": "boston-v1-206.1",
+  "version": "boston-v1-206.2",
   "sha256": {
-    "boston206.py": "b03ad1a3538a764c32f5870f2e33f865c38112bae0f19ff582e3a9d3070c480b",
+    "boston206.py": "00bdb1e24cb547848e1c9205ec0453a4f88658525a747de35812804c29887fd4",
     "boston206_button.py": "c25379ebc80c5ea3a23d60b9e6dd1de5d9d3c2e6299aa90b32e78a5346122850",
     "boston206_cover.py": "fc170ef0cd69d60e3fd42f81cc51723ee8a08aa9b1d5309927fc83864888b4d3",
     "boston206_job.py": "c92267d846f10c03ea5623fed3f476f8fca9069cb79a55bee1cf1eedba104abf",
