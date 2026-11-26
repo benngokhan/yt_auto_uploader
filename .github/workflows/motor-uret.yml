@@ -1,10 +1,10 @@
-name: Fix - 20261127 baslik ve Drive duzeni
+name: Fix - eski sablonlari ydk_ ile arsivle
 
 on:
   workflow_dispatch:
     inputs:
       onay:
-        description: Yazma onayi (__FIX_20261127_APPLY__)
+        description: Yazma onayi (__ESKI_SABLON_ARSIV__)
         required: true
         type: string
       kuru:
@@ -16,12 +16,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: fix-apply-20261127
+  group: eski-sablon-arsiv
   cancel-in-progress: false
 
 jobs:
-  apply:
-    if: ${{ github.repository == 'benngokhan/yt_auto_uploader' && github.ref == 'refs/heads/arena/fix-20261127' && inputs.onay == '__FIX_20261127_APPLY__' }}
+  arsivle:
+    if: ${{ github.repository == 'benngokhan/yt_auto_uploader' && github.ref == 'refs/heads/arena/fix-20261127' && inputs.onay == '__ESKI_SABLON_ARSIV__' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -45,15 +45,15 @@ jobs:
               raise SystemExit("Missing GitHub Actions secret: GOOGLE_TOKEN_JSON")
           Path("token.json").write_text(raw, encoding="utf-8")
           PY
-      - name: Onarim (once on-kontrol, sonra yazma)
+      - name: Eski sablonlari arsivle
         env:
           KURU: ${{ inputs.kuru }}
-        run: python arena_fix_20261127/uygula.py
+        run: python arena_fix_20261127/eski_sablon_arsivle.py
       - name: Save result
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: fix-result-20261127
+          name: eski-sablon-sonuc
           path: result_fix/
           if-no-files-found: ignore
           retention-days: 7
