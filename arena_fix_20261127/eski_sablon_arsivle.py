@@ -9,6 +9,7 @@ from __future__ import annotations
 import io
 import json
 import os
+import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -104,17 +105,14 @@ def main() -> int:
             f = files.get(name)
             if f:
                 targets.append((f, f"{prefix}{n}{Path(name).suffix}"))
-    if not targets:
-        raise SystemExit("Tasinacak eski dosya bulunamadi")
-
     row_nums = []
     for r in range(2, ws.max_row + 1):
         fname = str(ws.cell(r, 2).value or "").strip()
-        if not fname.lower().endswith(".mp4"):
-            continue
-        digits = "".join(ch for ch in fname if ch.isdigit())
-        if digits.isdigit() and int(digits) in ESKI and fname == f"video_{int(digits)}.mp4":
+        m = re.fullmatch(r"video_(\d+)\.mp4", fname, flags=re.IGNORECASE)
+        if m and int(m.group(1)) in ESKI:
             row_nums.append(r)
+    if not targets and not row_nums:
+        raise SystemExit("Tasinacak eski dosya/satir bulunamadi")
     log(f"OK  tasinacak dosya: {len(targets)}, arsivlenecek satir: {len(row_nums)}")
 
     if kuru:
