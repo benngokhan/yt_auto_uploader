@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-25 22:26:30",
-  "generated_at_iso": "2026-11-25T22:26:30.833315+03:00",
+  "generated_at": "2026-11-26 05:55:18",
+  "generated_at_iso": "2026-11-26T05:55:18.494685+03:00",
   "folders": {
     "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
     "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
@@ -36,8 +36,8 @@
     "ready_longs": 0,
     "total_ready": 16,
     "days_of_stock": 16,
-    "next_short": "video_186.mp4",
-    "next_short_title": "Yağmur Öncesi Toprak Kokusunu Köpekbalığından Keskin Alıyorsun! 🌧️🌱 #bilgidozu #shorts",
+    "next_short": "video_187.mp4",
+    "next_short_title": "Kurşun Kalemin İçinde Aslında Tek Bir Gram Bile Kurşun Yok! ✏️🪨 #bilgidozu #shorts",
     "next_long": null,
     "next_long_title": "",
     "missing_covers": []
@@ -255,11 +255,11 @@
         "modifiedTime": "2026-11-25T16:54:06.970Z"
       },
       {
-        "id": "1Qv8GGKQd7I00YeFZqeXH--SEGq9uwDca",
+        "id": "17rm5XGGj3BtVu_GDAQjxL_NVII6WaoYP",
         "name": "video_206.mp4",
         "mimeType": "video/mp4",
-        "size": 13649137,
-        "modifiedTime": "2026-11-25T16:52:27.458Z"
+        "size": 16974021,
+        "modifiedTime": "2026-11-25T20:21:33.278Z"
       },
       {
         "id": "1Szuy7f0NTAfrgY-9cC56haD6JiKESvU1",
@@ -558,8 +558,8 @@
         "id": "1aBt7me8IOzsJeSMQDVtkTktOgF9EZpJo",
         "name": "baslik.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 106564,
-        "modifiedTime": "2026-11-25T00:45:14.596Z"
+        "size": 107144,
+        "modifiedTime": "2026-11-26T00:21:57.000Z"
       },
       {
         "id": "1YjYzlPGzBlkFCH6baStgv1DOOdttaFzU",
@@ -1619,9 +1619,9 @@
       "file_name": "video_186.mp4",
       "number": 186,
       "type": "short",
-      "status": "BEKLEMEDE",
-      "is_ready": true,
-      "is_published": false,
+      "status": "YÜKLENDİ",
+      "is_ready": false,
+      "is_published": true,
       "title": "Yağmur Öncesi Toprak Kokusunu Köpekbalığından Keskin Alıyorsun! 🌧️🌱 #bilgidozu #shorts",
       "description": "💬 Yağmur yağdığında camı açıp o ilk toprak kokusunu içine çekenler burada mı? 🌧️🌱 Dünyanın en huzurlu kokusu sence ne? Yoruma yaz! 👇\n\nYağmur yağmaya başladığı ilk saniyelerde havaya yayılan o büyüleyici toprak kokusunu burnun köpekbalığından bile keskin alır! MIT yüksek hızlı kamera deneylerine göre ilk su damlaları kuru toprağa çarptığında, hapsolmuş mikroskobik hava kabarcıkları şampanya köpüğü gibi patlayarak havaya koku molekülleri fırlatır. Toprak bakterilerinin ürettiği geosmin adlı bu maddeye insan burnu o kadar duyarlıdır ki, bu kokuyu köpekbalığının okyanustaki kan kokusunu almasından binlerce kat daha hassas yakalar.\n\n💬 Yağmur sonrası o toprak kokusunu (petrikor) sen de seviyor musun? Yoruma yaz! 👇\n\n📚 Kaynak: MIT (Nature Communications) • CSIRO Australia\n\n#bilgidozu #shorts #yağmur #doğa #bilim #ilginçbilgiler",
       "tags": [
@@ -1638,7 +1638,7 @@
       ],
       "category_name": "Doğa ve Kimya",
       "pinned_comment": "Yağmur yağdığında camı açıp o ilk toprak kokusunu içine çekenler burada mı? 🌧️🌱 Dünyanın en huzurlu kokusu sence ne? Yoruma yaz! 👇",
-      "youtube_url": "",
+      "youtube_url": "https://youtu.be/fQHAhkB7Vp8",
       "has_drive_video": true,
       "drive_video_id": "1-uBG47--VyVlCSKQX_zFMff_CEaQ5w-F",
       "drive_video_size_mb": 9.59,
@@ -2200,29 +2200,30 @@
       "drive_cover_id": "1Bhl1VCxLDF7YPLUmeENhCVcTcrmGAtG8"
     },
     {
-      "row": 186,
+      "row": 214,
       "file_name": "video_205.mp4",
       "number": 205,
       "type": "short",
-      "status": "YÜKLENDİ",
-      "is_ready": false,
-      "is_published": true,
-      "title": "Kediler Yalnızca Mutluyken Değil, Yaralandıklarında da Neden Mırıldar? 🐈🔊 #bilgidozu #shorts",
-      "description": "💬 Kedilerin 7/24 yanında taşıdığı yerleşik fizik tedavi cihazıyla gezmesi şaka mı?! 😻🔊 Evinde kedi olanlar kedisinin adını yoruma yazsın! 👇\n\nKedilerin yalnızca başı okşandığında ve keyfi yerindeyken mırıldadığını sanıyorsan doğanın en gizemli iyileşme mekanizmasını kaçırıyorsun! Veterinerler doğum yapan, korkan, hatta ağır kırık geçiren kedilerin bile aralıksız mırıldadığını fark edip bu sesin akustik frekansını ölçtü. Amerikan Akustik Derneği araştırmalarına göre ev kedisinden çitaya kadar kedigiller tam 25 ile 150 Hertz aralığında kesintisiz mekanik titreşim üretir! Bu aralık, modern tıpta kırık kemiklerin kaynamasını hızlandıran ve kas-tendon ödemini çözen ultrasonik fizik tedavi frekansıyla birebir aynıdır; yani kedi kendi kendini onarır.\n\n💬 Kedinin yanına uzanıp o mırıltıyı dinlerken senin de stresinin azaldığını hissediyor musun? Yoruma yaz! 👇\n\n📚 Kaynak: Journal of the Acoustical Society of America (von Muggenthaler, 2001) • Scientific American\n🎨 Görseller yapay zekâ ile bilimsel canlandırma amacıyla üretilmiştir.\n\n#bilgidozu #shorts #kediler #hayvanlar #biyoloji #bilim",
+      "status": "BEKLEMEDE",
+      "is_ready": true,
+      "is_published": false,
+      "title": "Fatih'in Ressamı: Venedik'ten İstanbul'a Bir Portrenin Hikâyesi 🎨 #bilgidozu #shorts",
+      "description": "💬 Sen bu portrenin hikâyesini biliyor muydun? 👇\n\n1479'da Fatih Sultan Mehmet, Venedik'ten bir ressam istedi. Venedik, Gentile Bellini'yi İstanbul'a gönderdi. Bellini burada yaklaşık bir buçuk yıl kaldı ve Fatih'in portresini yaptı.\n\nBu ziyaret yalnızca sanatla ilgili değildi: iki taraf da siyasi ve ticari ilişkilerini geliştirmek istiyordu. 1480 tarihli portrede işlemeli kumaşlar, inciler ve taçlar hükümdarın ihtişamını vurguluyor. Tablo, bir sanat eserinin aynı zamanda diplomatik bir buluşmanın izi olabileceğini gösteriyor.\n\n🖼️ Görseller tarihsel yorumdur; temsili rekonstrüksiyondur.\n\nMerakını besle, Bilgi Dozu'nu takip et! 🔔\n\n📚 Kaynak: National Gallery • Open University\n#bilgidozu #shorts #tarih #sanat",
       "tags": [
         "bilgidozu",
-        "kediler neden mırıldar",
-        "kedi mırıltısı frekansı",
-        "kedi mırıltısı kemik iyileştirir mi",
-        "25 150 hz",
-        "biyoloji",
-        "hayvanlar",
-        "bilim",
         "shorts",
+        "tarih",
+        "fatih sultan mehmet",
+        "gentile bellini",
+        "istanbul",
+        "venedik",
+        "sanat tarihi",
+        "portre",
+        "osmanlı",
         "doz dışı"
       ],
-      "category_name": "Biyoakustik ve Veterinerlik",
-      "pinned_comment": "Kedilerin 7/24 yanında taşıdığı yerleşik fizik tedavi cihazıyla gezmesi şaka mı?! 😻🔊 Evinde kedi olanlar kedisinin adını yoruma yazsın! 👇",
+      "category_name": "Tarih",
+      "pinned_comment": "Sen bu portrenin hikâyesini biliyor muydun? 👇",
       "youtube_url": "",
       "has_drive_video": true,
       "drive_video_id": "1D5NnV25BQDLRQkoYZzbXGRHkueRoDMJ-",
@@ -2257,8 +2258,8 @@
       "pinned_comment": "1.200 G kuvvetle günde 12.000 kez kafa atıp baş ağrısı bile çekmemek... Doğanın mühendisliği karşısında şapka çıkarılır! 🤯🐦👇",
       "youtube_url": "",
       "has_drive_video": true,
-      "drive_video_id": "1Qv8GGKQd7I00YeFZqeXH--SEGq9uwDca",
-      "drive_video_size_mb": 13.02,
+      "drive_video_id": "17rm5XGGj3BtVu_GDAQjxL_NVII6WaoYP",
+      "drive_video_size_mb": 16.19,
       "expected_cover": "kapak_206.jpg",
       "has_drive_cover": true,
       "drive_cover_id": "1g6AlTj2ELzCOwfZ-MP8ZAeyul5kzN7ob"
