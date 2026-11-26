@@ -1,0 +1,59 @@
+name: Fix - eski sablonlari ydk_ ile arsivle
+
+on:
+  workflow_dispatch:
+    inputs:
+      onay:
+        description: Yazma onayi (__ESKI_SABLON_ARSIV__)
+        required: true
+        type: string
+      kuru:
+        description: true = sadece on-kontrol, false = uygula
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: eski-sablon-arsiv
+  cancel-in-progress: false
+
+jobs:
+  arsivle:
+    if: ${{ github.repository == 'benngokhan/yt_auto_uploader' && github.ref == 'refs/heads/arena/fix-20261127' && inputs.onay == '__ESKI_SABLON_ARSIV__' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install publication dependencies
+        run: python -m pip install -r requirements-publication.txt
+      - name: Configure Google credentials
+        env:
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          raw = os.getenv("GOOGLE_TOKEN_JSON", "").strip()
+          if not raw:
+              raise SystemExit("Missing GitHub Actions secret: GOOGLE_TOKEN_JSON")
+          Path("token.json").write_text(raw, encoding="utf-8")
+          PY
+      - name: Eski sablonlari arsivle
+        env:
+          KURU: ${{ inputs.kuru }}
+        run: python arena_fix_20261127/eski_sablon_arsivle.py
+      - name: Save result
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: eski-sablon-sonuc
+          path: result_fix/
+          if-no-files-found: ignore
+          retention-days: 7
