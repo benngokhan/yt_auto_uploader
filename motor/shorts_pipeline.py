@@ -4,7 +4,7 @@
 
 Onaylı koordinat ve ses mimarisi (1080x1920 @ 30fps):
   - Üst İlerleme Çubuğu: x=78..1038 (960x8 px), y=48..56, zemin #3A3A3A, dolgu #E3F424
-  - Sol Üst 3D Rozet: x=77, y=80 (214x58 px, 3x supersampled ArchivoBlack "BİLGİ DOZU")
+  - Sol Üst 3D Rozet: x=77, y=210 (214x58 px, 3x supersampled ArchivoBlack "BİLGİ DOZU")
   - Ortalanmış 2 Satır Sahne Başlığı: cx=540, y1=287, y2=363, Poppins-Bold 64 px, <=20 harf/satır,
     TAM BÜYÜK HARF; 1. satır solunda satır içi semantik sarı vektör rozet (?, ! daire içinde;
     ⚡, ▼, ▲, ✔ koyu konturlu vektör), 1. satır #FFFFFF beyaz, 2. satır #E3F424 limon sarısı
@@ -550,7 +550,7 @@ def build_static_overlay(
 ) -> Image.Image:
     """sablon_v2/build_v2_shorts.py birebir statik arayüz katmanı:
     - y=48..56, x=78..1038 üst ilerleme çubuğu zemini (#3A3A3A)
-    - x=77, y=80 sol üst 3D BİLGİ DOZU rozeti
+    - x=77, y=210 sol üst 3D BİLGİ DOZU rozeti
     - y=1751 görsel notu, y=1790 bilimsel kaynak (Poppins-Regular 27 px)
     - y=1840 ArchivoBlack 46 px BİLGİ DOZU imzası"""
     SS = 2
@@ -597,9 +597,9 @@ def build_static_overlay(
 
     base = ov.resize((W, H), Image.Resampling.LANCZOS)
 
-    # 4. Sol üst 3D kabartmalı BİLGİ DOZU rozeti @ (77, 80)
+    # 4. Sol üst 3D kabartmalı BİLGİ DOZU rozeti @ (77, 210) — TikTok ust arayuzunun altinda
     badge = render_3d_lime_pill("BİLGİ DOZU", bw_px=S_(214), bh_px=S_(53), radius_px=S_(15), font_px=S_(23))
-    base.alpha_composite(badge, (S_(77) - 40, S_(80) - 40))
+    base.alpha_composite(badge, (S_(77) - 40, S_(210) - 40))
     return base
 
 

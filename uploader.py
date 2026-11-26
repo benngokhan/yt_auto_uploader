@@ -1592,7 +1592,11 @@ def upload_job(
         except Exception as thumb_err:
             log.warning(f"  Kapak adımı atlandı (yayın korunuyor): {thumb_err}")
             thumbnail_result = ThumbnailResult()
-        comment_ok, _ = post_pinned_comment(youtube, vid_id, meta.get("pinned_comment", ""))
+        pinned_text = (meta.get("pinned_comment") or "").strip()
+        if not pinned_text:
+            pinned_text = "Sen bu videoda ne öğrendin? Yorumlara yaz 👇"
+            log.warning("  Tabloda sabit yorum boş; varsayılan CTA yorumu kullanılıyor.")
+        comment_ok, _ = post_pinned_comment(youtube, vid_id, pinned_text)
         backlink_info = backlink_previous_episode(
             youtube, drive, queue_folder, list_path, file_name, vid_id, meta["title"]
         )

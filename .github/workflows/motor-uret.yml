@@ -46,7 +46,7 @@ jobs:
           Path("token.json").write_text(raw, encoding="utf-8")
           PY
       - name: Read-only inventory
-        run: python arena_fix_20261127/inspect.py
+        run: python arena_fix_20261127/envanter.py
       - name: Save inventory
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
