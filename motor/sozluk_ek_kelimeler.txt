@@ -68,3 +68,4 @@ ateşböceği
 nanometre
 bozon
 # ŞÜPHELİ: eyi | 2026-11-15 | üretim - | başlık: MUM EYİ | sözlükte yok | DOĞRUYSA bu satırı silip yerine yalnız kelimeyi yazın
+# ŞÜPHELİ: kemiç | 2026-11-27 | üretim 7 | başlık: KEMİÇ BALIĞI | sözlükte yok | DOĞRUYSA bu satırı silip yerine yalnız kelimeyi yazın
