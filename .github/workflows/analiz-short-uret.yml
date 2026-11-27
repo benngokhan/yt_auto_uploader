@@ -80,8 +80,8 @@ jobs:
         env:
           BD_ANALYTICS_CLIENT_CONFIG: ${{ secrets.BD_ANALYTICS_CLIENT_CONFIG }}
           BD_ANALYTICS_REFRESH_TOKEN: ${{ secrets.BD_ANALYTICS_REFRESH_TOKEN }}
-          GUN: ${{ inputs.gun }}
-          ADET: ${{ inputs.adet }}
+          GUN: ${{ inputs.gun || '30' }}
+          ADET: ${{ inputs.adet || '2' }}
         run: |
           python yt_analiz.py --days "$GUN" --limit "$ADET" \
             --curve-limit "$ADET" --out yt_analiz.json
@@ -98,9 +98,9 @@ jobs:
           BD_ANALYTICS_REFRESH_TOKEN: ${{ secrets.BD_ANALYTICS_REFRESH_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_GROUP_CHAT_ID || secrets.TELEGRAM_CHAT_ID }}
-          ADET: ${{ inputs.adet }}
-          ONAY_SN: ${{ inputs.onay_dakika }}
-          KURU: ${{ inputs.kuru }}
+          ADET: ${{ inputs.adet || '2' }}
+          ONAY_SN: ${{ inputs.onay_dakika || '30' }}
+          KURU: ${{ inputs.kuru || 'false' }}
           MOTOR_VISUAL_QA_PASSED: "1"
         run: |
           python - <<'PY'
