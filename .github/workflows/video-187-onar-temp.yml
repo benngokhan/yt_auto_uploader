@@ -18,7 +18,8 @@ jobs:
       - name: Onar
         env:
           GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
-          FOLDER: "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC"
+          VIDEO_FOLDER: "1GK-yImpb09445uXfTUbIl7l6AfNM4BOb"
+          TABLE_FOLDER: "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC"
         run: |
           python - <<'PYEOF'
           import os, io, json, subprocess, pathlib
@@ -35,7 +36,7 @@ jobs:
           drive = build("drive", "v3", credentials=creds)
           FOLDER = os.environ["FOLDER"]
 
-          files = drive.files().list(q="'%s' in parents and name='video_187.mp4' and trashed=false" % FOLDER,
+          files = drive.files().list(q="'%s' in parents and name='video_187.mp4' and trashed=false" % VIDEO_FOLDER,
                                      fields="files(id,name,size,md5Checksum,modifiedTime)").execute().get("files", [])
           print("VIDEO:", json.dumps(files, ensure_ascii=False))
           if len(files) != 1:
@@ -61,7 +62,7 @@ jobs:
                                      fields="id,name,size,md5Checksum,modifiedTime").execute()
           print("DRIVE GUNCELLENDI:", json.dumps(upd, ensure_ascii=False))
 
-          tabs = drive.files().list(q="'%s' in parents and name='baslik.xlsx' and trashed=false" % FOLDER,
+          tabs = drive.files().list(q="'%s' in parents and name='baslik.xlsx' and trashed=false" % TABLE_FOLDER,
                                     fields="files(id,name,modifiedTime)").execute().get("files", [])
           print("TABLO:", json.dumps(tabs, ensure_ascii=False))
           if not tabs:
