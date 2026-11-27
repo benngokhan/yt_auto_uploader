@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-27 18:19:22",
-  "generated_at_iso": "2026-11-27T18:19:22.409780+03:00",
+  "generated_at": "2026-11-27 20:27:35",
+  "generated_at_iso": "2026-11-27T20:27:35.224656+03:00",
   "folders": {
     "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
     "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
@@ -48,8 +48,8 @@
         "id": "196-Oo4wtsEzGb4psjPWlkZndZKgqrJjD",
         "name": "video_187.mp4",
         "mimeType": "video/mp4",
-        "size": 16616262,
-        "modifiedTime": "2026-11-27T00:15:22.660Z"
+        "size": 22104226,
+        "modifiedTime": "2026-11-27T17:24:33.752Z"
       },
       {
         "id": "1nMxVYQ3ICYo8-fq8E_-DwfIi9--qgzj3",
@@ -159,8 +159,8 @@
         "id": "13skSKKlIo1-cBJhNxqFuWD3WyN9iV_IO",
         "name": "baslik.xlsx",
         "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "size": 41494,
-        "modifiedTime": "2026-11-27T01:07:47.726Z"
+        "size": 40451,
+        "modifiedTime": "2026-11-27T17:26:23.334Z"
       },
       {
         "id": "1FLYFfGtwQIpCa-zj9lXTkBorNQ8OTpLw",
@@ -244,10 +244,10 @@
       ],
       "category_name": "Tarih ve Arkeoloji",
       "pinned_comment": "Görseller gerçek arşiv kaydı değil, yapay zekâ ile hazırlanmış temsili canlandırmalardır. Olayın kaynağı: https://www.history.com/articles/great-molasses-flood-science",
-      "youtube_url": "https://youtu.be/lCKWBE2e_QQ",
+      "youtube_url": "https://youtu.be/LHL6c2pB-2g",
       "has_drive_video": true,
       "drive_video_id": "196-Oo4wtsEzGb4psjPWlkZndZKgqrJjD",
-      "drive_video_size_mb": 15.85,
+      "drive_video_size_mb": 21.08,
       "expected_cover": "kapak_187.jpg",
       "has_drive_cover": true,
       "drive_cover_id": "1nkCJB-V6Ij-cRvMbKZfBYY2NAZ8TehEY"
@@ -542,10 +542,10 @@
       "row": 2,
       "name": "Yükleyici (Drive -> YouTube)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-27 03:55",
+      "updated_at": "2026-11-27 20:26",
       "error_message": "",
       "jobs_done": 108,
-      "last_action": "video_187.mp4 yayınlandı (https://youtu.be/lCKWBE2e_QQ)"
+      "last_action": "video_187.mp4 yayınlandı (https://youtu.be/LHL6c2pB-2g)"
     },
     {
       "row": 3,
@@ -596,7 +596,7 @@
       "row": 8,
       "name": "Kapak İşçisi (Drive Hazır Kapak -> YouTube)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-27 03:55",
+      "updated_at": "2026-11-27 20:26",
       "error_message": "",
       "jobs_done": 108,
       "last_action": "video_187.mp4 için hazır Drive kapağı uygulandı"
@@ -605,7 +605,7 @@
       "row": 9,
       "name": "Yorumcu (Sabit Yorum İşçisi)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-27 03:55",
+      "updated_at": "2026-11-27 20:26",
       "error_message": "",
       "jobs_done": 108,
       "last_action": "video_187.mp4 altına ilk sabit yorum yazıldı"
@@ -614,7 +614,7 @@
       "row": 10,
       "name": "Analitik çekici (YouTube API)",
       "status": "Çalışıyor",
-      "updated_at": "2026-11-27 03:55",
+      "updated_at": "2026-11-27 20:26",
       "error_message": "",
       "jobs_done": 30,
       "last_action": "30 videonun gerçek görüntülenme ve yorum verisi güncellendi"
