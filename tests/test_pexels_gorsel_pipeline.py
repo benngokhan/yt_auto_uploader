@@ -44,6 +44,41 @@ def _make_textured_photo(w=1200, h=1800, base_rgb=(145, 170, 190), bright_border
     return im
 
 
+class LogoDenetimiTests(unittest.TestCase):
+    def test_corner_watermark_is_detected_and_cropped(self):
+        temiz = _make_textured_photo(1200, 1800)
+        var, bolge = gorsel_uret.logo_bolgesi_var_mi(temiz)
+        self.assertFalse(var, f"temiz fotoğrafta yanlış logo: {bolge}")
+
+        logolu = temiz.copy()
+        d = ImageDraw.Draw(logolu)
+        d.rectangle((1020, 60, 1180, 180), fill=(255, 255, 255))
+        d.text((1040, 100), "LOGO", fill=(20, 20, 20))
+        var, bolge = gorsel_uret.logo_bolgesi_var_mi(logolu)
+        self.assertTrue(var)
+        self.assertEqual(bolge, "ust_sag")
+
+        duzeltilen, bilgi = gorsel_uret.logo_duzelt(logolu)
+        self.assertEqual(bilgi["islem"], "kirpildi")
+        self.assertEqual(duzeltilen.size, (1200, 1800 - 108))
+
+        temiz_duz, temiz_bilgi = gorsel_uret.logo_duzelt(temiz)
+        self.assertEqual(temiz_bilgi["islem"], "dokunulmadi")
+        self.assertEqual(temiz_duz.size, temiz.size)
+
+    def test_logo_metadata_is_recorded_without_changing_dimensions(self):
+        with tempfile.TemporaryDirectory() as td, mock.patch.dict(
+            os.environ, {"MOTOR_VISUAL_QA_PASSED": "1"}
+        ):
+            klasor = Path(td)
+            gorsel = _make_textured_photo(1200, 1800)
+            gorsel.save(klasor / "ham_01.jpg", quality=92)
+            duzeltilen, bilgi = gorsel_uret.logo_duzelt(gorsel)
+            duzeltilen = gorsel_uret.dikey_kirp(duzeltilen)
+            self.assertEqual(duzeltilen.size, gorsel_uret.HEDEF)
+            self.assertIsInstance(bilgi["tespit"], bool)
+
+
 class PexelsGorselPipelineTests(unittest.TestCase):
     def test_visual_judge_retries_a_transient_timeout(self):
         import io

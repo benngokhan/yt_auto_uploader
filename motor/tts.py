@@ -364,8 +364,6 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
 
     # Arşiv: Gemini'den gelen ham ses, hiçbir işlem uygulanmadan (24 kHz, 16-bit, mono).
     _ham_arsiv = _arsivle("pcm_wav_yaz", "ham_tts_gemini_ISLENMEMIS", raw, 24000)
-    if _ham_arsiv:
-        _SON_HAM_SES["yol"] = _ham_arsiv
     ham_yol = cikti.with_suffix(".ham24k.wav")
     pcm = np.frombuffer(raw, dtype="<i2").astype(np.float32) / 32768.0
 
@@ -413,6 +411,11 @@ def _gemini_tts(metin: str, cikti: Path, ayar: dict) -> None:
         w.setsampwidth(2)
         w.setframerate(24000)
         w.writeframes(pcm_i16.tobytes())
+
+    # Deterministik ham kopya: v2 ses denetimi miksten değil, Gemini'nin işlenmemiş PCM'sinden ölçer.
+    denetim_ham = cikti.with_name(f"{cikti.stem}.gemini_ham24k.wav")
+    shutil.copyfile(ham_yol, denetim_ham)
+    _SON_HAM_SES["yol"] = str(denetim_ham)
 
     # EQ/sample-format only here. A single explicit tempo point is applied later by uret().
     ham_sure = len(pcm) / 24000.0
@@ -472,7 +475,7 @@ def _ses_kontrol(ayar: dict) -> None:
     vid = str(ses.get("voice_id") or "").strip()
     if sag not in {"gemini", "gemini_tts", "gemini_natural"}:
         raise SesHatasi(f"Ses sağlayıcısı Gemini olmalı, ayarda: {sag!r}")
-    if vid and vid != "Charon":
+    if vid != "Charon":
         raise SesHatasi(f"Ses kimliği Charon olmalı, ayarda: {vid!r}")
 
 
@@ -525,6 +528,9 @@ def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
 
     alignment = None
     gemini_provider = False
+    # KURAL: yanlış sağlayıcı/voice ile API isteği atılmasın; kontrol en başta.
+    if saglayici in {"gemini", "gemini_tts", "gemini_natural"}:
+        _ses_kontrol(ayar)
     if saglayici == "speechify":
         alignment = _speechify(metin, cikti, ayar)
     elif saglayici == "elevenlabs":
@@ -537,7 +543,6 @@ def uret(metin: str, cikti: str | Path, ayar: dict) -> dict | None:
         # KURAL (sahip): ses her zaman Gemini + Charon. Başka sese GEÇİLMEZ.
         # Gemini kotası dolarsa üretim DURUR; video yanlış sesle çıkmaz.
         _gemini_tts(metin, cikti, ayar)
-        _ses_kontrol(ayar)
         gemini_provider = True
     else:
         raise SesHatasi(f"Desteklenmeyen ses sağlayıcısı: {saglayici!r}")

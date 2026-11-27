@@ -1216,48 +1216,109 @@ def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict]
     return sahneler_q, yedekler
 
 
-def _copy_arena_voice_audio(scene_lines: list[str], work_dir: Path) -> Path:
-    """Copy caller-supplied Arena audio and bind its declared source to the narration.
+def _generate_gemini_voice_audio(scene_lines: list[str], work_dir: Path, ayar: dict) -> Path:
+    """Gemini TTS Charon ile 7 sahne anlatımını üretir ve sesi denetler.
 
-    The handoff records a caller attestation, not cryptographic proof of provider
-    origin; the downstream manifest preserves that distinction.
+    Referans, BilgiDozu_097_Fatih.mp4 içindeki Google TTS Charon sesidir.
+    'Arena' etiketi/provider'ı yoktur. Ham 24 kHz Gemini PCM'si üzerinde f0
+    ölçümü yapılır; onaylı tabandan saparsa üretim durur. Hız her zaman 1.00x.
     """
     import hashlib
-    import shutil
-    from shorts_acceptance import sha256_file
+    from shorts_acceptance import (
+        VOICE_AUDIT_FILE,
+        VOICE_ID,
+        VOICE_LANGUAGES,
+        VOICE_PROVIDER,
+        VOICE_PROVENANCE_STATUS,
+        VOICE_RAW_HAM_FILE,
+        sha256_file,
+    )
+    import ses_olcum
+    import tts
 
-    source_value = os.getenv("MIRA_ARENA_AUDIO_FILE", "").strip()
-    voice_id = os.getenv("MIRA_ARENA_VOICE_ID", "").strip()
-    language = os.getenv("MIRA_ARENA_VOICE_LANGUAGE", "tr").strip()
-    if not source_value or not voice_id:
+    ses = ayar.get("ses") or {}
+    provider = str(ses.get("saglayici") or "").strip().lower()
+    voice_id = str(ses.get("voice_id") or "").strip()
+    language = str(ses.get("dil") or "tr").strip()
+    if provider != VOICE_PROVIDER:
         raise SystemExit(
-            "Shorts v2 has no legacy-TTS fallback. Supply MIRA_ARENA_AUDIO_FILE and "
-            "MIRA_ARENA_VOICE_ID from a live Arena narration."
+            f"Shorts v2 ses sağlayıcısı {VOICE_PROVIDER} olmalı; ayarda: {provider!r}. "
+            "Başka sese geçilmez."
         )
-    if not voice_id.startswith("voice-") or language not in {"tr", "tr-TR"}:
-        raise SystemExit("Arena voice ID/language provenance is invalid; v2 audio import stopped.")
-    source = Path(source_value).expanduser().resolve()
-    if not source.is_file() or source.stat().st_size == 0:
-        raise SystemExit("MIRA_ARENA_AUDIO_FILE is missing or empty; legacy TTS is disabled for v2.")
+    if voice_id != VOICE_ID:
+        raise SystemExit(f"Ses kimliği {VOICE_ID} olmalı; ayarda: {voice_id!r}. Başka sese geçilmez.")
+    if language not in VOICE_LANGUAGES:
+        raise SystemExit(f"Ses dili tr olmalı; ayarda: {language!r}.")
+    try:
+        factor = float(ses.get("voice_speed_factor", 1.0))
+    except (TypeError, ValueError) as exc:
+        raise SystemExit("voice_speed_factor sayı olmalı; Gemini Charon sesi 1.00x kalır.") from exc
+    if abs(factor - 1.0) > 1e-9:
+        raise SystemExit("Gemini Charon sesi 1.00x olmalı; tempo değişimi yasak.")
+    if not os.getenv("GEMINI_API_KEY", "").strip():
+        raise SystemExit("GEMINI_API_KEY yok; Gemini Charon sesi üretilemedi. Başka sese geçilmez.")
 
     work_dir.mkdir(parents=True, exist_ok=True)
     raw_wav = work_dir / "vo_raw.wav"
-    if source != raw_wav.resolve():
-        shutil.copyfile(source, raw_wav)
     narration = " ".join(" ".join(str(line).split()) for line in scene_lines)
-    manifest = {
-        "provider": "arena.generate_speech",
-        "generation": "caller_supplied",
-        "provenance_status": "caller_attested_unverified",
-        "voice_id": voice_id,
+    try:
+        tts.uret(narration, raw_wav, ayar)
+    except Exception as hata:  # noqa: BLE001
+        raise SystemExit(f"Gemini Charon ses üretimi başarısız ({type(hata).__name__}): {str(hata)[:180]}") from hata
+    if not raw_wav.is_file() or raw_wav.stat().st_size == 0:
+        raise SystemExit("Gemini Charon ses dosyası üretilmedi; v2 durduruldu.")
+
+    ham_path = raw_wav.with_name(VOICE_RAW_HAM_FILE)
+    if not ham_path.is_file() or ham_path.stat().st_size == 0:
+        raise SystemExit("Ham Gemini PCM denetim için bulunamadı; v2 durduruldu.")
+    olcum = ses_olcum.olc(ham_path)
+    f0 = olcum.get("f0_medyan_hz")
+    if f0 is None:
+        raise SystemExit("Gemini ses perdesi ölçülemedi; ses denetimi geçmedi.")
+    perde = ses_olcum.perde_sapmasi(f0)
+    audit = {
+        "provider": VOICE_PROVIDER,
+        "generation": "live_gemini_tts",
+        "provenance_status": VOICE_PROVENANCE_STATUS,
+        "voice_id": VOICE_ID,
         "language": language,
+        "model": str(ses.get("model") or ""),
+        "raw_sha256": sha256_file(ham_path),
+        "voice_sha256": sha256_file(raw_wav),
+        "f0_medyan_hz": f0,
+        "f0_yuzde10_hz": olcum.get("f0_yuzde10_hz"),
+        "f0_yuzde90_hz": olcum.get("f0_yuzde90_hz"),
+        "parlaklik_hz": olcum.get("parlaklik_hz"),
+        "rms_db": olcum.get("rms_db"),
+        "taban_f0_hz": ses_olcum.TABAN_F0_HZ,
+        "sapma_esigi": ses_olcum.SAPMA_ESIGI,
+        "sapma_yuzde": perde["sapma_yuzde"],
+        "uyari": perde["uyari"],
+        "satir": perde["satir"],
+        "passed": not perde["uyari"],
+    }
+    (work_dir / VOICE_AUDIT_FILE).write_text(
+        json.dumps(audit, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    if perde["uyari"]:
+        raise SystemExit(f"Ses denetimi: {perde['satir']} — aynı Charon sesi korunamadı, üretim durdu.")
+
+    manifest = {
+        "provider": VOICE_PROVIDER,
+        "generation": "live_gemini_tts",
+        "provenance_status": VOICE_PROVENANCE_STATUS,
+        "voice_id": VOICE_ID,
+        "language": language,
+        "model": str(ses.get("model") or ""),
         "narration_sha256": hashlib.sha256(narration.encode("utf-8")).hexdigest(),
         "audio_sha256": sha256_file(raw_wav),
-        "source_filename": source.name,
+        "voice_audit_sha256": sha256_file(work_dir / VOICE_AUDIT_FILE),
+        "source_filename": raw_wav.name,
     }
     (work_dir / "voice_provenance_v2.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
     )
+    print(f"  [Ses] Gemini TTS {VOICE_ID}, 1.00x, denetim: {perde['satir']}")
     return raw_wav
 
 
@@ -1329,12 +1390,12 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     vdir = calisma / "v2"
     vdir.mkdir(parents=True, exist_ok=True)
     (vdir / "script.txt").write_text("\n".join(script_lines) + "\n", encoding="utf-8")
-    raw_wav = _copy_arena_voice_audio(script_lines, vdir)
+    raw_wav = _generate_gemini_voice_audio(script_lines, vdir, ayar)
 
     if getattr(a, "sadece_ses", False):
         ses_onay = calisma / "ses_onay.wav"
         shutil.copyfile(raw_wav, ses_onay)
-        print(f"Yalnızca Arena sesi kopyalandı; sentez/render yapılmadı: {ses_onay}")
+        print(f"Yalnızca Gemini Charon sesi hazırlandı; sentez/render yapılmadı: {ses_onay}")
         return 0
 
     # 2) GÖRSELLER (v2 fail-closed: all seven scenes require live Pexels + Gemini Vision)
@@ -1453,6 +1514,7 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     evidence_dir.mkdir(parents=True, exist_ok=True)
     for name in (
         "render_manifest_v2.json", "visual_validation.json", "voice_provenance_v2.json",
+        "voice_audit_v2.json", "vo_raw.gemini_ham24k.wav",
         "script.txt", "timing.json", "audio_qc.json", "vo_raw.wav", "vo_final.wav", "mix.wav",
     ):
         source_path = vdir / name
@@ -1471,7 +1533,16 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
          "-of", "default=noprint_wrappers=1:nokey=1", str(hedef_mp4)],
         check=True, capture_output=True, text=True, timeout=60,
     )
-    from shorts_acceptance import validate_render_manifest_v2
+    from shorts_acceptance import validate_final_size, validate_render_manifest_v2
+    size_probe = subprocess.run(
+        [ffprobe, "-v", "error", "-select_streams", "v:0",
+         "-show_entries", "stream=width,height", "-of", "csv=p=0:s=x", str(hedef_mp4)],
+        check=True, capture_output=True, text=True, timeout=60,
+    )
+    boyut = size_probe.stdout.strip().splitlines()[0].strip().split("x")
+    if len(boyut) < 2:
+        raise SystemExit("Son video boyutu ffprobe ile okunamadı.")
+    validate_final_size(boyut[0], boyut[1])
     validate_render_manifest_v2(evidence_dir, cfg, probe.stdout.strip(), mp4_path=hedef_mp4)
 
     # Standart Bilgi Dozu dikey kapak şablonu (kapak_176..196 ile birebir uyumlu)

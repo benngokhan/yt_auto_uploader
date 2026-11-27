@@ -403,6 +403,56 @@ def _ham_kusurlu_mu(im: Image.Image) -> tuple[bool, str]:
     return False, "ok"
 
 
+def logo_bolgesi_var_mi(im: Image.Image) -> tuple[bool, str]:
+    """Köşelerdeki küçük, yüksek kontrastlı yazı/filtre bloklarını logo sayar.
+
+    Yalnız köşelere bakılır; doğal gökyüzü/orman gibi geniş alanlar yanlışlıkla
+    logo sanılmasın diye 'parlaklık + kenar yoğunluğu' birlikte aranır.
+    """
+    kucuk = im.convert("RGB").resize((270, 480), Image.Resampling.BILINEAR)
+    a = np.asarray(kucuk, dtype=np.float32)
+    h, w, _ = a.shape
+    by, bx = max(10, int(h * 0.13)), max(10, int(w * 0.17))
+    bolgeler = {
+        "ust_sol": a[:by, :bx],
+        "ust_sag": a[:by, -bx:],
+        "alt_sol": a[-by:, :bx],
+        "alt_sag": a[-by:, -bx:],
+    }
+    for ad, bolge in bolgeler.items():
+        luma = 0.299 * bolge[..., 0] + 0.587 * bolge[..., 1] + 0.114 * bolge[..., 2]
+        parlak = float(np.mean(luma > 224))
+        koyu = float(np.mean(luma < 24))
+        kenar = float(np.mean(np.abs(np.diff(luma, axis=0)) > 22)
+                      + np.mean(np.abs(np.diff(luma, axis=1)) > 22))
+        if (parlak > 0.22 or koyu > 0.32) and kenar > 0.05:
+            return True, ad
+    return False, "yok"
+
+
+def logo_duzelt(im: Image.Image) -> tuple[Image.Image, dict]:
+    """Logo tespit edilen kenarı kırpar; kırpılan görsel sonra 9:16'ya getirilir."""
+    var, bolge = logo_bolgesi_var_mi(im)
+    bilgi = {"tespit": var, "bolge": bolge, "islem": "kirpildi" if var else "dokunulmadi"}
+    if not var:
+        return im, bilgi
+    en, boy = im.size
+    kenar = max(4, int(min(en, boy) * 0.09))
+    if bolge.startswith("ust"):
+        kutu = (0, kenar, en, boy)
+    elif bolge.startswith("alt"):
+        kutu = (0, 0, en, boy - kenar)
+    elif bolge.endswith("sol"):
+        kutu = (kenar, 0, en, boy)
+    else:
+        kutu = (0, 0, en - kenar, boy)
+    kutu = (max(0, kutu[0]), max(0, kutu[1]), min(en, kutu[2]), min(boy, kutu[3]))
+    if kutu[2] <= kutu[0] or kutu[3] <= kutu[1]:
+        bilgi["islem"] = "kirpilanmadan_red"
+        return im, bilgi
+    return im.crop(kutu), bilgi
+
+
 def dikey_kirp(img: Image.Image) -> Image.Image:
     """9:16 dikey kadraj (1350x2400).
     Dikey/kareye yakın fotoğrafları akıllı merkez kırpar;
@@ -763,8 +813,11 @@ def sahneler_icin_gorseller(
                         "rejection_reason": None,
                     }
                     is_duplicate = record["uid"] in used
+                    etiket_metni = str(hit.get("tags") or "").lower()
                     if is_duplicate:
                         record["rejection_reason"] = "duplicate_visual_already_used"
+                    elif re.search(r"\b(logo|watermark|filigran)\b", etiket_metni):
+                        record["rejection_reason"] = "logo_or_watermark_metadata"
                     elif not _yeterince_uygun(hit, query, scene_text, gevsek=True):
                         record["rejection_reason"] = "provider_metadata_or_photo_quality_filter"
                     elif score_origin is None:
@@ -792,7 +845,9 @@ def sahneler_icin_gorseller(
                                 raw.unlink(missing_ok=True)
                                 continue
                         with Image.open(raw) as im:
-                            processed = sinematik_isle(dikey_kirp(im.convert("RGB")), tohum=20261100 + scene_index)
+                            duzeltilen, logo_bilgi = logo_duzelt(im.convert("RGB"))
+                            processed = sinematik_isle(dikey_kirp(duzeltilen), tohum=20261100 + scene_index)
+                        record["logo_check"] = logo_bilgi
                         processed_brightness = average_image_brightness(processed)
                         if processed_brightness < MIN_AVG_BRIGHTNESS:
                             record["rejection_reason"] = f"processed_dark_image:{processed_brightness:.1f}/255"

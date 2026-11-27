@@ -20,16 +20,34 @@ class ShortsV2GateTests(unittest.TestCase):
         lines = [f"Sahne {i} için kısa ve aydınlık anlatım." for i in range(1, 7)] + [acceptance.SHORTS_CTA]
         script = "\n".join(lines) + "\n"
         (root / "script.txt").write_text(script, encoding="utf-8")
-        (root / "vo_raw.wav").write_bytes(b"raw-arena-waveform")
+        (root / "vo_raw.wav").write_bytes(b"raw-gemini-waveform")
+        ham = root / acceptance.VOICE_RAW_HAM_FILE
+        ham.write_bytes(b"ham-gemini-pcm")
         narration = " ".join(" ".join(line.split()) for line in lines)
+        audit = {
+            "provider": acceptance.VOICE_PROVIDER,
+            "generation": "live_gemini_tts",
+            "provenance_status": acceptance.VOICE_PROVENANCE_STATUS,
+            "voice_id": acceptance.VOICE_ID,
+            "language": "tr",
+            "raw_sha256": acceptance.sha256_file(ham),
+            "voice_sha256": acceptance.sha256_file(root / "vo_raw.wav"),
+            "f0_medyan_hz": acceptance.TABAN_F0_HZ,
+            "sapma_yuzde": 0.0,
+            "uyari": False,
+            "passed": True,
+        }
+        audit_path = root / acceptance.VOICE_AUDIT_FILE
+        audit_path.write_text(json.dumps(audit), encoding="utf-8")
         manifest = {
-            "provider": "arena.generate_speech",
-            "generation": "caller_supplied",
-            "provenance_status": "caller_attested_unverified",
-            "voice_id": "voice-00",
+            "provider": acceptance.VOICE_PROVIDER,
+            "generation": "live_gemini_tts",
+            "provenance_status": acceptance.VOICE_PROVENANCE_STATUS,
+            "voice_id": acceptance.VOICE_ID,
             "language": "tr",
             "narration_sha256": hashlib.sha256(narration.encode()).hexdigest(),
             "audio_sha256": acceptance.sha256_file(root / "vo_raw.wav"),
+            "voice_audit_sha256": acceptance.sha256_file(audit_path),
         }
         (root / "voice_provenance_v2.json").write_text(json.dumps(manifest), encoding="utf-8")
         names = []
@@ -87,6 +105,13 @@ class ShortsV2GateTests(unittest.TestCase):
         with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "bitişik"):
             acceptance.validate_scene_intervals(intervals)
 
+    def test_final_size_is_always_1080x1920(self):
+        self.assertEqual(acceptance.validate_final_size(1080, 1920), (1080, 1920))
+        with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "1080x1920"):
+            acceptance.validate_final_size(1920, 1080)
+        with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "1080x1920"):
+            acceptance.validate_final_size(1080, 1921)
+
     def test_version_mismatch_fails_closed_but_legacy_mix_is_not_overlocked(self):
         with tempfile.TemporaryDirectory(dir=ROOT / ".agent_tmp") as temp:
             root = Path(temp)
@@ -105,23 +130,48 @@ class ShortsV2GateTests(unittest.TestCase):
             result = acceptance.validate_v2_production_context(root, config)
             self.assertEqual(result["scene_count"], 7)
             self.assertEqual(result["voice_speed_factor"], 1.0)
-            self.assertEqual(result["voice_provenance_status"], "caller_attested_unverified")
+            self.assertEqual(result["voice_provenance_status"], acceptance.VOICE_PROVENANCE_STATUS)
             (root / "s4.jpg").write_bytes(b"changed image")
             with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "SHA256"):
                 acceptance.validate_v2_production_context(root, config)
 
-    def test_voice_manifest_records_caller_attestation_not_verified_live_origin(self):
+    def test_voice_manifest_requires_live_gemini_charon_origin(self):
         with tempfile.TemporaryDirectory(dir=ROOT / ".agent_tmp") as temp:
             root = Path(temp)
             config, _ = self._valid_context(root)
             manifest_path = root / "voice_provenance_v2.json"
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            self.assertEqual(manifest["generation"], "caller_supplied")
-            self.assertEqual(manifest["provenance_status"], "caller_attested_unverified")
-            manifest["generation"] = "live"
-            manifest["provenance_status"] = "verified"
+            self.assertEqual(manifest["generation"], "live_gemini_tts")
+            self.assertEqual(manifest["provenance_status"], acceptance.VOICE_PROVENANCE_STATUS)
+            self.assertEqual(manifest["voice_id"], acceptance.VOICE_ID)
+            manifest["voice_id"] = "Arena"
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "ses manifest"):
+                acceptance.validate_v2_production_context(root, config)
+
+    def test_voice_audit_fails_closed_on_wrong_pitch_or_hash(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / ".agent_tmp") as temp:
+            root = Path(temp)
+            config, _ = self._valid_context(root)
+            audit_path = root / acceptance.VOICE_AUDIT_FILE
+            audit = json.loads(audit_path.read_text(encoding="utf-8"))
+            audit["f0_medyan_hz"] = 100.0
+            audit["sapma_yuzde"] = -21.3
+            audit["uyari"] = True
+            audit["passed"] = False
+            audit_path.write_text(json.dumps(audit), encoding="utf-8")
+            manifest_path = root / "voice_provenance_v2.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["voice_audit_sha256"] = acceptance.sha256_file(audit_path)
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "ses perdesi"):
+                acceptance.validate_v2_production_context(root, config)
+
+        with tempfile.TemporaryDirectory(dir=ROOT / ".agent_tmp") as temp:
+            root = Path(temp)
+            config, _ = self._valid_context(root)
+            (root / acceptance.VOICE_RAW_HAM_FILE).write_bytes(b"changed-ham")
+            with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "ses denetimi"):
                 acceptance.validate_v2_production_context(root, config)
 
     def test_dark_visual_and_nonfinite_semantic_score_fail_closed(self):
@@ -166,8 +216,9 @@ class ShortsV2GateTests(unittest.TestCase):
                 "production_mode": "production_v2",
                 "shorts_version": acceptance.SHORTS_VERSION,
                 "template_version": acceptance.TEMPLATE_VERSION,
-                "voice_provider": "arena.generate_speech",
-                "voice_provenance_status": "caller_attested_unverified",
+                "voice_provider": acceptance.VOICE_PROVIDER,
+                "voice_provenance_status": acceptance.VOICE_PROVENANCE_STATUS,
+                "voice_audit_sha256": acceptance.sha256_file(root / acceptance.VOICE_AUDIT_FILE),
                 "voice_speed_factor": 1.0,
                 "voice_raw_sha256": acceptance.sha256_file(root / "vo_raw.wav"),
                 "voice_render_sha256": acceptance.sha256_file(root / "vo_final.wav"),
@@ -181,7 +232,7 @@ class ShortsV2GateTests(unittest.TestCase):
             }
             (root / "render_manifest_v2.json").write_text(json.dumps(manifest), encoding="utf-8")
             checked = acceptance.validate_render_manifest_v2(root, config, 17.5)
-            self.assertEqual(checked["voice_provider"], "arena.generate_speech")
+            self.assertEqual(checked["voice_provider"], acceptance.VOICE_PROVIDER)
             (root / "mix.wav").write_bytes(b"changed-mix")
             with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "mix_sha256"):
                 acceptance.validate_render_manifest_v2(root, config, 17.5)
@@ -203,7 +254,7 @@ class ShortsV2GateTests(unittest.TestCase):
                 root = Path(temp)
                 config, _ = self._valid_context(root)
                 config["voice_speed_factor"] = value
-                with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "Arena sesinde tempo"):
+                with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "Gemini Charon sesinde tempo"):
                     acceptance.validate_v2_production_context(root, config)
         self.assertEqual(acceptance.validate_duration(18.0), 18.0)
         with self.assertRaises(acceptance.ShortsAcceptanceError):

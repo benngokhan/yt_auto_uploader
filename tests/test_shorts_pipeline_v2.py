@@ -33,7 +33,7 @@ class VoiceSpeedProcessingTests(unittest.TestCase):
             run.assert_not_called()
             self.assertEqual(source.read_bytes(), target.read_bytes())
 
-    def test_arena_format_conversion_never_adds_atempo(self):
+    def test_gemini_format_conversion_never_adds_atempo(self):
         with tempfile.TemporaryDirectory(dir=ROOT / ".agent_tmp") as temp:
             root = Path(temp)
             source, target = root / "voice.wav", root / "normalized.wav"
@@ -51,24 +51,28 @@ class VoiceSpeedProcessingTests(unittest.TestCase):
             self.assertIn("44100", command)
             self.assertEqual(source.read_bytes(), source_bytes)
 
-    def test_arena_rejects_speed_change_before_ffmpeg(self):
+    def test_gemini_rejects_speed_change_before_ffmpeg(self):
         with tempfile.TemporaryDirectory(dir=ROOT / ".agent_tmp") as temp:
             root = Path(temp)
             source, target = root / "voice.wav", root / "bad.wav"
             _write_voice_wav(source)
             with mock.patch.object(shorts_pipeline.subprocess, "run") as run:
-                with self.assertRaisesRegex(shorts_pipeline.ShortsAcceptanceError, "Arena sesi 1.00x"):
+                with self.assertRaisesRegex(shorts_pipeline.ShortsAcceptanceError, "Gemini Charon sesi 1.00x"):
                     shorts_pipeline.prepare_voice_wav(str(source), str(target), 1.07)
             run.assert_not_called()
 
-    def test_non_arena_provider_is_rejected_by_v2_voice_preparation(self):
+    def test_gemini_provider_is_accepted_and_arena_is_rejected(self):
         with tempfile.TemporaryDirectory(dir=ROOT / ".agent_tmp") as temp:
             root = Path(temp)
-            source, target = root / "voice.wav", root / "non_arena.wav"
+            source, target = root / "voice.wav", root / "gemini.wav"
             _write_voice_wav(source)
+            shorts_pipeline.prepare_voice_wav(str(source), str(target), 1.0, provider="gemini_tts")
+            self.assertEqual(source.read_bytes(), target.read_bytes())
+
             with mock.patch.object(shorts_pipeline.subprocess, "run") as run:
-                with self.assertRaisesRegex(shorts_pipeline.ShortsAcceptanceError, "yalnız Arena"):
-                    shorts_pipeline.prepare_voice_wav(str(source), str(target), 1.07, provider="tts")
+                with self.assertRaisesRegex(shorts_pipeline.ShortsAcceptanceError, "yalnız Gemini Charon"):
+                    shorts_pipeline.prepare_voice_wav(
+                        str(source), str(root / "arena.wav"), 1.0, provider="arena.generate_speech")
             run.assert_not_called()
 
     def test_invalid_speed_rejected_before_ffmpeg(self):

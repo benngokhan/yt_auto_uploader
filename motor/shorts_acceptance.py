@@ -13,6 +13,11 @@ from urllib.parse import urlparse
 
 from PIL import Image
 
+try:  # paket içi / doğrudan motor yolu
+    from .ses_olcum import SAPMA_ESIGI, TABAN_F0_HZ, perde_sapmasi
+except ImportError:  # pragma: no cover - testler motor/ yolundan yükler
+    from ses_olcum import SAPMA_ESIGI, TABAN_F0_HZ, perde_sapmasi
+
 SHORTS_VERSION = "shorts-v2.1"
 TEMPLATE_VERSION = "2.2-sablon_v2"
 EXPECTED_SCENES = 7
@@ -20,6 +25,15 @@ SHORTS_CTA = "Daha fazla Bilgi Dozu için takip et!"
 MIN_SCENE_SECONDS = 2.0
 MAX_SCENE_SECONDS = 3.0
 MIN_AVG_BRIGHTNESS = 100.0
+# Ses sabiti: "Arena" etiketi yok. Referans, 097 üretimindeki Gemini TTS Charon sesidir.
+VOICE_PROVIDER = "gemini_tts"
+VOICE_ID = "Charon"
+VOICE_PROVENANCE_STATUS = "live_gemini_generated"
+VOICE_LANGUAGES = {"tr", "tr-TR"}
+VOICE_AUDIT_FILE = "voice_audit_v2.json"
+VOICE_RAW_HAM_FILE = "vo_raw.gemini_ham24k.wav"
+FINAL_WIDTH = 1080
+FINAL_HEIGHT = 1920
 # Threshold for live Gemini Vision image/text similarity scores; Pexels does not supply this score.
 SEMANTIC_THRESHOLD = 0.62
 LOCKED_MIX_TIMING = {
@@ -27,6 +41,18 @@ LOCKED_MIX_TIMING = {
     "sentence_pause": 0.54,
     "outro_hold": 1.45,
 }
+
+
+def validate_final_size(width: object, height: object) -> tuple[int, int]:
+    """Son Short her zaman 1080x1920 olmalı; başka boyut fail-closed."""
+    try:
+        w, h = int(width), int(height)
+    except (TypeError, ValueError) as exc:
+        raise ShortsAcceptanceError("Son video boyutu okunamadı") from exc
+    if (w, h) != (FINAL_WIDTH, FINAL_HEIGHT):
+        raise ShortsAcceptanceError(
+            f"Son video {FINAL_WIDTH}x{FINAL_HEIGHT} olmalı; bulundu: {w}x{h}")
+    return w, h
 
 
 class ShortsAcceptanceError(ValueError):
@@ -172,13 +198,15 @@ def validate_v2_production_context(work_dir: str | Path, config: dict) -> dict |
     validate_locked_mix_timing(config)
     speed = _finite_float(config.get("voice_speed_factor", 1.0), "voice_speed_factor")
     if abs(speed - 1.0) > 1e-9:
-        raise ShortsAcceptanceError("Arena sesinde tempo değişimi yasak; v2 yalnız 1.00x biçim dönüştürmesi kullanır")
+        raise ShortsAcceptanceError("Gemini Charon sesinde tempo değişimi yasak; v2 yalnız 1.00x biçim dönüştürmesi kullanır")
 
     script_path = work / "script.txt"
     raw_wav = work / "vo_raw.wav"
     voice_manifest_path = work / "voice_provenance_v2.json"
+    voice_audit_path = work / VOICE_AUDIT_FILE
+    voice_ham_path = work / VOICE_RAW_HAM_FILE
     visual_report_path = work / "visual_validation.json"
-    for required in (script_path, raw_wav, voice_manifest_path, visual_report_path):
+    for required in (script_path, raw_wav, voice_manifest_path, voice_audit_path, voice_ham_path, visual_report_path):
         if not required.is_file():
             raise ShortsAcceptanceError(f"V2 zorunlu dosya eksik: {required.name}")
 
@@ -195,15 +223,38 @@ def validate_v2_production_context(work_dir: str | Path, config: dict) -> dict |
     if not isinstance(manifest, dict):
         raise ShortsAcceptanceError("Ses manifest'i JSON nesnesi değil")
     if (
-        manifest.get("provider") != "arena.generate_speech"
-        or manifest.get("generation") != "caller_supplied"
-        or manifest.get("provenance_status") != "caller_attested_unverified"
-        or not str(manifest.get("voice_id") or "").startswith("voice-")
-        or manifest.get("language") not in {"tr", "tr-TR"}
+        manifest.get("provider") != VOICE_PROVIDER
+        or manifest.get("generation") != "live_gemini_tts"
+        or manifest.get("provenance_status") != VOICE_PROVENANCE_STATUS
+        or manifest.get("voice_id") != VOICE_ID
+        or manifest.get("language") not in VOICE_LANGUAGES
         or manifest.get("narration_sha256") != narration_hash
         or manifest.get("audio_sha256") != voice_hash
     ):
-        raise ShortsAcceptanceError("Arena ses manifest'i WAV/script SHA256 veya kaynakla eşleşmiyor")
+        raise ShortsAcceptanceError("Gemini Charon ses manifest'i WAV/script SHA256 veya kaynakla eşleşmiyor")
+
+    try:
+        audit = json.loads(voice_audit_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ShortsAcceptanceError("Ses denetim raporu okunamıyor") from exc
+    if not isinstance(audit, dict):
+        raise ShortsAcceptanceError("Ses denetim raporu JSON nesnesi değil")
+    audit_f0 = _finite_float(audit.get("f0_medyan_hz"), "denetim f0 medyanı")
+    if (perde_sapmasi(audit_f0)["uyari"]
+            or abs(_finite_float(audit.get("sapma_yuzde"), "denetim sapması")) > SAPMA_ESIGI * 100 + 1e-9):
+        raise ShortsAcceptanceError("Gemini Charon ses perdesi onaylı tabandan fazla sapıyor")
+    if (
+        audit.get("provider") != VOICE_PROVIDER
+        or audit.get("voice_id") != VOICE_ID
+        or audit.get("generation") != "live_gemini_tts"
+        or audit.get("provenance_status") != VOICE_PROVENANCE_STATUS
+        or audit.get("passed") is not True
+        or audit.get("uyari") is not False
+        or audit.get("voice_sha256") != voice_hash
+        or audit.get("raw_sha256") != sha256_file(voice_ham_path)
+        or manifest.get("voice_audit_sha256") != sha256_file(voice_audit_path)
+    ):
+        raise ShortsAcceptanceError("Gemini Charon ses denetimi başarısız veya manifest ile uyuşmuyor")
 
     report = json.loads(visual_report_path.read_text(encoding="utf-8"))
     rows = _validate_visual_report(report)
@@ -238,7 +289,10 @@ def validate_v2_production_context(work_dir: str | Path, config: dict) -> dict |
         "narration_sha256": narration_hash,
         "voice_raw_sha256": voice_hash,
         "voice_provider": manifest["provider"],
+        "voice_id": manifest["voice_id"],
         "voice_provenance_status": manifest["provenance_status"],
+        "voice_audit_sha256": sha256_file(voice_audit_path),
+        "voice_f0_medyan_hz": audit_f0,
         "visual_report": report,
         "voice_speed_factor": speed,
         "scene_count": EXPECTED_SCENES,
@@ -267,8 +321,9 @@ def validate_render_manifest_v2(
         or manifest.get("production_mode") != "production_v2"
         or manifest.get("shorts_version") != SHORTS_VERSION
         or manifest.get("template_version") != TEMPLATE_VERSION
-        or manifest.get("voice_provider") != "arena.generate_speech"
-        or manifest.get("voice_provenance_status") != "caller_attested_unverified"
+        or manifest.get("voice_provider") != VOICE_PROVIDER
+        or manifest.get("voice_provenance_status") != VOICE_PROVENANCE_STATUS
+        or manifest.get("voice_audit_sha256") != sha256_file(work / VOICE_AUDIT_FILE)
         or _finite_float(manifest.get("voice_speed_factor"), "manifest voice_speed_factor") != 1.0
         or _finite_float(config.get("voice_speed_factor", 1.0), "voice_speed_factor") != 1.0
     ):

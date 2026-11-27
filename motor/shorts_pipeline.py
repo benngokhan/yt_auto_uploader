@@ -56,6 +56,7 @@ from shorts_acceptance import (  # noqa: E402
     EXPECTED_SCENES,
     MIN_SCENE_SECONDS,
     MAX_SCENE_SECONDS,
+    VOICE_PROVIDER,
     ShortsAcceptanceError,
     sha256_file,
     validate_duration,
@@ -937,19 +938,19 @@ def prepare_voice_wav(
     raw_wav: str,
     output_wav: str,
     speed_factor: float,
-    provider: str = "arena.generate_speech",
+    provider: str = VOICE_PROVIDER,
 ) -> None:
-    """Prepare the declared Arena voice at 1.00x; format conversion never changes tempo."""
+    """Prepare the declared Gemini Charon voice at 1.00x; format conversion never changes tempo."""
     try:
         factor = float(speed_factor)
     except (TypeError, ValueError) as exc:
         raise ShortsAcceptanceError("voice_speed_factor sayı olmalı") from exc
     if not math.isfinite(factor):
         raise ShortsAcceptanceError("voice_speed_factor sonlu olmalı")
-    if provider != "arena.generate_speech":
-        raise ShortsAcceptanceError(f"Shorts v2 yalnız Arena sesini kabul eder; sağlayıcı: {provider}")
+    if provider != VOICE_PROVIDER:
+        raise ShortsAcceptanceError(f"Shorts v2 yalnız Gemini Charon sesini kabul eder; sağlayıcı: {provider}")
     if abs(factor - 1.0) >= 1e-9:
-        raise ShortsAcceptanceError("Arena sesi 1.00x kalmalı; yalnız biçim dönüştürmeye izin var")
+        raise ShortsAcceptanceError("Gemini Charon sesi 1.00x kalmalı; yalnız biçim dönüştürmeye izin var")
 
     source_ok = False
     try:
@@ -977,7 +978,7 @@ def prepare_voice_wav(
         raise
     except Exception as exc:  # noqa: BLE001
         Path(output_wav).unlink(missing_ok=True)
-        raise ShortsAcceptanceError(f"Arena WAV biçim/tempo işlemi başarısız ({type(exc).__name__})") from exc
+        raise ShortsAcceptanceError(f"Gemini Charon WAV biçim/tempo işlemi başarısız ({type(exc).__name__})") from exc
 
 
 def ff_silences(path: str, noise_db: float = -35.0, min_dur: float = 0.14):
@@ -2004,6 +2005,7 @@ def render_video(vdir_arg: str, explicit_cfg_path: str | None = None):
             "template_version": cfg["template_version"],
             "voice_provider": v2_context["voice_provider"],
             "voice_provenance_status": v2_context["voice_provenance_status"],
+            "voice_audit_sha256": v2_context["voice_audit_sha256"],
             "voice_speed_factor": v2_context["voice_speed_factor"],
             "voice_raw_sha256": v2_context["voice_raw_sha256"],
             "voice_render_sha256": sha256_file(os.path.join(work_dir, "vo_final.wav")),
