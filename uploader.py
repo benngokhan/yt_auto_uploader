@@ -319,7 +319,12 @@ def validate_metadata_workbook(drive, queue_folder: str) -> str:
         print(f"YOUTUBE-OTOMASYON: Aktif CEO klasörü = '{qname}' (id {queue_folder[:8]}...) — Kısa/Uzun Video alt klasörleri bağlı.")
     except Exception as xe:
         print(f"UZUN-RONTGEN hata (zararsız): {xe}")
-    print("CROSSPOST: Instagram ve TikTok paylaşımı kullanıcı kararıyla PASİF.")
+    try:
+        from crosspost_worker import _flag_on, _tiktok_ready
+        _tt_durum = "AÇIK" if _flag_on("CROSSPOST_ENABLED") and _tiktok_ready() else "KAPALI"
+    except Exception:
+        _tt_durum = "KAPALI"
+    print(f"CROSSPOST: TikTok {_tt_durum}, Instagram KAPALI (sahip kararı).")
     qstats = compute_queue_stats(
         drive,
         queue_folder or DEFAULT_DRIVE_FOLDER_ID,

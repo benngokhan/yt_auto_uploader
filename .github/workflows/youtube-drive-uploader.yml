@@ -46,13 +46,18 @@ jobs:
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-      # Kullanıcı isteği: Instagram/TikTok devre dışı; eski oturumlar kullanılmaz.
-      CROSSPOST_ENABLED: 'false'
+      # Sahip onayı (27.11.2026): yalnızca TikTok açık; Instagram kapalı kalır.
+      # TIKTOK_SESSIONID GitHub Secret'tan okunur; secret yoksa Drive keys dosyası kullanılır.
+      # Acil durdurma: CROSSPOST_ENABLED değerini 'false' yapman yeterli.
+      CROSSPOST_ENABLED: 'true'
+      TIKTOK_ENABLED: 'true'
+      INSTAGRAM_ENABLED: 'false'
+      TIKTOK_SESSIONID: ${{ secrets.TIKTOK_SESSIONID }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref_name }}
           persist-credentials: true
 
       - name: Set up Python

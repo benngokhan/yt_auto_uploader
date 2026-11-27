@@ -29,7 +29,9 @@
     "min_shorts_number": 155,
     "min_long_number": 8,
     "cover_fallback_generation": false,
-    "crosspost_enabled": false
+    "crosspost_enabled": true,
+    "tiktok_enabled": true,
+    "instagram_enabled": false
   },
   "queue_summary": {
     "ready_shorts": 19,

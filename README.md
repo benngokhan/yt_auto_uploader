@@ -114,6 +114,18 @@ Open your browser at **http://localhost:8000**
 
 Per-channel settings (upload time, uploads per day, privacy, etc.) are set via the dashboard and stored in `channels.json`.
 
+### Cross-post (TikTok)
+
+TikTok sharing is enabled with the owner's explicit approval (27.11.2026); Instagram stays off. Flags live in `.github/workflows/youtube-drive-uploader.yml`:
+
+| Variable | Value | Meaning |
+|---|---|---|
+| `CROSSPOST_ENABLED` | `true` | Master kill switch. Set to `false` to stop every external platform immediately. |
+| `TIKTOK_ENABLED` | `true` | TikTok posting (also requires `TIKTOK_SESSIONID`). |
+| `INSTAGRAM_ENABLED` | `false` | Owner decision — stays off. |
+
+`TIKTOK_SESSIONID` is read from the GitHub repository secret of the same name. If that secret is not set, the old `crosspost_keys.json` in the Drive stock folder is used as a fallback. Use a current session cookie; old sessions are not reused. Only 9:16 Shorts are posted — `uzun_*` videos stay YouTube-only. A platform failure never breaks the YouTube upload; the result is reported as "unverified" on the Telegram card.
+
 ---
 
 ## How It Works
