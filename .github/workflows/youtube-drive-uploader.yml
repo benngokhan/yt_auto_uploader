@@ -53,6 +53,7 @@ jobs:
       TIKTOK_ENABLED: 'true'
       INSTAGRAM_ENABLED: 'false'
       TIKTOK_SESSIONID: ${{ secrets.TIKTOK_SESSIONID }}
+      TIKTOK_DATACENTER: ${{ secrets.TIKTOK_DATACENTER }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

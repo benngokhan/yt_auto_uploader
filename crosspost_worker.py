@@ -201,6 +201,15 @@ def _ensure_playwright_browser() -> None:
         log.warning(f"playwright chromium kurulumu: {e} (devam ediliyor, zaten kurulu olabilir)")
 
 
+def _tiktok_cookies(sid: str) -> list[dict]:
+    """TikTok kimlik çerezleri; varsa veri merkezi çerezini de ekle."""
+    cookies = [{"name": "sessionid", "value": sid, "domain": ".tiktok.com", "path": "/"}]
+    datacenter = os.getenv("TIKTOK_DATACENTER", "").strip()
+    if datacenter:
+        cookies.append({"name": "tt-target-idc", "value": datacenter, "domain": ".tiktok.com", "path": "/"})
+    return cookies
+
+
 def post_tiktok(video_path: Path, caption: str) -> str | None:
     """sessionid çereziyle TikTok'a yükler. Başarılıysa None değil URL/ID döner."""
     if not _flag_on("TIKTOK_ENABLED"):
@@ -216,9 +225,7 @@ def post_tiktok(video_path: Path, caption: str) -> str | None:
 
         # tiktok-uploader 1.2.0 sessionid cookie'sini domain'siz ekleyip patlıyor;
         # domain+path içeren cookies_list formatıyla bypass ediyoruz
-        cookies_list = [
-            {"name": "sessionid", "value": sid, "domain": ".tiktok.com", "path": "/"},
-        ]
+        cookies_list = _tiktok_cookies(sid)
         failed = upload_video(
             filename=str(video_path),
             description=_trim_caption(caption, TIKTOK_MAX_CAPTION),

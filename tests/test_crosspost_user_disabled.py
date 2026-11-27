@@ -63,6 +63,17 @@ class CrosspostOwnerDecisionTests(unittest.TestCase):
         tiktok.assert_not_called()
         self.assertEqual(result, {"instagram": None, "tiktok": None})
 
+    def test_tiktok_cookies_include_datacenter_when_set(self):
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(worker._tiktok_cookies("abc"), [
+                {"name": "sessionid", "value": "abc", "domain": ".tiktok.com", "path": "/"}
+            ])
+        with patch.dict(os.environ, {"TIKTOK_DATACENTER": "us"}, clear=True):
+            self.assertEqual(worker._tiktok_cookies("abc"), [
+                {"name": "sessionid", "value": "abc", "domain": ".tiktok.com", "path": "/"},
+                {"name": "tt-target-idc", "value": "us", "domain": ".tiktok.com", "path": "/"},
+            ])
+
     def test_tiktok_session_prefix_is_normalized(self):
         cases = {
             'sessionid=abc123': 'abc123',
