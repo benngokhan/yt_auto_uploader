@@ -35,9 +35,51 @@ except ImportError:
 from shorts_acceptance import MIN_AVG_BRIGHTNESS, SEMANTIC_THRESHOLD
 
 HEDEF = (1350, 2400)  # Tam 9:16 dikey, Ken Burns zoom için yüksek keskinlik
-SEMANTIC_MODEL = "gemini-3.8-flash"
+SEMANTIC_MODEL = os.getenv("GEMINI_VISION_MODEL", "gemini-3.8-flash")
+# Ücretsiz kota model başına günlük 20 istek. Ana model tükenirse sırayla yedek dene.
+_SEMANTIC_FALLBACKS = [
+    m.strip() for m in os.getenv(
+        "GEMINI_VISION_FALLBACKS",
+        "gemini-3.8-flash-lite,gemini-3.6-flash,gemini-2.5-flash",
+    ).split(",") if m.strip()
+]
 MAX_CANDIDATES_PER_QUERY = 5
 VISUAL_QA_ENV = "MOTOR_VISUAL_QA_PASSED"
+
+
+_DISCOVERED_VISION_MODELS: list[str] | None = None
+
+
+def _static_vision_models() -> list[str]:
+    """Ana model + env ile verilen sabit yedekler."""
+    return [SEMANTIC_MODEL] + [m for m in _SEMANTIC_FALLBACKS if m != SEMANTIC_MODEL]
+
+
+def _discover_flash_models() -> list[str]:
+    """Yalnız ana model(ler) kotayla düşünce çağrılır: Gemini'nin diğer flash modelleri."""
+    global _DISCOVERED_VISION_MODELS
+    if _DISCOVERED_VISION_MODELS is not None:
+        return _DISCOVERED_VISION_MODELS
+    bulunan: list[str] = []
+    key = (os.getenv("GEMINI_API_KEY") or "").strip()
+    if key:
+        try:
+            with urllib.request.urlopen(
+                "https://generativelanguage.googleapis.com/v1beta/models?key=" + key, timeout=30
+            ) as y:
+                veri = json.load(y).get("models", [])
+            for m in veri:
+                ad = str(m.get("name", "")).split("/", 1)[-1]
+                dusuk = ad.lower()
+                if ("generateContent" in (m.get("supportedGenerationMethods") or [])
+                        and "flash" in dusuk
+                        and not any(x in dusuk for x in ("tts", "image", "live", "omni", "embedding"))):
+                    if ad not in bulunan:
+                        bulunan.append(ad)
+        except Exception:  # noqa: BLE001 — model listesi alınamazsa sabit yedeklerle devam
+            pass
+    _DISCOVERED_VISION_MODELS = bulunan
+    return bulunan
 
 
 def semantic_score_passes(score: float | None) -> bool:
@@ -342,7 +384,7 @@ def _sorgu_adaylari(sahne: dict, yedek: list[str] | None = None, ana_konu: str =
         q = " ".join(w for w in temiz(raw).split() if w.lower() not in soyut)
         if q and q.lower() not in {x.lower() for x in sorgular}:
             sorgular.append(q)
-    return sorgular[:2]
+    return sorgular[:1]
 
 
 def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str = "", gevsek: bool = False) -> bool:
@@ -626,50 +668,66 @@ def _visual_text_scores(scene_text: str, candidates: list[dict]) -> list[float |
 
         body = {"contents": [{"parts": parts}],
                 "generationConfig": {"responseMimeType": "application/json", "temperature": 0}}
-        req = urllib.request.Request(
-            f"https://generativelanguage.googleapis.com/v1beta/models/{SEMANTIC_MODEL}:generateContent?key={key}",
-            data=json.dumps(body).encode("utf-8"),
-            headers={"Content-Type": "application/json"})
         try:
-            response = None
-            for attempt in range(3):
-                try:
-                    response = urllib.request.urlopen(req, timeout=90)
-                    break
-                except urllib.error.HTTPError as http_error:
-                    if http_error.code not in (429, 503) or attempt == 2:
-                        raise
-                    try:
-                        retry_after = float(http_error.headers.get("Retry-After", 2 ** (attempt + 1)))
-                    except (TypeError, ValueError):
-                        retry_after = float(2 ** (attempt + 1))
-                    time.sleep(min(max(retry_after, 1.0), 15.0))
-                except TimeoutError:
-                    if attempt == 2:
-                        raise
-                    # A timed-out scoring request has no publishing side effect; retry is bounded
-                    # to the same three-attempt ceiling already used for HTTP 429/503.
-                    time.sleep(min(float(2 ** (attempt + 1)), 15.0))
-            if response is None:
-                raise RuntimeError("Gemini Vision retry loop ended without a response")
-            with response:
-                answer = json.load(response)["candidates"][0]["content"]["parts"][0]["text"]
-            parsed = json.loads(answer)
-            raw = parsed.get("scores") if isinstance(parsed, dict) else None
-            if not isinstance(raw, list) or len(raw) != len(valid_indices):
-                return [None] * len(candidates)
-            scores: list[float | None] = [None] * len(candidates)
-            for i, val in zip(valid_indices, raw):
-                try:
-                    score = float(val)
-                except (TypeError, ValueError):
-                    candidates[i]["_vision_error"] = "invalid_live_vision_score"
+            last_exc: Exception | None = None
+            modeller = _static_vision_models()
+            denenen: set[str] = set()
+            kesif_yapildi = False
+            idx = 0
+            while idx < len(modeller) and len(denenen) < 6:
+                model = modeller[idx]
+                idx += 1
+                if model in denenen:
                     continue
-                if np.isfinite(score) and 0.0 <= score <= 1.0:
-                    scores[i] = score
-                else:
-                    candidates[i]["_vision_error"] = "invalid_live_vision_score"
-            return scores
+                denenen.add(model)
+                req = urllib.request.Request(
+                    f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}",
+                    data=json.dumps(body).encode("utf-8"),
+                    headers={"Content-Type": "application/json"})
+                try:
+                    response = None
+                    for attempt in range(2):
+                        try:
+                            response = urllib.request.urlopen(req, timeout=90)
+                            break
+                        except urllib.error.HTTPError as http_error:
+                            last_exc = http_error
+                            # 429/404: bu model tükendi veya yok; aynı modelde ısrar etme.
+                            if http_error.code in (429, 400, 404):
+                                response = None
+                                break
+                            if http_error.code != 503 or attempt == 1:
+                                raise
+                            time.sleep(min(float(2 ** (attempt + 1)), 15.0))
+                        except TimeoutError:
+                            if attempt == 1:
+                                raise
+                            time.sleep(min(float(2 ** (attempt + 1)), 15.0))
+                    if response is not None:
+                        with response:
+                            answer = json.load(response)["candidates"][0]["content"]["parts"][0]["text"]
+                        parsed = json.loads(answer)
+                        raw = parsed.get("scores") if isinstance(parsed, dict) else None
+                        if isinstance(raw, list) and len(raw) == len(valid_indices):
+                            scores: list[float | None] = [None] * len(candidates)
+                            for i, val in zip(valid_indices, raw):
+                                try:
+                                    score = float(val)
+                                except (TypeError, ValueError):
+                                    candidates[i]["_vision_error"] = "invalid_live_vision_score"
+                                    continue
+                                if np.isfinite(score) and 0.0 <= score <= 1.0:
+                                    scores[i] = score
+                                else:
+                                    candidates[i]["_vision_error"] = "invalid_live_vision_score"
+                            return scores
+                        last_exc = RuntimeError("vision_score_shape")
+                except Exception as exc:  # noqa: BLE001 — sıradaki modeli dene
+                    last_exc = exc
+                if idx >= len(modeller) and not kesif_yapildi:
+                    kesif_yapildi = True
+                    modeller.extend(_discover_flash_models())
+            raise last_exc or RuntimeError("Gemini Vision hiçbir modelde yanıt vermedi")
         except Exception as exc:  # noqa: BLE001 — fail closed
             # Keep only safe quota metadata; never log the request URL or API key.
             if isinstance(exc, urllib.error.HTTPError):
@@ -743,9 +801,10 @@ def sahneler_icin_gorseller(
     pexels_key = (os.getenv("PEXELS_API_KEY") or os.getenv("PEXELS_KEY") or os.getenv("PEXELS_API") or "").strip()
     pixabay_key = os.getenv("PIXABAY_API_KEY", "").strip()
     providers: list[tuple[str, str, object]] = []
+    # v2 kabul kapısı yalnız Pexels kaynağını kabul eder; Pixabay'a boşa kota harcama.
     if pexels_key:
         providers.append(("pexels", pexels_key, pexels_ara))
-    if pixabay_key:
+    elif pixabay_key:
         providers.append(("pixabay", pixabay_key, pixabay_ara))
 
     klasor.mkdir(parents=True, exist_ok=True)
