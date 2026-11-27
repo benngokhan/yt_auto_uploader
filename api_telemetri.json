@@ -1,12 +1,12 @@
 {
-  "zaman": "2026-11-26T21:40:01+00:00",
+  "zaman": "2026-11-27T08:43:29+00:00",
   "servisler": [
     {
       "ad": "Pexels",
       "durum": "ok",
-      "kalan": 24543,
+      "kalan": 24505,
       "limit": 25000,
-      "kullanilan": 457,
+      "kullanilan": 495,
       "birim": "istek/ay",
       "reset_iso": "2026-12-12T13:51:48+00:00",
       "yenilenme": "aylık kota · saatlik 200 istek penceresi",
@@ -16,8 +16,8 @@
       "ad": "Gemini · Charon",
       "durum": "ok",
       "limit": 1500,
-      "kalan": 1494,
-      "kullanilan": 6,
+      "kalan": 1498,
+      "kullanilan": 2,
       "birim": "istek/gün",
       "model_sayisi": 50,
       "yenilenme": "günlük · her gün TR 10:00 (00:00 Pasifik) sıfırlanır",
@@ -46,21 +46,21 @@
     {
       "ad": "Google Drive",
       "durum": "ok",
-      "kalan": 3577912013,
+      "kalan": 3560830848,
       "limit": 16106127360,
-      "kullanilan": 12528215347,
+      "kullanilan": 12545296512,
       "birim": "bayt",
       "kirilim": [
         {
           "ad": "Video + Kapak Kuyruğu (video kapak)",
-          "boyut": 390287668,
-          "dosya": 72,
+          "boyut": 118573230,
+          "dosya": 14,
           "sahip": "active.sav81@gmail.com, galtundal81@gmail.com"
         },
         {
           "ad": "Ana Klasör & baslik.xlsx (Bilgi_Dozu_Yeni_Shorts)",
-          "boyut": 491385227,
-          "dosya": 99,
+          "boyut": 376360291,
+          "dosya": 74,
           "sahip": "active.sav81@gmail.com, galtundal81@gmail.com"
         },
         {
@@ -88,14 +88,14 @@
     {
       "ad": "GitHub Actions",
       "durum": "ok",
-      "kalan": 1626.8,
+      "kalan": 1570.5,
       "limit": 2000,
-      "kullanilan": 373.2,
+      "kullanilan": 429.5,
       "birim": "dk/ay",
-      "actions_dakika": 373.2,
+      "actions_dakika": 429.5,
       "actions_kosu": 500,
       "actions_limit": 2000,
-      "actions_kalan": 1626.8,
+      "actions_kalan": 1570.5,
       "api_kalan": 4999,
       "api_limit": 5000,
       "yenilenme": "aylık 2.000 dk ücretsiz · her ayın 1'inde sıfırlanır",
