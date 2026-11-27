@@ -720,8 +720,20 @@ def get_next_scheduled_video(
             continue
         break
 
-    if force_file and force_file.casefold() != name.casefold():
-        log.warning("Sıra dışı Shorts isteği yok sayıldı: %s; beklenen %s", force_file, name)
+    force = (force_file or "").strip()
+    allow_force = os.getenv("ALLOW_FORCE_FILE", "").strip().lower() in {"1", "true", "yes", "on"}
+    if force and force.casefold() != name.casefold():
+        if allow_force:
+            log.warning("Tek seferlik force_file geçersiz kılma: %s (beklenen %s)", force, name)
+            forced = [c for c in collect_ready(want_long=False) if c["name"].casefold() == force.casefold()]
+            if not forced:
+                log.warning("İstenen %s yok veya hazır değil; sıra atlanmadan bekleniyor.", force)
+                return None
+            if len(forced) != 1:
+                log.error("İstenen %s birden fazla sürümle eşleşti; güvenlik için durduruldu.", force)
+                return None
+            return forced[0]
+        log.warning("Sıra dışı Shorts isteği yok sayıldı: %s; beklenen %s", force, name)
     candidates = [c for c in collect_ready(want_long=False) if c["name"].casefold() == name.casefold()]
     if not candidates:
         log.warning("Sıradaki %s yok veya hazır değil; sıra atlanmadan bekleniyor.", name)

@@ -236,6 +236,7 @@ jobs:
           INPUT_VIDEO_TYPE: ${{ steps.slot.outputs.kind || inputs.video_type || 'auto' }}
           BILGI_SLOT_KEY: ${{ steps.slot.outputs.key }}
           INPUT_FORCE_FILE: ${{ inputs.force_file || '' }}
+          ALLOW_FORCE_FILE: ${{ inputs.force_file != '' && '1' || '0' }}
         run: |
           python - <<'PY'
           import os, time

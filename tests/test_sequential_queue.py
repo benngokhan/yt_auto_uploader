@@ -1,3 +1,4 @@
+import os
 import unittest
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
@@ -54,6 +55,13 @@ class SequentialQueueTests(unittest.TestCase):
         table={'video_157.mp4':meta('video_157.mp4'), 'video_158.mp4':meta('video_158.mp4')}
         result=self.select(table,[item(n) for n in table],skip=done)
         self.assertEqual(result['name'],'video_158.mp4')
+
+    def test_force_file_override_only_when_explicitly_allowed(self):
+        table={'video_155.mp4':meta('video_155.mp4'),'video_158.mp4':meta('video_158.mp4')}
+        videos=[item(n) for n in table]
+        self.assertEqual(self.select(table,videos,force='video_158.mp4')['name'],'video_155.mp4')
+        with patch.dict(os.environ, {'ALLOW_FORCE_FILE':'1'}):
+            self.assertEqual(self.select(table,videos,force='video_158.mp4')['name'],'video_158.mp4')
 
     def test_matching_duplicate_names_refuse_publication(self):
         table={'video_155.mp4':meta('video_155.mp4')}
