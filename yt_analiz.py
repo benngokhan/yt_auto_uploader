@@ -23,10 +23,11 @@ import retansiyon_raporu as rr
 
 SCHEMA = 1
 SCORE_VERSION = "engagement-retention-trend-v1"
-LONG_MIN_SEC = 180.0
+# Eşikler gerçek veriye göre ayarlanabilir; garanti/sıralama iddiası değildir.
+LONG_MIN_SEC = float(os.getenv("UZUN_MIN_SN", "120"))
 LONG_MAX_SEC = 3600.0
-MIN_VIEWS = 200
-DEFAULT_DAYS = 30
+MIN_VIEWS = int(os.getenv("MIN_IZLENME", "50"))
+DEFAULT_DAYS = int(os.getenv("ANALIZ_GUN", "180"))
 DEFAULT_LIMIT = 10
 DEFAULT_CURVE_LIMIT = 6
 ENGAGEMENT_METRICS = (

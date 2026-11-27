@@ -22,7 +22,7 @@ on:
       gun:
         description: "Analiz penceresi (gün)"
         required: false
-        default: "30"
+        default: "180"
         type: string
       onay_dakika:
         description: "Her video için Telegram onay süresi (dakika)"
@@ -80,8 +80,10 @@ jobs:
         env:
           BD_ANALYTICS_CLIENT_CONFIG: ${{ secrets.BD_ANALYTICS_CLIENT_CONFIG }}
           BD_ANALYTICS_REFRESH_TOKEN: ${{ secrets.BD_ANALYTICS_REFRESH_TOKEN }}
-          GUN: ${{ inputs.gun || '30' }}
+          GUN: ${{ inputs.gun || '180' }}
           ADET: ${{ inputs.adet || '2' }}
+          UZUN_MIN_SN: "120"
+          MIN_IZLENME: "50"
         run: |
           python yt_analiz.py --days "$GUN" --limit "$ADET" \
             --curve-limit "$ADET" --out yt_analiz.json
