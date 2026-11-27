@@ -149,16 +149,17 @@ class ShortsV2GateTests(unittest.TestCase):
             with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "ses manifest"):
                 acceptance.validate_v2_production_context(root, config)
 
-    def test_voice_audit_fails_closed_on_wrong_pitch_or_hash(self):
+    def test_voice_audit_fails_closed_on_invalid_measurement_or_hash(self):
+        # Perde sapması uyarıdır; ölçüm yoksa/sonsuzsa fail-closed.
         with tempfile.TemporaryDirectory(dir=ROOT / ".agent_tmp") as temp:
             root = Path(temp)
             config, _ = self._valid_context(root)
             audit_path = root / acceptance.VOICE_AUDIT_FILE
             audit = json.loads(audit_path.read_text(encoding="utf-8"))
-            audit["f0_medyan_hz"] = 100.0
-            audit["sapma_yuzde"] = -21.3
+            audit["f0_medyan_hz"] = 0.0
+            audit["sapma_yuzde"] = -100.0
             audit["uyari"] = True
-            audit["passed"] = False
+            audit["passed"] = True
             audit_path.write_text(json.dumps(audit), encoding="utf-8")
             manifest_path = root / "voice_provenance_v2.json"
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))

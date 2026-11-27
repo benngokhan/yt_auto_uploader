@@ -143,17 +143,18 @@ class V2OrchestratorTests(unittest.TestCase):
             self.assertEqual(audit["raw_sha256"],
                              shorts_acceptance.sha256_file(output / shorts_acceptance.VOICE_RAW_HAM_FILE))
 
-    def test_voice_pitch_warning_stops_production(self):
+    def test_voice_pitch_warning_does_not_stop_production(self):
+        # Sahip kararı: f0 sapması yalnız ölçüm/uyarı; Charon kimliği kanıtlarla korunur.
         with tempfile.TemporaryDirectory(dir=ROOT / ".agent_tmp") as temp:
             output = Path(temp) / "v2"
             with mock.patch.dict(os.environ, {"GEMINI_API_KEY": "test-only"}), \
                  mock.patch.dict(sys.modules, {"tts": _tts_module(_fake_tts)}), \
                  mock.patch.object(ses_olcum, "olc", return_value=_olcum(100.0)):
-                with self.assertRaisesRegex(SystemExit, "Ses denetimi"):
-                    uret._generate_gemini_voice_audio(["Sahne."], output, _ayar())
+                uret._generate_gemini_voice_audio(["Sahne."], output, _ayar())
             audit = json.loads((output / shorts_acceptance.VOICE_AUDIT_FILE).read_text(encoding="utf-8"))
-            self.assertFalse(audit["passed"])
+            self.assertTrue(audit["passed"])
             self.assertTrue(audit["uyari"])
+            self.assertEqual(audit["voice_id"], "Charon")
 
 
 if __name__ == "__main__":
