@@ -126,6 +126,8 @@ TikTok sharing is enabled with the owner's explicit approval (27.11.2026); Insta
 
 `TIKTOK_SESSIONID` is read from the GitHub repository secret of the same name. If that secret is not set, the old `crosspost_keys.json` in the Drive stock folder is used as a fallback. Use a current session cookie; old sessions are not reused. Optional `TIKTOK_DATACENTER` secret adds the `tt-target-idc` cookie when TikTok requires it. Only 9:16 Shorts are posted — `uzun_*` videos stay YouTube-only. A platform failure never breaks the YouTube upload; the result is reported as "unverified" on the Telegram card.
 
+For an isolated TikTok check without uploading to YouTube, run the **TikTok Only Test** workflow (`tiktok-only-test.yml`) with `force_file=video_188.mp4`. It downloads the selected short from Drive and calls TikTok directly; no YouTube API upload is performed.
+
 ---
 
 ## How It Works
