@@ -119,6 +119,32 @@ def bilinmeyenler(metin: str) -> list[str]:
     return [k for k in kelimeler(metin) if not bilinen_mi(k)]
 
 
+_TR_HARF = "abcçdefgğhıijklmnoöprsştuüvyz"
+
+
+def yakin_adaylar(kelime: str, azami: int = 3) -> list[str]:
+    """Tek harf değişimiyle (aynı uzunluk) oluşan ve sözlükte BİLİNEN kelimeler.
+
+    Yapay zekâ düzeltmesi sonuç vermezse kullanılan yedek yoldur. Tek harf farkı,
+    Türkçede en sık yazım hatası biçimidir (ör. 'KEMİÇ' -> 'KEMİK'). Yalnız TEK
+    aday bulunursa güvenle kullanılmalıdır; birden fazla aday belirsizliktir.
+    """
+    k = tr_kucuk(str(kelime or "").replace("’", "'"))
+    if len(k) < 3 or "'" in k:
+        return []
+    bulunan: list[str] = []
+    for i in range(len(k)):
+        for harf in _TR_HARF:
+            if harf == k[i]:
+                continue
+            aday = k[:i] + harf + k[i + 1:]
+            if bilinen_mi(aday) and aday not in bulunan:
+                bulunan.append(aday)
+                if len(bulunan) >= azami:
+                    return bulunan
+    return bulunan
+
+
 def hazir_mi() -> tuple[bool, str]:
     try:
         _cozumleyici()

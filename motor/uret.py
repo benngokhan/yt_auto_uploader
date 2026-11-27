@@ -509,24 +509,78 @@ class BaslikDuzeltilemedi(SystemExit):
 BASLIK_DUZELTME_DENEMESI = 2
 
 
-def _baslik_duzeltme_iste(baslik: str, hatali: list, cumle: str, ayar: dict) -> str:
+def _baslik_duzeltme_iste(baslik: str, hatali: list, cumle: str, ayar: dict,
+                          *, onceki: str = "", atla: tuple[str, ...] = ()) -> str:
     """Yalnız işaretlenen kelime(ler) için yapay zekâdan düzeltme ister; cevabı olduğu gibi (büyük harfle) döndürür."""
     istem = (
         "Bir Türkçe video başlığında yazım hatası var. Başlık: " + json.dumps(baslik, ensure_ascii=False) + ". "
         "Sözlükte bulunmayan kelime(ler): " + json.dumps(hatali, ensure_ascii=False) + ". "
         "Başlığın ait olduğu cümle: " + json.dumps(cumle, ensure_ascii=False) + ". "
         "YALNIZCA sözlükte bulunmayan kelimeyi, cümleye uyan DOĞRU yazılmış Türkçe kelimeyle değiştir "
-        "(ör. 'MUM EYİ' -> 'MUM EVİ', 'ZERRCİKLER' -> 'ZERRECİKLER'). Diğer kelimelere dokunma, kelime sayısını "
-        "değiştirme, TAM BÜYÜK HARF yaz.\n"
-        'Yalnız JSON döndür: {"cumleler": ["DÜZELTİLMİŞ BAŞLIK"]}'
+        "(ör. 'MUM EYİ' -> 'MUM EVİ', 'ZERRCİKLER' -> 'ZERRECİKLER', 'KEMİÇ BALIĞI' -> 'KEMİK BALIĞI'). "
+        "Doğru kelime genellikle aynı uzunluktadır ve yalnız bir harf farklıdır; ekleri koru. "
+        "Diğer kelimelere dokunma, kelime sayısını değiştirme, TAM BÜYÜK HARF yaz.\n"
     )
+    if onceki:
+        istem += (
+            "ÖNEMLİ: Önceki önerin " + json.dumps(onceki, ensure_ascii=False) + " idi ve KABUL EDİLMEDİ "
+            "(aynı başlığı ya da yanlış kelimeyi tekrar verdi). Bu kez FARKLI ve gerçekten düzeltilmiş "
+            "bir başlık ver; sözlükte olmayan kelime yeni başlıkta KESİNLİKLE kalmasın.\n"
+        )
+    istem += 'Yalnız JSON döndür: {"cumleler": ["DÜZELTİLMİŞ BAŞLIK"]}'
     # Not: _llm_json yalnız "cumleler" (vb.) anahtarı taşıyan cevabı kabul eder; o yüzden cevap bu anahtarla istenir.
     # (67. çalıştırmada "baslik" anahtarı istendiği için doğru cevaplar yok sayılmıştı.)
-    veri = _llm_json(istem, ayar, "Sen titiz bir Türkçe yazım denetçisisin. Yalnız geçerli JSON döndürürsün.")
+    veri = _llm_json(istem, ayar, "Sen titiz bir Türkçe yazım denetçisisin. Yalnız geçerli JSON döndürürsün.",
+                     atla=atla)
     liste = veri.get("cumleler") if isinstance(veri, dict) else None
     if isinstance(liste, str):
         liste = [liste]
     return tr_upper(str(liste[0] or "").strip()) if isinstance(liste, list) and liste else ""
+
+
+def _sozluk_tabanli_duzeltme(eski: str, hatali: list) -> str:
+    """Yapay zekâ düzeltmesi sonuç vermezse: her şüpheli kelime için TEK harf farklı TEK aday varsa uygular.
+
+    Belirsizlikte (0 veya 2+ aday) boş döndürür; tahminle başlık üretilmez.
+    """
+    import re
+    import sozluk
+    yeni = eski
+    for kelime in hatali:
+        try:
+            adaylar = sozluk.yakin_adaylar(kelime)
+        except sozluk.SozlukYok:
+            return ""
+        if len(adaylar) != 1:
+            return ""
+        desen = rf"(?<!\w){re.escape(kelime)}(?!\w)"
+        if not re.search(desen, yeni):
+            return ""
+        yeni = re.sub(desen, tr_upper(adaylar[0]), yeni, count=1)
+    return yeni
+
+
+def _baslik_yeniden_uret(baslik1: str, baslik2: str, cumle: str, ayar: dict) -> tuple[str, str]:
+    """Kelime düzeltmesi tutmazsa sahnenin 2 satırlık başlığını cümleden YENİDEN üretir.
+
+    Başlık uydurma kelime içerdiğinde harf tahmini yerine anlamlı ve doğru yazımlı
+    yeni bir başlık istemek daha güvenlidir. Sonuç yine sözlük kapısından geçer.
+    """
+    istem = (
+        "Türkçe bir bilim videosu sahnesi için 2 satırlık vurucu başlık yaz.\n"
+        "Sahnenin cümlesi: " + json.dumps(cumle, ensure_ascii=False) + "\n"
+        "Kurallar: TAM BÜYÜK HARF; her satır en fazla 18 karakter; kelime ortasından bölme; "
+        "YALNIZ günlük Türkçede doğru yazılan yaygın sözcükler kullan; uydurma kelime, marka veya "
+        "yabancı terim yok; cümledeki anlamı koru; soru işareti kullanabilirsin.\n"
+        "Şu başlıklar yanlış yazım içerdiği için YASAK: "
+        + json.dumps([baslik1, baslik2], ensure_ascii=False) + "\n"
+        'Yalnız JSON döndür: {"cumleler": ["BİRİNCİ SATIR", "İKİNCİ SATIR"]}'
+    )
+    veri = _llm_json(istem, ayar, "Sen titiz bir Türkçe metin yazarısın. Yalnız geçerli JSON döndürürsün.")
+    liste = veri.get("cumleler") if isinstance(veri, dict) else None
+    if not isinstance(liste, list) or len(liste) != 2:
+        return "", ""
+    return tr_upper(str(liste[0] or "").strip()), tr_upper(str(liste[1] or "").strip())
 
 
 def _baslik_denetimi(sahneler: list, ayar: dict) -> int:
@@ -557,9 +611,14 @@ def _baslik_denetimi(sahneler: list, ayar: dict) -> int:
                 nedenler = {k: sozluk.durum(k) for k in hatali}
                 yaz(f"  başlık sözlük denetimi: {sira}. sahne {eski!r} -> şüpheli kelime: {nedenler}")
                 kabul = ""
+                reddedilen = ""
                 for deneme in range(1, BASLIK_DUZELTME_DENEMESI + 1):
+                    # İlk deneme ana sağlayıcıda; sonraki denemede aynı cevabı almamak için
+                    # o sağlayıcı atlanır ve modele önceki reddedilen öneri açıkça söylenir.
+                    atla = ("groq",) if deneme > 1 else ()
                     try:
-                        yeni = _baslik_duzeltme_iste(eski, hatali, str(x.get("ses", "")), ayar)
+                        yeni = _baslik_duzeltme_iste(eski, hatali, str(x.get("ses", "")), ayar,
+                                                     onceki=reddedilen, atla=atla)
                     except (Exception, SystemExit) as h:  # noqa: BLE001
                         yaz(f"    deneme {deneme}: düzeltme alınamadı ({type(h).__name__})")
                         continue
@@ -576,7 +635,44 @@ def _baslik_denetimi(sahneler: list, ayar: dict) -> int:
                     else:
                         kabul = yeni
                         break
+                    reddedilen = yeni or reddedilen
                     yaz(f"    deneme {deneme}: öneri {yeni!r} reddedildi ({neden})")
+                if not kabul:
+                    # Harf tahmini yerine önce başlığı cümleden yeniden üret: uydurma kelime
+                    # yerine anlamlı ve doğru yazımlı bir başlık çıkma şansı daha yüksek.
+                    try:
+                        y1, y2 = _baslik_yeniden_uret(
+                            str(x.get("baslik1", "")), str(x.get("baslik2", "")),
+                            str(x.get("ses", "")), ayar)
+                    except (Exception, SystemExit) as h:  # noqa: BLE001
+                        y1 = y2 = ""
+                        yaz(f"    başlık yeniden üretilemedi ({type(h).__name__})")
+                    if y1 and y2 and (y1, y2) != (str(x.get("baslik1", "")), str(x.get("baslik2", ""))):
+                        try:
+                            kalan1 = sozluk.bilinmeyenler(y1)
+                            kalan2 = sozluk.bilinmeyenler(y2)
+                        except sozluk.SozlukYok:
+                            kalan1, kalan2 = ["?"], ["?"]
+                        if (len(y1) <= 18 and len(y2) <= 18 and not kalan1 and not kalan2):
+                            x["baslik1"], x["baslik2"] = y1, y2
+                            kabul = y1 if anahtar == "baslik1" else y2
+                            yaz(f"    başlık yeniden üretildi: {eski!r} -> {kabul!r}")
+                        else:
+                            yaz(f"    yeniden üretilen başlık reddedildi (kalan: {kalan1 + kalan2})")
+                if not kabul:
+                    # Son güvenli yol: sözlükte tek harf farklı TEK aday varsa (ör. KEMİÇ -> KEMİK).
+                    # Birden fazla aday varsa tahmin yapılmaz.
+                    yedek = _sozluk_tabanli_duzeltme(eski, hatali)
+                    if yedek and yedek != eski:
+                        try:
+                            kalan = sozluk.bilinmeyenler(yedek)
+                        except sozluk.SozlukYok:
+                            kalan = ["?"]
+                        eski_k, yeni_k = sozluk.kelimeler(eski), sozluk.kelimeler(yedek)
+                        if (not kalan and len(yeni_k) == len(eski_k)
+                                and all(e == y for e, y in zip(eski_k, yeni_k) if e not in hatali)):
+                            kabul = yedek
+                            yaz(f"    sözlük tabanlı düzeltme kabul edildi: {eski!r} -> {yedek!r}")
                 if not kabul:
                     yaz(f"  BAŞLIK DÜZELTİLEMEDİ: {sira}. sahne {eski!r} (sözlükte olmayan: {hatali})")
                     for k in hatali:   # yanlış alarm olabilir: kelime ek kelime dosyasına NOT olarak düşülür
@@ -924,8 +1020,12 @@ PROMPT_V2 = (
 )
 
 
-def _llm_json(istem: str, ayar: dict, sistem: str | None = None) -> dict:
-    """Sahne planındaki sağlayıcı zincirini (groq -> gemini -> openrouter) tek istem için kullanır."""
+def _llm_json(istem: str, ayar: dict, sistem: str | None = None, *, atla: tuple[str, ...] = ()) -> dict:
+    """Sahne planındaki sağlayıcı zincirini (groq -> gemini -> openrouter) tek istem için kullanır.
+
+    `atla`: aynı istemi tekrar sorarken aynı cevabı almamak için atlanacak sağlayıcılar
+    (ör. ("groq",) -> gemini/openrouter denenir). Tümü atlanırsa zincir yine baştan çalışır.
+    """
     import urllib.request
     import re as _re
     sistem = sistem or _LLM_SISTEM
@@ -983,7 +1083,7 @@ def _llm_json(istem: str, ayar: dict, sistem: str | None = None) -> dict:
             print(f"v2 LLM JSON çözülemedi: {metin[:500]}")
             return {}
 
-    if os.getenv("GROQ_API_KEY"):
+    if os.getenv("GROQ_API_KEY") and "groq" not in atla:
         for m in dict.fromkeys([groq_model(), "llama-3.3-70b-versatile", "llama-3.1-8b-instant"]):
             try:
                 print(f"v2 LLM: groq {m}")
@@ -1004,7 +1104,7 @@ def _llm_json(istem: str, ayar: dict, sistem: str | None = None) -> dict:
             except Exception as h:
                 print(f"v2 groq ({m}) başarısız: {type(h).__name__}")
 
-    if os.getenv("GEMINI_API_KEY"):
+    if os.getenv("GEMINI_API_KEY") and "gemini" not in atla:
         aday_modeller: list[str] = []
         istenen_gem = os.getenv("GEMINI_LLM_MODEL", "").strip()
         if istenen_gem and not istenen_gem.startswith("llama-") and istenen_gem not in ("gemini-2.5-flash", "gemini-3.6-flash"):
@@ -1045,7 +1145,7 @@ def _llm_json(istem: str, ayar: dict, sistem: str | None = None) -> dict:
             except Exception as h:
                 print(f"v2 gemini ({model}) başarısız: {type(h).__name__}")
 
-    if os.getenv("OPENROUTER_API_KEY"):
+    if os.getenv("OPENROUTER_API_KEY") and "openrouter" not in atla:
         try:
             m = os.getenv("OPENROUTER_LLM_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
             d = _ayikla(_cagir("https://openrouter.ai/api/v1/chat/completions",

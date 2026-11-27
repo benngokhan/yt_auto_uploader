@@ -141,6 +141,59 @@ class SozlukTestleri(unittest.TestCase):
             self.assertEqual(sozluk.bilinmeyenler("TÜTCEN DUMAN"), [])
 
 
+class BaslikKurtarmaTestleri(_ArsivOrtami):
+    """Sözlük kapısı takıldığında güvenli kurtarma yolları (zemberek gerekmez; sözlük sahte)."""
+
+    def setUp(self):
+        super().setUp()
+        import sozluk
+        self.sozluk = sozluk
+        self.sahne = [{"ses": "Fener balığı ışığıyla avını çeker.",
+                       "baslik1": "KEMİÇ BALIĞI", "baslik2": "IŞIK SAÇAR"}]
+        self.yamalar = [
+            mock.patch.object(sozluk, "bilinmeyenler",
+                              side_effect=lambda m: ["KEMİÇ"] if "KEMİÇ" in m else []),
+            mock.patch.object(sozluk, "durum", return_value="sözlükte yok"),
+            mock.patch.object(sozluk, "not_dus", return_value=False),
+        ]
+        for y in self.yamalar:
+            y.start()
+
+    def tearDown(self):
+        for y in self.yamalar:
+            y.stop()
+        super().tearDown()
+
+    def test_ayni_oneri_tekrar_ederse_baslik_cumleden_yeniden_uretilir(self):
+        cevaplar = [
+            {"cumleler": ["KEMİÇ BALIĞI"]},                    # 1. deneme: değişiklik yok
+            {"cumleler": ["KEMİÇ BALIĞI"]},                    # 2. deneme: yine aynı
+            {"cumleler": ["FENER BALIĞI", "IŞIK SAÇAR"]},      # yeniden üretim
+        ]
+        with mock.patch.object(uret, "_llm_json", side_effect=cevaplar) as llm, \
+                mock.patch("builtins.print"):
+            self.assertEqual(uret._baslik_denetimi(self.sahne, {}), 1)
+        self.assertEqual(self.sahne[0]["baslik1"], "FENER BALIĞI")
+        self.assertEqual(self.sahne[0]["baslik2"], "IŞIK SAÇAR")
+        self.assertEqual(llm.call_count, 3)
+
+    def test_yeniden_uretim_de_tutmazsa_tek_harf_adayi_kullanilir(self):
+        with mock.patch.object(uret, "_llm_json", return_value={"cumleler": ["KEMİÇ BALIĞI"]}), \
+                mock.patch.object(self.sozluk, "yakin_adaylar", return_value=["kemik"]), \
+                mock.patch("builtins.print") as yaz:
+            self.assertEqual(uret._baslik_denetimi(self.sahne, {}), 1)
+        self.assertEqual(self.sahne[0]["baslik1"], "KEMİK BALIĞI")
+        self.assertIn("sözlük tabanlı düzeltme", " ".join(str(c.args[0]) for c in yaz.call_args_list))
+
+    def test_birden_fazla_aday_varsa_tahmin_edilmez(self):
+        with mock.patch.object(uret, "_llm_json", return_value={"cumleler": ["KEMİÇ BALIĞI"]}), \
+                mock.patch.object(self.sozluk, "yakin_adaylar", return_value=["kemik", "kemir"]), \
+                mock.patch("builtins.print"):
+            with self.assertRaises(uret.BaslikDuzeltilemedi):
+                uret._baslik_denetimi(self.sahne, {})
+        self.assertEqual(self.sahne[0]["baslik1"], "KEMİÇ BALIĞI")
+
+
 @SOZLUK_GEREK
 class BaslikDenetimiTestleri(_ArsivOrtami):
     def _sahne(self):
