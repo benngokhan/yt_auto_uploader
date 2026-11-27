@@ -6,6 +6,12 @@ name: Analizden Short üret (Telegram onaylı)
 # 19:30 yayın saatine ve crosspost bayraklarına DOKUNMAZ.
 
 on:
+  # API'den dispatch edilemediği için ilk push'ta kendiliğinden başlar.
+  # Sonraki kod push'ları tetiklemesin diye yalnızca bu dosya filtrelendi.
+  push:
+    branches: [wip/shorts-v2-rebuild]
+    paths:
+      - .github/workflows/analiz-short-uret.yml
   workflow_dispatch:
     inputs:
       adet:
