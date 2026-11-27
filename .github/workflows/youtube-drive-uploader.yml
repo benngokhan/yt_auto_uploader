@@ -12,8 +12,6 @@ on:
       - 'plan_tablo.py'
       - 'thumbnail_design.py'
       - 'related_plan.py'
-      - 'crosspost_worker.py'
-      - 'delivery_diagnostics.py'
       - 'kota_sayac.py'
       - 'sync_panel_telemetry.py'
       - 'config.json'
@@ -80,13 +78,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      # Sahip onayı (27.11.2026): TikTok açık, Instagram kapalı; eski oturum kullanılmaz.
-      # Acil durdurma: CROSSPOST_ENABLED değerini 'false' yapman yeterli.
-      CROSSPOST_ENABLED: 'true'
-      TIKTOK_ENABLED: 'true'
-      INSTAGRAM_ENABLED: 'false'
-      TIKTOK_SESSIONID: ${{ secrets.TIKTOK_SESSIONID }}
-      TIKTOK_DATACENTER: ${{ secrets.TIKTOK_DATACENTER }}
+      # TikTok/Instagram projeden kaldırıldı; yalnız YouTube yayın akışı aktif.
+      CROSSPOST_ENABLED: 'false'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

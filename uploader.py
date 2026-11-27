@@ -319,7 +319,7 @@ def validate_metadata_workbook(drive, queue_folder: str) -> str:
         print(f"YOUTUBE-OTOMASYON: Aktif CEO klasörü = '{qname}' (id {queue_folder[:8]}...) — Kısa/Uzun Video alt klasörleri bağlı.")
     except Exception as xe:
         print(f"UZUN-RONTGEN hata (zararsız): {xe}")
-    print("CROSSPOST: Instagram ve TikTok paylaşımı kullanıcı kararıyla PASİF.")
+    print("CROSSPOST: TikTok/Instagram proje dışı bırakıldı.")
     qstats = compute_queue_stats(
         drive,
         queue_folder or DEFAULT_DRIVE_FOLDER_ID,
@@ -1641,26 +1641,7 @@ def upload_job(
             queue_folder=queue_folder,
         )
 
-        # --- Çapraz paylaşım (TikTok + Instagram Reels): dosya silinmeden önce ---
-        crosspost_result = None
-        try:
-            from qa_and_crosspost import build_crosspost_caption
-            from crosspost_worker import run_crosspost
-
-            xcap = build_crosspost_caption(meta)
-            crosspost_result = run_crosspost(tmp_path, file_name, xcap, drive=drive, folder_id="1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC")
-            log.info(f"Çapraz paylaşım sonucu: {crosspost_result}")
-        except Exception as xe:
-            # Kimlik bilgileri/çerezler exception metninde bulunabileceğinden metni yazdırma.
-            log.warning("Çapraz paylaşım atlandı (YouTube akışı etkilenmedi): %s", type(xe).__name__)
-
-        # Ana yükleme kartı, çapraz denemeden önce oluşturulmuştur. Bu nedenle
-        # kartı ancak eldeki sonucu dürüstçe etiketleyerek sonradan tamamlarız.
-        try:
-            from delivery_diagnostics import append_to_payload
-            append_to_payload(BASE_DIR / "last_upload_payload.json", file_name, crosspost_result)
-        except Exception as de:
-            log.warning("Çapraz sonuç karta eklenemedi: %s", type(de).__name__)
+        # TikTok/Instagram çapraz paylaşım projeden kaldırıldı; yalnız YouTube akışı çalışır.
 
         return {
             "video_id": vid_id,
@@ -1669,7 +1650,6 @@ def upload_job(
             "drive_file_id": file_id,
             "drive_file_name": file_name,
             "comment_posted": comment_ok,
-            "crosspost": crosspost_result,
         }
     finally:
         if tmp_path.exists():
@@ -1832,16 +1812,6 @@ def sync_kartal_status_report(
                 "updated_at": now_str,
                 "jobs_done": len(yt_videos),
                 "last_action": f"{len(yt_videos)} videonun gerçek görüntülenme ve yorum verisi güncellendi",
-                "error_message": "",
-            },
-            {
-                "id": "crosspost",
-                "name": "Çapraz Paylaşım (Instagram / TikTok)",
-                "status": "disabled",
-                "status_text": "Pasif (Devre Dışı)",
-                "updated_at": "-",
-                "jobs_done": 0,
-                "last_action": "Paylaşım yapılmadığı için pasif duruma getirildi",
                 "error_message": "",
             },
         ]

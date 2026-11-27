@@ -497,7 +497,6 @@ def build_telemetry(drive=None, local_retention_xlsx: Path | None = None, push_t
             "min_shorts_number": MIN_SHORTS_NUMBER,
             "min_long_number": MIN_LONG_NUMBER,
             "cover_fallback_generation": False,
-            "crosspost_enabled": False,
         },
         "queue_summary": {
             "ready_shorts": len(ready_shorts_queue),

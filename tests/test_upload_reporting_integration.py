@@ -11,7 +11,6 @@ from pathlib import Path
 from unittest.mock import patch
 
 import uploader
-import crosspost_worker
 
 
 class UploadReportingIntegration(unittest.TestCase):
@@ -46,7 +45,6 @@ class UploadReportingIntegration(unittest.TestCase):
             for name, value in replacements.items():
                 stack.enter_context(patch.object(uploader, name, value))
             stack.enter_context(patch.dict(os.environ, {'GITHUB_EVENT_NAME': 'workflow_dispatch'}, clear=True))
-            stack.enter_context(patch.object(crosspost_worker, 'run_crosspost', return_value={'instagram': None, 'tiktok': None}))
             if related_side_effect is None:
                 stack.enter_context(patch.object(uploader, 'sync_related_links', return_value={
                     'status': 'studio_pending', 'target_name': 'uzun_video_24.mp4',
@@ -62,19 +60,18 @@ class UploadReportingIntegration(unittest.TestCase):
             self.assertTrue((root / 'report.txt').exists())
             return result, payload
 
-    def test_pending_link_and_skipped_social_are_in_same_card(self):
+    def test_pending_link_is_reported_in_same_card(self):
         result, payload = self.simulate_upload()
         self.assertEqual(result['video_id'], 'aBcdEfGhI12')
         self.assertIn('otomatik bağlanmadı', payload['text'])
-        self.assertIn('Instagram: Atlandı veya sonuç yok; doğrulanmadı.', payload['text'])
-        self.assertIn('TikTok: Atlandı veya sonuç yok; doğrulanmadı.', payload['text'])
+        self.assertNotIn('ÇAPRAZ PAYLAŞIM DURUMU', payload['text'])
         self.assertIn('inline_keyboard', payload['reply_markup'])
 
     def test_related_planner_failure_does_not_break_recorded_upload(self):
         result, payload = self.simulate_upload(RuntimeError('test failure'))
         self.assertEqual(result['video_id'], 'aBcdEfGhI12')
         self.assertIn('İlgili video doğrulanamadı', payload['text'])
-        self.assertIn('ÇAPRAZ PAYLAŞIM DURUMU', payload['text'])
+        self.assertNotIn('ÇAPRAZ PAYLAŞIM DURUMU', payload['text'])
 
 
 class TelegramWorkflowTests(unittest.TestCase):

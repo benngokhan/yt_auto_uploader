@@ -54,16 +54,6 @@
       "jobs_done": 30,
       "last_action": "30 videonun gerçek görüntülenme ve yorum verisi güncellendi",
       "error_message": ""
-    },
-    {
-      "id": "crosspost",
-      "name": "Çapraz Paylaşım (Instagram / TikTok)",
-      "status": "disabled",
-      "status_text": "Pasif (Devre Dışı)",
-      "updated_at": "-",
-      "jobs_done": 0,
-      "last_action": "Paylaşım yapılmadığı için pasif duruma getirildi",
-      "error_message": ""
     }
   ],
   "alerts": [
