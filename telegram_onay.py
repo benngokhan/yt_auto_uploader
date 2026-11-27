@@ -65,6 +65,8 @@ def _call(token: str, method: str, payload: dict | None = None) -> dict:
 def preview_metni(bilgi: dict) -> str:
     """Kısa, sade onay mesajı. Başlık/açıklama xlsx'e onaydan sonra yazılır."""
     satirlar = ["<b>BİLGİ DOZU — ONAY BEKLİYOR</b>"]
+    if bilgi.get("video_numarasi"):
+        satirlar.append(f"Sıra: video_{bilgi['video_numarasi']}")
     baslik = str(bilgi.get("baslik") or "").strip()
     if baslik:
         satirlar.append(f"Başlık: {baslik}")

@@ -22,7 +22,9 @@ def _updates(icerikler, offset=41):
 class TelegramOnayTests(unittest.TestCase):
     def test_preview_message_is_simple_and_has_no_secret(self):
         metin = to.preview_metni({"baslik": "Mum neden söner?", "sure_sn": 42,
-                                  "sahne_sayisi": 7, "kaynak_video_id": "abcdefghijk"})
+                                  "sahne_sayisi": 7, "kaynak_video_id": "abcdefghijk",
+                                  "video_numarasi": 194})
+        self.assertIn("video_194", metin)
         self.assertIn("Mum neden söner?", metin)
         self.assertIn("onayladım", metin)
         self.assertIn("7", metin)
