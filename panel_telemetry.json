@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-27 20:27:35",
-  "generated_at_iso": "2026-11-27T20:27:35.224656+03:00",
+  "generated_at": "2026-11-28 02:36:25",
+  "generated_at_iso": "2026-11-28T02:36:25.755034+03:00",
   "folders": {
     "youtube_otomasyon": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
     "ceo": "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC",
@@ -28,8 +28,7 @@
     "shorts_only": true,
     "min_shorts_number": 155,
     "min_long_number": 8,
-    "cover_fallback_generation": false,
-    "crosspost_enabled": false
+    "cover_fallback_generation": false
   },
   "queue_summary": {
     "ready_shorts": 6,
