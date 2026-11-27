@@ -69,8 +69,20 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Test queue order and duplicate safeguards
+      - name: Test full suite (scheduled runs)
+        if: github.event_name != 'workflow_dispatch'
         run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Test critical safeguards (manual dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: >-
+          python -m unittest
+          tests.test_sequential_queue
+          tests.test_crosspost_user_disabled
+          tests.test_delivery_diagnostics
+          tests.test_upload_reporting_integration
+          tests.test_watchdog_dispatch
+          -v
 
       - name: Resolve publication slot
         id: slot
