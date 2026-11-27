@@ -1,0 +1,94 @@
+name: Video 187 onarim (gecici)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  onar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
+      - name: Onar
+        env:
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          FOLDER: "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC"
+        run: |
+          python - <<'PYEOF'
+          import os, io, json, subprocess, pathlib
+          from google.oauth2.credentials import Credentials
+          from google.auth.transport.requests import Request
+          from googleapiclient.discovery import build
+          from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload, MediaIoBaseUpload
+          import openpyxl
+
+          pathlib.Path("token.json").write_text(os.environ["GOOGLE_TOKEN_JSON"], encoding="utf8")
+          creds = Credentials.from_authorized_user_file("token.json")
+          if not creds.valid:
+              creds.refresh(Request())
+          drive = build("drive", "v3", credentials=creds)
+          FOLDER = os.environ["FOLDER"]
+
+          files = drive.files().list(q="'%s' in parents and name='video_187.mp4' and trashed=false" % FOLDER,
+                                     fields="files(id,name,size,md5Checksum,modifiedTime)").execute().get("files", [])
+          print("VIDEO:", json.dumps(files, ensure_ascii=False))
+          if len(files) != 1:
+              raise SystemExit("video_187.mp4 tek olmali, bulunan: %d" % len(files))
+          fid = files[0]["id"]
+
+          buf = io.BytesIO()
+          dl = MediaIoBaseDownload(buf, drive.files().get_media(fileId=fid))
+          done = False
+          while not done:
+              _, done = dl.next_chunk()
+          pathlib.Path("giris.mp4").write_bytes(buf.getvalue())
+          print("indirilen bayt:", len(buf.getvalue()), "md5:", files[0].get("md5Checksum"))
+
+          subprocess.run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-i", "giris.mp4",
+                          "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p",
+                          "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "cikis.mp4"], check=True)
+          print("cikis bayt:", pathlib.Path("cikis.mp4").stat().st_size)
+          print(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", "cikis.mp4"],
+                               capture_output=True, text=True).stdout.strip(), "sn")
+
+          upd = drive.files().update(fileId=fid, media_body=MediaFileUpload("cikis.mp4", mimetype="video/mp4", resumable=True),
+                                     fields="id,name,size,md5Checksum,modifiedTime").execute()
+          print("DRIVE GUNCELLENDI:", json.dumps(upd, ensure_ascii=False))
+
+          tabs = drive.files().list(q="'%s' in parents and name='baslik.xlsx' and trashed=false" % FOLDER,
+                                    fields="files(id,name,modifiedTime)").execute().get("files", [])
+          print("TABLO:", json.dumps(tabs, ensure_ascii=False))
+          if not tabs:
+              raise SystemExit("baslik.xlsx yok")
+          tid = tabs[0]["id"]
+          b = io.BytesIO()
+          dl = MediaIoBaseDownload(b, drive.files().get_media(fileId=tid))
+          done = False
+          while not done:
+              _, done = dl.next_chunk()
+          b.seek(0)
+          wb = openpyxl.load_workbook(b)
+          ws = wb["DRIVE"] if "DRIVE" in wb.sheetnames else wb.active
+          print("sekme:", ws.title, "satir:", ws.max_row)
+          found = False
+          for r in range(2, ws.max_row + 1):
+              if str(ws.cell(r, 2).value or "").strip() == "video_187.mp4":
+                  ws.cell(r, 1).value = "BEKLEMEDE"
+                  for c in (10, 11, 12, 13):
+                      ws.cell(r, c).value = None
+                  found = True
+                  print("satir", r, "->", ws.cell(r, 1).value, "|", ws.cell(r, 2).value)
+          print("187 bulundu:", found)
+          out = io.BytesIO()
+          wb.save(out)
+          out.seek(0)
+          drive.files().update(fileId=tid, media_body=MediaIoBaseUpload(
+              out, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", resumable=False)).execute()
+          print("TABLO GUNCELLENDI")
+          PYEOF
