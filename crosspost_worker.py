@@ -210,6 +210,53 @@ def _tiktok_cookies(sid: str) -> list[dict]:
     return cookies
 
 
+# TikTok ilk kullanım "tur" penceresi (react-joyride) yazı alanı ve Post
+# butonunun üzerine biniyor; Playwright tıklamalarını engelliyor. Düğümleri
+# silmiyoruz (React kendi DOM'unu yönetiyor), sadece görünmez + tıklanamaz
+# yapıyoruz. Init script olarak eklendiği için her sayfa geçişinde geçerli.
+_TIKTOK_OVERLAY_INIT_JS = r"""
+(() => {
+  const id = '__tt_no_onboarding_tour';
+  const css = '#react-joyride-portal,.react-joyride__overlay,[data-test-id="overlay"]' +
+              '{display:none!important;visibility:hidden!important;pointer-events:none!important}';
+  const install = () => {
+    if (!document.head && !document.documentElement) return false;
+    if (document.getElementById(id)) return true;
+    const style = document.createElement('style');
+    style.id = id;
+    style.textContent = css;
+    (document.head || document.documentElement).appendChild(style);
+    return true;
+  };
+  if (!install()) document.addEventListener('DOMContentLoaded', install);
+  try {
+    new MutationObserver(install).observe(
+      document.documentElement || document, { childList: true, subtree: true }
+    );
+  } catch (e) {}
+})();
+"""
+
+
+def _install_tiktok_overlay_cleanup(upload_module) -> None:
+    """tiktok-uploader'ın get_browser'ını overlay temizliğiyle sarar (idempotent)."""
+    if getattr(upload_module, "_tt_overlay_cleanup_installed", False):
+        return
+    original_get_browser = upload_module.get_browser
+
+    def patched_get_browser(*args, **kwargs):
+        page = original_get_browser(*args, **kwargs)
+        try:
+            page.context.add_init_script(_TIKTOK_OVERLAY_INIT_JS)
+            page.evaluate(_TIKTOK_OVERLAY_INIT_JS)
+        except Exception as exc:
+            log.warning("TikTok tur penceresi gizlenemedi: %s", type(exc).__name__)
+        return page
+
+    upload_module.get_browser = patched_get_browser
+    upload_module._tt_overlay_cleanup_installed = True
+
+
 def post_tiktok(video_path: Path, caption: str) -> str | None:
     """sessionid çereziyle TikTok'a yükler. Başarılıysa None değil URL/ID döner."""
     if not _flag_on("TIKTOK_ENABLED"):
@@ -221,7 +268,10 @@ def post_tiktok(video_path: Path, caption: str) -> str | None:
         return None
     try:
         _ensure_playwright_browser()
-        from tiktok_uploader.upload import upload_video
+        from tiktok_uploader import upload as tiktok_upload
+
+        _install_tiktok_overlay_cleanup(tiktok_upload)
+        upload_video = tiktok_upload.upload_video
 
         # tiktok-uploader 1.2.0 sessionid cookie'sini domain'siz ekleyip patlıyor;
         # domain+path içeren cookies_list formatıyla bypass ediyoruz
