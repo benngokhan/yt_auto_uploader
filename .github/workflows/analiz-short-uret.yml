@@ -103,6 +103,7 @@ jobs:
           ADET: ${{ inputs.adet || '2' }}
           ONAY_SN: ${{ inputs.onay_dakika || '30' }}
           KURU: ${{ inputs.kuru || 'false' }}
+          V2_ANLATIM_MAX: "260"
           MOTOR_VISUAL_QA_PASSED: "1"
         run: |
           python - <<'PY'

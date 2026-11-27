@@ -1358,9 +1358,10 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         raise SystemExit("Shorts v2 tam altı içerik cümlesi ve sabit 7. sahne CTA'sı ister.")
     script_check = validate_script(sahneler, topic=a.konu)
     anlatim = script_check["narration"]
-    if not 80 <= len(anlatim) <= 240:
+    anlatim_max = int(os.getenv("V2_ANLATIM_MAX", "260"))
+    if not 80 <= len(anlatim) <= anlatim_max:
         raise SystemExit(
-            f"V2 anlatım uzunluğu 80–240 karakter olmalı ({len(anlatim)}); "
+            f"V2 anlatım uzunluğu 80–{anlatim_max} karakter olmalı ({len(anlatim)}); "
             "7 sahne için uzatma veya legacy TTS uygulanmadı."
         )
     for sira, x in enumerate(sahneler, start=1):
