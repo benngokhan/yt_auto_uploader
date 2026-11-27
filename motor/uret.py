@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib.error
@@ -1274,29 +1275,104 @@ def tr_upper(metin: str) -> str:
     return (metin or "").replace("i", "İ").replace("ı", "I").upper()
 
 
+# Sözcüklerin köküyle eşleştirme yapılır; cümlede geçmeyen jenerik "bilim" görseli
+# üretilirse görsel kapısı zaten reddeder. Burada amaç doğru sorguyu ilk seferde üretmek.
+_JENERIK_GORSEL_KELIMELERI = frozenset({
+    "microscope", "laboratory", "lab", "pipette", "beaker", "flask", "test", "tube",
+    "lens", "iris", "mri", "scan", "thermometer", "hourglass", "laser", "droplet",
+    "gear", "gears", "wristwatch", "optical", "medical", "clinical", "chemistry",
+    "scientist", "science", "brain",
+})
+_DURAK_KELIMELER = frozenset({
+    "ve", "bir", "için", "ile", "olan", "bu", "şu", "değil", "çok", "her", "kendi",
+    "gibi", "şey", "neden", "nasıl", "çünkü", "sonra", "ancak", "aynı", "bazı",
+    "diğer", "yine", "sadece", "kadar", "içinde", "üzerinde", "altında", "olan",
+})
+_KONU_SOMUT_KELIMELER = (
+    "mikroskop", "laboratuvar", "mercek", "optik", "göz", "beyin", "tıbbi", "tıp",
+    "microscope", "laboratory", "optical", "eye", "brain", "medical",
+)
+
+
+def _kelime_kokleri(metin: str, durak_at: bool = False) -> list[str]:
+    kelimeler = re.findall(r"[^\W\d_]+", (metin or "").casefold(), flags=re.UNICODE)
+    if durak_at:
+        kelimeler = [k for k in kelimeler if len(k) > 2 and k not in _DURAK_KELIMELER]
+    return [k for k in kelimeler if len(k) > 2]
+
+
+def _dayanak_cumlede_mi(dayanak: str, cumle: str) -> bool:
+    """LLM'nin 'turkce_dayanak' alanı gerçekten o cümleden alınmış mı?"""
+    kokler = _kelime_kokleri(dayanak, durak_at=True)
+    cumle_kokleri = _kelime_kokleri(cumle)
+    if not kokler or not cumle_kokleri:
+        return False
+    return any(a.startswith(b[:4]) or b.startswith(a[:4]) for a in kokler for b in cumle_kokleri)
+
+
+def _sorgu_sorunlari(ham_liste: list, cumleler: list, konu: str) -> list[int]:
+    """Cümleyle ilgisiz veya jenerik görsel sorgularının 1 tabanlı sahne numaraları."""
+    sorunlar: list[int] = []
+    konu_dusuk = (konu or "").casefold()
+    konu_izin = any(k in konu_dusuk for k in _KONU_SOMUT_KELIMELER)
+    for i in range(min(len(ham_liste), len(cumleler))):
+        item = ham_liste[i]
+        if isinstance(item, dict):
+            ana = str(item.get("ana") or item.get("alternatif") or "").strip()
+            dayanak = str(item.get("turkce_dayanak") or item.get("dayanak") or "").strip()
+        else:
+            ana, dayanak = str(item).strip(), ""
+        if not ana:
+            continue
+        if not konu_izin and set(re.findall(r"[a-z]+", ana.casefold())) & _JENERIK_GORSEL_KELIMELERI:
+            sorunlar.append(i + 1)
+            continue
+        if dayanak and not _dayanak_cumlede_mi(dayanak, cumleler[i]):
+            sorunlar.append(i + 1)
+    return sorunlar
+
+
 def _gorsel_aramalari(konu: str, cumleler: list, ayar: dict) -> tuple[list[dict], list[str]]:
-    """Her sahne için birbirinden FARKLI 2 kademeli yakın plan bilimsel/makro İngilizce Pexels araması üretir."""
+    """Her sahne için o sahnenin SOMUT VARLIĞINI gösteren İngilizce Pexels araması üretir."""
     n = len(cumleler)
     numarali = "\n".join(f"{i+1}) {c}" for i, c in enumerate(cumleler))
-    istem = (
-        f"Konu: {konu}\n\n"
-        f"Cümleler:\n{numarali}\n\n"
-        f"Yukarıdaki {n} Türkçe bilim cümlesinin her biri için Pexels gerçek kamera fotoğrafı arşivinde "
-        f"net 4K dikey bilimsel/tıbbi/optik sonuç verecek BİRBİRİNDEN TAMAMEN FARKLI İngilizce somut nesne aramaları yaz.\n"
-        "KESİN KURALLAR (Pexels gerçek kamera fotoğrafı arşividir, 3D çizim arşivi değildir):\n"
-        "1) İki sahnede aynı ana kelimeyi TEKRARLAMA.\n"
-        "2) SADECE gerçek bir fotoğrafçının kamerayla çekebileceği somut bilimsel/optik/anatomik/laboratuvar nesneleri yaz "
-        "(mükemmel örnekler: 'human eye iris', 'scientist microscope', 'laboratory test tube', 'brain mri scan', "
-        "'optical glass lens', 'blue laser beam', 'hourglass sand', 'medical laboratory', 'astronomy night sky', "
-        "'water droplets glass', 'wristwatch gears', 'clinical thermometer').\n"
-        "3) YASAK SORGULAR: Kamerayla çekilemeyen soyut molekül/bakteri adları ('vitamin molecule', 'retinal pigment', 'bacteria', 'protein') YASAK (bunlar kozmetik şişesi döndürür; yerine 'laboratory pipette' veya 'scientist microscope' yaz)! "
-        "'texture', 'pattern', 'abstract', 'background' kelimeleri YASAK (kağıt dokusu döndürür)! "
-        "Gündelik stok klişeleri ('mobile phone', 'hand holding phone', 'person texting', 'person in bed', 'man', 'woman', 'office', 'window') YASAK!\n"
-        f"Yalnız JSON döndür: {{\"sahneler_gorsel\": [{{\"ana\": \"bu sahnenin metnindeki somut nesne/eylem\", \"alternatif\": \"aynı sahneyle doğrudan ilgili başka somut nesne\"}}, ...]}}. "
-        f"\"sahneler_gorsel\" dizisi TAM {n} elemanlı olacak."
-    )
-    veri = _llm_json(istem, ayar, _LLM_SISTEM)
-    ham_liste = veri.get("sahneler_gorsel") or veri.get("aramalar") or []
+
+    def istem(ek: str = "") -> str:
+        return (
+            f"Konu: {konu}\n\n"
+            f"Cümleler:\n{numarali}\n\n"
+            f"Yukarıdaki {n} cümlenin her biri için, O CÜMLENİN ANLATTIĞI SOMUT VARLIĞI/EYLEMİ/MEKÂNI "
+            "doğrudan gösteren gerçek kamera fotoğrafı İngilizce araması yaz.\n"
+            "KESİN KURALLAR:\n"
+            "1) Sorgu cümledeki varlıktan/eylemden türetilir; cümlede geçmeyen bir nesne eklenmez.\n"
+            "2) 'turkce_dayanak' alanına o cümleden birebir alınmış somut varlık/eylem yazılır.\n"
+            "3) Cümle açıkça anlatmıyorsa jenerik bilim/laboratuvar/optik nesneleri YAZMA: "
+            "microscope, laboratory, lens, iris, mri, brain, thermometer, hourglass, laser, gear, wristwatch.\n"
+            "4) Soyut molekül/bakteri adları, 'texture', 'pattern', 'abstract', 'background' ve "
+            "gündelik stok klişeleri (phone, person, office, window) YASAK.\n"
+            "5) İki sahnede aynı ana kelimeyi TEKRARLAMA.\n"
+            f"Yalnız JSON döndür: {{\"sahneler_gorsel\": [{{\"ana\": \"İngilizce fotoğraf araması\", "
+            "\"alternatif\": \"aynı varlığın başka bir görünümü\", \"turkce_dayanak\": \"cümlenen somut varlığı\"}}, ...]}}. "
+            f"\"sahneler_gorsel\" dizisi TAM {n} elemanlı olacak.{ek}"
+        )
+
+    def coz(metin: str) -> list:
+        veri = _llm_json(metin, ayar, _LLM_SISTEM)
+        return veri.get("sahneler_gorsel") or veri.get("aramalar") or []
+
+    ham_liste = coz(istem())
+    sorunlar = _sorgu_sorunlari(ham_liste, cumleler, konu)
+    if sorunlar:
+        geri = (
+            "\n\nÖNCEKİ ÖNERİLER REDDEDİLDİ: " + ", ".join(str(x) for x in sorunlar) +
+            " numaralı sahneler için jenerik veya cümleyle ilgisiz sorgu üretildi. "
+            "Şimdi her sorguyu o sahnenin kendi cümlesinden türet; 'turkce_dayanak' mutlaka o cümleden birebir alınsın."
+        )
+        yeni = coz(istem(geri))
+        if len(_sorgu_sorunlari(yeni, cumleler, konu)) < len(sorunlar):
+            ham_liste = yeni
+            print(f"Görsel sorguları yeniden üretildi (reddedilen sahneler: {sorunlar}).")
+
     # Genel bilim/atmosfer yedeği bilinçli olarak yok: sahneye uygun terim yoksa görsel seçilmez.
     yedekler: list[str] = []
     sahneler_q: list[dict] = []

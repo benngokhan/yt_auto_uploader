@@ -389,5 +389,53 @@ class PexelsGorselPipelineTests(unittest.TestCase):
         self.assertEqual(shorts_pipeline._verified_source_url_format("NASA + Boeing Technical Reports"), "")
 
 
+class GorselSorguUretimTests(unittest.TestCase):
+    """Sahne görseli sorguları konudan saparsa yeniden üretilir; kapı gevşetilmez."""
+
+    def test_jenerik_sorgu_ilgisiz_konuda_reddedilir(self):
+        uret = _import_uret_without_persisting_quota_counter()
+        sorunlar = uret._sorgu_sorunlari(
+            [{"ana": "scientist microscope", "turkce_dayanak": "deniz canlıları"}],
+            ["Deniz canlıları neden ışıldar?"],
+            "Okyanusta kendi ışığını üreten canlılar",
+        )
+        self.assertEqual(sorunlar, [1])
+
+    def test_jenerik_sorgu_konu_istiyorsa_reddedilmez(self):
+        uret = _import_uret_without_persisting_quota_counter()
+        sorunlar = uret._sorgu_sorunlari(
+            [{"ana": "scientist microscope", "turkce_dayanak": "mikroskop"}],
+            ["Mikroskop altında hücreleri inceliyoruz."],
+            "Mikroskop ve laboratuvar teknikleri",
+        )
+        self.assertEqual(sorunlar, [])
+
+    def test_generic_first_answer_is_regenerated_with_rejection_feedback(self):
+        uret = _import_uret_without_persisting_quota_counter()
+        ilk = {"sahneler_gorsel": [{"ana": "brain mri scan", "alternatif": "medical laboratory"}]}
+        iyi = {"sahneler_gorsel": [{"ana": "bioluminescent jellyfish", "alternatif": "glowing plankton"}]}
+        with mock.patch.object(uret, "_llm_json", side_effect=[ilk, iyi]) as llm:
+            aramalar, yedekler = uret._gorsel_aramalari(
+                "Okyanusta ışık üreten canlılar", ["Deniz canlıları neden ışıldar?"], {}
+            )
+        self.assertEqual(aramalar, [{"ana": "bioluminescent jellyfish", "alternatif": "glowing plankton"}])
+        self.assertEqual(yedekler, [])
+        self.assertEqual(llm.call_count, 2)
+        self.assertIn("ÖNCEKİ ÖNERİLER REDDEDİLDİ", llm.call_args_list[1].args[0])
+
+    def test_dayanak_cumlede_yoksa_yeniden_uretilir(self):
+        uret = _import_uret_without_persisting_quota_counter()
+        ilk = {"sahneler_gorsel": [{"ana": "white passenger airplane", "turkce_dayanak": "kuş"}]}
+        iyi = {"sahneler_gorsel": [{"ana": "white passenger airplane", "turkce_dayanak": "uçak"}]}
+        with mock.patch.object(uret, "_llm_json", side_effect=[ilk, iyi]):
+            aramalar, _ = uret._gorsel_aramalari(
+                "Uçakların boyanması", ["Yolcu uçakları neden beyaza boyanır?"], {}
+            )
+        self.assertEqual(aramalar[0]["ana"], "white passenger airplane")
+        self.assertEqual(uret._sorgu_sorunlari(
+            [{"ana": aramalar[0]["ana"], "turkce_dayanak": "uçak"}],
+            ["Yolcu uçakları neden beyaza boyanır?"], "Uçakların boyanması"), [])
+
+
 if __name__ == "__main__":
     unittest.main()
