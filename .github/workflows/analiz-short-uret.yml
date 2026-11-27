@@ -105,6 +105,7 @@ jobs:
           KURU: ${{ inputs.kuru || 'false' }}
           V2_ANLATIM_MAX: "260"
           MOTOR_VISUAL_QA_PASSED: "1"
+          PYTHONUNBUFFERED: "1"
         run: |
           python - <<'PY'
           import os
@@ -116,7 +117,7 @@ jobs:
           [ "$KURU" = "true" ] && ARG="$ARG --kuru"
           echo "Komut: python analiz_uret.py $ARG"
           set -o pipefail
-          python analiz_uret.py $ARG 2>&1 | tee analiz_uretim_logu.txt
+          python -u analiz_uret.py $ARG 2>&1 | tee analiz_uretim_logu.txt
 
       - name: Kayıt dosyalarını depoya yaz
         if: always()
@@ -142,5 +143,6 @@ jobs:
             motor/cikti/analiz/**/final.mp4
             motor/cikti/analiz/**/kapak.jpg
             motor/cikti/analiz/**/yayin_bilgisi.json
+            motor/cikti/gorseller/gorsel_secim_raporu.json
           if-no-files-found: warn
           retention-days: 30

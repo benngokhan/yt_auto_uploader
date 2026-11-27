@@ -36,7 +36,7 @@ from shorts_acceptance import MIN_AVG_BRIGHTNESS, SEMANTIC_THRESHOLD
 
 HEDEF = (1350, 2400)  # Tam 9:16 dikey, Ken Burns zoom için yüksek keskinlik
 SEMANTIC_MODEL = "gemini-3.8-flash"
-MAX_CANDIDATES_PER_QUERY = 8
+MAX_CANDIDATES_PER_QUERY = 5
 VISUAL_QA_ENV = "MOTOR_VISUAL_QA_PASSED"
 
 
@@ -287,7 +287,7 @@ def pexels_ara(sorgu: str, anahtar: str, adet: int = MAX_CANDIDATES_PER_QUERY) -
                     "source_page_url": str(p.get("url") or ""),
                 },
             )
-        if len(sonuclar) >= 8:
+        if len(sonuclar) >= min(adet, 80):
             break
     return sorted(sonuclar.values(), key=lambda h: _puanla(h, sorgu), reverse=True)
 
@@ -326,7 +326,7 @@ def pixabay_ara(sorgu: str, anahtar: str, adet: int = MAX_CANDIDATES_PER_QUERY) 
             kopya["preview_url"] = h.get("previewURL") or h.get("webformatURL") or indir_url
             kopya["source_page_url"] = str(h.get("pageURL") or "")
             sonuclar.setdefault(int(hid), kopya)
-        if len(sonuclar) >= 8:
+        if len(sonuclar) >= min(adet, 80):
             break
     return sorted(sonuclar.values(), key=lambda h: _puanla(h, sorgu), reverse=True)
 
@@ -342,7 +342,7 @@ def _sorgu_adaylari(sahne: dict, yedek: list[str] | None = None, ana_konu: str =
         q = " ".join(w for w in temiz(raw).split() if w.lower() not in soyut)
         if q and q.lower() not in {x.lower() for x in sorgular}:
             sorgular.append(q)
-    return sorgular[:4]
+    return sorgular[:2]
 
 
 def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str = "", gevsek: bool = False) -> bool:
@@ -613,9 +613,9 @@ def _visual_text_scores(scene_text: str, candidates: list[dict]) -> list[float |
                 _indir(url, tmp)
                 with Image.open(tmp) as im:
                     im = im.convert("RGB")
-                    im.thumbnail((384, 384), Image.Resampling.LANCZOS)
+                    im.thumbnail((256, 256), Image.Resampling.LANCZOS)
                     buf = io.BytesIO()
-                    im.save(buf, format="JPEG", quality=78, optimize=True)
+                    im.save(buf, format="JPEG", quality=65, optimize=True)
                 parts.append({"text": f"Aday fotoğraf {i + 1}:"})
                 parts.append({"inline_data": {"mime_type": "image/jpeg", "data": base64.b64encode(buf.getvalue()).decode("ascii")}})
                 valid_indices.append(i)
@@ -903,4 +903,25 @@ def sahneler_icin_gorseller(
     if not providers:
         report["provider_error"] = "PEXELS_API_KEY and PIXABAY_API_KEY are both missing"
         _gorsel_kalite_logunu_yaz(klasor, report)
+
+    # Tek satırlık, sızdırmaz tanı özeti: hangi kapının görseli reddettiği net görülür.
+    nedenler: dict[str, int] = {}
+    skorlar: list[float] = []
+    for sahne in report["scenes"]:
+        for q in sahne.get("queries", []):
+            for pr in q.get("provider_results", []):
+                for aday in pr.get("candidates", []):
+                    neden = str(aday.get("rejection_reason") or "secildi")
+                    nedenler[neden] = nedenler.get(neden, 0) + 1
+                    skor = aday.get("semantic_similarity")
+                    if isinstance(skor, (int, float)):
+                        skorlar.append(float(skor))
+    ozet = {
+        "sahne": len(report["scenes"]),
+        "secilen": sum(1 for s in report["scenes"] if s.get("selected")),
+        "esik": SEMANTIC_THRESHOLD,
+        "skor_araligi": [round(min(skorlar), 3), round(max(skorlar), 3)] if skorlar else None,
+        "reddetme_nedenleri": dict(sorted(nedenler.items(), key=lambda x: (-x[1], x[0]))),
+    }
+    print("GORSEL_SECIM_OZET: " + json.dumps(ozet, ensure_ascii=False, sort_keys=True), flush=True)
     return paths
