@@ -95,6 +95,8 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY || secrets.PEXELS_KEY || secrets.PEXELS_API }}
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
           BD_ANALYTICS_CLIENT_CONFIG: ${{ secrets.BD_ANALYTICS_CLIENT_CONFIG }}
           BD_ANALYTICS_REFRESH_TOKEN: ${{ secrets.BD_ANALYTICS_REFRESH_TOKEN }}
