@@ -51,7 +51,7 @@ class StatusClassificationTests(unittest.TestCase):
 
 class DisabledCrosspostTests(unittest.TestCase):
     def test_explicit_flag_stays_off_even_if_drive_has_old_credentials(self):
-        keys = {"CROSSPOST_ENABLED": "true", "IG_SESSIONID": "old-ig", "TIKTOK_SESSIONID": "old-tt"}
+        keys = {"CROSSPOST_ENABLED": "true", "TIKTOK_ENABLED": "true", "IG_SESSIONID": "old-ig", "TIKTOK_SESSIONID": "old-tt"}
         with patch.dict(os.environ, {"CROSSPOST_ENABLED": "false"}, clear=True), \
              patch.object(c, "_load_drive_keys", return_value=keys), \
              patch.object(c, "post_instagram") as ig, \
@@ -62,7 +62,7 @@ class DisabledCrosspostTests(unittest.TestCase):
             self.assertEqual(result, {"instagram": None, "tiktok": None, "status": "disabled_by_user"})
 
     def test_drive_flag_off_does_not_post_even_when_sessions_are_present(self):
-        keys = {"CROSSPOST_ENABLED": "false", "IG_SESSIONID": "old-ig", "TIKTOK_SESSIONID": "old-tt"}
+        keys = {"CROSSPOST_ENABLED": "false", "TIKTOK_ENABLED": "true", "IG_SESSIONID": "old-ig", "TIKTOK_SESSIONID": "old-tt"}
         with patch.dict(os.environ, {}, clear=True), \
              patch.object(c, "_load_drive_keys", return_value=keys), \
              patch.object(c, "post_instagram") as ig, \

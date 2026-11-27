@@ -80,8 +80,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      # Kullanıcı isteği: Instagram/TikTok devre dışı; eski oturumlar kullanılmaz.
-      CROSSPOST_ENABLED: 'false'
+      # Sahip onayı (27.11.2026): TikTok açık, Instagram kapalı; eski oturum kullanılmaz.
+      # Acil durdurma: CROSSPOST_ENABLED değerini 'false' yapman yeterli.
+      CROSSPOST_ENABLED: 'true'
+      TIKTOK_ENABLED: 'true'
+      INSTAGRAM_ENABLED: 'false'
+      TIKTOK_SESSIONID: ${{ secrets.TIKTOK_SESSIONID }}
+      TIKTOK_DATACENTER: ${{ secrets.TIKTOK_DATACENTER }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

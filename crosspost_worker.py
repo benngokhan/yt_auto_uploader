@@ -2,15 +2,17 @@
 """
 Bilgi Dozu Çapraz Paylaşım İşçisi (TikTok + Instagram Reels)
 -----------------------------------------------------------
-Kullanıcı isteğiyle TikTok ve Instagram paylaşımı pasiftir. Önceki oturumlar
-kullanılmaz, Drive'dan kimlik bilgisi alınmaz ve dış platforma istek gönderilmez.
-Tekrar etkinleştirme ancak açık kullanıcı onayı ve güvenli yeni oturumlarla yapılır.
+Sahip onayıyla (27.11.2026) yalnızca TikTok yeniden etkindir; Instagram kapalı kalır.
+Eski oturumlar kullanılmaz: gönderim için güncel TIKTOK_SESSIONID gerekir.
+Önceki kapatma kararı (01.11.2026) nedeniyle global ana kilit ve platform
+bayrakları birlikte kontrol edilir; kapalı olan platforma hiç istek gidilmez.
 
-Geçmişte kullanılan ortam değişkenleri (GitHub Secrets):
-  IG_SESSIONID    -> Instagram sessionid çerezi (öncelikli)
-  IG_USERNAME / IG_PASSWORD -> sessionid yoksa klasik giriş
-  TIKTOK_SESSIONID -> TikTok sessionid çerezi
-  CROSSPOST_ENABLED=false -> tüm çapraz paylaşımı anında kapatır (kilit anahtar)
+Ortam değişkenleri:
+  CROSSPOST_ENABLED=false -> tüm çapraz paylaşımı anında kapatır (ana kilit)
+  TIKTOK_ENABLED=true     -> TikTok paylaşımı (ayrıca TIKTOK_SESSIONID gerekli)
+  INSTAGRAM_ENABLED=false -> Instagram kapalı (sahip kararı; değiştirilmez)
+  TIKTOK_SESSIONID        -> TikTok sessionid çerezi (Drive keys dosyasından da okunur)
+  IG_SESSIONID / IG_USERNAME / IG_PASSWORD -> Instagram kimlikleri (şu an kullanılmaz)
 
 Kurallar:
   * Sadece 9:16 Shorts'lar paylaşılır; 16:9 uzun videolar (uzun_*) YouTube'a özeldir.
@@ -31,9 +33,9 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(name)s | %(mes
 STOCK_FOLDER_ID = "1ttP8K3VHtqaNtdSlWjqIFza8Kzf0wxpC"
 KEYS_FILE_NAME = "crosspost_keys.json"
 
-# Kullanıcı her iki platformu pasife aldı. Env/Drive'daki eski oturumlar veya
-# bayraklar bu kilidi kaldıramaz; yeniden açma açık kullanıcı onayı gerektirir.
-CROSSPOST_DISABLED_BY_USER = True
+# Sahip kararı: Instagram kalıcı olarak kapalı. TikTok yalnızca açık onay sonrası,
+# güncel bir oturumla ve platform bayrağı açıkken kullanılır.
+INSTAGRAM_DISABLED_BY_USER = True
 
 
 def _load_drive_keys(drive=None, folder_id: str = "") -> dict:
@@ -68,7 +70,7 @@ def _load_drive_keys(drive=None, folder_id: str = "") -> dict:
 
 def _hydrate_env_from_keys(keys: dict) -> None:
     """Drive'dan gelen anahtarları, env'de EKSİKSE os.environ'a enjekte eder (env her zaman öncelikli)."""
-    for k in ("CROSSPOST_ENABLED", "IG_SESSIONID", "IG_USERNAME", "IG_PASSWORD", "TIKTOK_SESSIONID", "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"):
+    for k in ("CROSSPOST_ENABLED", "TIKTOK_ENABLED", "INSTAGRAM_ENABLED", "IG_SESSIONID", "IG_USERNAME", "IG_PASSWORD", "TIKTOK_SESSIONID", "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"):
         v = str(keys.get(k, "")).strip()
         if v and not os.getenv(k, "").strip():
             os.environ[k] = v
@@ -79,18 +81,41 @@ TIKTOK_MAX_CAPTION = 2100  # TikTok 2200 limiti; güvenli pay bırak
 IG_MAX_CAPTION = 2100      # Reels 2200 limiti; güvenli pay bırak
 
 
-def crosspost_enabled() -> bool:
-    """Kullanıcı kilidi, ortam bayrağı ve platform kimliklerini birlikte kontrol et."""
-    if CROSSPOST_DISABLED_BY_USER:
+_FALSEY = {"0", "false", "no", "hayir", "hayır", "kapali", "kapalı"}
+
+
+def _flag_on(name: str, default: str = "false") -> bool:
+    """Ortam bayrağını oku; boş ve bilinmeyen değerler kapalı sayılır."""
+    value = os.getenv(name, default).strip().lower()
+    return bool(value) and value not in _FALSEY
+
+
+def _tiktok_session() -> str:
+    """TIKTOK_SESSIONID değerini oku; 'sessionid=' öneki/tırnak varsa temizle."""
+    raw = os.getenv("TIKTOK_SESSIONID", "").strip()
+    low = raw.lower()
+    for prefix in ("sessionid=", "sessionid:"):
+        if low.startswith(prefix):
+            raw = raw[len(prefix):].strip()
+            break
+    return raw.strip('"').strip("'")
+
+
+def _tiktok_ready() -> bool:
+    return _flag_on("TIKTOK_ENABLED") and bool(_tiktok_session())
+
+
+def _instagram_ready() -> bool:
+    if INSTAGRAM_DISABLED_BY_USER or not _flag_on("INSTAGRAM_ENABLED"):
         return False
-    flag = os.getenv("CROSSPOST_ENABLED", "false").strip().lower()
-    if flag in ("0", "false", "no", "hayir", "hayır", "kapali", "kapalı"):
-        return False
-    has_ig = bool(os.getenv("IG_SESSIONID", "").strip()) or (
+    return bool(os.getenv("IG_SESSIONID", "").strip()) or (
         bool(os.getenv("IG_USERNAME", "").strip()) and bool(os.getenv("IG_PASSWORD", "").strip())
     )
-    has_tt = bool(os.getenv("TIKTOK_SESSIONID", "").strip())
-    return has_ig or has_tt
+
+
+def crosspost_enabled() -> bool:
+    """Ana kilit + platform bayrakları + oturumlar birlikte kontrol edilir."""
+    return _flag_on("CROSSPOST_ENABLED") and (_tiktok_ready() or _instagram_ready())
 
 
 def _trim_caption(text: str, limit: int) -> str:
@@ -127,8 +152,8 @@ def _send_telegram_note(lines: list[str]) -> None:
 
 def post_instagram(video_path: Path, caption: str) -> str | None:
     """Reels (clip) olarak Instagram'a yükler. Başarılıysa reel URL'si döner."""
-    if CROSSPOST_DISABLED_BY_USER:
-        log.info("Instagram paylaşımı kullanıcı isteğiyle pasif.")
+    if INSTAGRAM_DISABLED_BY_USER or not _flag_on("INSTAGRAM_ENABLED"):
+        log.info("Instagram paylaşımı kapalı (sahip kararı / bayrak).")
         return None
     sid = os.getenv("IG_SESSIONID", "").strip()
     user = os.getenv("IG_USERNAME", "").strip()
@@ -176,24 +201,81 @@ def _ensure_playwright_browser() -> None:
         log.warning(f"playwright chromium kurulumu: {e} (devam ediliyor, zaten kurulu olabilir)")
 
 
+def _tiktok_cookies(sid: str) -> list[dict]:
+    """TikTok kimlik çerezleri; varsa veri merkezi çerezini de ekle."""
+    cookies = [{"name": "sessionid", "value": sid, "domain": ".tiktok.com", "path": "/"}]
+    datacenter = os.getenv("TIKTOK_DATACENTER", "").strip()
+    if datacenter:
+        cookies.append({"name": "tt-target-idc", "value": datacenter, "domain": ".tiktok.com", "path": "/"})
+    return cookies
+
+
+# TikTok ilk kullanım "tur" penceresi (react-joyride) yazı alanı ve Post
+# butonunun üzerine biniyor; Playwright tıklamalarını engelliyor. Düğümleri
+# silmiyoruz (React kendi DOM'unu yönetiyor), sadece görünmez + tıklanamaz
+# yapıyoruz. Init script olarak eklendiği için her sayfa geçişinde geçerli.
+_TIKTOK_OVERLAY_INIT_JS = r"""
+(() => {
+  const id = '__tt_no_onboarding_tour';
+  const css = '#react-joyride-portal,.react-joyride__overlay,[data-test-id="overlay"]' +
+              '{display:none!important;visibility:hidden!important;pointer-events:none!important}';
+  const install = () => {
+    if (!document.head && !document.documentElement) return false;
+    if (document.getElementById(id)) return true;
+    const style = document.createElement('style');
+    style.id = id;
+    style.textContent = css;
+    (document.head || document.documentElement).appendChild(style);
+    return true;
+  };
+  if (!install()) document.addEventListener('DOMContentLoaded', install);
+  try {
+    new MutationObserver(install).observe(
+      document.documentElement || document, { childList: true, subtree: true }
+    );
+  } catch (e) {}
+})();
+"""
+
+
+def _install_tiktok_overlay_cleanup(upload_module) -> None:
+    """tiktok-uploader'ın get_browser'ını overlay temizliğiyle sarar (idempotent)."""
+    if getattr(upload_module, "_tt_overlay_cleanup_installed", False):
+        return
+    original_get_browser = upload_module.get_browser
+
+    def patched_get_browser(*args, **kwargs):
+        page = original_get_browser(*args, **kwargs)
+        try:
+            page.context.add_init_script(_TIKTOK_OVERLAY_INIT_JS)
+            page.evaluate(_TIKTOK_OVERLAY_INIT_JS)
+        except Exception as exc:
+            log.warning("TikTok tur penceresi gizlenemedi: %s", type(exc).__name__)
+        return page
+
+    upload_module.get_browser = patched_get_browser
+    upload_module._tt_overlay_cleanup_installed = True
+
+
 def post_tiktok(video_path: Path, caption: str) -> str | None:
     """sessionid çereziyle TikTok'a yükler. Başarılıysa None değil URL/ID döner."""
-    if CROSSPOST_DISABLED_BY_USER:
-        log.info("TikTok paylaşımı kullanıcı isteğiyle pasif.")
+    if not _flag_on("TIKTOK_ENABLED"):
+        log.info("TikTok bayrağı kapalı -> atlanıyor.")
         return None
-    sid = os.getenv("TIKTOK_SESSIONID", "").strip()
+    sid = _tiktok_session()
     if not sid:
         log.info("TikTok kimliği yok (TIKTOK_SESSIONID) -> atlanıyor.")
         return None
     try:
         _ensure_playwright_browser()
-        from tiktok_uploader.upload import upload_video
+        from tiktok_uploader import upload as tiktok_upload
+
+        _install_tiktok_overlay_cleanup(tiktok_upload)
+        upload_video = tiktok_upload.upload_video
 
         # tiktok-uploader 1.2.0 sessionid cookie'sini domain'siz ekleyip patlıyor;
         # domain+path içeren cookies_list formatıyla bypass ediyoruz
-        cookies_list = [
-            {"name": "sessionid", "value": sid, "domain": ".tiktok.com", "path": "/"},
-        ]
+        cookies_list = _tiktok_cookies(sid)
         failed = upload_video(
             filename=str(video_path),
             description=_trim_caption(caption, TIKTOK_MAX_CAPTION),
@@ -215,13 +297,18 @@ def post_tiktok(video_path: Path, caption: str) -> str | None:
 def run_crosspost(video_path: Path, file_name: str, caption: str, drive=None, folder_id: str = "") -> dict:
     """Ana giriş: uygunsa IG + TikTok'a yükler, sonuçları raporlar."""
     results = {"instagram": None, "tiktok": None}
-    if CROSSPOST_DISABLED_BY_USER:
-        log.info("Instagram ve TikTok kullanıcı isteğiyle pasif; oturumlar okunmadı.")
+    # Env'de ana kilit açıkça kapatılmışsa Drive anahtarları bu kararı geçersiz kılamaz.
+    if os.getenv("CROSSPOST_ENABLED", "").strip() and not _flag_on("CROSSPOST_ENABLED"):
+        log.info("Çapraz paylaşım ana kilidi kapalı; oturumlar okunmadı.")
         return {**results, "status": "disabled_by_user"}
 
     # Env'de anahtar yoksa Drive'daki crosspost_keys.json'dan hidre et (GitHub workflow YAML'si kilitli)
     if not crosspost_enabled() and drive is not None:
         _hydrate_env_from_keys(_load_drive_keys(drive, folder_id or STOCK_FOLDER_ID))
+
+    if not _flag_on("CROSSPOST_ENABLED"):
+        log.info("Çapraz paylaşım ana kilidi kapalı.")
+        return {**results, "status": "disabled_by_user"}
 
     if not crosspost_enabled():
         log.info("Çapraz paylaşım kapalı veya kimlik eksik -> atlanıyor.")
@@ -233,8 +320,10 @@ def run_crosspost(video_path: Path, file_name: str, caption: str, drive=None, fo
         return results
 
     log.info(f"Çapraz paylaşım başladı: {file_name}")
-    results["instagram"] = post_instagram(video_path, caption)
-    results["tiktok"] = post_tiktok(video_path, caption)
+    if _instagram_ready():
+        results["instagram"] = post_instagram(video_path, caption)
+    if _tiktok_ready():
+        results["tiktok"] = post_tiktok(video_path, caption)
 
     # Yalnız API yanıtı veya genel profil adresi herkese açık yayının kanıtı değildir.
     # Telegram notuna hata gövdesi veya kimlik bilgisi içerebilecek ham değer ekleme.

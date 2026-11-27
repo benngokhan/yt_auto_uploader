@@ -1,4 +1,3 @@
-import json
 import os
 import tempfile
 import unittest
@@ -9,13 +8,18 @@ import crosspost_worker as worker
 import delivery_diagnostics as diagnostics
 
 
-class CrosspostUserDisabledTests(unittest.TestCase):
-    def test_all_env_and_drive_flags_cannot_reactivate_old_sessions(self):
-        flags = {
-            "CROSSPOST_ENABLED": "true",
-            "IG_SESSIONID": "not-real-instagram-session",
-            "TIKTOK_SESSIONID": "not-real-tiktok-session",
-        }
+FLAGS = {
+    "CROSSPOST_ENABLED": "true",
+    "TIKTOK_ENABLED": "true",
+    "INSTAGRAM_ENABLED": "true",
+    "TIKTOK_SESSIONID": "fresh-tiktok-session",
+    "IG_SESSIONID": "fresh-instagram-session",
+}
+
+
+class CrosspostOwnerDecisionTests(unittest.TestCase):
+    def test_global_kill_switch_still_wins(self):
+        flags = dict(FLAGS, CROSSPOST_ENABLED="false")
         drive = Mock(name="drive")
         with patch.dict(os.environ, flags, clear=True), \
              patch.object(worker, "_load_drive_keys") as load, \
@@ -30,13 +34,69 @@ class CrosspostUserDisabledTests(unittest.TestCase):
             fn.assert_not_called()
         self.assertEqual(drive.mock_calls, [])
 
-    def test_direct_platform_entrypoints_do_not_upload(self):
-        flags = {"CROSSPOST_ENABLED": "true", "IG_SESSIONID": "fake", "TIKTOK_SESSIONID": "fake"}
+    def test_tiktok_only_instagram_stays_locked(self):
+        drive = Mock(name="drive")
+        with patch.dict(os.environ, FLAGS, clear=True), \
+             patch.object(worker, "_load_drive_keys") as load, \
+             patch.object(worker, "post_instagram") as instagram, \
+             patch.object(worker, "post_tiktok", return_value="https://www.tiktok.com/@bilgidozuofficial") as tiktok, \
+             patch.object(worker, "_send_telegram_note") as telegram:
+            self.assertTrue(worker.crosspost_enabled())
+            result = worker.run_crosspost(Path("/not/real.mp4"), "video_200.mp4", "", drive=drive)
+        load.assert_not_called()
+        instagram.assert_not_called()
+        tiktok.assert_called_once()
+        telegram.assert_called_once()
+        self.assertEqual(result["tiktok"], "https://www.tiktok.com/@bilgidozuofficial")
+        self.assertIsNone(result["instagram"])
+        self.assertEqual(drive.mock_calls, [])
+
+    def test_no_tiktok_session_means_no_upload(self):
+        flags = dict(FLAGS)
+        flags.pop("TIKTOK_SESSIONID")
         with patch.dict(os.environ, flags, clear=True), \
-             patch.object(worker, "_ensure_playwright_browser") as browser:
+             patch.object(worker, "_load_drive_keys", return_value={}), \
+             patch.object(worker, "post_tiktok") as tiktok, \
+             patch.object(worker, "_send_telegram_note"):
+            self.assertFalse(worker.crosspost_enabled())
+            result = worker.run_crosspost(Path("/not/real.mp4"), "video_200.mp4", "", drive=object())
+        tiktok.assert_not_called()
+        self.assertEqual(result, {"instagram": None, "tiktok": None})
+
+    def test_tiktok_cookies_include_datacenter_when_set(self):
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(worker._tiktok_cookies("abc"), [
+                {"name": "sessionid", "value": "abc", "domain": ".tiktok.com", "path": "/"}
+            ])
+        with patch.dict(os.environ, {"TIKTOK_DATACENTER": "us"}, clear=True):
+            self.assertEqual(worker._tiktok_cookies("abc"), [
+                {"name": "sessionid", "value": "abc", "domain": ".tiktok.com", "path": "/"},
+                {"name": "tt-target-idc", "value": "us", "domain": ".tiktok.com", "path": "/"},
+            ])
+
+    def test_tiktok_session_prefix_is_normalized(self):
+        cases = {
+            'sessionid=abc123': 'abc123',
+            'sessionid:"abc123"': 'abc123',
+            "'abc123'": 'abc123',
+            '  abc123  ': 'abc123',
+        }
+        for raw, expected in cases.items():
+            with self.subTest(raw=raw), patch.dict(os.environ, {"TIKTOK_SESSIONID": raw}, clear=True):
+                self.assertEqual(worker._tiktok_session(), expected)
+
+    def test_instagram_entrypoint_ignores_all_flags(self):
+        with patch.dict(os.environ, FLAGS, clear=True):
             self.assertIsNone(worker.post_instagram(Path("/missing.mp4"), "test"))
-            self.assertIsNone(worker.post_tiktok(Path("/missing.mp4"), "test"))
-            browser.assert_not_called()
+
+    def test_long_video_is_not_crossposted(self):
+        with patch.dict(os.environ, FLAGS, clear=True), \
+             patch.object(worker, "post_tiktok") as tiktok, \
+             patch.object(worker, "_send_telegram_note") as telegram:
+            result = worker.run_crosspost(Path("/not/real.mp4"), "uzun_video_24.mp4", "")
+        tiktok.assert_not_called()
+        telegram.assert_not_called()
+        self.assertEqual(result, {"instagram": None, "tiktok": None})
 
     def test_intentionally_disabled_is_not_reported_as_a_failure_or_success(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -49,9 +109,12 @@ class CrosspostUserDisabledTests(unittest.TestCase):
             self.assertFalse(changed)
             self.assertEqual(path.read_text(encoding="utf-8"), original)
 
-    def test_workflow_also_disables_crosspost_explicitly(self):
+    def test_workflow_enables_tiktok_only(self):
         path = Path(__file__).resolve().parents[1] / ".github/workflows/youtube-drive-uploader.yml"
-        self.assertIn("CROSSPOST_ENABLED: 'false'", path.read_text(encoding="utf-8"))
+        text = path.read_text(encoding="utf-8")
+        self.assertIn("CROSSPOST_ENABLED: 'true'", text)
+        self.assertIn("TIKTOK_ENABLED: 'true'", text)
+        self.assertIn("INSTAGRAM_ENABLED: 'false'", text)
 
 
 if __name__ == "__main__":
