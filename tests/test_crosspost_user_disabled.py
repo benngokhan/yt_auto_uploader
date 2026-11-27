@@ -63,6 +63,17 @@ class CrosspostOwnerDecisionTests(unittest.TestCase):
         tiktok.assert_not_called()
         self.assertEqual(result, {"instagram": None, "tiktok": None})
 
+    def test_tiktok_session_prefix_is_normalized(self):
+        cases = {
+            'sessionid=abc123': 'abc123',
+            'sessionid:"abc123"': 'abc123',
+            "'abc123'": 'abc123',
+            '  abc123  ': 'abc123',
+        }
+        for raw, expected in cases.items():
+            with self.subTest(raw=raw), patch.dict(os.environ, {"TIKTOK_SESSIONID": raw}, clear=True):
+                self.assertEqual(worker._tiktok_session(), expected)
+
     def test_instagram_entrypoint_ignores_all_flags(self):
         with patch.dict(os.environ, FLAGS, clear=True):
             self.assertIsNone(worker.post_instagram(Path("/missing.mp4"), "test"))

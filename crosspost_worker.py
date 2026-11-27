@@ -90,8 +90,19 @@ def _flag_on(name: str, default: str = "false") -> bool:
     return bool(value) and value not in _FALSEY
 
 
+def _tiktok_session() -> str:
+    """TIKTOK_SESSIONID değerini oku; 'sessionid=' öneki/tırnak varsa temizle."""
+    raw = os.getenv("TIKTOK_SESSIONID", "").strip()
+    low = raw.lower()
+    for prefix in ("sessionid=", "sessionid:"):
+        if low.startswith(prefix):
+            raw = raw[len(prefix):].strip()
+            break
+    return raw.strip('"').strip("'")
+
+
 def _tiktok_ready() -> bool:
-    return _flag_on("TIKTOK_ENABLED") and bool(os.getenv("TIKTOK_SESSIONID", "").strip())
+    return _flag_on("TIKTOK_ENABLED") and bool(_tiktok_session())
 
 
 def _instagram_ready() -> bool:
@@ -195,7 +206,7 @@ def post_tiktok(video_path: Path, caption: str) -> str | None:
     if not _flag_on("TIKTOK_ENABLED"):
         log.info("TikTok bayrağı kapalı -> atlanıyor.")
         return None
-    sid = os.getenv("TIKTOK_SESSIONID", "").strip()
+    sid = _tiktok_session()
     if not sid:
         log.info("TikTok kimliği yok (TIKTOK_SESSIONID) -> atlanıyor.")
         return None
