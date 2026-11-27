@@ -34,8 +34,7 @@ jobs:
           if not creds.valid:
               creds.refresh(Request())
           drive = build("drive", "v3", credentials=creds)
-          FOLDER = os.environ["FOLDER"]
-
+          
           files = drive.files().list(q="'%s' in parents and name='video_187.mp4' and trashed=false" % VIDEO_FOLDER,
                                      fields="files(id,name,size,md5Checksum,modifiedTime)").execute().get("files", [])
           print("VIDEO:", json.dumps(files, ensure_ascii=False))
