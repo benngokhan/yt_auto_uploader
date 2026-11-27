@@ -1671,9 +1671,10 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         raise SystemExit("Canlı görsel seçim raporu tam yedi sahne içermiyor.")
     for index, row in enumerate(rows, start=1):
         selected = row.get("selected") if isinstance(row, dict) else None
-        if not isinstance(selected, dict) or selected.get("provider") != "pexels" \
+        provider = str((selected or {}).get("provider") or "")
+        if not isinstance(selected, dict) or provider not in {"pexels", "cloudflare_ai"} \
                 or selected.get("score_origin") != "live_gemini_vision":
-            raise SystemExit(f"Shorts v2 sahne {index}: canlı Pexels/Gemini Vision kanıtı yok.")
+            raise SystemExit(f"Shorts v2 sahne {index}: canlı görsel/Gemini Vision kanıtı yok.")
 
     from shorts_acceptance import sha256_file
     render_inputs = []

@@ -156,15 +156,21 @@ def _validate_visual_report(report: dict) -> list[dict]:
         selected = row.get("selected") if isinstance(row, dict) else None
         if not isinstance(selected, dict):
             raise ShortsAcceptanceError(f"Görsel sahne {index} seçimi eksik")
-        if selected.get("provider") != "pexels":
-            raise ShortsAcceptanceError(f"Görsel sahne {index} canlı Pexels kaynağı değil")
+        provider = str(selected.get("provider") or "")
+        if provider not in {"pexels", "cloudflare_ai"}:
+            raise ShortsAcceptanceError(f"Görsel sahne {index} desteklenen canlı kaynak değil: {provider!r}")
         uid = str(selected.get("uid") or "")
         if not uid or uid in seen:
-            raise ShortsAcceptanceError("V2 sahne görselleri benzersiz Pexels UID taşımalı")
+            raise ShortsAcceptanceError("V2 sahne görselleri benzersiz UID taşımalı")
         seen.add(uid)
         url = str(selected.get("source_page_url") or "")
-        if urlparse(url).hostname not in {"pexels.com", "www.pexels.com"}:
-            raise ShortsAcceptanceError(f"Görsel sahne {index} Pexels kaynak URL'si doğrulanamadı")
+        host = (urlparse(url).hostname or "").lower().rstrip(".")
+        if provider == "pexels":
+            if host not in {"pexels.com", "www.pexels.com"}:
+                raise ShortsAcceptanceError(f"Görsel sahne {index} Pexels kaynak URL'si doğrulanamadı")
+        elif provider == "cloudflare_ai":
+            if host not in {"developers.cloudflare.com", "www.cloudflare.com", "cloudflare.com"}:
+                raise ShortsAcceptanceError(f"Görsel sahne {index} Cloudflare AI kaynak URL'si doğrulanamadı")
         score_origin = selected.get("score_origin")
         if score_origin == "live_gemini_vision":
             score = _finite_float(selected.get("semantic_similarity"), f"Sahne {index} semantik skor")

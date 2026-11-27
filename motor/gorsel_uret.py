@@ -13,6 +13,7 @@ Karar (kullanıcı):
 from __future__ import annotations
 
 import base64
+import hashlib
 import io
 import json
 import os
@@ -575,6 +576,10 @@ def sinematik_isle(img: Image.Image, tohum: int = 20261112) -> Image.Image:
 
 
 def _indir(url: str, hedef: Path) -> None:
+    if str(url).startswith("file://"):
+        src = Path(urllib.request.url2pathname(urllib.parse.urlparse(str(url)).path))
+        hedef.write_bytes(src.read_bytes())
+        return
     son_hata: Exception | None = None
     for bekle in (0, 2, 4):
         if bekle:
@@ -770,7 +775,14 @@ def _provider_page_url_ok(provider: str, url: str) -> bool:
     try:
         parsed = urllib.parse.urlparse(str(url or ""))
         host = (parsed.hostname or "").lower().rstrip(".")
-        domain = "pexels.com" if provider == "pexels" else "pixabay.com" if provider == "pixabay" else ""
+        if provider == "pexels":
+            domain = "pexels.com"
+        elif provider == "pixabay":
+            domain = "pixabay.com"
+        elif provider == "cloudflare_ai":
+            domain = "cloudflare.com"
+        else:
+            domain = ""
         return parsed.scheme == "https" and bool(domain) and (host == domain or host.endswith("." + domain))
     except Exception:
         return False
@@ -790,6 +802,74 @@ def _gorsel_kalite_logunu_yaz(klasor: Path, log: dict) -> None:
         print(f"[görsel log uyarısı] üretim arşivi yazılamadı: {type(exc).__name__}")
 
 
+def cloudflare_ai_gorseller_uret(scene_text: str, scene_index: int, klasor: Path, adet: int = 1) -> list[dict]:
+    """Cloudflare Workers AI ile sahneye özel görsel üretir (fallback)."""
+    account_id = (os.getenv("CLOUDFLARE_ACCOUNT_ID") or "").strip()
+    token = (os.getenv("CLOUDFLARE_API_TOKEN") or "").strip()
+    if not account_id or not token:
+        return []
+    model = (os.getenv("CLOUDFLARE_AI_IMAGE_MODEL") or "@cf/black-forest-labs/flux-1-schnell").strip()
+    prompt = (
+        "Photorealistic cinematic documentary image for a science short video. "
+        "Show this scene clearly and concretely: " + " ".join(str(scene_text).split()) + ". "
+        "No text, no letters, no numbers, no watermark, no logo, no border, no collage. "
+        "Natural lighting, high detail, vertical composition friendly."
+    )
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{model}"
+    hits: list[dict] = []
+    for i in range(max(1, min(adet, 2))):
+        try:
+            body = {"prompt": prompt, "num_steps": 4}
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(body).encode("utf-8"),
+                headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                raw = resp.read()
+                ctype = (resp.headers.get("Content-Type") or "").lower()
+            img_bytes: bytes | None = None
+            if "application/json" in ctype or raw[:1] in (b"{", b"["):
+                data = json.loads(raw.decode("utf-8", "replace"))
+                result = data.get("result") if isinstance(data, dict) else None
+                if isinstance(result, dict) and isinstance(result.get("image"), str):
+                    img_bytes = base64.b64decode(result["image"])
+                elif isinstance(data, dict) and isinstance(data.get("image"), str):
+                    img_bytes = base64.b64decode(data["image"])
+            if img_bytes is None and raw[:3] in (b"\xff\xd8\xff", b"\x89PN", b"RIFF"):
+                img_bytes = raw
+            if not img_bytes:
+                print(f"  [cf-ai] sahne {scene_index}: yanıt görsel içermedi.")
+                continue
+            hedef = klasor / f"cf_{scene_index:02d}_{i+1}.png"
+            with Image.open(io.BytesIO(img_bytes)) as im:
+                im = im.convert("RGB")
+                im.save(hedef, format="PNG")
+                w, h = im.size
+            uid = f"cloudflare_ai:{hashlib.sha256(img_bytes).hexdigest()[:16]}_{scene_index}_{i+1}"
+            file_url = hedef.resolve().as_uri()
+            hits.append({
+                "uid": uid,
+                "kaynak": "cloudflare_ai",
+                "id": uid,
+                "imageWidth": int(w),
+                "imageHeight": int(h),
+                "tags": " ".join(str(scene_text).split()[:16]),
+                "type": "photo",
+                "avg_color": "#666666",
+                "likes": 0,
+                "downloads": 0,
+                "indir_url": file_url,
+                "preview_url": file_url,
+                "source_page_url": "https://developers.cloudflare.com/workers-ai/",
+                "_local_path": str(hedef),
+            })
+        except Exception as exc:  # noqa: BLE001
+            print(f"  [cf-ai] sahne {scene_index} üretim hatası: {type(exc).__name__}")
+    return hits
+
+
 def sahneler_icin_gorseller(
     sahneler: list[dict],
     klasor: Path,
@@ -801,7 +881,7 @@ def sahneler_icin_gorseller(
     pexels_key = (os.getenv("PEXELS_API_KEY") or os.getenv("PEXELS_KEY") or os.getenv("PEXELS_API") or "").strip()
     pixabay_key = os.getenv("PIXABAY_API_KEY", "").strip()
     providers: list[tuple[str, str, object]] = []
-    # v2 kabul kapısı yalnız Pexels kaynağını kabul eder; Pixabay'a boşa kota harcama.
+    # Stok önceliği: Pexels, yoksa Pixabay. Cloudflare AI son çare fallback olarak ayrıca denenir.
     if pexels_key:
         providers.append(("pexels", pexels_key, pexels_ara))
     elif pixabay_key:
@@ -930,6 +1010,90 @@ def sahneler_icin_gorseller(
             if selected_path:
                 break
 
+        if not selected_path:
+            cf_hits = cloudflare_ai_gorseller_uret(scene_text, scene_index, klasor, adet=1)
+            if cf_hits:
+                query_log = {"query": f"cloudflare_ai:{scene_text[:80]}", "provider_results": []}
+                provider_log = {"provider": "cloudflare_ai", "returned_candidate_count": len(cf_hits), "candidates": []}
+                query_log["provider_results"].append(provider_log)
+                try:
+                    scores = _visual_text_scores(scene_text, cf_hits)
+                except Exception as exc:  # noqa: BLE001
+                    scores = [None] * len(cf_hits)
+                    for hit in cf_hits:
+                        hit["_vision_error"] = f"vision_judge:{type(exc).__name__}"
+                if len(scores) != len(cf_hits):
+                    scores = [None] * len(cf_hits)
+                scored = []
+                for hit, vision_score in zip(cf_hits, scores):
+                    heuristic = float(_puanla(hit, scene_text))
+                    score_origin = "live_gemini_vision" if vision_score is not None else None
+                    record = {
+                        "uid": str(hit.get("uid") or f"cloudflare_ai:{scene_index}"),
+                        "provider": "cloudflare_ai",
+                        "search_query": query_log["query"],
+                        "candidate_tags": str(hit.get("tags") or ""),
+                        "heuristic_tag_score": round(heuristic, 3),
+                        "semantic_similarity": None if vision_score is None else round(float(vision_score), 4),
+                        "score_origin": score_origin,
+                        "image_url": str(hit.get("indir_url") or ""),
+                        "source_page_url": str(hit.get("source_page_url") or "https://developers.cloudflare.com/workers-ai/"),
+                        "selected": False,
+                        "rejection_reason": None,
+                    }
+                    is_duplicate = record["uid"] in used
+                    etiket_metni = str(hit.get("tags") or "").lower()
+                    if is_duplicate:
+                        record["rejection_reason"] = "duplicate_visual_already_used"
+                    elif re.search(r"\b(logo|watermark|filigran)\b", etiket_metni):
+                        record["rejection_reason"] = "logo_or_watermark_metadata"
+                    elif not _yeterince_uygun(hit, scene_text, scene_text, gevsek=True):
+                        record["rejection_reason"] = "provider_metadata_or_photo_quality_filter"
+                    elif score_origin is None:
+                        record["rejection_reason"] = str(hit.get("_vision_error") or "semantic_score_unavailable_fail_closed")
+                    elif not _record_score_passes(record):
+                        record["rejection_reason"] = "semantic_similarity_below_threshold"
+                    elif not record["image_url"] or not _provider_page_url_ok("cloudflare_ai", record["source_page_url"]):
+                        record["rejection_reason"] = "missing_or_invalid_provider_source_url"
+                    scored.append((hit, vision_score, record))
+                    provider_log["candidates"].append(record)
+                eligible = [x for x in scored if _record_score_passes(x[2]) and x[2]["rejection_reason"] is None]
+                eligible.sort(key=lambda x: (float(x[1]), x[2]["heuristic_tag_score"]), reverse=True)
+                for hit, score, record in eligible:
+                    uid = record["uid"]
+                    raw = klasor / f"ham_{scene_index:02d}.jpg"
+                    try:
+                        _indir(record["image_url"], raw)
+                        with Image.open(raw) as im:
+                            im.load()
+                            defective, reason = _ham_kusurlu_mu(im)
+                            if defective:
+                                record["rejection_reason"] = f"pixel_filter:{reason}"
+                                raw.unlink(missing_ok=True)
+                                continue
+                        with Image.open(raw) as im:
+                            duzeltilen, logo_bilgi = logo_duzelt(im.convert("RGB"))
+                            processed = sinematik_isle(dikey_kirp(duzeltilen), tohum=20261100 + scene_index)
+                        record["logo_check"] = logo_bilgi
+                        processed_brightness = average_image_brightness(processed)
+                        if processed_brightness < MIN_AVG_BRIGHTNESS:
+                            record["rejection_reason"] = f"processed_dark_image:{processed_brightness:.1f}/255"
+                            raw.unlink(missing_ok=True)
+                            continue
+                        selected_path = klasor / f"sahne_{scene_index:02d}.png"
+                        processed.save(selected_path, format="PNG")
+                        record["average_brightness"] = round(processed_brightness, 2)
+                        raw.unlink(missing_ok=True)
+                        record["selected"] = True
+                        record["rejection_reason"] = None
+                        selected_hit, selected_query, selected_provider = hit, query_log["query"], "cloudflare_ai"
+                        used.add(uid)
+                        break
+                    except Exception as exc:  # noqa: BLE001
+                        raw.unlink(missing_ok=True)
+                        record["rejection_reason"] = f"download_or_pixel_error:{type(exc).__name__}"
+                scene_log["queries"].append(query_log)
+
         if selected_path and selected_hit:
             scene_log["selected"] = {
                 "provider": selected_provider,
@@ -959,8 +1123,9 @@ def sahneler_icin_gorseller(
         report["scenes"].append(scene_log)
         _gorsel_kalite_logunu_yaz(klasor, report)
 
-    if not providers:
-        report["provider_error"] = "PEXELS_API_KEY and PIXABAY_API_KEY are both missing"
+    cf_ready = bool((os.getenv("CLOUDFLARE_ACCOUNT_ID") or "").strip() and (os.getenv("CLOUDFLARE_API_TOKEN") or "").strip())
+    if not providers and not cf_ready:
+        report["provider_error"] = "No image providers configured (PEXELS/PIXABAY/CLOUDFLARE)"
         _gorsel_kalite_logunu_yaz(klasor, report)
 
     # Tek satırlık, sızdırmaz tanı özeti: hangi kapının görseli reddettiği net görülür.
