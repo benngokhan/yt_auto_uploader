@@ -157,7 +157,7 @@ def _validate_visual_report(report: dict) -> list[dict]:
         if not isinstance(selected, dict):
             raise ShortsAcceptanceError(f"Görsel sahne {index} seçimi eksik")
         provider = str(selected.get("provider") or "")
-        if provider not in {"pexels", "cloudflare_ai"}:
+        if provider not in {"pexels", "pixabay", "cloudflare_ai", "gemini_ai"}:
             raise ShortsAcceptanceError(f"Görsel sahne {index} desteklenen canlı kaynak değil: {provider!r}")
         uid = str(selected.get("uid") or "")
         if not uid or uid in seen:
@@ -168,9 +168,15 @@ def _validate_visual_report(report: dict) -> list[dict]:
         if provider == "pexels":
             if host not in {"pexels.com", "www.pexels.com"}:
                 raise ShortsAcceptanceError(f"Görsel sahne {index} Pexels kaynak URL'si doğrulanamadı")
+        elif provider == "pixabay":
+            if host not in {"pixabay.com", "www.pixabay.com"}:
+                raise ShortsAcceptanceError(f"Görsel sahne {index} Pixabay kaynak URL'si doğrulanamadı")
         elif provider == "cloudflare_ai":
             if host not in {"developers.cloudflare.com", "www.cloudflare.com", "cloudflare.com"}:
                 raise ShortsAcceptanceError(f"Görsel sahne {index} Cloudflare AI kaynak URL'si doğrulanamadı")
+        elif provider == "gemini_ai":
+            if host not in {"ai.google.dev", "generativelanguage.googleapis.com", "google.com", "www.google.com"}:
+                raise ShortsAcceptanceError(f"Görsel sahne {index} Gemini AI kaynak URL'si doğrulanamadı")
         score_origin = selected.get("score_origin")
         if score_origin == "live_gemini_vision":
             score = _finite_float(selected.get("semantic_similarity"), f"Sahne {index} semantik skor")

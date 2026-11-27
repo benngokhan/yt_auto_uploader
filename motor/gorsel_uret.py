@@ -781,6 +781,8 @@ def _provider_page_url_ok(provider: str, url: str) -> bool:
             domain = "pixabay.com"
         elif provider == "cloudflare_ai":
             domain = "cloudflare.com"
+        elif provider == "gemini_ai":
+            return parsed.scheme == "https" and (host == "google.com" or host.endswith(".google.com") or host == "google.dev" or host.endswith(".google.dev") or host.endswith(".googleapis.com"))
         else:
             domain = ""
         return parsed.scheme == "https" and bool(domain) and (host == domain or host.endswith("." + domain))
@@ -898,6 +900,79 @@ def cloudflare_ai_gorseller_uret(scene_text: str, scene_index: int, klasor: Path
     return hits
 
 
+def gemini_ai_gorseller_uret(scene_text: str, scene_index: int, klasor: Path, adet: int = 1) -> list[dict]:
+    """Gemini ile sahneye özel görsel üretir (fallback)."""
+    key = (os.getenv("GEMINI_API_KEY") or "").strip()
+    if not key:
+        return []
+    modeller = [
+        os.getenv("GEMINI_IMAGE_MODEL", "").strip() or "gemini-2.5-flash-image",
+        "gemini-2.0-flash-preview-image-generation",
+    ]
+    # dedupe preserving order
+    seen_m = set(); modeller = [m for m in modeller if m and not (m in seen_m or seen_m.add(m))]
+    prompt = (
+        "Create a photorealistic cinematic vertical documentary image for a science short video. "
+        "Scene: " + " ".join(str(scene_text).split()) + ". "
+        "No text, no letters, no numbers, no watermark, no logo. High detail, natural lighting."
+    )
+    hits: list[dict] = []
+    for model in modeller:
+        try:
+            body = {
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]},
+            }
+            req = urllib.request.Request(
+                f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}",
+                data=json.dumps(body).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=150) as resp:
+                data = json.load(resp)
+            img_bytes = None
+            for cand in data.get("candidates", []) or []:
+                for part in (cand.get("content") or {}).get("parts", []) or []:
+                    inline = part.get("inlineData") or part.get("inline_data")
+                    if isinstance(inline, dict) and inline.get("data"):
+                        img_bytes = base64.b64decode(inline["data"])
+                        break
+                if img_bytes:
+                    break
+            if not img_bytes:
+                print(f"  [gemini-ai] sahne {scene_index} {model}: görsel içermedi")
+                continue
+            hedef = klasor / f"gm_{scene_index:02d}.png"
+            with Image.open(io.BytesIO(img_bytes)) as im:
+                im = im.convert("RGB")
+                im.save(hedef, format="PNG")
+                w, h = im.size
+            uid = f"gemini_ai:{hashlib.sha256(img_bytes).hexdigest()[:16]}_{scene_index}"
+            file_url = hedef.resolve().as_uri()
+            hits.append({
+                "uid": uid, "kaynak": "gemini_ai", "id": uid,
+                "imageWidth": int(w), "imageHeight": int(h),
+                "tags": " ".join(str(scene_text).split()[:16]),
+                "type": "photo", "avg_color": "#666666",
+                "likes": 0, "downloads": 0,
+                "indir_url": file_url, "preview_url": file_url,
+                "source_page_url": "https://ai.google.dev/",
+                "_local_path": str(hedef),
+            })
+            print(f"  [gemini-ai] sahne {scene_index}: görsel üretildi ({model})")
+            break
+        except urllib.error.HTTPError as exc:
+            try:
+                err_body = exc.read().decode("utf-8", "replace")[:200]
+            except Exception:
+                err_body = ""
+            print(f"  [gemini-ai] sahne {scene_index} {model}: HTTP {exc.code} {err_body}")
+        except Exception as exc:  # noqa: BLE001
+            print(f"  [gemini-ai] sahne {scene_index} {model}: {type(exc).__name__}")
+    return hits
+
+
 def sahneler_icin_gorseller(
     sahneler: list[dict],
     klasor: Path,
@@ -909,10 +984,10 @@ def sahneler_icin_gorseller(
     pexels_key = (os.getenv("PEXELS_API_KEY") or os.getenv("PEXELS_KEY") or os.getenv("PEXELS_API") or "").strip()
     pixabay_key = os.getenv("PIXABAY_API_KEY", "").strip()
     providers: list[tuple[str, str, object]] = []
-    # Stok önceliği: Pexels, yoksa Pixabay. Cloudflare AI son çare fallback olarak ayrıca denenir.
+    # Stok: Pexels + Pixabay birlikte denenir. AI fallback ayrıca devreye girer.
     if pexels_key:
         providers.append(("pexels", pexels_key, pexels_ara))
-    elif pixabay_key:
+    if pixabay_key:
         providers.append(("pixabay", pixabay_key, pixabay_ara))
 
     klasor.mkdir(parents=True, exist_ok=True)
@@ -1115,6 +1190,90 @@ def sahneler_icin_gorseller(
                         record["selected"] = True
                         record["rejection_reason"] = None
                         selected_hit, selected_query, selected_provider = hit, query_log["query"], "cloudflare_ai"
+                        used.add(uid)
+                        break
+                    except Exception as exc:  # noqa: BLE001
+                        raw.unlink(missing_ok=True)
+                        record["rejection_reason"] = f"download_or_pixel_error:{type(exc).__name__}"
+                scene_log["queries"].append(query_log)
+
+        if not selected_path:
+            gm_hits = gemini_ai_gorseller_uret(scene_text, scene_index, klasor, adet=1)
+            if gm_hits:
+                query_log = {"query": f"gemini_ai:{scene_text[:80]}", "provider_results": []}
+                provider_log = {"provider": "gemini_ai", "returned_candidate_count": len(gm_hits), "candidates": []}
+                query_log["provider_results"].append(provider_log)
+                try:
+                    scores = _visual_text_scores(scene_text, gm_hits)
+                except Exception as exc:  # noqa: BLE001
+                    scores = [None] * len(gm_hits)
+                    for hit in gm_hits:
+                        hit["_vision_error"] = f"vision_judge:{type(exc).__name__}"
+                if len(scores) != len(gm_hits):
+                    scores = [None] * len(gm_hits)
+                scored = []
+                for hit, vision_score in zip(gm_hits, scores):
+                    heuristic = float(_puanla(hit, scene_text))
+                    score_origin = "live_gemini_vision" if vision_score is not None else None
+                    record = {
+                        "uid": str(hit.get("uid") or f"gemini_ai:{scene_index}"),
+                        "provider": "gemini_ai",
+                        "search_query": query_log["query"],
+                        "candidate_tags": str(hit.get("tags") or ""),
+                        "heuristic_tag_score": round(heuristic, 3),
+                        "semantic_similarity": None if vision_score is None else round(float(vision_score), 4),
+                        "score_origin": score_origin,
+                        "image_url": str(hit.get("indir_url") or ""),
+                        "source_page_url": str(hit.get("source_page_url") or "https://ai.google.dev/"),
+                        "selected": False,
+                        "rejection_reason": None,
+                    }
+                    is_duplicate = record["uid"] in used
+                    etiket_metni = str(hit.get("tags") or "").lower()
+                    if is_duplicate:
+                        record["rejection_reason"] = "duplicate_visual_already_used"
+                    elif re.search(r"\b(logo|watermark|filigran)\b", etiket_metni):
+                        record["rejection_reason"] = "logo_or_watermark_metadata"
+                    elif not _yeterince_uygun(hit, scene_text, scene_text, gevsek=True):
+                        record["rejection_reason"] = "provider_metadata_or_photo_quality_filter"
+                    elif score_origin is None:
+                        record["rejection_reason"] = str(hit.get("_vision_error") or "semantic_score_unavailable_fail_closed")
+                    elif not _record_score_passes(record):
+                        record["rejection_reason"] = "semantic_similarity_below_threshold"
+                    elif not record["image_url"] or not _provider_page_url_ok("gemini_ai", record["source_page_url"]):
+                        record["rejection_reason"] = "missing_or_invalid_provider_source_url"
+                    scored.append((hit, vision_score, record))
+                    provider_log["candidates"].append(record)
+                eligible = [x for x in scored if _record_score_passes(x[2]) and x[2]["rejection_reason"] is None]
+                eligible.sort(key=lambda x: (float(x[1]), x[2]["heuristic_tag_score"]), reverse=True)
+                for hit, score, record in eligible:
+                    uid = record["uid"]
+                    raw = klasor / f"ham_{scene_index:02d}.jpg"
+                    try:
+                        _indir(record["image_url"], raw)
+                        with Image.open(raw) as im:
+                            im.load()
+                            defective, reason = _ham_kusurlu_mu(im)
+                            if defective:
+                                record["rejection_reason"] = f"pixel_filter:{reason}"
+                                raw.unlink(missing_ok=True)
+                                continue
+                        with Image.open(raw) as im:
+                            duzeltilen, logo_bilgi = logo_duzelt(im.convert("RGB"))
+                            processed = sinematik_isle(dikey_kirp(duzeltilen), tohum=20261100 + scene_index)
+                        record["logo_check"] = logo_bilgi
+                        processed_brightness = average_image_brightness(processed)
+                        if processed_brightness < MIN_AVG_BRIGHTNESS:
+                            record["rejection_reason"] = f"processed_dark_image:{processed_brightness:.1f}/255"
+                            raw.unlink(missing_ok=True)
+                            continue
+                        selected_path = klasor / f"sahne_{scene_index:02d}.png"
+                        processed.save(selected_path, format="PNG")
+                        record["average_brightness"] = round(processed_brightness, 2)
+                        raw.unlink(missing_ok=True)
+                        record["selected"] = True
+                        record["rejection_reason"] = None
+                        selected_hit, selected_query, selected_provider = hit, query_log["query"], "gemini_ai"
                         used.add(uid)
                         break
                     except Exception as exc:  # noqa: BLE001

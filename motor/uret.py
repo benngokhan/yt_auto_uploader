@@ -1672,7 +1672,7 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     for index, row in enumerate(rows, start=1):
         selected = row.get("selected") if isinstance(row, dict) else None
         provider = str((selected or {}).get("provider") or "")
-        if not isinstance(selected, dict) or provider not in {"pexels", "cloudflare_ai"} \
+        if not isinstance(selected, dict) or provider not in {"pexels", "pixabay", "cloudflare_ai", "gemini_ai"} \
                 or selected.get("score_origin") != "live_gemini_vision":
             raise SystemExit(f"Shorts v2 sahne {index}: canlı görsel/Gemini Vision kanıtı yok.")
 
