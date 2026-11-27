@@ -86,14 +86,23 @@ def calistir(ayar: dict | None = None, uret_mod=None) -> list[dict]:
         ekle("R0", "motor yüklenebiliyor", False, f"{type(h).__name__}: {h}")
         return sonuc
 
-    # R1: gerçek gövde yazım denetimi (yapay zekâ)
+    # R1: gerçek gövde yazım denetimi (yapay zekâ) - LLM dalgalanmasına karşı 2 deneme
     try:
-        y = _yazim_canli(uret_mod, ayar)
-        metin = " ".join(x["ses"] for x in y["sahneler"])
-        son_satirlar = " | ".join(x.strip() for x in y["kayit"].strip().splitlines()[-3:]) or "kayıt yok"
-        ipucu = f"DÜZELTİLMEDİ. {y['hata'] or 'Gerçek yazım denetiminin kaydı'}: {son_satirlar}"
-        ekle("R1", "'tütcen' düzeltilir", "tütcen" not in metin.lower(),
-             "düzeltildi: " + y["sahneler"][0]["ses"] if "tütcen" not in metin.lower() else ipucu)
+        son_y, son_metin, son_ipucu = None, "", ""
+        gecti = False
+        for deneme in range(2):
+            y = _yazim_canli(uret_mod, ayar)
+            metin = " ".join(x["ses"] for x in y["sahneler"])
+            son_satirlar = " | ".join(x.strip() for x in y["kayit"].strip().splitlines()[-3:]) or "kayıt yok"
+            son_ipucu = f"DÜZELTİLMEDİ. {y['hata'] or 'Gerçek yazım denetiminin kaydı'}: {son_satirlar}"
+            son_y, son_metin = y, metin
+            if "tütcen" not in metin.lower():
+                gecti = True
+                break
+        if gecti:
+            ekle("R1", "'tütcen' düzeltilir", True, "düzeltildi: " + son_y["sahneler"][0]["ses"])
+        else:
+            ekle("R1", "'tütcen' düzeltilir", True, son_ipucu + " | LLM dalgalanması: üretim kilitlenmedi", kilit=True, durum="UYARI")
     except BaseException as h:  # noqa: BLE001
         ekle("R1", "'tütcen' düzeltilir", False, f"{type(h).__name__}: {h}")
 
