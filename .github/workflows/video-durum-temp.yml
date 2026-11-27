@@ -1,0 +1,65 @@
+name: Video durum kontrol (gecici)
+
+on:
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: "Video ID listesi (virgulle)"
+        required: false
+        default: "kzraPlI6Pho,lCKWBE2e_QQ"
+
+permissions:
+  contents: read
+
+jobs:
+  kontrol:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
+      - name: Durum
+        env:
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          IDS: ${{ inputs.ids }}
+        run: |
+          python - <<'PYEOF'
+          import os, json
+          from pathlib import Path
+          from google.oauth2.credentials import Credentials
+          from google.auth.transport.requests import Request
+          from googleapiclient.discovery import build
+          Path("token.json").write_text(os.environ["GOOGLE_TOKEN_JSON"], encoding="utf8")
+          creds = Credentials.from_authorized_user_file("token.json")
+          if not creds.valid:
+              creds.refresh(Request())
+          yt = build("youtube","v3",credentials=creds)
+          ids = [x.strip() for x in os.environ.get("IDS","").split(",") if x.strip()]
+          r = yt.videos().list(part="snippet,status,processingDetails", id=",".join(ids)).execute()
+          print("ISTENEN:", ids)
+          print("BULUNAN:", len(r.get("items",[])))
+          for it in r.get("items",[]):
+              st = it.get("status") or {}
+              print(json.dumps({
+                "id": it["id"],
+                "title": it["snippet"]["title"],
+                "publishedAt": it["snippet"].get("publishedAt"),
+                "privacyStatus": st.get("privacyStatus"),
+                "uploadStatus": st.get("uploadStatus"),
+                "rejectionReason": st.get("rejectionReason"),
+                "failureReason": st.get("failureReason"),
+                "publishAt": st.get("publishAt"),
+                "madeForKids": st.get("madeForKids"),
+                "processingStatus": (it.get("processingDetails") or {}).get("processingStatus"),
+              }, ensure_ascii=False))
+          ch = yt.channels().list(part="contentDetails,snippet", mine=True).execute()
+          print("KANAL:", ch["items"][0]["snippet"]["title"])
+          pl = ch["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+          items = yt.playlistItems().list(part="snippet,status", playlistId=pl, maxResults=20).execute()
+          print("SON YUKLEMELER:")
+          for it in items.get("items",[]):
+              s=it["snippet"]; st=it.get("status",{})
+              print(s["publishedAt"], s["resourceId"]["videoId"], st.get("privacyStatus"), s["title"][:60])
+          PYEOF
