@@ -1537,10 +1537,73 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     script_check = validate_script(sahneler, topic=a.konu)
     anlatim = script_check["narration"]
     anlatim_max = int(os.getenv("V2_ANLATIM_MAX", "260"))
+    if len(anlatim) > anlatim_max:
+        hedef = max(80, anlatim_max - 4)
+        print(f"V2 anlatım uzunluğu {len(anlatim)}>{anlatim_max}; otomatik kısaltma deneniyor (hedef {hedef}).")
+        kisaltma_istem = (
+            f"Aşağıdaki 6 kısa bilgi cümlesini Türkçe olarak kısalt.\n"
+            f"KONU: {a.konu}\n"
+            f"TOPLAM ANLATIM HEDEFİ: en fazla {hedef} karakter (6 cümle + boşluklar toplamı).\n"
+            f"MEVCUT ANLATIM: {len(anlatim)} karakter.\n"
+            "Kurallar:\n"
+            "- Tam 6 cümle döndür; sıra ve anlam korunmalı.\n"
+            "- 7. CTA cümlesini yazma; o sabit.\n"
+            "- Her cümle kısa, doğal ve anlaşılır olsun; bilgi uydurma.\n"
+            "- Gereksiz dolgu kelimelerini at, ama ana olguyu koru.\n"
+            "SADECE JSON: {\"cumleler\":[\"...\", \"...\", \"...\", \"...\", \"...\", \"...\"]}\n\n"
+            "MEVCUT CÜMLELER:\n" + json.dumps(script_lines[:6], ensure_ascii=False)
+        )
+        try:
+            veri = _llm_json(kisaltma_istem, ayar, "Sen kısa ve doğru Türkçe bilgi metni yazarsın. Yalnız geçerli JSON döndürürsün.")
+            yeni = veri.get("cumleler") or []
+            if isinstance(yeni, list) and len(yeni) == 6:
+                aday = sahneler[:]
+                gecerli = True
+                for i, c in enumerate(yeni):
+                    c = " ".join(str(c or "").split())
+                    if not c or _CTA in c:
+                        gecerli = False
+                        break
+                    aday[i] = {**sahneler[i], "ses": c}
+                if gecerli:
+                    aday_check = validate_script(aday, topic=a.konu)
+                    aday_anlatim = aday_check["narration"]
+                    if 80 <= len(aday_anlatim) <= anlatim_max:
+                        sahneler = aday
+                        script_lines = [" ".join(str(x.get("ses") or "").split()) for x in sahneler]
+                        script_check = aday_check
+                        anlatim = aday_anlatim
+                        print(f"V2 anlatım kısaltıldı: {len(anlatim)} karakter.")
+        except Exception as _ke:  # noqa: BLE001
+            print(f"V2 anlatım kısaltma LLM denemesi başarısız: {type(_ke).__name__}")
+    if len(anlatim) > anlatim_max:
+        # Son çare: en uzun içerik cümlesinden dolgu kırp, CTA'ya dokunma.
+        for _ in range(80):
+            cumleler = [" ".join(str(x.get("ses") or "").split()) for x in sahneler]
+            anlatim = " ".join(cumleler)
+            if len(anlatim) <= anlatim_max:
+                break
+            idxler = sorted(range(6), key=lambda i: len(cumleler[i]), reverse=True)
+            degisti = False
+            for i in idxler:
+                c = cumleler[i]
+                kisa = re.sub(r"\s*,\s*[^,]{0,40}(?=[.!?]?$)", "", c, count=1).strip()
+                if not kisa or kisa == c:
+                    kisa = re.sub(r"\b(gerçekten|aslında|oldukça|son derece|tam olarak|birçok)\b\s*", "", c, count=1, flags=re.IGNORECASE).strip()
+                kisa = " ".join(kisa.split())
+                if kisa and kisa != c and len(kisa) >= 20:
+                    sahneler[i] = {**sahneler[i], "ses": kisa}
+                    degisti = True
+                    break
+            if not degisti:
+                break
+        script_lines = [" ".join(str(x.get("ses") or "").split()) for x in sahneler]
+        script_check = validate_script(sahneler, topic=a.konu)
+        anlatim = script_check["narration"]
     if not 80 <= len(anlatim) <= anlatim_max:
         raise SystemExit(
             f"V2 anlatım uzunluğu 80–{anlatim_max} karakter olmalı ({len(anlatim)}); "
-            "7 sahne için uzatma veya legacy TTS uygulanmadı."
+            "otomatik kısaltma sonrası hâlâ sınır dışında."
         )
     for sira, x in enumerate(sahneler, start=1):
         print(f"  senaryo {sira}: [{x.get('baslik1', '')} / {x.get('baslik2', '')}] {x['ses']}")
