@@ -88,6 +88,33 @@ jobs:
           python yt_analiz.py --days "$GUN" --limit "$ADET" \
             --curve-limit "$ADET" --out yt_analiz.json
 
+      - name: Cloudflare AI tanı
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os, json, urllib.request, urllib.error
+          aid=(os.getenv('CLOUDFLARE_ACCOUNT_ID') or '').strip()
+          tok=(os.getenv('CLOUDFLARE_API_TOKEN') or '').strip()
+          if not aid or not tok:
+              print('CF_TANI: secrets eksik')
+              raise SystemExit(0)
+          for model in ['@cf/black-forest-labs/flux-1-schnell','@cf/stabilityai/stable-diffusion-xl-base-1.0']:
+              url=f'https://api.cloudflare.com/client/v4/accounts/{aid}/ai/run/{model}'
+              body=json.dumps({'prompt':'a simple red sphere on white background','num_steps':4}).encode()
+              req=urllib.request.Request(url,data=body,headers={'Authorization':'Bearer '+tok,'Content-Type':'application/json'})
+              try:
+                  with urllib.request.urlopen(req,timeout=120) as r:
+                      raw=r.read(); ct=r.headers.get('Content-Type','')
+                  print('CF_TANI',model,'OK',ct,len(raw))
+              except urllib.error.HTTPError as e:
+                  b=e.read().decode('utf-8','replace')[:200]
+                  print('CF_TANI',model,'HTTP',e.code,b)
+              except Exception as e:
+                  print('CF_TANI',model,type(e).__name__)
+          PY
+
       - name: Üret + Telegram onayı + teslim
         env:
           COQUI_TOS_AGREED: "1"

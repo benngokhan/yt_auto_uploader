@@ -808,40 +808,67 @@ def cloudflare_ai_gorseller_uret(scene_text: str, scene_index: int, klasor: Path
     token = (os.getenv("CLOUDFLARE_API_TOKEN") or "").strip()
     if not account_id or not token:
         return []
-    model = (os.getenv("CLOUDFLARE_AI_IMAGE_MODEL") or "@cf/black-forest-labs/flux-1-schnell").strip()
+    model_env = (os.getenv("CLOUDFLARE_AI_IMAGE_MODEL") or "").strip()
+    modeller = [model_env] if model_env else [
+        "@cf/black-forest-labs/flux-1-schnell",
+        "@cf/stabilityai/stable-diffusion-xl-base-1.0",
+        "@cf/bytedance/stable-diffusion-xl-lightning",
+    ]
     prompt = (
         "Photorealistic cinematic documentary image for a science short video. "
         "Show this scene clearly and concretely: " + " ".join(str(scene_text).split()) + ". "
         "No text, no letters, no numbers, no watermark, no logo, no border, no collage. "
         "Natural lighting, high detail, vertical composition friendly."
     )
-    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{model}"
     hits: list[dict] = []
-    for i in range(max(1, min(adet, 2))):
+    for i in range(max(1, min(adet, 1))):
+        img_bytes: bytes | None = None
+        used_model = ""
+        for model in modeller:
+            used_model = model
+            url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{model}"
+            try:
+                body = {"prompt": prompt}
+                if "flux" in model:
+                    body["num_steps"] = 4
+                req = urllib.request.Request(
+                    url,
+                    data=json.dumps(body).encode("utf-8"),
+                    headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+                    method="POST",
+                )
+                with urllib.request.urlopen(req, timeout=150) as resp:
+                    raw = resp.read()
+                    ctype = (resp.headers.get("Content-Type") or "").lower()
+                if "application/json" in ctype or raw[:1] in (b"{", b"["):
+                    data = json.loads(raw.decode("utf-8", "replace"))
+                    if isinstance(data, dict) and not data.get("success", True):
+                        errs = data.get("errors") or []
+                        msg = errs[0].get("message") if errs and isinstance(errs[0], dict) else str(errs)[:120]
+                        print(f"  [cf-ai] sahne {scene_index} {model}: API hatası {msg}")
+                        img_bytes = None
+                        continue
+                    result = data.get("result") if isinstance(data, dict) else None
+                    if isinstance(result, dict) and isinstance(result.get("image"), str):
+                        img_bytes = base64.b64decode(result["image"])
+                    elif isinstance(data, dict) and isinstance(data.get("image"), str):
+                        img_bytes = base64.b64decode(data["image"])
+                if img_bytes is None and raw[:3] in (b"\xff\xd8\xff", b"\x89PN", b"RIFF"):
+                    img_bytes = raw
+                if img_bytes:
+                    break
+                print(f"  [cf-ai] sahne {scene_index} {model}: görsel içermedi")
+            except urllib.error.HTTPError as exc:
+                try:
+                    err_body = exc.read().decode("utf-8", "replace")[:200]
+                except Exception:
+                    err_body = ""
+                print(f"  [cf-ai] sahne {scene_index} {model}: HTTP {exc.code} {err_body}")
+            except Exception as exc:  # noqa: BLE001
+                print(f"  [cf-ai] sahne {scene_index} {model}: {type(exc).__name__}")
+        if not img_bytes:
+            continue
         try:
-            body = {"prompt": prompt, "num_steps": 4}
-            req = urllib.request.Request(
-                url,
-                data=json.dumps(body).encode("utf-8"),
-                headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
-                method="POST",
-            )
-            with urllib.request.urlopen(req, timeout=120) as resp:
-                raw = resp.read()
-                ctype = (resp.headers.get("Content-Type") or "").lower()
-            img_bytes: bytes | None = None
-            if "application/json" in ctype or raw[:1] in (b"{", b"["):
-                data = json.loads(raw.decode("utf-8", "replace"))
-                result = data.get("result") if isinstance(data, dict) else None
-                if isinstance(result, dict) and isinstance(result.get("image"), str):
-                    img_bytes = base64.b64decode(result["image"])
-                elif isinstance(data, dict) and isinstance(data.get("image"), str):
-                    img_bytes = base64.b64decode(data["image"])
-            if img_bytes is None and raw[:3] in (b"\xff\xd8\xff", b"\x89PN", b"RIFF"):
-                img_bytes = raw
-            if not img_bytes:
-                print(f"  [cf-ai] sahne {scene_index}: yanıt görsel içermedi.")
-                continue
             hedef = klasor / f"cf_{scene_index:02d}_{i+1}.png"
             with Image.open(io.BytesIO(img_bytes)) as im:
                 im = im.convert("RGB")
@@ -865,8 +892,9 @@ def cloudflare_ai_gorseller_uret(scene_text: str, scene_index: int, klasor: Path
                 "source_page_url": "https://developers.cloudflare.com/workers-ai/",
                 "_local_path": str(hedef),
             })
+            print(f"  [cf-ai] sahne {scene_index}: görsel üretildi ({used_model})")
         except Exception as exc:  # noqa: BLE001
-            print(f"  [cf-ai] sahne {scene_index} üretim hatası: {type(exc).__name__}")
+            print(f"  [cf-ai] sahne {scene_index} kaydetme hatası: {type(exc).__name__}")
     return hits
 
 
