@@ -1505,7 +1505,13 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     shorts_pipeline.py all (MİRA v2.2 + Saf 3D Kapanış) -> kapak -> onay."""
     import shutil
     from PIL import Image
-    from shorts_acceptance import SHORTS_VERSION, TEMPLATE_VERSION, validate_script
+    from shorts_acceptance import (
+        MIN_LIVE_VISUALS,
+        SHORTS_VERSION,
+        TEMPLATE_VERSION,
+        sha256_file,
+        validate_script,
+    )
 
     if int(sahne_sayisi) != 7:
         raise SystemExit("Shorts v2 tam 7 sahne ister; legacy/TTS yoluna geçiş yapılmadı.")
@@ -1688,7 +1694,6 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     if kart_sahne:
         print(f"UYARI: {kart_sahne}/7 sahne temiz metin kartı (canlı görsel yok).", flush=True)
 
-    from shorts_acceptance import MIN_LIVE_VISUALS, sha256_file
     render_inputs = []
     for index, path in enumerate(parallelar, start=1):
         target = vdir / f"s{index}.jpg"

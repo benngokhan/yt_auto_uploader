@@ -1,3 +1,4 @@
+import ast
 import atexit
 import os
 import sys
@@ -403,6 +404,30 @@ class PexelsGorselPipelineTests(unittest.TestCase):
                          "https://ntrs.nasa.gov/citations/123")
         self.assertEqual(shorts_pipeline._verified_source_url_format("https://fake-nasa.gov/source"), "")
         self.assertEqual(shorts_pipeline._verified_source_url_format("NASA + Boeing Technical Reports"), "")
+
+
+    def test_min_live_visuals_is_imported_before_it_is_used(self):
+        uret = _import_uret_without_persisting_quota_counter()
+        source = Path(uret.__file__).read_text(encoding="utf-8")
+        tree = ast.parse(source)
+        func = next(
+            node for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == "_sablon_v2_uret"
+        )
+        import_lines = [
+            node.lineno for node in ast.walk(func)
+            if isinstance(node, ast.ImportFrom)
+            and any(alias.name == "MIN_LIVE_VISUALS" for alias in node.names)
+        ]
+        use_lines = [
+            node.lineno for node in ast.walk(func)
+            if isinstance(node, ast.Name)
+            and node.id == "MIN_LIVE_VISUALS"
+            and isinstance(node.ctx, ast.Load)
+        ]
+        self.assertTrue(import_lines, "MIN_LIVE_VISUALS içe aktarılmıyor")
+        self.assertTrue(use_lines, "MIN_LIVE_VISUALS kullanılmıyor")
+        self.assertLess(min(import_lines), min(use_lines))
 
 
 class GorselSorguUretimTests(unittest.TestCase):
