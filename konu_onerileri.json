@@ -1,37 +1,37 @@
 {
-  "generated_at": "2026-11-27T12:38:31.401200+00:00",
+  "generated_at": "2026-11-28T11:56:39.127479+00:00",
   "used_count": 191,
   "method": "Drive yükleme tablosu + onay bekleyen metadata + Gemini anlamsal tekrar kontrolü + yerel benzerlik kapısı",
   "suggestions": [
     {
-      "title": "Yaprakların Yazın Yeşilden Kırmızıya Dönüşünün Gerçek Sebebi: Savunma Mekanizması! 🍁🛡️",
+      "title": "Küçük Bir Damla Bal, Neden Kavanozun Dibine Akıp Giderken Yumak Olup Kalır? 🍯🧪",
+      "score": 95,
+      "reason": "Viskozite ve yüzey gerilimi arasındaki dengeyi gösteren, görsel olarak tatmin edici ve günlük hayattan bir fizik olayı. 'Neden' sorusu merak uyandırır.",
+      "duplicate_check": "Geçmişte balın 3000 yıl dayanıklılığı (kimyasal koruma) ve mikrodalga fırın (ısıtma prensibi) var. Hidrolik reoloji (akışkan mekanı) konusu yok."
+    },
+    {
+      "title": "Buzdolabındaki İçecek Neden Cam Şişede Daha Hızlı Soğur? ❄️🥤",
+      "score": 94,
+      "reason": "İletkenlik farkı (cam vs plastik/metal). Görsel olarak soğutma deneyi çekilebilir. Günlük hayat tecrübesini bilimsel olarak açıklar.",
+      "duplicate_check": "Geçmişte buzun kayganlığı (moleküler fizik) ve soğukta diş takırdaması (refleks) var. Malzemenin termal iletkenliği konsepti yok."
+    },
+    {
+      "title": "Yumurtayı Haşlarken Kabuğun Neden Patlaması? 🥚⚡",
+      "score": 93,
+      "reason": "Buhar basıncı ve genleşme. Sıcaklıktaki artışın yumurta içindeki havayı nasıl genişlettiğini açıklar. Mutfak bilimi, yüksek izlenme potansiyeli.",
+      "duplicate_check": "Geçmişte yumurta ile ilgili biyolojik veya fiziksel bir içerik yok. Mikrodalga fırın (ısıtma) farklı bir mekanizma."
+    },
+    {
+      "title": "Saçının Uçları Neden Geç Kalır: Bifurkasyon Noktası Nedir? ✂️🧬",
       "score": 92,
-      "reason": "Mevsimsel renk değişimi herkesin bildiği bir olay olsa da, bunun basit bir 'pigment kaybı' değil, ışığı emip fotosentezi durdurarak böcekleri cezbeden aktif bir kimyasal savunma stratejisi olduğu az bilinen bir detaydır. Görsel olarak sarı/kırmızı yapraklar güçlü çekim sağlar.",
-      "duplicate_check": "Geçmişte 'Flamingolar Neden Pembe' (diyet temelli renk) ve 'Kesilen Elma Neden Kararır' (oksidasyon) var. Bu konu; fotosentez durdurma + böcek itici/çekici kimyasal (anti-herbivore) savunma mekanizmasıdır. Pigment oluşumu değil, pigment dönüşümü ve kimyasal sinyal odaklıdır."
+      "reason": "Saç kesiminde 'bifurkasyon' (yapraklanma) teriminin biyolojik kökenini açıklar. Görsel olarak saç ucu yakın çekimiyle desteklenebilir. Sağlık tavsiyesi değil, biyolojik yapı açıklamasıdır.",
+      "duplicate_check": "Geçmişte saçla ilgili spesifik bir biyolojik yapı analizi yok. Tüyler diken diken olma (tüy dikilmesi refleksi) farklı bir mekanizma."
     },
     {
-      "title": "Yıldızların Işığını Bugün Görmüyoruz: Bazıları Zaten Öldü! ✨💀",
-      "score": 90,
-      "reason": "İnsanın gördüğü şeyin 'şimdi' değil 'geçmiş' olması kavramsal olarak güçlü bir etki bırakır. 'Ölü yıldız' ifadesi dramatik ve ilgi çekicidir. Astronomi bilgisi somut ve doğrulanabilir (ışık hızı gecikmesi).",
-      "duplicate_check": "Geçmişte 'Ay Uzaklaşıyor', 'Venus Günü Uzun', 'Jüpiter Fırtınası' var. Bu konu; ışık hızının sonlu olması nedeniyle oluşan zaman gecikmesi (light travel time) ve astronomik mesafe-algı ilkesidir. Gezegen hareketi veya uzaklaşma hızı değil, ışığın geç ulaşmasıdır."
-    },
-    {
-      "title": "Güneş Işığından Gelen Vitamin D, Kemiklerinize Neden 3 Ay Sonra Etki Eder? ☀️🦴",
-      "score": 89,
-      "reason": "Güneşlenmenin anlık etkisi sanılırken, asıl işin karaciğer ve böbreklerdeki enzim süreciyle kemik dokusunda gerçekleşmesi, biyolojik bir 'gizli saat' etkisi yaratır. Sağlıklı yaşamla ilgili ama tıbbi tavsiye değil, biyolojik mekanizma açıklamasıdır.",
-      "duplicate_check": "Geçmişte 'Acı Biber Beyin Kandırır' ve 'Nane Soğuk Hissettirmez' var. Bu konu; fotokimyasal dönüşüm (Vitamin D3 sentezi) ve metabolik yarı ömür/ikincil hedef organ etkisidir. Duyu aldatmacası değil, kimyasal sentez ve zamanlama odaklıdır."
-    },
-    {
-      "title": "Buzdolabındaki Süt Neden Ekvana Dağından Daha Soğuk Hissediyor? 🥛🧊",
-      "score": 88,
-      "reason": "Aynı sıcaklıkta (0-4°C) iki farklı yüzeyin neden farklı hissettirdiği sorusu, ısı iletimi ve termal kapasite üzerine merak uyandırır. Günlük hayattan somut bir örnek, soyut fizik kavramını anlaşılmaz kılmaz, aksine şaşırtıcı kilitler.",
-      "duplicate_check": "Geçmişte 'Buzun Üzeri Neden Kaygandır' (moleküler kayma) var. Bu konu ısı transferi (conduction) ve termal iletkenlik farkıdır. Kayganlık değil, soğukluk hissi ve enerji alışverişi odaklıdır."
-    },
-    {
-      "title": "Deniz Yılanları Neden Bataklıkta Boğulmaz? Suyun Altındaki Gizli Akciğer! 🐍🌊",
-      "score": 87,
-      "reason": "Deniz yılanlarının akciğer yapısının karada yaşayan yılanlardan farklı olarak 'su geçirmez' ve daha az hacimli olması, evrimsel bir uyum örneğidir. Su altı görselleri her zaman ilgi çeker.",
-      "duplicate_check": "Geçmişte 'Elektrikli Yılan Balığı', 'Su Altında Nefes Tutan Hayvan (Ayı/Yunus karsıtlığı)' var. Bu konu; balık değil, sürüngen (deniz yılanı) ve akciğerin su geçirmezlik özelliği (hydrophobic lungs) ile gaz değişim verimliliğidir."
+      "title": "Çorabın Dibe Örgüsü Neden Daha Hızlı Çürür? 🧦🦠",
+      "score": 92,
+      "reason": "Nem, sıcaklık ve bakteri birikimi. Ayak tabanının terleme fiziği ve mikroorganizma büyüme koşulları. Hijyen ve biyoloji kesişimi.",
+      "duplicate_check": "Geçmişte ayak uyuşması (sinir basıncı) var. Çorap malzemesinin biyolojik aşınması yok."
     }
   ]
 }
