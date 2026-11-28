@@ -33,7 +33,11 @@ try:
 except ImportError:
     from workspace_paths import workspace_temp_dir
 
-from shorts_acceptance import MIN_AVG_BRIGHTNESS, SEMANTIC_THRESHOLD
+from shorts_acceptance import (
+    SEMANTIC_THRESHOLD,
+    is_dark_scene,
+    min_brightness_for,
+)
 
 HEDEF = (1350, 2400)  # Tam 9:16 dikey, Ken Burns zoom için yüksek keskinlik
 SEMANTIC_MODEL = os.getenv("GEMINI_VISION_MODEL", "gemini-3.8-flash")
@@ -403,13 +407,17 @@ def _yeterince_uygun(hit: dict, sorgu: str, ana_konu: str = "", gevsek: bool = F
         return False
     return True
 
-def _ham_kusurlu_mu(im: Image.Image) -> tuple[bool, str]:
+def _ham_kusurlu_mu(im: Image.Image, scene_text: str = "") -> tuple[bool, str]:
     """İndirilen ham görseli piksel düzeyinde denetler:
-    beyaz stüdyo kesimi, düz clipart arka planı, aşırı patlamış ışık veya bulanıklığı eler."""
+    beyaz stüdyo kesimi, düz clipart arka planı, aşırı patlamış ışık veya bulanıklığı eler.
+
+    Gece/derin deniz/uzay gibi doğal karanlık sahnelerde ortalama parlaklık yerine
+    görünür ışık kaynağı (parlak piksel oranı) ve kontrast aranır; düz siyah kare elenir."""
     en, boy = im.size
     if min(en, boy) < 700:
         return True, f"cozunurluk_dusuk({en}x{boy})"
 
+    karanlik_sahne = is_dark_scene(scene_text)
     kucuk = np.asarray(im.convert("RGB").resize((270, 480), Image.BILINEAR), dtype=np.float32)
     h, w, _ = kucuk.shape
     b_y, b_x = max(8, int(h * 0.06)), max(8, int(w * 0.06))
@@ -427,13 +435,21 @@ def _ham_kusurlu_mu(im: Image.Image) -> tuple[bool, str]:
         return True, f"beyaz_studyo_kesim({beyaz_oran:.2f})"
 
     kenar_std = float(np.std(kenar))
-    if kenar_std < 4.2:
+    kenar_esik = 3.0 if karanlik_sahne else 4.2
+    if kenar_std < kenar_esik:
         return True, f"duz_yapay_arkaplan(std={kenar_std:.1f})"
 
     luma = (0.299 * kucuk[..., 0] + 0.587 * kucuk[..., 1] + 0.114 * kucuk[..., 2]) / 255.0
     avg_luma = float(luma.mean() * 255.0)
-    if avg_luma < MIN_AVG_BRIGHTNESS:
+    if avg_luma < min_brightness_for(scene_text):
         return True, f"karanlik_gorsel({avg_luma:.1f}/255)"
+    if karanlik_sahne:
+        # Düz siyah/boş kare değil: görünür ışık kaynağı veya aydınlatılmış özne olmalı.
+        parlak_oran = float(np.mean(luma > 0.55))
+        if parlak_oran < 0.004:
+            return True, f"isik_kaynagi_yok({parlak_oran:.3f})"
+        if float(np.std(luma)) < 0.035:
+            return True, f"kontrast_yetersiz(std={float(np.std(luma)):.3f})"
     patlak_oran = float(np.mean(luma > 0.95))
     if patlak_oran > 0.34:
         return True, f"patlamis_isik({patlak_oran:.2f})"
@@ -566,7 +582,8 @@ def sinematik_isle(img: Image.Image, tohum: int = 20261112) -> Image.Image:
         vig = np.clip(1.02 - 0.18 * (nx * nx + ny * ny), 0.78, 1.0)[..., None]
         a = np.clip(a * vig, 0.0, 1.0)
     elif ort_lum < 0.13:
-        a = np.power(np.clip(a, 0.0, 1.0), 0.85)
+        # Gece/derin deniz sahneleri mobilde seçilebilsin diye gölgeler korunarak hafif açılır.
+        a = np.power(np.clip(a, 0.0, 1.0), 0.78)
 
     out = Image.fromarray((np.clip(a, 0.0, 1.0) * 255.0).astype(np.uint8))
     out = ImageEnhance.Color(out).enhance(1.04)
@@ -600,6 +617,7 @@ def _adaylardan_indir_ve_dogrula(
     ham_dosya: Path,
     kullanilan: set[str],
     siki_piksel: bool = True,
+    scene_text: str = "",
 ) -> tuple[str, dict] | None:
     """Sıralı adaylardan ilk piksel-temiz görseli indirip doğrular."""
     for hit in adaylar[:4]:
@@ -614,7 +632,7 @@ def _adaylardan_indir_ve_dogrula(
             with Image.open(ham_dosya) as im:
                 im.load()
                 if siki_piksel:
-                    kusurlu, neden = _ham_kusurlu_mu(im)
+                    kusurlu, neden = _ham_kusurlu_mu(im, scene_text)
                     if kusurlu:
                         print(f"    [anti-ham elendi] {uid} ({neden}) — sonraki adaya geçiliyor")
                         ham_dosya.unlink(missing_ok=True)
@@ -814,14 +832,23 @@ def cloudflare_ai_gorseller_uret(scene_text: str, scene_index: int, klasor: Path
     modeller = [model_env] if model_env else [
         "@cf/black-forest-labs/flux-1-schnell",
     ]
-    prompt = (
-        "Photorealistic cinematic documentary image for a science short video. "
-        "Show this scene clearly and concretely: " + " ".join(str(scene_text).split()) + ". "
-        "No text, no letters, no numbers, no watermark, no logo, no border, no collage. "
-        "Natural lighting, high detail, vertical composition friendly."
+    sahne = " ".join(str(scene_text).split())
+    isik = (
+        "Karanlık/deniz altı sahnesi olsa bile ana özne net biçimde aydınlatılmış, parlak ışık "
+        "vurguları ve güçlü kontrast olsun; düz siyah, boş, puslu veya bulanık kare olmasın."
+        if is_dark_scene(scene_text)
+        else "Dengeli ve net pozlama, canlı renkler, güçlü kontrast; aşırı karanlık veya soluk olmasın."
     )
     hits: list[dict] = []
-    for i in range(max(1, min(adet, 1))):
+    for i in range(max(1, min(adet, 2))):
+        varyasyon = " Geniş açı kurulum çekimi." if i == 0 else " Ana öznenin yakın plan detayı."
+        prompt = (
+            "Photorealistic cinematic documentary image for a science short video. "
+            "Show this scene clearly and concretely: " + sahne + "." + varyasyon + " "
+            + isik + " "
+            "No text, no letters, no numbers, no watermark, no logo, no border, no collage. "
+            "High detail, vertical 9:16 composition."
+        )
         img_bytes: bytes | None = None
         used_model = ""
         for model in modeller:
@@ -908,10 +935,17 @@ def gemini_ai_gorseller_uret(scene_text: str, scene_index: int, klasor: Path, ad
     ]
     # dedupe preserving order
     seen_m = set(); modeller = [m for m in modeller if m and not (m in seen_m or seen_m.add(m))]
+    sahne = " ".join(str(scene_text).split())
+    isik = (
+        "Ana özne net biçimde aydınlatılmış, parlak ışık vurguları ve güçlü kontrast olsun; "
+        "düz siyah, boş, puslu veya bulanık kare olmasın."
+        if is_dark_scene(scene_text)
+        else "Dengeli ve net pozlama, canlı renkler, güçlü kontrast; aşırı karanlık veya soluk olmasın."
+    )
     prompt = (
         "Create a photorealistic cinematic vertical documentary image for a science short video. "
-        "Scene: " + " ".join(str(scene_text).split()) + ". "
-        "No text, no letters, no numbers, no watermark, no logo. High detail, natural lighting."
+        "Scene: " + sahne + ". " + isik + " "
+        "No text, no letters, no numbers, no watermark, no logo. High detail, vertical 9:16 composition."
     )
     hits: list[dict] = []
     for model in modeller:
@@ -1078,7 +1112,7 @@ def sahneler_icin_gorseller(
                         _indir(record["image_url"], raw)
                         with Image.open(raw) as im:
                             im.load()
-                            defective, reason = _ham_kusurlu_mu(im)
+                            defective, reason = _ham_kusurlu_mu(im, scene_text)
                             if defective:
                                 record["rejection_reason"] = f"pixel_filter:{reason}"
                                 raw.unlink(missing_ok=True)
@@ -1088,7 +1122,7 @@ def sahneler_icin_gorseller(
                             processed = sinematik_isle(dikey_kirp(duzeltilen), tohum=20261100 + scene_index)
                         record["logo_check"] = logo_bilgi
                         processed_brightness = average_image_brightness(processed)
-                        if processed_brightness < MIN_AVG_BRIGHTNESS:
+                        if processed_brightness < min_brightness_for(scene_text):
                             record["rejection_reason"] = f"processed_dark_image:{processed_brightness:.1f}/255"
                             raw.unlink(missing_ok=True)
                             continue
@@ -1111,7 +1145,7 @@ def sahneler_icin_gorseller(
                 break
 
         if not selected_path:
-            cf_hits = cloudflare_ai_gorseller_uret(scene_text, scene_index, klasor, adet=1)
+            cf_hits = cloudflare_ai_gorseller_uret(scene_text, scene_index, klasor, adet=2)
             if cf_hits:
                 query_log = {"query": f"cloudflare_ai:{scene_text[:80]}", "provider_results": []}
                 provider_log = {"provider": "cloudflare_ai", "returned_candidate_count": len(cf_hits), "candidates": []}
@@ -1166,7 +1200,7 @@ def sahneler_icin_gorseller(
                         _indir(record["image_url"], raw)
                         with Image.open(raw) as im:
                             im.load()
-                            defective, reason = _ham_kusurlu_mu(im)
+                            defective, reason = _ham_kusurlu_mu(im, scene_text)
                             if defective:
                                 record["rejection_reason"] = f"pixel_filter:{reason}"
                                 raw.unlink(missing_ok=True)
@@ -1176,7 +1210,7 @@ def sahneler_icin_gorseller(
                             processed = sinematik_isle(dikey_kirp(duzeltilen), tohum=20261100 + scene_index)
                         record["logo_check"] = logo_bilgi
                         processed_brightness = average_image_brightness(processed)
-                        if processed_brightness < MIN_AVG_BRIGHTNESS:
+                        if processed_brightness < min_brightness_for(scene_text):
                             record["rejection_reason"] = f"processed_dark_image:{processed_brightness:.1f}/255"
                             raw.unlink(missing_ok=True)
                             continue
@@ -1250,7 +1284,7 @@ def sahneler_icin_gorseller(
                         _indir(record["image_url"], raw)
                         with Image.open(raw) as im:
                             im.load()
-                            defective, reason = _ham_kusurlu_mu(im)
+                            defective, reason = _ham_kusurlu_mu(im, scene_text)
                             if defective:
                                 record["rejection_reason"] = f"pixel_filter:{reason}"
                                 raw.unlink(missing_ok=True)
@@ -1260,7 +1294,7 @@ def sahneler_icin_gorseller(
                             processed = sinematik_isle(dikey_kirp(duzeltilen), tohum=20261100 + scene_index)
                         record["logo_check"] = logo_bilgi
                         processed_brightness = average_image_brightness(processed)
-                        if processed_brightness < MIN_AVG_BRIGHTNESS:
+                        if processed_brightness < min_brightness_for(scene_text):
                             record["rejection_reason"] = f"processed_dark_image:{processed_brightness:.1f}/255"
                             raw.unlink(missing_ok=True)
                             continue

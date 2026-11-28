@@ -156,6 +156,16 @@ class PexelsGorselPipelineTests(unittest.TestCase):
         self.assertTrue(kusur_dark)
         self.assertIn("karanlik_gorsel", neden_dark)
 
+    def test_dark_scene_allows_visible_glow_but_rejects_flat_black(self):
+        glow = _make_textured_photo(1080, 1620, base_rgb=(12, 18, 25))
+        ImageDraw.Draw(glow).ellipse((340, 520, 740, 920), fill=(90, 210, 235))
+        ok, reason = gorsel_uret._ham_kusurlu_mu(glow, "derin denizde biyolüminesans")
+        self.assertFalse(ok, reason)
+
+        flat = Image.new("RGB", (1080, 1620), (10, 15, 20))
+        bad, why = gorsel_uret._ham_kusurlu_mu(flat, "derin denizde biyolüminesans")
+        self.assertTrue(bad, why)
+
     def test_live_gemini_score_gate_rejects_absent_invalid_and_wrong_origin(self):
         self.assertTrue(gorsel_uret._record_score_passes({
             "score_origin": "live_gemini_vision", "semantic_similarity": 0.62,

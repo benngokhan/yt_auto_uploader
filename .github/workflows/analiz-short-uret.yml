@@ -202,6 +202,7 @@ jobs:
             motor/cikti/analiz/**/final.mp4
             motor/cikti/analiz/**/kapak.jpg
             motor/cikti/analiz/**/yayin_bilgisi.json
+            motor/cikti/analiz/**/gorseller/gorsel_secim_raporu.json
             motor/cikti/gorseller/gorsel_secim_raporu.json
           if-no-files-found: warn
           retention-days: 30

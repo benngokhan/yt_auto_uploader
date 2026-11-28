@@ -25,6 +25,27 @@ SHORTS_CTA = "Daha fazla Bilgi Dozu için takip et!"
 MIN_SCENE_SECONDS = 2.0
 MAX_SCENE_SECONDS = 3.0
 MIN_AVG_BRIGHTNESS = 100.0
+# Karanlık konulu sahneler (derin deniz, gece, uzay, biyolüminesans) doğal olarak
+# düşük ortalama parlaklığa sahiptir. Bu sahnelerde düz siyah kare yerine
+# "görünür ışık kaynağı + yeterli kontrast" aranır.
+MIN_AVG_BRIGHTNESS_DARK = 18.0
+DARK_SCENE_HINTS = (
+    "karanlık", "karanlik", "gece", "derin deniz", "derin okyanus", "okyanus dibi",
+    "biyolüminesans", "biyoluminesans", "ışılda", "isilda", "parılda", "parilda",
+    "neon", "uzay", "yıldız", "yildiz", "galaksi", "dark", "night", "deep sea",
+    "deep ocean", "bioluminesc", "glow", "space", "galaxy", "star",
+)
+
+
+def is_dark_scene(scene_text: object) -> bool:
+    """Sahne metni gece/derin deniz/uzay gibi doğal karanlık bir konu mu?"""
+    text = str(scene_text or "").lower()
+    return any(hint in text for hint in DARK_SCENE_HINTS)
+
+
+def min_brightness_for(scene_text: object) -> float:
+    """Sahne türüne göre kabul edilen en düşük ortalama parlaklık (0..255)."""
+    return MIN_AVG_BRIGHTNESS_DARK if is_dark_scene(scene_text) else MIN_AVG_BRIGHTNESS
 # Ses sabiti: "Arena" etiketi yok. Referans, 097 üretimindeki Gemini TTS Charon sesidir.
 VOICE_PROVIDER = "gemini_tts"
 VOICE_ID = "Charon"
@@ -295,7 +316,7 @@ def validate_v2_production_context(work_dir: str | Path, config: dict) -> dict |
             luma += 0.587 * np.asarray(rgb.getchannel("G"), dtype=np.float32)
             luma += 0.114 * np.asarray(rgb.getchannel("B"), dtype=np.float32)
             brightness = float(luma.mean())
-        if brightness < MIN_AVG_BRIGHTNESS:
+        if brightness < min_brightness_for(rows[index - 1].get("scene_text") if index - 1 < len(rows) else ""):
             raise ShortsAcceptanceError(f"Sahne {index} görseli karanlık ({brightness:.1f}/255)")
 
     return {
