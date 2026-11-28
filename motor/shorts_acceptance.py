@@ -29,6 +29,8 @@ MIN_AVG_BRIGHTNESS = 100.0
 # düşük ortalama parlaklığa sahiptir. Bu sahnelerde düz siyah kare yerine
 # "görünür ışık kaynağı + yeterli kontrast" aranır.
 MIN_AVG_BRIGHTNESS_DARK = 18.0
+# 7 sahneden en az bu kadar canlı görsel geçmeli; kalan sahneler temiz düz zemin kartı olabilir.
+MIN_LIVE_VISUALS = 3
 DARK_SCENE_HINTS = (
     "karanlık", "karanlik", "gece", "derin deniz", "derin okyanus", "okyanus dibi",
     "biyolüminesans", "biyoluminesans", "ışılda", "isilda", "parılda", "parilda",
@@ -191,10 +193,14 @@ def _validate_visual_report(report: dict) -> list[dict]:
     if not isinstance(rows, list) or len(rows) != EXPECTED_SCENES:
         raise ShortsAcceptanceError("Canlı görsel raporu tam 7 sahne içermeli")
     seen: set[str] = set()
+    live = 0
     for index, row in enumerate(rows, start=1):
         selected = row.get("selected") if isinstance(row, dict) else None
         if not isinstance(selected, dict):
+            if isinstance(row, dict) and row.get("fallback") == "plain_background":
+                continue  # temiz metin kartı: canlı görsel kanıtı aranmaz
             raise ShortsAcceptanceError(f"Görsel sahne {index} seçimi eksik")
+        live += 1
         provider = str(selected.get("provider") or "")
         if provider not in {"pexels", "pixabay", "cloudflare_ai", "gemini_ai"}:
             raise ShortsAcceptanceError(f"Görsel sahne {index} desteklenen canlı kaynak değil: {provider!r}")
@@ -223,6 +229,9 @@ def _validate_visual_report(report: dict) -> list[dict]:
                 raise ShortsAcceptanceError(f"Görsel sahne {index} canlı Gemini Vision eşiğini geçmedi")
         else:
             raise ShortsAcceptanceError(f"Görsel sahne {index} skor kökeni doğrulanamadı")
+    if live < MIN_LIVE_VISUALS:
+        raise ShortsAcceptanceError(
+            f"En az {MIN_LIVE_VISUALS} sahne canlı görsel içermeli; bulundu: {live}")
     return rows
 
 
@@ -327,6 +336,9 @@ def validate_v2_production_context(work_dir: str | Path, config: dict) -> dict |
         record = by_name.get(image.name)
         if not record or record.get("sha256") != sha256_file(image):
             raise ShortsAcceptanceError(f"Görsel sahne {index} SHA256 manifest uyuşmuyor")
+        row = rows[index - 1] if index - 1 < len(rows) else {}
+        if not row.get("selected") and row.get("fallback") == "plain_background":
+            continue  # düz zemin kartı: parlaklık kapısı uygulanmaz
         with Image.open(image) as im:
             rgb = im.convert("RGB")
             import numpy as np

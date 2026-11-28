@@ -826,6 +826,22 @@ def _gorsel_kalite_logunu_yaz(klasor: Path, log: dict) -> None:
         print(f"[görsel log uyarısı] üretim arşivi yazılamadı: {type(exc).__name__}")
 
 
+def _duz_zemin_karti(scene_index: int, klasor: Path) -> Path:
+    """Canlı görsel geçmeyen sahne için temiz metin kartı görseli üretir.
+
+    Alakasız stok/AI görseli koymak yerine nötr gradyan kullanılır; metin üst
+    bina tarafından eklenir. Böylece 7 sahnenin tamamı render edilebilir.
+    """
+    hedef = klasor / f"sahne_{scene_index:02d}.png"
+    h, w = 1920, 1080
+    yy = np.linspace(0.0, 1.0, h, dtype=np.float32)[:, None]
+    arr = np.empty((h, w, 3), dtype=np.uint8)
+    for ch, (bas, son) in enumerate(((26, 52), (32, 62), (44, 78))):
+        arr[..., ch] = np.clip(bas + (son - bas) * yy, 0, 255).astype(np.uint8)
+    Image.fromarray(arr).save(hedef, format="PNG")
+    return hedef
+
+
 def cloudflare_ai_gorseller_uret(scene_text: str, scene_index: int, klasor: Path, adet: int = 1) -> list[dict]:
     """Cloudflare Workers AI ile sahneye özel görsel üretir (fallback)."""
     account_id = (os.getenv("CLOUDFLARE_ACCOUNT_ID") or "").strip()
@@ -1339,8 +1355,10 @@ def sahneler_icin_gorseller(
             print(f"  görsel {scene_index}: {selected_provider} / sorgu={selected_query!r} / Gemini Vision={display_score} / {scene_log['selected']['source_page_url']}")
         else:
             reason = "no_scene_specific_query" if not queries else "no_candidate_passed_semantic_threshold_or_pixel_checks"
+            scene_log["fallback"] = "plain_background"
             scene_log["fallback_reason"] = reason
-            print(f"  sahne {scene_index}: görsel seçilmedi ({reason}); düz zemin + metin kullanılacak.")
+            print(f"  sahne {scene_index}: görsel seçilmedi ({reason}); temiz metin kartı kullanılacak.")
+            selected_path = _duz_zemin_karti(scene_index, klasor)
         paths.append(selected_path)
         report["scenes"].append(scene_log)
         _gorsel_kalite_logunu_yaz(klasor, report)

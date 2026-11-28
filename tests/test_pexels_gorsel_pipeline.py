@@ -310,7 +310,7 @@ class PexelsGorselPipelineTests(unittest.TestCase):
                      mock.patch.object(gorsel_uret, "_visual_text_scores", side_effect=fake_judge) as judge, \
                      mock.patch.object(gorsel_uret, "_indir", side_effect=fake_download):
                     selected = gorsel_uret.sahneler_icin_gorseller(scene_inputs, root / "out")
-            self.assertEqual(selected[:5], [None] * 5)
+            self.assertTrue(all(p is not None and p.is_file() for p in selected[:5]))
             self.assertIsNotNone(selected[5])
             self.assertEqual(judge.call_count, 6)
 
@@ -318,7 +318,8 @@ class PexelsGorselPipelineTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td, mock.patch.dict(os.environ, {"MOTOR_VISUAL_QA_PASSED": "1"}):
             root = Path(td)
             result = gorsel_uret.sahneler_icin_gorseller([{"ses": "Vakum hattı basıncı."}], root)
-            self.assertEqual(result, [None])
+            self.assertEqual(len(result), 1)
+            self.assertTrue(result[0].is_file())
             report = __import__("json").loads((root / "gorsel_secim_raporu.json").read_text(encoding="utf-8"))
             self.assertEqual(report["scenes"][0]["selected"], None)
             self.assertEqual(report["scenes"][0]["fallback"], "plain_background")

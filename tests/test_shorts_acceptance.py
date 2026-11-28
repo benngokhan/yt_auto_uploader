@@ -204,6 +204,36 @@ class ShortsV2GateTests(unittest.TestCase):
             with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "skor kökeni"):
                 acceptance.validate_v2_production_context(root, config)
 
+    def test_plain_background_cards_allowed_when_three_live_visuals_pass(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / ".agent_tmp") as temp:
+            root = Path(temp)
+            config, _ = self._valid_context(root)
+            report_path = root / "visual_validation.json"
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+            for index in range(3, 7):
+                report["scenes"][index] = {
+                    "fallback": "plain_background",
+                    "fallback_reason": "no_candidate_passed_semantic_threshold_or_pixel_checks",
+                }
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            result = acceptance.validate_v2_production_context(root, config)
+            self.assertEqual(result["scene_count"], 7)
+
+    def test_plain_background_cards_still_require_minimum_live_visuals(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / ".agent_tmp") as temp:
+            root = Path(temp)
+            config, _ = self._valid_context(root)
+            report_path = root / "visual_validation.json"
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+            for index in range(2, 7):
+                report["scenes"][index] = {
+                    "fallback": "plain_background",
+                    "fallback_reason": "no_candidate_passed_semantic_threshold_or_pixel_checks",
+                }
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "En az 3"):
+                acceptance.validate_v2_production_context(root, config)
+
     def test_render_manifest_hashes_are_reopened_and_checked(self):
         with tempfile.TemporaryDirectory(dir=ROOT / ".agent_tmp") as temp:
             root = Path(temp)

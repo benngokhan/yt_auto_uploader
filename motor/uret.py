@@ -1659,8 +1659,8 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     parallelar = gorsel_uret.sahneler_icin_gorseller(
         visual_scene_inputs, gorsel_klasoru, yedek_sorgular=yedekler
     )
-    if len(parallelar) != 7 or any(path is None for path in parallelar):
-        raise SystemExit("Shorts v2 fail-closed: yedi sahnenin tamamı canlı görsel seçimini geçmedi.")
+    if len(parallelar) != 7 or any(path is None or not Path(path).is_file() for path in parallelar):
+        raise SystemExit("Shorts v2: yedi sahne görsel dosyasının tamamı üretilmedi.")
 
     secim_raporu_yolu = gorsel_klasoru / "gorsel_secim_raporu.json"
     if not secim_raporu_yolu.is_file():
@@ -1669,14 +1669,26 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     rows = secim_raporu.get("scenes")
     if not isinstance(rows, list) or len(rows) != 7:
         raise SystemExit("Canlı görsel seçim raporu tam yedi sahne içermiyor.")
+    canli_sahne = 0
+    kart_sahne = 0
     for index, row in enumerate(rows, start=1):
         selected = row.get("selected") if isinstance(row, dict) else None
+        if not isinstance(selected, dict) and isinstance(row, dict) \
+                and row.get("fallback") == "plain_background":
+            kart_sahne += 1
+            continue
         provider = str((selected or {}).get("provider") or "")
         if not isinstance(selected, dict) or provider not in {"pexels", "pixabay", "cloudflare_ai", "gemini_ai"} \
                 or selected.get("score_origin") != "live_gemini_vision":
             raise SystemExit(f"Shorts v2 sahne {index}: canlı görsel/Gemini Vision kanıtı yok.")
+        canli_sahne += 1
+    if canli_sahne < MIN_LIVE_VISUALS:
+        raise SystemExit(
+            f"Shorts v2: yalnız {canli_sahne}/7 sahne canlı görsel geçti; en az {MIN_LIVE_VISUALS} gerekli.")
+    if kart_sahne:
+        print(f"UYARI: {kart_sahne}/7 sahne temiz metin kartı (canlı görsel yok).", flush=True)
 
-    from shorts_acceptance import sha256_file
+    from shorts_acceptance import MIN_LIVE_VISUALS, sha256_file
     render_inputs = []
     for index, path in enumerate(parallelar, start=1):
         target = vdir / f"s{index}.jpg"
@@ -1689,6 +1701,9 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         "mode": "production_v2",
         "generation": "live",
         "fallback_policy": "fail_closed",
+        "min_live_visuals": MIN_LIVE_VISUALS,
+        "live_visual_count": canli_sahne,
+        "plain_card_count": kart_sahne,
         "semantic_model": secim_raporu.get("semantic_model"),
         "semantic_threshold": secim_raporu.get("threshold"),
         "scenes": rows,
