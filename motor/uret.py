@@ -1640,6 +1640,14 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
     (vdir / "script.txt").write_text("\n".join(script_lines) + "\n", encoding="utf-8")
     raw_wav = _generate_gemini_voice_audio(script_lines, vdir, ayar)
 
+    # 38–45 sn hedefi için cümle arası nefes süresini gerçek ses uzunluğundan hesapla.
+    import wave
+    with wave.open(str(raw_wav), "rb") as wf:
+        konusma_suresi = wf.getnframes() / float(wf.getframerate())
+    hedef_sure = min(45.0, max(38.0, float(os.getenv("V2_HEDEF_SURE", "41.0"))))
+    nefes_sn = round(max(0.54, (hedef_sure - konusma_suresi - 2.90) / 6.0), 3)
+    print(f"V2 süre hedefi: {hedef_sure:.1f} sn (konuşma {konusma_suresi:.2f} sn, nefes {nefes_sn:.3f} sn)")
+
     if getattr(a, "sadece_ses", False):
         ses_onay = calisma / "ses_onay.wav"
         shutil.copyfile(raw_wav, ses_onay)
@@ -1735,7 +1743,7 @@ def _sablon_v2_uret(a, ayar: dict, sahne_sayisi: int, calisma=None) -> int:
         "cover_lines": [sahneler[0]["baslik1"], sahneler[0]["baslik2"]],
         "music_theme": ayar.get("music_theme", "gunluk_bilim"),
         "intro_lead": 1.45,
-        "sentence_pause": float((ayar.get("miks") or {}).get("cumle_arasi_es_sn", 0.54)),
+        "sentence_pause": nefes_sn,
         "outro_hold": 1.45,
         "note1": konu_kaynak,
         "note2": gorsel_notu,

@@ -95,13 +95,13 @@ class ShortsV2GateTests(unittest.TestCase):
         with self.assertRaises(acceptance.ShortsAcceptanceError):
             acceptance.validate_script(good)
 
-    def test_scene_intervals_are_two_to_three_seconds_and_ordered(self):
-        intervals = [{"start": i * 2.5, "end": (i + 1) * 2.5} for i in range(7)]
+    def test_scene_intervals_fit_38_to_45_second_target_and_are_ordered(self):
+        intervals = [{"start": i * 5.8, "end": (i + 1) * 5.8} for i in range(7)]
         self.assertEqual(len(acceptance.validate_scene_intervals(intervals)), 7)
-        intervals[2] = {"start": 5.0, "end": 6.99}
-        with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "2.0–3.0"):
+        intervals[2] = {"start": 11.6, "end": 19.0}
+        with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "5.0–7.0"):
             acceptance.validate_scene_intervals(intervals)
-        intervals[2] = {"start": 4.0, "end": 6.5}
+        intervals[2] = {"start": 12.0, "end": 17.5}
         with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "bitişik"):
             acceptance.validate_scene_intervals(intervals)
 
@@ -259,14 +259,14 @@ class ShortsV2GateTests(unittest.TestCase):
                     {"file": name, "sha256": acceptance.sha256_file(root / name)}
                     for name in config["scenes"]
                 ],
-                "mp4_duration_seconds": 17.5,
+                "mp4_duration_seconds": 41.0,
             }
             (root / "render_manifest_v2.json").write_text(json.dumps(manifest), encoding="utf-8")
-            checked = acceptance.validate_render_manifest_v2(root, config, 17.5)
+            checked = acceptance.validate_render_manifest_v2(root, config, 41.0)
             self.assertEqual(checked["voice_provider"], acceptance.VOICE_PROVIDER)
             (root / "mix.wav").write_bytes(b"changed-mix")
             with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "mix_sha256"):
-                acceptance.validate_render_manifest_v2(root, config, 17.5)
+                acceptance.validate_render_manifest_v2(root, config, 41.0)
 
     def test_speed_factor_and_mp4_duration_gates(self):
         for value in (1.0, 1.05, 1.07, 1.10):
@@ -287,11 +287,13 @@ class ShortsV2GateTests(unittest.TestCase):
                 config["voice_speed_factor"] = value
                 with self.assertRaisesRegex(acceptance.ShortsAcceptanceError, "Gemini Charon sesinde tempo"):
                     acceptance.validate_v2_production_context(root, config)
-        self.assertEqual(acceptance.validate_duration(18.0), 18.0)
+        self.assertEqual(acceptance.validate_duration(41.0), 41.0)
         with self.assertRaises(acceptance.ShortsAcceptanceError):
             acceptance.validate_duration(float("nan"))
         with self.assertRaises(acceptance.ShortsAcceptanceError):
             acceptance.validate_duration(30.0)
+        with self.assertRaises(acceptance.ShortsAcceptanceError):
+            acceptance.validate_duration(50.0)
 
 
 if __name__ == "__main__":

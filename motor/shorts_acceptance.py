@@ -22,8 +22,11 @@ SHORTS_VERSION = "shorts-v2.1"
 TEMPLATE_VERSION = "2.2-sablon_v2"
 EXPECTED_SCENES = 7
 SHORTS_CTA = "Daha fazla Bilgi Dozu için takip et!"
-MIN_SCENE_SECONDS = 2.0
-MAX_SCENE_SECONDS = 3.0
+# 7 sahne / 38–45 sn hedefi => sahne başına 5.4–6.4 sn.
+MIN_SCENE_SECONDS = 5.0
+MAX_SCENE_SECONDS = 7.0
+MIN_FINAL_DURATION = 38.0
+MAX_FINAL_DURATION = 45.0
 MIN_AVG_BRIGHTNESS = 100.0
 # Karanlık konulu sahneler (derin deniz, gece, uzay, biyolüminesans) doğal olarak
 # düşük ortalama parlaklığa sahiptir. Bu sahnelerde düz siyah kare yerine
@@ -79,9 +82,11 @@ FINAL_HEIGHT = 1920
 SEMANTIC_THRESHOLD = 0.62
 LOCKED_MIX_TIMING = {
     "intro_lead": 1.45,
-    "sentence_pause": 0.54,
     "outro_hold": 1.45,
 }
+# Cümle arası nefes, 38–45 sn hedefine göre ses uzunluğundan dinamik hesaplanır.
+MIN_SENTENCE_PAUSE = 0.54
+MAX_SENTENCE_PAUSE = 3.2
 
 
 def validate_final_size(width: object, height: object) -> tuple[int, int]:
@@ -169,8 +174,8 @@ def validate_scene_intervals(intervals: list[dict | tuple | list]) -> list[dict]
 
 def validate_duration(duration_seconds: object) -> float:
     duration = _finite_float(duration_seconds, "MP4 süresi")
-    minimum = EXPECTED_SCENES * MIN_SCENE_SECONDS
-    maximum = EXPECTED_SCENES * MAX_SCENE_SECONDS
+    minimum = MIN_FINAL_DURATION
+    maximum = MAX_FINAL_DURATION
     if duration < minimum or duration > maximum:
         raise ShortsAcceptanceError(f"MP4 süresi {duration:.3f}s; v2 hedefi {minimum:.1f}–{maximum:.1f}s")
     return duration
@@ -182,6 +187,11 @@ def validate_locked_mix_timing(config: dict) -> None:
         actual = _finite_float(config.get(key, expected), key)
         if abs(actual - expected) > 1e-6:
             raise ShortsAcceptanceError(f"V2 {key} kilidi uyuşmuyor: {actual} != {expected}")
+    pause = _finite_float(config.get("sentence_pause", MIN_SENTENCE_PAUSE), "sentence_pause")
+    if pause < MIN_SENTENCE_PAUSE - 1e-6 or pause > MAX_SENTENCE_PAUSE + 1e-6:
+        raise ShortsAcceptanceError(
+            f"V2 sentence_pause izin aralığında değil: {pause} "
+            f"({MIN_SENTENCE_PAUSE}–{MAX_SENTENCE_PAUSE})")
 
 
 def _validate_visual_report(report: dict) -> list[dict]:

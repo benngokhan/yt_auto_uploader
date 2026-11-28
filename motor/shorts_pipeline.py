@@ -1270,7 +1270,9 @@ def stage_timing(vdir_arg: str, explicit_cfg_path: str | None = None):
                 else:
                     cut_smp = (i_a + i_b) // 2
                 gap = t_n - t_e
-                add_s = max(0.0, min(0.48, pause_target - gap))
+                # v2 hedefi 38–45 sn olduğu için sahne nefesleri 0.48 sn ile sınırlı kalamaz.
+                pause_cap = 3.0 if v2_context is not None else 0.48
+                add_s = max(0.0, min(pause_cap, pause_target - gap))
                 if add_s >= 0.05:
                     pauses.append((cut_smp, round(add_s, 3)))
 
