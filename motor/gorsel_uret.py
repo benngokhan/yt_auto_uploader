@@ -813,8 +813,6 @@ def cloudflare_ai_gorseller_uret(scene_text: str, scene_index: int, klasor: Path
     model_env = (os.getenv("CLOUDFLARE_AI_IMAGE_MODEL") or "").strip()
     modeller = [model_env] if model_env else [
         "@cf/black-forest-labs/flux-1-schnell",
-        "@cf/stabilityai/stable-diffusion-xl-base-1.0",
-        "@cf/bytedance/stable-diffusion-xl-lightning",
     ]
     prompt = (
         "Photorealistic cinematic documentary image for a science short video. "
@@ -830,9 +828,8 @@ def cloudflare_ai_gorseller_uret(scene_text: str, scene_index: int, klasor: Path
             used_model = model
             url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{model}"
             try:
+                # Flux şeması yalnız prompt kabul eder; num_steps 400 veriyor.
                 body = {"prompt": prompt}
-                if "flux" in model:
-                    body["num_steps"] = 4
                 req = urllib.request.Request(
                     url,
                     data=json.dumps(body).encode("utf-8"),
