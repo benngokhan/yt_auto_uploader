@@ -34,9 +34,10 @@ except ImportError:
     from workspace_paths import workspace_temp_dir
 
 from shorts_acceptance import (
+    MIN_AVG_BRIGHTNESS,
     SEMANTIC_THRESHOLD,
     is_dark_scene,
-    min_brightness_for,
+    luma_is_acceptable,
 )
 
 HEDEF = (1350, 2400)  # Tam 9:16 dikey, Ken Burns zoom için yüksek keskinlik
@@ -161,6 +162,15 @@ def average_image_brightness(image: Image.Image) -> float:
     """Approximate mean Rec. 601 luma in 0..255 from the actual image pixels."""
     small = np.asarray(image.convert("RGB").resize((64, 64), Image.Resampling.BILINEAR), dtype=np.float32)
     return float((0.299 * small[..., 0] + 0.587 * small[..., 1] + 0.114 * small[..., 2]).mean())
+
+
+def _processed_parlaklik_kabul(image: Image.Image, avg: float) -> bool:
+    """İşlenmiş kare için aynı parlaklık kapısını uygular."""
+    if avg >= MIN_AVG_BRIGHTNESS:
+        return True
+    kucuk = np.asarray(image.convert("RGB").resize((270, 480), Image.BILINEAR), dtype=np.float32)
+    luma = 0.299 * kucuk[..., 0] + 0.587 * kucuk[..., 1] + 0.114 * kucuk[..., 2]
+    return luma_is_acceptable(luma)
 
 
 # Alaka ölçümünde sayılmayan süs/sanat kelimeleri.
@@ -441,15 +451,9 @@ def _ham_kusurlu_mu(im: Image.Image, scene_text: str = "") -> tuple[bool, str]:
 
     luma = (0.299 * kucuk[..., 0] + 0.587 * kucuk[..., 1] + 0.114 * kucuk[..., 2]) / 255.0
     avg_luma = float(luma.mean() * 255.0)
-    if avg_luma < min_brightness_for(scene_text):
+    # Anahtar kelimeye bakılmaz: karanlık ama ışıklı/kontrastlı kare gerçek görseldir.
+    if not luma_is_acceptable(luma * 255.0):
         return True, f"karanlik_gorsel({avg_luma:.1f}/255)"
-    if karanlik_sahne:
-        # Düz siyah/boş kare değil: görünür ışık kaynağı veya aydınlatılmış özne olmalı.
-        parlak_oran = float(np.mean(luma > 0.55))
-        if parlak_oran < 0.004:
-            return True, f"isik_kaynagi_yok({parlak_oran:.3f})"
-        if float(np.std(luma)) < 0.035:
-            return True, f"kontrast_yetersiz(std={float(np.std(luma)):.3f})"
     patlak_oran = float(np.mean(luma > 0.95))
     if patlak_oran > 0.34:
         return True, f"patlamis_isik({patlak_oran:.2f})"
@@ -1122,7 +1126,7 @@ def sahneler_icin_gorseller(
                             processed = sinematik_isle(dikey_kirp(duzeltilen), tohum=20261100 + scene_index)
                         record["logo_check"] = logo_bilgi
                         processed_brightness = average_image_brightness(processed)
-                        if processed_brightness < min_brightness_for(scene_text):
+                        if not _processed_parlaklik_kabul(processed, processed_brightness):
                             record["rejection_reason"] = f"processed_dark_image:{processed_brightness:.1f}/255"
                             raw.unlink(missing_ok=True)
                             continue
@@ -1210,7 +1214,7 @@ def sahneler_icin_gorseller(
                             processed = sinematik_isle(dikey_kirp(duzeltilen), tohum=20261100 + scene_index)
                         record["logo_check"] = logo_bilgi
                         processed_brightness = average_image_brightness(processed)
-                        if processed_brightness < min_brightness_for(scene_text):
+                        if not _processed_parlaklik_kabul(processed, processed_brightness):
                             record["rejection_reason"] = f"processed_dark_image:{processed_brightness:.1f}/255"
                             raw.unlink(missing_ok=True)
                             continue
@@ -1294,7 +1298,7 @@ def sahneler_icin_gorseller(
                             processed = sinematik_isle(dikey_kirp(duzeltilen), tohum=20261100 + scene_index)
                         record["logo_check"] = logo_bilgi
                         processed_brightness = average_image_brightness(processed)
-                        if processed_brightness < min_brightness_for(scene_text):
+                        if not _processed_parlaklik_kabul(processed, processed_brightness):
                             record["rejection_reason"] = f"processed_dark_image:{processed_brightness:.1f}/255"
                             raw.unlink(missing_ok=True)
                             continue

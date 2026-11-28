@@ -146,6 +146,7 @@ class PexelsGorselPipelineTests(unittest.TestCase):
         clean_im = _make_textured_photo(1080, 1620, base_rgb=(150, 170, 190), bright_border=False)
         bad_im = _make_textured_photo(1080, 1620, base_rgb=(120, 120, 120), bright_border=True)
         dark_im = _make_textured_photo(1080, 1620, base_rgb=(12, 18, 25), bright_border=False)
+        ImageDraw.Draw(dark_im).ellipse((270, 405, 810, 1215), fill=(12, 18, 25))
 
         kusur_clean, neden_clean = gorsel_uret._ham_kusurlu_mu(clean_im)
         kusur_bad, neden_bad = gorsel_uret._ham_kusurlu_mu(bad_im)
@@ -165,6 +166,10 @@ class PexelsGorselPipelineTests(unittest.TestCase):
         flat = Image.new("RGB", (1080, 1620), (10, 15, 20))
         bad, why = gorsel_uret._ham_kusurlu_mu(flat, "derin denizde biyolüminesans")
         self.assertTrue(bad, why)
+
+        # Kapı anahtar kelimeye değil piksele bakar: nötr metinde de ışıklı kare geçer.
+        ok2, reason2 = gorsel_uret._ham_kusurlu_mu(glow, "plankton")
+        self.assertFalse(ok2, reason2)
 
     def test_live_gemini_score_gate_rejects_absent_invalid_and_wrong_origin(self):
         self.assertTrue(gorsel_uret._record_score_passes({

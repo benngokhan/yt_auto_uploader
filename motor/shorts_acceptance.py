@@ -43,9 +43,27 @@ def is_dark_scene(scene_text: object) -> bool:
     return any(hint in text for hint in DARK_SCENE_HINTS)
 
 
-def min_brightness_for(scene_text: object) -> float:
-    """Sahne türüne göre kabul edilen en düşük ortalama parlaklık (0..255)."""
-    return MIN_AVG_BRIGHTNESS_DARK if is_dark_scene(scene_text) else MIN_AVG_BRIGHTNESS
+def luma_is_acceptable(luma: object) -> bool:
+    """Parlaklık kapısı (luma 0..255).
+
+    Normal pozlamalı kareler doğrudan geçer. Karanlık kareler yalnızca
+    görünür ışık kaynağı (>=%0.4 parlak piksel) VE yeterli kontrast
+    (std >= 9/255) varsa geçer; düz siyah/boş kare fail-closed kalır.
+    """
+    import numpy as np
+
+    arr = np.asarray(luma, dtype=np.float32)
+    if arr.size == 0:
+        return False
+    avg = float(arr.mean())
+    if avg >= MIN_AVG_BRIGHTNESS:
+        return True
+    if avg < MIN_AVG_BRIGHTNESS_DARK:
+        return False
+    return (
+        float(np.mean(arr > 0.55 * 255.0)) >= 0.004
+        and float(np.std(arr)) >= 0.035 * 255.0
+    )
 # Ses sabiti: "Arena" etiketi yok. Referans, 097 üretimindeki Gemini TTS Charon sesidir.
 VOICE_PROVIDER = "gemini_tts"
 VOICE_ID = "Charon"
@@ -316,7 +334,7 @@ def validate_v2_production_context(work_dir: str | Path, config: dict) -> dict |
             luma += 0.587 * np.asarray(rgb.getchannel("G"), dtype=np.float32)
             luma += 0.114 * np.asarray(rgb.getchannel("B"), dtype=np.float32)
             brightness = float(luma.mean())
-        if brightness < min_brightness_for(rows[index - 1].get("scene_text") if index - 1 < len(rows) else ""):
+        if not luma_is_acceptable(luma):
             raise ShortsAcceptanceError(f"Sahne {index} görseli karanlık ({brightness:.1f}/255)")
 
     return {
