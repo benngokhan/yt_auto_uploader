@@ -904,7 +904,7 @@ def gemini_ai_gorseller_uret(scene_text: str, scene_index: int, klasor: Path, ad
         return []
     modeller = [
         os.getenv("GEMINI_IMAGE_MODEL", "").strip() or "gemini-2.5-flash-image",
-        "gemini-2.0-flash-preview-image-generation",
+        "gemini-2.5-flash-image-preview",
     ]
     # dedupe preserving order
     seen_m = set(); modeller = [m for m in modeller if m and not (m in seen_m or seen_m.add(m))]

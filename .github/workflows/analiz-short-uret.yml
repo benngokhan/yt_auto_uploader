@@ -115,6 +115,36 @@ jobs:
                   print('CF_TANI',model,type(e).__name__)
           PY
 
+      - name: Gemini görsel tanı
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python - <<'PY'
+          import os, json, urllib.request, urllib.error
+          key=(os.getenv('GEMINI_API_KEY') or '').strip()
+          if not key:
+              print('GEMINI_TANI: key yok')
+              raise SystemExit(0)
+          try:
+              with urllib.request.urlopen(f'https://generativelanguage.googleapis.com/v1beta/models?key={key}', timeout=60) as r:
+                  data=json.load(r)
+              isimler=[m.get('name','') for m in data.get('models',[]) if 'image' in m.get('name','').lower()]
+              print('GEMINI_TANI modeller:', ', '.join(isimler[:20]) or 'image modeli yok')
+          except urllib.error.HTTPError as e:
+              print('GEMINI_TANI liste HTTP', e.code, e.read().decode('utf-8','replace')[:200])
+          for model in ['gemini-2.5-flash-image','gemini-2.5-flash-image-preview']:
+              body=json.dumps({'contents':[{'parts':[{'text':'a simple red sphere on white background'}]}],'generationConfig':{'responseModalities':['TEXT','IMAGE']}}).encode()
+              req=urllib.request.Request(f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}',data=body,headers={'Content-Type':'application/json'})
+              try:
+                  with urllib.request.urlopen(req,timeout=120) as r:
+                      raw=r.read()
+                  print('GEMINI_TANI',model,'OK',len(raw))
+              except urllib.error.HTTPError as e:
+                  print('GEMINI_TANI',model,'HTTP',e.code,e.read().decode('utf-8','replace')[:200])
+              except Exception as e:
+                  print('GEMINI_TANI',model,type(e).__name__)
+          PY
+
       - name: Üret + Telegram onayı + teslim
         env:
           COQUI_TOS_AGREED: "1"
